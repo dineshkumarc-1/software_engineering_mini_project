@@ -15,6 +15,23 @@ void check(bool condition, const char* message) {
     }
 }
 
+bool isInsideGrid(snake::GridPosition position) {
+    return position.x >= 0 &&
+           position.x < snake::config::GridColumns &&
+           position.y >= 0 &&
+           position.y < snake::config::GridRows;
+}
+
+bool isOnSnake(const snake::GameEngine& game,
+               snake::GridPosition position) {
+    for (const auto& segment : game.snake()) {
+        if (segment == position) {
+            return true;
+        }
+    }
+    return false;
+}
+
 void testInitialSnake() {
     snake::GameEngine game;
     const auto& body = game.snake();
@@ -29,6 +46,54 @@ void testInitialSnake() {
           "tail starts behind the second segment");
     check(game.direction() == snake::Direction::Right,
           "snake initially faces right");
+}
+
+void testRandomFoodSpawnsOnFreeCell() {
+    snake::GameEngine game;
+
+    check(game.hasFood(),
+          "food exists when the game starts");
+
+    const auto food = game.food();
+
+    check(isInsideGrid(food),
+          "food spawns inside the grid");
+    check(!isOnSnake(game, food),
+          "food does not spawn on the snake");
+}
+
+void testEatingFoodGrowsSnakeAndRespawnsFood() {
+    std::deque<snake::GridPosition> body = {
+        {5, 5},
+        {4, 5},
+        {3, 5}
+    };
+
+    // The snake faces right, and food is directly in front of its head.
+    const snake::GridPosition initialFood{6, 5};
+
+    snake::GameEngine game(
+        body, snake::Direction::Right, initialFood);
+
+    check(game.hasFood(),
+          "test food is placed successfully");
+    check(game.food() == initialFood,
+          "test food starts at the requested position");
+
+    game.tick();
+
+    check(game.snake().size() == body.size() + 1,
+          "eating food increases snake length by exactly one");
+    check(game.snake().front() == initialFood,
+          "snake head moves onto the eaten food cell");
+    check(game.hasFood(),
+          "replacement food exists immediately after eating");
+    check(isInsideGrid(game.food()),
+          "replacement food is inside the grid");
+    check(!isOnSnake(game, game.food()),
+          "replacement food does not overlap the snake");
+    check(game.food() != initialFood,
+          "replacement food is different from the eaten cell");
 }
 
 void testMovement() {
@@ -112,7 +177,6 @@ void testQueuedReverseIsRejected() {
 void testWallCollision() {
     snake::GameEngine game;
 
-    // Move right until the next move would leave the grid.
     for (int i = 0; i < snake::config::GridColumns; ++i) {
         game.tick();
     }
@@ -153,11 +217,7 @@ void testTickDoesNothingAfterGameOver() {
           "further ticks do not move the snake after game over");
 }
 
-
-
 void testSelfCollision() {
-    // The head is at (2,2), moving right.
-    // The next cell (3,2) is occupied by a non-tail segment.
     std::deque<snake::GridPosition> body = {
         {2, 2},
         {1, 2},
@@ -175,11 +235,13 @@ void testSelfCollision() {
           "self-collision sets the game-over flag");
 }
 
-
 } // namespace
 
 int main() {
     testInitialSnake();
+    testRandomFoodSpawnsOnFreeCell();
+    testEatingFoodGrowsSnakeAndRespawnsFood();
+
     testMovement();
     testDirectionChanges();
     testTwoQueuedTurns();
