@@ -49,7 +49,12 @@ if(SNAKE_BUILD_APP)
     target_link_libraries(snake_presentation PUBLIC snake_app_state sfml-graphics sfml-window sfml-system)
     snake_warnings(snake_presentation)
     add_executable(SnakeXtreme src/main.cpp)
-    target_link_libraries(SnakeXtreme PRIVATE snake_presentation)
+    target_link_libraries(
+        SnakeXtreme
+        PRIVATE
+        snake_presentation
+        snake_scoring
+    )
     snake_warnings(SnakeXtreme)
     # Shared-library builds on Windows need the SFML DLLs beside the executable.
     if(WIN32 AND SNAKE_FETCH_SFML AND BUILD_SHARED_LIBS)

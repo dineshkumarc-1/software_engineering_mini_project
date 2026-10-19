@@ -26,7 +26,12 @@ int AppManager::run() {
             accumulator -= fixedStep;
         }
         window_.clear(sf::Color(15, 23, 32));
-        renderer_.draw(window_, state_.screen());
+        renderer_.draw(
+            window_,
+            state_.screen(),
+            scoreService_.currentScore(),
+        scoreService_.highScore()
+        );
         window_.display();
     }
     return 0;
@@ -62,9 +67,17 @@ void AppManager::pollEvents() {
 }
 
 void AppManager::dispatch(Action action) {
+    if (action == Action::Start) {
+        scoreService_.reset();
+    }
+
     state_.dispatch(action);
-    if (state_.screen() == Screen::Exiting) window_.close();
-    else updateTitle();
+
+    if (state_.screen() == Screen::Exiting) {
+        window_.close();
+    } else {
+        updateTitle();
+    }
 }
 
 void AppManager::update(sf::Time step) {
