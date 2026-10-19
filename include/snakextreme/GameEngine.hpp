@@ -1,4 +1,3 @@
-
 #pragma once
 
 #include <cstddef>
@@ -26,6 +25,12 @@ enum class Direction {
     Right
 };
 
+enum class GameOverReason {
+    None,
+    WALL,
+    SELF
+};
+
 class GameEngine {
 public:
     GameEngine();
@@ -40,12 +45,15 @@ public:
     void tick();
 
     bool isGameOver() const noexcept;
+    GameOverReason gameOverReason() const noexcept;
 
 private:
     std::deque<GridPosition> snake_;
     std::deque<Direction> directionQueue_;
     Direction direction_{Direction::Right};
+
     bool gameOver_{false};
+    GameOverReason gameOverReason_{GameOverReason::None};
 };
 
 } // namespace snake
