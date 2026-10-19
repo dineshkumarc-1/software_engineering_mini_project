@@ -4,6 +4,7 @@
 
 #include <cstdlib>
 #include <iostream>
+#include <deque>
 
 namespace {
 
@@ -108,6 +109,73 @@ void testQueuedReverseIsRejected() {
           "reverse of the queued direction is rejected");
 }
 
+void testWallCollision() {
+    snake::GameEngine game;
+
+    // Move right until the next move would leave the grid.
+    for (int i = 0; i < snake::config::GridColumns; ++i) {
+        game.tick();
+    }
+
+    check(game.isGameOver(),
+          "wall collision sets the game-over flag");
+}
+
+void testSnakeDoesNotMoveAfterWallCollision() {
+    snake::GameEngine game;
+
+    for (int i = 0; i < snake::config::GridColumns; ++i) {
+        game.tick();
+    }
+
+    const auto bodyAfterCollision = game.snake();
+
+    game.tick();
+
+    check(game.snake() == bodyAfterCollision,
+          "snake remains in place after wall collision");
+}
+
+void testTickDoesNothingAfterGameOver() {
+    snake::GameEngine game;
+
+    for (int i = 0; i < snake::config::GridColumns; ++i) {
+        game.tick();
+    }
+
+    const auto bodyAfterCollision = game.snake();
+
+    game.changeDirection(snake::Direction::Up);
+    game.tick();
+    game.tick();
+
+    check(game.snake() == bodyAfterCollision,
+          "further ticks do not move the snake after game over");
+}
+
+
+
+void testSelfCollision() {
+    // The head is at (2,2), moving right.
+    // The next cell (3,2) is occupied by a non-tail segment.
+    std::deque<snake::GridPosition> body = {
+        {2, 2},
+        {1, 2},
+        {1, 1},
+        {2, 1},
+        {3, 1},
+        {3, 2},
+        {4, 2}
+    };
+
+    snake::GameEngine game(body, snake::Direction::Right);
+    game.tick();
+
+    check(game.isGameOver(),
+          "self-collision sets the game-over flag");
+}
+
+
 } // namespace
 
 int main() {
@@ -117,6 +185,11 @@ int main() {
     testTwoQueuedTurns();
     testQueueLimit();
     testQueuedReverseIsRejected();
+
+    testWallCollision();
+    testSnakeDoesNotMoveAfterWallCollision();
+    testTickDoesNothingAfterGameOver();
+    testSelfCollision();
 
     std::cout << "All game engine tests passed.\n";
     return EXIT_SUCCESS;
