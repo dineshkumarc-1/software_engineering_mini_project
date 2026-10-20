@@ -4,7 +4,7 @@
 
 #include <catch2/catch_test_macros.hpp>
 #include <stdexcept>
-
+#include <vector>
 #include <algorithm>
 #include <deque>
 
@@ -162,6 +162,69 @@ TEST_CASE("Snake does not move after wall collision",
     REQUIRE(game.gameOverReason() == snake::GameOverReason::WALL);
 }
 
+TEST_CASE("Wall collision is detected at all four boundaries",
+          "[engine][collision][walls]") {
+    SECTION("Left boundary") {
+        std::deque<snake::GridPosition> body = {
+            {0, 5}, {1, 5}, {2, 5}
+        };
+
+        snake::GameEngine game(
+            body, snake::Direction::Left, {10, 10});
+
+        game.tick();
+
+        REQUIRE(game.isGameOver());
+        REQUIRE(game.gameOverReason() == snake::GameOverReason::WALL);
+    }
+
+    SECTION("Right boundary") {
+        std::deque<snake::GridPosition> body = {
+            {snake::config::GridColumns - 1, 5},
+            {snake::config::GridColumns - 2, 5},
+            {snake::config::GridColumns - 3, 5}
+        };
+
+        snake::GameEngine game(
+            body, snake::Direction::Right, {10, 10});
+
+        game.tick();
+
+        REQUIRE(game.isGameOver());
+        REQUIRE(game.gameOverReason() == snake::GameOverReason::WALL);
+    }
+
+    SECTION("Top boundary") {
+        std::deque<snake::GridPosition> body = {
+            {5, 0}, {5, 1}, {5, 2}
+        };
+
+        snake::GameEngine game(
+            body, snake::Direction::Up, {10, 10});
+
+        game.tick();
+
+        REQUIRE(game.isGameOver());
+        REQUIRE(game.gameOverReason() == snake::GameOverReason::WALL);
+    }
+
+    SECTION("Bottom boundary") {
+        std::deque<snake::GridPosition> body = {
+            {5, snake::config::GridRows - 1},
+            {5, snake::config::GridRows - 2},
+            {5, snake::config::GridRows - 3}
+        };
+
+        snake::GameEngine game(
+            body, snake::Direction::Down, {10, 10});
+
+        game.tick();
+
+        REQUIRE(game.isGameOver());
+        REQUIRE(game.gameOverReason() == snake::GameOverReason::WALL);
+    }
+}
+
 TEST_CASE("Self-collision ends the game",
           "[engine][collision]") {
     std::deque<snake::GridPosition> body = {
@@ -234,6 +297,66 @@ TEST_CASE("Eating food grows the snake by exactly one segment",
     }
 }
 
+
+
+TEST_CASE("Ten consecutive food consumptions grow the snake by ten",
+          "[engine][food][growth]") {
+    std::deque<snake::GridPosition> body = {
+        {5, 5}, {4, 5}, {3, 5}
+    };
+
+    int nextFoodX = 7;
+
+    auto selector = [&nextFoodX](
+        const std::vector<snake::GridPosition>& freeCells
+    ) -> snake::GridPosition {
+        const snake::GridPosition target{nextFoodX, 5};
+
+        const auto found = std::find(
+            freeCells.begin(), freeCells.end(), target
+        );
+
+        if (found == freeCells.end()) {
+            throw std::runtime_error(
+                "Expected next food cell to be free"
+            );
+        }
+
+        ++nextFoodX;
+        return target;
+    };
+
+    snake::GameEngine game(
+        body,
+        snake::Direction::Right,
+        {6, 5},
+        selector
+    );
+
+    for (int foodCount = 1; foodCount <= 10; ++foodCount) {
+        const auto food = game.food();
+
+        REQUIRE(game.hasFood());
+        REQUIRE(game.snake().size() ==
+                body.size() + static_cast<std::size_t>(foodCount - 1));
+
+        game.tick();
+
+        REQUIRE_FALSE(game.isGameOver());
+        REQUIRE(game.snake().size() ==
+                body.size() + static_cast<std::size_t>(foodCount));
+        REQUIRE(game.snake().front() == food);
+
+        for (const auto& segment : game.snake()) {
+            REQUIRE(game.food() != segment);
+        }
+    }
+
+    REQUIRE(game.snake().size() == 13);
+}
+
+
+
 TEST_CASE("Eating food respawns it on a free cell",
           "[engine][food]") {
     std::deque<snake::GridPosition> body = {
@@ -249,6 +372,34 @@ TEST_CASE("Eating food respawns it on a free cell",
 
     for (const auto& segment : game.snake()) {
         REQUIRE(game.food() != segment);
+    }
+}
+
+TEST_CASE("Food respawns on a free in-grid cell across 1000 trials",
+          "[engine][food][stress]") {
+    for (int trial = 0; trial < 1000; ++trial) {
+        std::deque<snake::GridPosition> body = {
+            {5, 5}, {4, 5}, {3, 5}
+        };
+
+        snake::GameEngine game(
+            body, snake::Direction::Right, {6, 5});
+
+        game.tick();
+
+        REQUIRE(game.hasFood());
+        REQUIRE_FALSE(game.isGameOver());
+
+        const auto food = game.food();
+
+        REQUIRE(food.x >= 0);
+        REQUIRE(food.x < snake::config::GridColumns);
+        REQUIRE(food.y >= 0);
+        REQUIRE(food.y < snake::config::GridRows);
+
+        for (const auto& segment : game.snake()) {
+            REQUIRE(food != segment);
+        }
     }
 }
 

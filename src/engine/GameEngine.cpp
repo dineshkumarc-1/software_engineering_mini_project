@@ -1,8 +1,10 @@
+
 #include "snakextreme/GameEngine.hpp"
 #include "snakextreme/GameConfig.hpp"
 
 #include <algorithm>
 #include <stdexcept>
+#include <utility>
 #include <vector>
 
 namespace snake {
@@ -36,7 +38,8 @@ GameEngine::GameEngine(
     std::deque<GridPosition> initialSnake,
     Direction initialDirection
 )
-    : snake_(initialSnake), direction_(initialDirection) {
+    : snake_(std::move(initialSnake)),
+      direction_(initialDirection) {
     validateInitialSnake(snake_);
     spawnFood();
 }
@@ -46,7 +49,8 @@ GameEngine::GameEngine(
     Direction initialDirection,
     GridPosition initialFood
 )
-    : snake_(initialSnake), direction_(initialDirection) {
+    : snake_(std::move(initialSnake)),
+      direction_(initialDirection) {
     validateInitialSnake(snake_);
 
     const bool inside =
@@ -67,6 +71,28 @@ GameEngine::GameEngine(
 
     food_ = initialFood;
     hasFood_ = true;
+}
+
+GameEngine::GameEngine(
+    std::deque<GridPosition> initialSnake,
+    Direction initialDirection,
+    GridPosition initialFood,
+    std::function<GridPosition(
+        const std::vector<GridPosition>&
+    )> foodSelector
+)
+    : GameEngine(
+          std::move(initialSnake),
+          initialDirection,
+          initialFood
+      ) {
+    if (!foodSelector) {
+        throw std::invalid_argument(
+            "Food selector must not be empty"
+        );
+    }
+
+    foodSelector_ = std::move(foodSelector);
 }
 
 const std::deque<GridPosition>& GameEngine::snake() const noexcept {
@@ -134,13 +160,29 @@ bool GameEngine::spawnFood() {
         return false;
     }
 
-    std::uniform_int_distribution<std::size_t> choose(
-        0, freeCells.size() - 1
-    );
+    if (foodSelector_) {
+        const GridPosition selected = foodSelector_(freeCells);
 
-    food_ = freeCells[choose(randomEngine_)];
+        const bool isFree = std::find(
+            freeCells.begin(), freeCells.end(), selected
+        ) != freeCells.end();
+
+        if (!isFree) {
+            throw std::invalid_argument(
+                "Food selector must choose a free cell"
+            );
+        }
+
+        food_ = selected;
+    } else {
+        std::uniform_int_distribution<std::size_t> choose(
+            0, freeCells.size() - 1
+        );
+
+        food_ = freeCells[choose(randomEngine_)];
+    }
+
     hasFood_ = true;
-
     return true;
 }
 

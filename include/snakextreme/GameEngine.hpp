@@ -3,7 +3,9 @@
 
 #include <cstddef>
 #include <deque>
+#include <functional>
 #include <random>
+#include <vector>
 
 namespace snake {
 
@@ -43,11 +45,21 @@ public:
         Direction initialDirection
     );
 
-    // Constructor for deterministic food-related tests.
+    // Constructor for deterministic initial-food tests.
     GameEngine(
         std::deque<GridPosition> initialSnake,
         Direction initialDirection,
         GridPosition initialFood
+    );
+
+    // Constructor allowing deterministic food placement in tests.
+    GameEngine(
+        std::deque<GridPosition> initialSnake,
+        Direction initialDirection,
+        GridPosition initialFood,
+        std::function<GridPosition(
+            const std::vector<GridPosition>&
+        )> foodSelector
     );
 
     const std::deque<GridPosition>& snake() const noexcept;
@@ -72,6 +84,10 @@ private:
     bool hasFood_{false};
 
     std::mt19937 randomEngine_{std::random_device{}()};
+
+    std::function<GridPosition(
+        const std::vector<GridPosition>&
+    )> foodSelector_;
 
     bool spawnFood();
 
