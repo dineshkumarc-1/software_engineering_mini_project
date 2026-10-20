@@ -19,6 +19,10 @@ endfunction()
 add_library(snake_app_state src/app/AppState.cpp)
 target_include_directories(snake_app_state PUBLIC include)
 snake_warnings(snake_app_state)
+# SFML-free core gameplay engine, suitable for headless testing.
+add_library(snake_engine src/engine/GameEngine.cpp)
+target_include_directories(snake_engine PUBLIC include)
+snake_warnings(snake_engine)
 
 add_library(snake_scoring src/scoring/ScoreService.cpp)
 target_include_directories(snake_scoring PUBLIC include)
@@ -46,7 +50,7 @@ if(SNAKE_BUILD_APP)
         src/presentation/AppManager.cpp
         src/presentation/Renderer.cpp)
     target_include_directories(snake_presentation PUBLIC include)
-    target_link_libraries(snake_presentation PUBLIC snake_app_state sfml-graphics sfml-window sfml-system)
+    target_link_libraries(snake_presentation PUBLIC snake_app_state snake_engine sfml-graphics sfml-window sfml-system)
     snake_warnings(snake_presentation)
     add_executable(SnakeXtreme src/main.cpp)
     target_link_libraries(
@@ -73,12 +77,20 @@ if(BUILD_TESTING)
     snake_warnings(app_state_tests)
     add_test(NAME app_state_flow COMMAND app_state_tests)
 
+
     add_executable(score_service_tests tests/ScoreServiceTests.cpp)
     target_link_libraries(score_service_tests PRIVATE snake_scoring)
     snake_warnings(score_service_tests)
     add_test(NAME score_service COMMAND score_service_tests)
+
     add_executable(game_session_tests tests/GameSessionTests.cpp)
     target_link_libraries(game_session_tests PRIVATE snake_scoring)
     snake_warnings(game_session_tests)
     add_test(NAME game_session COMMAND game_session_tests)
+
+    add_executable(game_engine_tests tests/GameEngineTests.cpp)
+    target_link_libraries(game_engine_tests PRIVATE snake_engine)
+    snake_warnings(game_engine_tests)
+    add_test(NAME game_engine COMMAND game_engine_tests)
 endif()
+
