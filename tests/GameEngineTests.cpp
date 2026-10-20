@@ -98,6 +98,7 @@ TEST_CASE("Direction queue accepts at most two turns",
     REQUIRE(game.direction() == snake::Direction::Left);
 }
 
+
 TEST_CASE("Reversal of the last queued direction is rejected",
           "[engine][direction]") {
     std::deque<snake::GridPosition> body = {
@@ -110,11 +111,19 @@ TEST_CASE("Reversal of the last queued direction is rejected",
     game.changeDirection(snake::Direction::Up);
     game.changeDirection(snake::Direction::Down);
 
+    // The Down turn reverses the queued Up turn, so it must be rejected.
     game.tick();
 
     REQUIRE(game.direction() == snake::Direction::Up);
     REQUIRE(game.snake().front() == snake::GridPosition{5, 4});
+
+    // Check that the rejected reversal does not take effect on the next tick.
+    game.tick();
+
+    REQUIRE(game.direction() == snake::Direction::Up);
+    REQUIRE(game.snake().front() == snake::GridPosition{5, 3});
 }
+
 
 TEST_CASE("Wall collision ends the game",
           "[engine][collision]") {
