@@ -2,6 +2,7 @@
 #include "snakextreme/GameConfig.hpp"
 #include "snakextreme/GameEngine.hpp"
 
+#include <algorithm>
 #include <cstdlib>
 #include <deque>
 #include <iostream>
@@ -30,6 +31,24 @@ bool isOnSnake(const snake::GameEngine& game,
         }
     }
     return false;
+}
+
+// Create a snake occupying every grid cell except freeCell.
+std::deque<snake::GridPosition> snakeOccupyingAllBut(
+    snake::GridPosition freeCell) {
+    std::deque<snake::GridPosition> body;
+
+    for (int y = 0; y < snake::config::GridRows; ++y) {
+        for (int x = 0; x < snake::config::GridColumns; ++x) {
+            snake::GridPosition cell{x, y};
+
+            if (cell != freeCell) {
+                body.push_back(cell);
+            }
+        }
+    }
+
+    return body;
 }
 
 void testInitialSnake() {
@@ -69,7 +88,6 @@ void testEatingFoodGrowsSnakeAndRespawnsFood() {
         {3, 5}
     };
 
-    // The snake faces right, and food is directly in front of its head.
     const snake::GridPosition initialFood{6, 5};
 
     snake::GameEngine game(
@@ -103,7 +121,7 @@ void testMovement() {
         {13, 10}
     };
 
-    // Explicit food placement prevents random food from affecting this test.
+    // Explicit food placement keeps this movement test deterministic.
     snake::GameEngine game(
         body, snake::Direction::Right, snake::GridPosition{20, 15});
 
@@ -115,6 +133,29 @@ void testMovement() {
           "snake length stays constant without food");
     check(game.snake().back() == snake::GridPosition{14, 10},
           "tail moves forward when the snake moves");
+}
+
+void testSafeTailCellMovement() {
+    std::deque<snake::GridPosition> body = {
+        {2, 2},
+        {2, 3},
+        {1, 3},
+        {1, 2}
+    };
+
+    snake::GameEngine game(
+        body,
+        snake::Direction::Left,
+        snake::GridPosition{5, 5});
+
+    game.tick();
+
+    check(!game.isGameOver(),
+          "moving into the vacating tail cell is safe");
+    check(game.snake().front() == snake::GridPosition{1, 2},
+          "head moves into the tail's previous cell");
+    check(game.snake().size() == body.size(),
+          "safe tail-cell movement preserves snake length");
 }
 
 void testDirectionChanges() {
@@ -131,7 +172,14 @@ void testDirectionChanges() {
     game.changeDirection(snake::Direction::Down);
 
     check(game.direction() == snake::Direction::Up,
-          "snake rejects a direct reversal");
+          "snake rejects a direct reversal before the tick");
+
+    game.tick();
+
+    check(game.direction() == snake::Direction::Up,
+          "snake direction remains unchanged after rejected reversal");
+    check(game.snake().front() == snake::GridPosition{15, 8},
+          "snake continues upward after rejected reversal");
 }
 
 void testTwoQueuedTurns() {
@@ -190,6 +238,73 @@ void testQueuedReverseIsRejected() {
           "reverse of the queued direction is rejected");
     check(game.snake().front() == snake::GridPosition{15, 9},
           "snake moves up rather than reversing after the tick");
+}
+
+void testOneRemainingFreeCell() {
+    const snake::GridPosition lastCell{5, 5};
+    auto body = snakeOccupyingAllBut(lastCell);
+
+    snake::GameEngine game(body, snake::Direction::Right);
+
+    check(game.hasFood(),
+          "food spawns when one free cell remains");
+    check(game.food() == lastCell,
+          "food occupies the only remaining free cell");
+    check(!game.isGameOver(),
+          "board is not full while one free cell remains");
+}
+
+void testEatingLastFoodFillsBoard() {
+    const snake::GridPosition lastCell{1, 0};
+    auto body = snakeOccupyingAllBut(lastCell);
+
+    // Reorder the body so its head starts at (0, 0), facing right.
+    const auto head = std::find(
+        body.begin(), body.end(), snake::GridPosition{0, 0});
+
+    check(head != body.end(),
+          "test setup contains the initial head cell");
+
+    body.erase(head);
+    body.push_front({0, 0});
+
+    snake::GameEngine game(
+        body,
+        snake::Direction::Right,
+        lastCell);
+
+    check(game.hasFood(),
+          "last food is available before the final move");
+
+    game.tick();
+
+    check(game.isGameOver(),
+          "eating the last food ends the game");
+    check(!game.hasFood(),
+          "no food remains when the board is full");
+    check(game.gameOverReason() == snake::GameOverReason::BOARD_FULL,
+          "eating the last food reports BOARD_FULL");
+    check(game.snake().size() == body.size() + 1,
+          "eating the last food still grows the snake");
+}
+
+void testAlreadyFullBoardReportsBoardFull() {
+    std::deque<snake::GridPosition> body;
+
+    for (int y = 0; y < snake::config::GridRows; ++y) {
+        for (int x = 0; x < snake::config::GridColumns; ++x) {
+            body.push_back({x, y});
+        }
+    }
+
+    snake::GameEngine game(body, snake::Direction::Right);
+
+    check(game.isGameOver(),
+          "an already-full board ends the game");
+    check(!game.hasFood(),
+          "an already-full board has no food");
+    check(game.gameOverReason() == snake::GameOverReason::BOARD_FULL,
+          "an already-full board reports BOARD_FULL");
 }
 
 void testWallCollision() {
@@ -265,10 +380,15 @@ int main() {
     testEatingFoodGrowsSnakeAndRespawnsFood();
 
     testMovement();
+    testSafeTailCellMovement();
     testDirectionChanges();
     testTwoQueuedTurns();
     testQueueLimit();
     testQueuedReverseIsRejected();
+
+    testOneRemainingFreeCell();
+    testEatingLastFoodFillsBoard();
+    testAlreadyFullBoardReportsBoardFull();
 
     testWallCollision();
     testSnakeDoesNotMoveAfterWallCollision();

@@ -30,7 +30,8 @@ enum class Direction {
 enum class GameOverReason {
     None,
     WALL,
-    SELF
+    SELF,
+    BOARD_FULL
 };
 
 class GameEngine {

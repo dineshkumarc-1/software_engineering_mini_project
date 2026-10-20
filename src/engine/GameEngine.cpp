@@ -87,6 +87,7 @@ bool GameEngine::spawnFood() {
     if (availableCells.empty()) {
         hasFood_ = false;
         gameOver_ = true;
+        gameOverReason_ = GameOverReason::BOARD_FULL;
         return false;
     }
 
