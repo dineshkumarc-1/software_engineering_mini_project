@@ -29,8 +29,8 @@ int AppManager::run() {
         renderer_.draw(
             window_,
             state_.screen(),
-            scoreService_.currentScore(),
-        scoreService_.highScore()
+            gameSession_.currentScore(),
+            gameSession_.highScore()
         );
         window_.display();
     }
@@ -68,7 +68,7 @@ void AppManager::pollEvents() {
 
 void AppManager::dispatch(Action action) {
     if (action == Action::Start) {
-        scoreService_.reset();
+        gameSession_.start();
     }
 
     state_.dispatch(action);
@@ -79,7 +79,6 @@ void AppManager::dispatch(Action action) {
         updateTitle();
     }
 }
-
 void AppManager::update(sf::Time step) {
     if (state_.screen() != Screen::Gameplay) return;
     // Integration seam for the SFML-free engine; do not put game rules here.

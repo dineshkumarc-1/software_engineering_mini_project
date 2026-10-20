@@ -2,7 +2,7 @@
 #include "snakextreme/AppState.hpp"
 #include "snakextreme/Renderer.hpp"
 #include <SFML/Graphics.hpp>
-#include "snakextreme/ScoreService.hpp"
+#include "snakextreme/GameSession.hpp"
 
 namespace snake {
 class AppManager {
@@ -17,6 +17,6 @@ private:
     sf::RenderWindow window_;
     AppState state_;
     Renderer renderer_;
-    ScoreService scoreService_;
+    GameSession gameSession_;
 };
 } // namespace snake
