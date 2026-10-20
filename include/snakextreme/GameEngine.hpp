@@ -27,6 +27,12 @@ enum class Direction {
     Right
 };
 
+enum class GameOverReason {
+    None,
+    WALL,
+    SELF
+};
+
 class GameEngine {
 public:
     GameEngine();
@@ -49,6 +55,7 @@ public:
     void tick();
 
     bool isGameOver() const noexcept;
+    GameOverReason gameOverReason() const noexcept;
 
 private:
     std::deque<GridPosition> snake_;
@@ -61,6 +68,7 @@ private:
     std::mt19937 randomEngine_{std::random_device{}()};
 
     bool spawnFood();
+    GameOverReason gameOverReason_{GameOverReason::None};
 };
 
 } // namespace snake

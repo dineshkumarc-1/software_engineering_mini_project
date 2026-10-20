@@ -3,8 +3,8 @@
 #include "snakextreme/GameEngine.hpp"
 
 #include <cstdlib>
-#include <iostream>
 #include <deque>
+#include <iostream>
 
 namespace {
 
@@ -97,7 +97,16 @@ void testEatingFoodGrowsSnakeAndRespawnsFood() {
 }
 
 void testMovement() {
-    snake::GameEngine game;
+    std::deque<snake::GridPosition> body = {
+        {15, 10},
+        {14, 10},
+        {13, 10}
+    };
+
+    // Explicit food placement prevents random food from affecting this test.
+    snake::GameEngine game(
+        body, snake::Direction::Right, snake::GridPosition{20, 15});
+
     game.tick();
 
     check(game.snake().front() == snake::GridPosition{16, 10},
@@ -110,6 +119,7 @@ void testMovement() {
 
 void testDirectionChanges() {
     snake::GameEngine game;
+
     game.changeDirection(snake::Direction::Up);
     game.tick();
 
@@ -119,6 +129,7 @@ void testDirectionChanges() {
           "snake moves upward after turning");
 
     game.changeDirection(snake::Direction::Down);
+
     check(game.direction() == snake::Direction::Up,
           "snake rejects a direct reversal");
 }
@@ -130,12 +141,14 @@ void testTwoQueuedTurns() {
     game.changeDirection(snake::Direction::Left);
 
     game.tick();
+
     check(game.direction() == snake::Direction::Up,
           "first queued turn is applied first");
     check(game.snake().front() == snake::GridPosition{15, 9},
           "first queued turn moves the snake up");
 
     game.tick();
+
     check(game.direction() == snake::Direction::Left,
           "second queued turn is applied on the next tick");
     check(game.snake().front() == snake::GridPosition{14, 9},
@@ -150,14 +163,17 @@ void testQueueLimit() {
     game.changeDirection(snake::Direction::Down);
 
     game.tick();
+
     check(game.direction() == snake::Direction::Up,
           "first queued turn remains first");
 
     game.tick();
+
     check(game.direction() == snake::Direction::Left,
           "second queued turn remains second");
 
     game.tick();
+
     check(game.direction() == snake::Direction::Left,
           "third turn is ignored when the queue is full");
 }
@@ -172,6 +188,8 @@ void testQueuedReverseIsRejected() {
 
     check(game.direction() == snake::Direction::Up,
           "reverse of the queued direction is rejected");
+    check(game.snake().front() == snake::GridPosition{15, 9},
+          "snake moves up rather than reversing after the tick");
 }
 
 void testWallCollision() {
@@ -183,6 +201,8 @@ void testWallCollision() {
 
     check(game.isGameOver(),
           "wall collision sets the game-over flag");
+    check(game.gameOverReason() == snake::GameOverReason::WALL,
+          "wall collision reports WALL game-over reason");
 }
 
 void testSnakeDoesNotMoveAfterWallCollision() {
@@ -233,6 +253,8 @@ void testSelfCollision() {
 
     check(game.isGameOver(),
           "self-collision sets the game-over flag");
+    check(game.gameOverReason() == snake::GameOverReason::SELF,
+          "self-collision reports SELF game-over reason");
 }
 
 } // namespace
