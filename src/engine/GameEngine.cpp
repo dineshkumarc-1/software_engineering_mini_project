@@ -103,13 +103,16 @@ void GameEngine::tick() {
         nextHead.y < 0 ||
         nextHead.y >= config::GridRows) {
         gameOver_ = true;
+        gameOverReason_ = GameOverReason::WALL;
         return;
     }
 
-    // Check whether the next head position intersects the snake.
-    for (const auto& segment : snake_) {
-        if (nextHead == segment) {
+    // The tail vacates its cell unless the snake is growing.
+    // This branch has no food/growth logic, so the tail always vacates.
+    for (std::size_t i = 0; i + 1 < snake_.size(); ++i) {
+        if (nextHead == snake_[i]) {
             gameOver_ = true;
+            gameOverReason_ = GameOverReason::SELF;
             return;
         }
     }
@@ -122,6 +125,11 @@ void GameEngine::tick() {
 // Report whether a collision has ended the game.
 bool GameEngine::isGameOver() const noexcept {
     return gameOver_;
+}
+
+// Return the reason the game ended, or None if it is still running.
+GameOverReason GameEngine::gameOverReason() const noexcept {
+    return gameOverReason_;
 }
 
 } // namespace snake
