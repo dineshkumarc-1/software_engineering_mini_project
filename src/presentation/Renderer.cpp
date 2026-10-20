@@ -51,22 +51,6 @@ void Renderer::draw(sf::RenderTarget& target,
 
     target.draw(grid);
 
-    // Draw the food.
-    if (engine.hasFood()) {
-        const auto food = engine.food();
-
-        sf::CircleShape foodShape(
-            static_cast<float>(config::CellSize) * 0.35f);
-
-        foodShape.setFillColor(sf::Color(255, 90, 90));
-        foodShape.setPosition(
-            static_cast<float>(food.x * config::CellSize) +
-                config::CellSize * 0.15f,
-            static_cast<float>(food.y * config::CellSize) +
-                config::CellSize * 0.15f);
-
-        target.draw(foodShape);
-    }
 
     // Draw the snake, using a brighter colour for its head.
     const auto& body = engine.snake();
