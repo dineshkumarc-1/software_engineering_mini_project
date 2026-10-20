@@ -1,11 +1,19 @@
 
 #include "snakextreme/Renderer.hpp"
+#include <array>
 
 namespace snake {
 
 Renderer::Renderer() {
-    // Windows system-font fallback for the current development setup.
-    fontLoaded_ = font_.loadFromFile("C:/Windows/Fonts/arial.ttf");
+    fontLoaded_ = font_.loadFromFile(
+        "assets/fonts/dejavu-sans-ttf-2.37/ttf/DejaVuSans.ttf"
+    );
+
+    if (!fontLoaded_) {
+        fontLoaded_ = font_.loadFromFile(
+            "C:/Windows/Fonts/arial.ttf"
+        );
+    }
 
     if (!fontLoaded_) {
         fontLoaded_ = font_.loadFromFile(
