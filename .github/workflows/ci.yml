@@ -17,7 +17,9 @@ permissions:
   contents: read
 
 concurrency:
-  group: ci-${{ github.ref }}
+  # Keep each commit's CI run distinct so rapid sequential PR updates don't cancel
+  # the run that exercises a newly added test step before it starts.
+  group: ci-${{ github.ref }}-${{ github.sha }}
   cancel-in-progress: true
 
 jobs:
