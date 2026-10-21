@@ -32,7 +32,13 @@ public:
     ModeManager(SessionConfig config, std::uint32_t seed);
 
     // Starts or restarts a session: resets the countdown and, in Obstacle
-    // mode, places obstacles away from the given snake and food.
+    // mode, places obstacles away from the given snake and food. The layout
+    // never splits the board.
+    //
+    // Throws std::runtime_error if the mode's obstacles cannot all be placed
+    // safely; the previous session state is then left unchanged. That needs a
+    // nearly full board, so it cannot happen when a new game starts. Callers
+    // should go back to the menu rather than start the game.
     void startSession(const std::deque<GridPosition>& snake,
                       std::optional<GridPosition> food);
 

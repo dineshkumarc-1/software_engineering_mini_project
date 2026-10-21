@@ -3,6 +3,7 @@
 // C7 ModeManager - mode strategies (SAD section 4.3.4, ADR-003).
 // SFML-free: only plain grid types are used, so every rule is unit-testable.
 
+#include "snakextreme/GameConfig.hpp"
 #include "snakextreme/GameEngine.hpp" // GridPosition (header-only use)
 #include "snakextreme/GameMode.hpp"
 
@@ -32,8 +33,13 @@ public:
     // Base points per food before any multiplier (FR-016).
     virtual int foodPoints() const noexcept = 0;
 
-    // Static obstacle cells for a new session (FR-011). Modes without
-    // obstacles return an empty list.
+    // Obstacles a session of this mode needs: 8 in Obstacle mode (FR-011),
+    // none in the others.
+    virtual std::size_t obstacleCount() const noexcept = 0;
+
+    // Static obstacle cells for a new session (FR-011). The result never
+    // splits the board. It holds fewer than obstacleCount() cells only when
+    // no further cell can be added safely, which needs a nearly full board.
     virtual Obstacles placeObstacles(std::mt19937& random,
                                      const std::deque<GridPosition>& snake,
                                      std::optional<GridPosition> food) const = 0;
@@ -50,6 +56,7 @@ public:
     GameMode mode() const noexcept override;
     std::optional<std::chrono::milliseconds> timeLimit() const noexcept override;
     int foodPoints() const noexcept override;
+    std::size_t obstacleCount() const noexcept override { return 0; }
     Obstacles placeObstacles(std::mt19937& random,
                              const std::deque<GridPosition>& snake,
                              std::optional<GridPosition> food) const override;
@@ -62,6 +69,7 @@ public:
     GameMode mode() const noexcept override;
     std::optional<std::chrono::milliseconds> timeLimit() const noexcept override;
     int foodPoints() const noexcept override;
+    std::size_t obstacleCount() const noexcept override { return 0; }
     Obstacles placeObstacles(std::mt19937& random,
                              const std::deque<GridPosition>& snake,
                              std::optional<GridPosition> food) const override;
@@ -74,6 +82,7 @@ public:
     GameMode mode() const noexcept override;
     std::optional<std::chrono::milliseconds> timeLimit() const noexcept override;
     int foodPoints() const noexcept override;
+    std::size_t obstacleCount() const noexcept override { return config::ObstacleCount; }
     Obstacles placeObstacles(std::mt19937& random,
                              const std::deque<GridPosition>& snake,
                              std::optional<GridPosition> food) const override;
@@ -87,11 +96,13 @@ bool isInsideGrid(GridPosition cell) noexcept;
 // max(|dx|, |dy|): the number of king moves between two cells.
 int chebyshevDistance(GridPosition a, GridPosition b) noexcept;
 
-// Picks up to `count` distinct cells uniformly from the cells that are not on
+// Picks up to `count` distinct cells at random from the cells that are not on
 // the snake, not on the food and at least `minHeadDistance` (Chebyshev) from
-// the snake head. Placements that would cut the board into separate regions
-// are re-drawn, so food can always be reached. Returns fewer cells only when
-// fewer eligible cells exist.
+// the snake head. Cells are added one at a time, and a cell is skipped if it
+// would cut the board into separate regions, so the result never splits the
+// board and food can always be reached. Fewer than `count` cells come back
+// only when no further eligible cell can be added safely; callers must treat
+// that as a failure, not as a smaller layout to play with.
 Obstacles placeObstacleCells(std::size_t count,
                              std::mt19937& random,
                              const std::deque<GridPosition>& snake,
