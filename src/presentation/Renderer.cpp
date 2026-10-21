@@ -1,13 +1,14 @@
 #include "snakextreme/Renderer.hpp"
-#include <windows.h>
 #include <filesystem>
-
 #include <string>
+#if defined(_WIN32)
+#include <windows.h>
+#endif
 
 namespace snake {
 
 Renderer::Renderer() {
-
+#if defined(_WIN32)
     // Load the font bundled beside the executable.
 wchar_t executablePath[MAX_PATH];
 DWORD length = GetModuleFileNameW(
@@ -24,6 +25,19 @@ if (length > 0 && length < MAX_PATH) {
 } else {
     fontLoaded_ = false;
 }
+#else
+    const auto bundledFontPath = std::filesystem::path("assets")
+        / "fonts" / "DejaVuSans.ttf";
+    fontLoaded_ = font_.loadFromFile(bundledFontPath.string());
+#endif
+
+#if defined(SNAKE_ASSET_DIR)
+    if (!fontLoaded_) {
+        const auto sourceTreeFontPath = std::filesystem::path(SNAKE_ASSET_DIR)
+            / "fonts" / "dejavu-sans-ttf-2.37" / "ttf" / "DejaVuSans.ttf";
+        fontLoaded_ = font_.loadFromFile(sourceTreeFontPath.string());
+    }
+#endif
 
 }
 
