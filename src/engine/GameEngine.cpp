@@ -111,6 +111,11 @@ bool GameEngine::hasFood() const noexcept {
     return hasFood_;
 }
 
+
+std::size_t GameEngine::foodEatenCount() const noexcept {
+    return foodEatenCount_;
+}
+
 void GameEngine::changeDirection(Direction next) {
     if (gameOver_) {
         return;
@@ -239,14 +244,17 @@ void GameEngine::tick() {
         }
     }
 
+
     snake_.push_front(nextHead);
 
     if (eating) {
+        ++foodEatenCount_;
         spawnFood();
     } else {
         snake_.pop_back();
     }
-}
+}  // This closes GameEngine::tick()
+
 
 bool GameEngine::isGameOver() const noexcept {
     return gameOver_;

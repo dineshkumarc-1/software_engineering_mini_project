@@ -3,10 +3,12 @@
 #include "snakextreme/GameEngine.hpp"
 
 #include <catch2/catch_test_macros.hpp>
+
+#include <algorithm>
+#include <cstddef>
+#include <deque>
 #include <stdexcept>
 #include <vector>
-#include <algorithm>
-#include <deque>
 
 TEST_CASE("Initial snake has the correct state",
           "[engine][movement]") {
@@ -98,7 +100,6 @@ TEST_CASE("Direction queue accepts at most two turns",
     REQUIRE(game.direction() == snake::Direction::Left);
 }
 
-
 TEST_CASE("Reversal of the last queued direction is rejected",
           "[engine][direction]") {
     std::deque<snake::GridPosition> body = {
@@ -117,13 +118,12 @@ TEST_CASE("Reversal of the last queued direction is rejected",
     REQUIRE(game.direction() == snake::Direction::Up);
     REQUIRE(game.snake().front() == snake::GridPosition{5, 4});
 
-    // Check that the rejected reversal does not take effect on the next tick.
+    // The rejected reversal must not take effect on the next tick.
     game.tick();
 
     REQUIRE(game.direction() == snake::Direction::Up);
     REQUIRE(game.snake().front() == snake::GridPosition{5, 3});
 }
-
 
 TEST_CASE("Wall collision ends the game",
           "[engine][collision]") {
@@ -297,8 +297,6 @@ TEST_CASE("Eating food grows the snake by exactly one segment",
     }
 }
 
-
-
 TEST_CASE("Ten consecutive food consumptions grow the snake by ten",
           "[engine][food][growth]") {
     std::deque<snake::GridPosition> body = {
@@ -355,7 +353,44 @@ TEST_CASE("Ten consecutive food consumptions grow the snake by ten",
     REQUIRE(game.snake().size() == 13);
 }
 
+TEST_CASE("Food eaten count increases once per consumption",
+          "[engine][food][events]") {
+    std::deque<snake::GridPosition> body = {
+        {5, 5}, {4, 5}, {3, 5}
+    };
 
+    int nextFoodX = 7;
+
+    auto selector = [&nextFoodX](
+        const std::vector<snake::GridPosition>& freeCells
+    ) -> snake::GridPosition {
+        const snake::GridPosition target{nextFoodX++, 5};
+
+        if (std::find(freeCells.begin(), freeCells.end(), target)
+            == freeCells.end()) {
+            throw std::runtime_error(
+                "Expected food cell to be free"
+            );
+        }
+
+        return target;
+    };
+
+    snake::GameEngine game(
+        body, snake::Direction::Right, {6, 5}, selector
+    );
+
+    REQUIRE(game.foodEatenCount() == 0);
+
+    game.tick();
+    REQUIRE(game.foodEatenCount() == 1);
+
+    game.tick();
+    REQUIRE(game.foodEatenCount() == 2);
+
+    game.tick();
+    REQUIRE(game.foodEatenCount() == 3);
+}
 
 TEST_CASE("Eating food respawns it on a free cell",
           "[engine][food]") {
@@ -454,8 +489,8 @@ TEST_CASE("An already full board ends with BOARD_FULL",
     REQUIRE_FALSE(game.hasFood());
 }
 
-TEST_CASE("Eating the last food fills the board",
-          "[engine][food][growth][collision]") {
+TEST_CASE("Eating the last food increments count before board fills",
+          "[engine][food][growth][collision][events]") {
     const snake::GridPosition lastCell{1, 0};
     std::deque<snake::GridPosition> body;
 
@@ -470,14 +505,17 @@ TEST_CASE("Eating the last food fills the board",
     }
 
     // Put the head at (0, 0), facing right, with (1, 0) as the only
-    // unoccupied cell. The rest of the body occupies all other cells.
+    // unoccupied cell.
     body.push_front({0, 0});
 
     snake::GameEngine game(
         body, snake::Direction::Right, lastCell);
 
+    REQUIRE(game.foodEatenCount() == 0);
+
     game.tick();
 
+    REQUIRE(game.foodEatenCount() == 1);
     REQUIRE(game.isGameOver());
     REQUIRE(game.gameOverReason() == snake::GameOverReason::BOARD_FULL);
     REQUIRE_FALSE(game.hasFood());

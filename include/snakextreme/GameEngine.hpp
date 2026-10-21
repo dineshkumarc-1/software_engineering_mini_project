@@ -68,6 +68,9 @@ public:
     GridPosition food() const noexcept;
     bool hasFood() const noexcept;
 
+    // Total food items consumed during this engine instance.
+    std::size_t foodEatenCount() const noexcept;
+
     void changeDirection(Direction next);
     void tick();
 
@@ -82,6 +85,9 @@ private:
     bool gameOver_{false};
     GridPosition food_{};
     bool hasFood_{false};
+
+    // Counts food consumed, starting from zero.
+    std::size_t foodEatenCount_{0};
 
     std::mt19937 randomEngine_{std::random_device{}()};
 
