@@ -1,6 +1,8 @@
 #include "snakextreme/ModeManager.hpp"
 
 #include <algorithm>
+#include <stdexcept>
+#include <utility>
 
 namespace snake {
 
@@ -14,8 +16,18 @@ ModeManager::ModeManager(SessionConfig config, std::uint32_t seed)
 
 void ModeManager::startSession(const std::deque<GridPosition>& snake,
                                std::optional<GridPosition> food) {
+    Obstacles placed = strategy_->placeObstacles(random_, snake, food);
+
+    // A short layout means the board had no safe room left. Refuse to start
+    // rather than play Obstacle mode with fewer obstacles than FR-011 needs.
+    // Nothing has been changed yet, so the previous session stays intact.
+    if (placed.size() < strategy_->obstacleCount()) {
+        throw std::runtime_error(
+            "Cannot place all obstacles without splitting the board");
+    }
+
+    obstacles_ = std::move(placed);
     elapsed_ = std::chrono::microseconds{0};
-    obstacles_ = strategy_->placeObstacles(random_, snake, food);
 }
 
 void ModeManager::update(std::chrono::microseconds elapsed) noexcept {

@@ -14,10 +14,10 @@ constexpr std::size_t CellCount =
     static_cast<std::size_t>(config::GridColumns) *
     static_cast<std::size_t>(config::GridRows);
 
-// Re-draws allowed before accepting a placement that splits the board. With
-// 8 obstacles on 600 cells a split is very rare, so this is never reached in
-// normal play.
-constexpr int MaxPlacementAttempts = 64;
+// Random orders tried before giving up on placing every requested cell. One
+// pass always succeeds on a normal board; more passes only matter when the
+// board is nearly full, and every pass returns a connected layout.
+constexpr int MaxPlacementPasses = 16;
 
 std::size_t indexOf(GridPosition cell) noexcept {
     return static_cast<std::size_t>(cell.y) *
@@ -135,26 +135,33 @@ Obstacles placeObstacleCells(std::size_t count,
         }
     }
 
-    const std::size_t take = std::min(count, eligible.size());
-    Obstacles chosen;
+    // Largest connected layout found so far. Only connected layouts are ever
+    // stored here, so whatever is returned is safe to play on.
+    Obstacles best;
 
-    for (int attempt = 0; attempt < MaxPlacementAttempts; ++attempt) {
-        // Partial Fisher-Yates shuffle: the first `take` cells are a uniform
-        // random sample without repetition.
-        for (std::size_t i = 0; i < take; ++i) {
+    for (int pass = 0; pass < MaxPlacementPasses && best.size() < count; ++pass) {
+        Obstacles chosen;
+
+        // Visit the eligible cells in a fresh random order (a Fisher-Yates
+        // shuffle done one step at a time) and keep each cell that leaves
+        // every open cell reachable. The layout stays connected after every
+        // step, so it can never end up split.
+        for (std::size_t i = 0; i < eligible.size() && chosen.size() < count; ++i) {
             std::uniform_int_distribution<std::size_t> pick(i, eligible.size() - 1);
             std::swap(eligible[i], eligible[pick(random)]);
+
+            chosen.push_back(eligible[i]);
+            if (!keepsBoardConnected(chosen)) {
+                chosen.pop_back();
+            }
         }
 
-        chosen.assign(eligible.begin(),
-                      eligible.begin() + static_cast<std::ptrdiff_t>(take));
-
-        if (keepsBoardConnected(chosen)) {
-            break;
+        if (chosen.size() > best.size()) {
+            best = std::move(chosen);
         }
     }
 
-    return chosen;
+    return best;
 }
 
 // ---- Classic ---------------------------------------------------------------
@@ -222,7 +229,7 @@ int ObstacleMode::foodPoints() const noexcept {
 Obstacles ObstacleMode::placeObstacles(std::mt19937& random,
                                        const std::deque<GridPosition>& snake,
                                        std::optional<GridPosition> food) const {
-    return placeObstacleCells(config::ObstacleCount, random, snake, food,
+    return placeObstacleCells(obstacleCount(), random, snake, food,
                               config::ObstacleMinHeadDistance);
 }
 
