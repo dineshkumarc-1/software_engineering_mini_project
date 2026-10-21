@@ -78,19 +78,21 @@ for attempt in $(seq 1 60); do
 done
 [[ -n "$window" ]] || { echo "Timed out waiting for SnakeXtreme window" >&2; exit 1; }
 
-xdotool windowfocus --sync "$window"
-xdotool key --clearmodifiers Return
+# Xvfb has no desktop window manager; avoid waiting indefinitely for an
+# active-window notification that a minimal display may never provide.
+timeout 5s xdotool windowfocus "$window" || true
+timeout 5s xdotool key --clearmodifiers Return
 sleep 0.8
 
-window_title="$(xdotool getwindowname "$window")"
+window_title="$(timeout 5s xdotool getwindowname "$window")"
 echo "Window title after Enter: $window_title"
 [[ "$window_title" == *"Gameplay placeholder"* ]] || {
     echo "App did not enter gameplay after Return" >&2
     exit 1
 }
 
-import -window "$window" "$screenshot"
-ocr_text="$(tesseract "$screenshot" stdout --psm 6 2>/dev/null | tr '\n' ' ')"
+timeout 10s import -window "$window" "$screenshot"
+ocr_text="$(timeout 20s tesseract "$screenshot" stdout --psm 6 2>/dev/null | tr '\n' ' ')"
 echo "OCR of gameplay screenshot: $ocr_text"
 grep -Eiq 'Score[ :]*0' <<< "$ocr_text" || {
     echo "Screenshot did not show the current score" >&2
