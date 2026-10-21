@@ -150,7 +150,7 @@ bool GameEngine::spawnFood() {
 
             const bool occupied = std::find(
                 snake_.begin(), snake_.end(), cell
-            ) != snake_.end();
+            ) != snake_.end() || isObstacle(cell);
 
             if (!occupied) {
                 freeCells.push_back(cell);
@@ -230,6 +230,12 @@ void GameEngine::tick() {
         return;
     }
 
+    if (isObstacle(nextHead)) {
+        gameOver_ = true;
+        gameOverReason_ = GameOverReason::OBSTACLE;
+        return;
+    }
+
     const bool eating = hasFood_ && nextHead == food_;
 
     // The tail remains occupied when eating; otherwise it vacates.
@@ -262,6 +268,59 @@ bool GameEngine::isGameOver() const noexcept {
 
 GameOverReason GameEngine::gameOverReason() const noexcept {
     return gameOverReason_;
+}
+
+void GameEngine::setObstacles(std::vector<GridPosition> obstacles) {
+    std::vector<GridPosition> unique;
+    unique.reserve(obstacles.size());
+
+    for (const GridPosition& cell : obstacles) {
+        const bool inside =
+            cell.x >= 0 &&
+            cell.x < config::GridColumns &&
+            cell.y >= 0 &&
+            cell.y < config::GridRows;
+
+        if (!inside) {
+            throw std::invalid_argument(
+                "Obstacles must be inside the grid"
+            );
+        }
+
+        if (std::find(snake_.begin(), snake_.end(), cell) != snake_.end()) {
+            throw std::invalid_argument(
+                "Obstacles must not overlap the snake"
+            );
+        }
+
+        if (std::find(unique.begin(), unique.end(), cell) == unique.end()) {
+            unique.push_back(cell);
+        }
+    }
+
+    obstacles_ = std::move(unique);
+
+    if (hasFood_ && isObstacle(food_)) {
+        spawnFood();
+    }
+}
+
+const std::vector<GridPosition>& GameEngine::obstacles() const noexcept {
+    return obstacles_;
+}
+
+void GameEngine::endGame(GameOverReason reason) noexcept {
+    if (gameOver_ || reason == GameOverReason::None) {
+        return;
+    }
+
+    gameOver_ = true;
+    gameOverReason_ = reason;
+}
+
+bool GameEngine::isObstacle(GridPosition cell) const noexcept {
+    return std::find(obstacles_.begin(), obstacles_.end(), cell) !=
+           obstacles_.end();
 }
 
 } // namespace snake

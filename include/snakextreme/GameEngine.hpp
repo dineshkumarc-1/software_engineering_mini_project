@@ -33,7 +33,9 @@ enum class GameOverReason {
     None,
     WALL,
     SELF,
-    BOARD_FULL
+    BOARD_FULL,
+    OBSTACLE, // FR-011: head entered an Obstacle-mode cell
+    TIME_UP   // FR-010: Timed Challenge countdown reached zero
 };
 
 class GameEngine {
@@ -77,7 +79,23 @@ public:
     bool isGameOver() const noexcept;
     GameOverReason gameOverReason() const noexcept;
 
+    // Game-mode hooks (C7 ModeManager, issue #11). The engine stays
+    // mode-agnostic: it only learns which cells are blocked and when a
+    // mode rule has ended the session.
+
+    // Static cells that end the game on contact and never hold food. Food
+    // already on one of them is moved to a free cell. Throws
+    // std::invalid_argument for a cell outside the grid or on the snake.
+    void setObstacles(std::vector<GridPosition> obstacles);
+    const std::vector<GridPosition>& obstacles() const noexcept;
+
+    // Ends a running session for a reason decided outside the engine, such
+    // as TIME_UP. Ignored when the game is already over or reason is None.
+    void endGame(GameOverReason reason) noexcept;
+
 private:
+    bool isObstacle(GridPosition cell) const noexcept;
+
     std::deque<GridPosition> snake_;
     std::deque<Direction> directionQueue_;
     Direction direction_{Direction::Right};
@@ -98,6 +116,8 @@ private:
     bool spawnFood();
 
     GameOverReason gameOverReason_{GameOverReason::None};
+
+    std::vector<GridPosition> obstacles_;
 };
 
 } // namespace snake

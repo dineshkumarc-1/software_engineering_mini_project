@@ -1,0 +1,135 @@
+# SnakeXtreme continuous integration (issue #10; NFR-005, NFR-006, NFR-007).
+#
+# Every push to main and every pull request builds the project and runs the
+# full CTest suite on Linux, macOS and Windows (MSVC and MinGW-w64). The job
+# names below appear as status checks on each pull request; see
+# docs/modes-build-ci.md for making them required before merging.
+
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # SFML-free logic and tests only: proves the core builds and passes its
+  # tests without SFML or a display (NFR-007, TC-TEST-01).
+  headless:
+    name: Tests (${{ matrix.name }})
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: Linux GCC
+            os: ubuntu-latest
+            werror: "ON"
+          - name: macOS Clang
+            os: macos-latest
+            werror: "ON"
+          - name: Windows MSVC
+            os: windows-latest
+            werror: "OFF"
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure
+        run: >
+          cmake -S . -B build
+          -DSNAKE_BUILD_APP=OFF
+          -DCMAKE_BUILD_TYPE=Release
+          -DSNAKE_WARNINGS_AS_ERRORS=${{ matrix.werror }}
+
+      - name: Build
+        run: cmake --build build --config Release --parallel
+
+      - name: Test
+        run: ctest --test-dir build -C Release --output-on-failure
+
+  mingw:
+    name: Tests (Windows MinGW-w64)
+    runs-on: windows-latest
+    timeout-minutes: 20
+    defaults:
+      run:
+        shell: msys2 {0}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: msys2/setup-msys2@v2
+        with:
+          msystem: UCRT64
+          update: false
+          install: >-
+            git
+            mingw-w64-ucrt-x86_64-gcc
+            mingw-w64-ucrt-x86_64-cmake
+            mingw-w64-ucrt-x86_64-ninja
+
+      - name: Configure
+        run: >
+          cmake -S . -B build -G Ninja
+          -DSNAKE_BUILD_APP=OFF
+          -DCMAKE_BUILD_TYPE=Release
+
+      - name: Build
+        run: cmake --build build --parallel
+
+      - name: Test
+        run: ctest --test-dir build --output-on-failure
+
+  # Full desktop build with the pinned SFML 2.5.1 (NFR-006). The Windows
+  # executable is kept as a download for manual testing and demos.
+  app:
+    name: App build (${{ matrix.name }})
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: Windows MSVC
+            os: windows-latest
+          - name: Linux GCC
+            os: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install SFML build dependencies
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            libx11-dev libxrandr-dev libudev-dev libgl1-mesa-dev libfreetype-dev
+
+      - name: Configure
+        run: >
+          cmake -S . -B build
+          -DSNAKE_FETCH_SFML=ON
+          -DBUILD_SHARED_LIBS=OFF
+          -DCMAKE_BUILD_TYPE=Release
+
+      - name: Build
+        run: cmake --build build --config Release --parallel
+
+      - name: Test
+        run: ctest --test-dir build -C Release --output-on-failure
+
+      - name: Upload Windows executable
+        if: runner.os == 'Windows'
+        uses: actions/upload-artifact@v4
+        with:
+          name: SnakeXtreme-windows-x64
+          path: build/Release/SnakeXtreme.exe
+          if-no-files-found: error
+          retention-days: 14
