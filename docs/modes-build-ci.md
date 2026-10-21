@@ -1,6 +1,8 @@
 # Sprint 1 — Game modes, difficulty, build and CI
 
-Issues **#5, #10, #11, #12, #13** (owner: B V Tejas). Built on top of the Catch2 engine branch from PR #36 (`feature/ayushi-core-headless-tests`), so that PR should merge first.
+Issues **#5, #10, #11, #12, #13** (owner: B V Tejas), PR #37. Built on top of the Catch2 engine work from PR #36, which is now merged into `main`.
+
+**In scope:** the mode, difficulty, build and CI code and its automated tests. **Separate work, not claimed here:** wiring the modes into the running application (#19 screens, #3 movement loop in PR #35) and runtime/demo validation of the game on Windows 10/11.
 
 ## #12 — Difficulty speed profiles (FR-009)
 
@@ -20,7 +22,11 @@ Issues **#5, #10, #11, #12, #13** (owner: B V Tejas). Built on top of the Catch2
 | Timed: 60 s countdown, game over at zero | `TimedMode::timeLimit()` = 60 s; `ModeManager::update(dt)`, `remainingTime()` (never negative), `isTimeUp()`; engine `endGame(GameOverReason::TIME_UP)` | TC-MODE-03 unit + integration (running at 59.9 s, `TIME_UP` at 60.0 s) |
 | Obstacle: 8 static obstacles with collision | `ObstacleMode::placeObstacles()` → 8 cells; engine `setObstacles()` blocks food and ends the game with `GameOverReason::OBSTACLE` | TC-MODE-04 unit + integration |
 
-Placement rules for obstacles (SRS Addendum §4): free cells only, never on the snake or food, at least 3 cells from the head. The distance is Chebyshev (`max(|dx|, |dy|)`), so the 5×5 square around the head is clear; this satisfies "≥ 3 cells" under either distance reading. Placements that would seal off part of the board are re-drawn, so food can always be reached (not required by the SRS, added because a sealed corner with food in it would stall a game).
+Placement rules for obstacles (SRS Addendum §4): free cells only, never on the snake or food, at least 3 cells from the head. The distance is Chebyshev (`max(|dx|, |dy|)`), so the 5×5 square around the head is clear; this satisfies "≥ 3 cells" under either distance reading.
+
+The board also stays connected, so food can always be reached (not required by the SRS, added because a sealed corner with food in it would stall a game). Obstacles are added one at a time in random order, and a cell is skipped if it would cut off any open cell. The layout is therefore connected after every step, so no returned layout can split the board. (The first version re-drew whole layouts and, after 64 failed tries, returned the last one even though it split the board; the regression tests below cover this.)
+
+**Failure handling.** If the mode's 8 obstacles cannot all be placed safely, `ModeManager::startSession()` throws `std::runtime_error` and leaves the previous session unchanged, instead of starting Obstacle mode with fewer obstacles. That needs a nearly full board, so it cannot happen when a new game starts: a fresh 30 × 20 board always has hundreds of eligible cells whose whole 3 × 3 neighbourhood is open, and an obstacle there cannot cut anything off.
 
 ### Engine changes (small, additive)
 
@@ -40,7 +46,7 @@ The UI stories (#19 screens, #3 movement loop) own `AppManager`. These are the l
 // On Start, with the player's choice from the Mode & Difficulty screen:
 engine_ = GameEngine{};
 modes_ = ModeManager{SessionConfig{mode, difficulty}};
-modes_.startSession(engine_.snake(), engine_.food());
+modes_.startSession(engine_.snake(), engine_.food()); // throws only on a nearly full board: go back to the menu
 engine_.setObstacles(modes_.obstacles());
 
 // In update(step), only while the Gameplay screen is active (so pause freezes the timer):
@@ -63,7 +69,7 @@ const auto moveInterval = sf::milliseconds(static_cast<sf::Int32>(modes_.tickInt
 | Acceptance criterion | Implementation | Validation |
 | --- | --- | --- |
 | Modular targets for engine, modes, persistence, UI, test runner | `snake_engine`, `snake_modes`, `snake_persistence` (placeholder until #15 adds sources), `snake_app_state` + `snake_presentation` (UI), `check` (builds and runs all tests). `snake_add_module()` in `cmake/SnakeModules.cmake` | Configure fails if an SFML-free module links SFML; `layering_core_is_sfml_free` CTest follows includes from core sources and fails on any SFML header |
-| Clean build on Windows 10/11 (MSVC / MinGW) | `/W4 /permissive- /utf-8` for MSVC; MinGW uses the GCC flags. SFML 2.5.1 fetch now configures under CMake 4 (`CMAKE_POLICY_VERSION_MINIMUM`), which current runners and Homebrew ship | MinGW-w64 cross-compile clean with `-Werror` locally; MSVC and native MinGW runs happen in CI (see below) |
+| Clean build on Windows 10/11 (MSVC / MinGW) | `/W4 /permissive- /utf-8` for MSVC; MinGW uses the GCC flags. SFML 2.5.1 fetch now configures under CMake 4 (`CMAKE_POLICY_VERSION_MINIMUM`), which current runners and Homebrew ship | Windows MSVC and MinGW-w64 builds and tests pass in CI on GitHub's Windows runners, and so does the full MSVC app build (see Validation). Running the game on Windows 10/11 is separate demo work |
 | Catch2 v3 test target | `cmake/SnakeCatch2.cmake`: installed Catch2 3.x if found, else pinned v3.8.1 download; headers treated as system headers. `snake_add_catch2_test()` registers each test executable with CTest | `game_engine_tests`, `game_mode_tests` |
 
 Options: `SNAKE_BUILD_APP`, `SNAKE_FETCH_SFML`, `SNAKE_FETCH_CATCH2`, `SNAKE_WARNINGS_AS_ERRORS`. Presets: `headless`, `app` (CMake 3.21+).
@@ -95,18 +101,24 @@ Warnings become fatal on MSVC and MinGW once each has a green run; that tighteni
 
 ## #13 — Game-mode tests (TC-MODE-01..04)
 
-`tests/GameModeTests.cpp` (unit) and `tests/ModeEngineIntegrationTests.cpp` (modes + engine), one `game_mode_tests` executable, 34 Catch2 test cases. Run one area with a tag, e.g. `game_mode_tests "[TC-MODE-03]"`.
+`tests/GameModeTests.cpp` (unit) and `tests/ModeEngineIntegrationTests.cpp` (modes + engine), one `game_mode_tests` executable, 37 Catch2 test cases. Run one area with a tag, e.g. `game_mode_tests "[TC-MODE-03]"`.
 
 | Test case | Requirement | Covered by | Status |
 | --- | --- | --- | --- |
 | TC-MODE-01 | FR-008 | Exactly three modes, Classic default; each mode's rules (timer only in Timed, obstacles only in Obstacle); stored names round-trip, bad names rejected | Logic automated. The on-screen part (selection list, HUD showing the mode) waits for the Mode & Difficulty screen (#19) |
 | TC-MODE-02 | FR-009, FR-002 | Profiles 200/120/70 ms; all 9 mode × difficulty combinations; snake moves 5/8/14 cells in one simulated second | Automated |
 | TC-MODE-03 | FR-010 | 60 s limit; running at 59.9 s, `TIME_UP` at 60.0 s; no drift at the app's 60 Hz step; never negative; zero/negative steps ignored; restart resets; pause freezes; final state kept; untimed modes never expire | Automated |
-| TC-MODE-04 | FR-011 | 8 obstacles on valid cells for 500 seeds (plus a corner start); no board split; same seed same layout; no obstacles in Classic/Timed; engine collision → `OBSTACLE`, head never enters; every generated obstacle fatal; food never on an obstacle; invalid cells rejected | Automated |
+| TC-MODE-04 | FR-011 | 8 obstacles on valid cells for 500 seeds (plus a corner start); no board split, including two regression cases where a safe full layout does not exist (placement stops short; the session refuses to start and keeps the previous one) and dense layouts of up to 157 obstacles; same seed same layout; no obstacles in Classic/Timed; engine collision → `OBSTACLE`, head never enters; every generated obstacle fatal; food never on an obstacle; invalid cells rejected | Automated |
 
 Timing uses explicit millisecond steps and randomness uses fixed seeds, so every run is repeatable (STP §5 determinism).
 
-## Local validation (21 Oct 2026)
+## Validation (21 Oct 2026)
+
+### CI on PR #37
+
+[Run 39553515636](https://github.com/dineshkumarc-1/software_engineering_mini_project/actions/runs/39553515636): all 6 jobs passed: Linux GCC, macOS Clang, Windows MSVC and Windows MinGW-w64 tests, plus the full app builds on Windows MSVC and Linux GCC, with the Windows `.exe` artifact. This confirms the Windows build. It does not cover running the game on Windows 10/11 or the NFR-001 frame-rate check.
+
+### Local
 
 Environment: Ubuntu 24.04 container, no Windows machine.
 
@@ -119,8 +131,10 @@ Environment: Ubuntu 24.04 container, no Windows machine.
 | Full app with fetched SFML 2.5.1, CMake 3.28 and CMake 4.4 | PASS — builds, 4/4 tests; app launches under Xvfb |
 | `cmake --preset headless` / build / test (CMake 4.4) | PASS |
 | `check` target | PASS |
-| Mutation check: 9 deliberate rule breaks (obstacle not fatal, food on obstacle, time-up off by one, head distance, no re-draw, 7 obstacles, 50 s timer, Hard 80 ms, food ignored) | All caught by tests or by compile-time checks |
+| Mutation check: 9 deliberate rule breaks (obstacle not fatal, food on obstacle, time-up off by one, head distance, split layouts allowed, 7 obstacles, 50 s timer, Hard 80 ms, food ignored) | All caught by tests or by compile-time checks |
 | Layering check with an SFML include planted in a core header | Fails as intended |
 | `actionlint` on the workflow | PASS |
+| Obstacle-placement fix: the PR's original placement code put back in place | Both regression tests fail, reproducing the split-layout bug |
+| Obstacle-placement fix: connectivity check skipped / shortfall ignored / session changed before refusing | Each caught by a regression test |
 
-Not executed here: MSVC builds, running anything on Windows 10/11, macOS, and the workflow on GitHub itself. The first CI run on the pull request is the evidence for those.
+Not executed here or in CI: running the game on Windows 10/11 (runtime/demo validation, TC-PERF-01) and the modes inside the running application, which is not wired yet (see "Wiring").
