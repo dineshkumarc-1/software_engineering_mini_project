@@ -17,6 +17,7 @@
 #include <deque>
 #include <optional>
 #include <random>
+#include <stdexcept>
 
 using namespace std::chrono_literals;
 
@@ -58,8 +59,9 @@ bool hasDuplicates(Obstacles cells) {
 
 void requireValidLayout(const Obstacles& obstacles,
                         const std::deque<GridPosition>& snake,
-                        std::optional<GridPosition> food) {
-    REQUIRE(obstacles.size() == snake::config::ObstacleCount);
+                        std::optional<GridPosition> food,
+                        std::size_t expectedCount = snake::config::ObstacleCount) {
+    REQUIRE(obstacles.size() == expectedCount);
     REQUIRE_FALSE(hasDuplicates(obstacles));
     REQUIRE(snake::keepsBoardConnected(obstacles));
 
@@ -73,6 +75,25 @@ void requireValidLayout(const Obstacles& obstacles,
         REQUIRE(snake::chebyshevDistance(cell, snake.front()) >=
                 snake::config::ObstacleMinHeadDistance);
     }
+}
+
+// A snake with its head at `head` whose body covers every cell except
+// `freeCells`. Snake cells can never hold obstacles but stay passable, so
+// this limits placement to `freeCells` without blocking any paths.
+std::deque<GridPosition> snakeCoveringAllBut(GridPosition head,
+                                             const Obstacles& freeCells) {
+    std::deque<GridPosition> body{head};
+    for (int y = 0; y < snake::config::GridRows; ++y) {
+        for (int x = 0; x < snake::config::GridColumns; ++x) {
+            const GridPosition cell{x, y};
+            const bool keepFree =
+                std::find(freeCells.begin(), freeCells.end(), cell) != freeCells.end();
+            if (cell != head && !keepFree) {
+                body.push_back(cell);
+            }
+        }
+    }
+    return body;
 }
 
 } // namespace
@@ -304,7 +325,7 @@ TEST_CASE("Obstacle mode places 8 valid obstacles for 500 seeds",
     }
 }
 
-TEST_CASE("Placement re-draws layouts that would seal off part of the board",
+TEST_CASE("Placement skips cells that would seal off part of the board",
           "[obstacle][TC-MODE-04]") {
     // Only four cells are eligible. Choosing (1,0) and (0,1) together would
     // seal (0,0) in its corner; any other pair keeps the board connected.
@@ -328,6 +349,74 @@ TEST_CASE("Placement re-draws layouts that would seal off part of the board",
         const Obstacles placed = snake::placeObstacleCells(2, random, body, std::nullopt, 3);
         REQUIRE(placed.size() == 2);
         REQUIRE(snake::keepsBoardConnected(placed));
+    }
+}
+
+TEST_CASE("Placement never returns a layout that splits the board",
+          "[obstacle][TC-MODE-04][regression]") {
+    // Regression: the first version re-drew a splitting layout up to 64
+    // times and then returned the last one anyway. Here the only eligible
+    // cells are row 5, so 30 obstacles can only form a wall that cuts the
+    // board in two. Placement must stop at 29 and leave a gap.
+    Obstacles row;
+    for (int x = 0; x < snake::config::GridColumns; ++x) {
+        row.push_back({x, 5});
+    }
+    const auto body = snakeCoveringAllBut({0, 0}, row);
+
+    for (std::uint32_t seed = 0; seed < 20; ++seed) {
+        INFO("seed " << seed);
+        std::mt19937 random{seed};
+        const Obstacles placed = snake::placeObstacleCells(
+            row.size(), random, body, std::nullopt,
+            snake::config::ObstacleMinHeadDistance);
+
+        requireValidLayout(placed, body, std::nullopt, row.size() - 1);
+    }
+}
+
+TEST_CASE("Obstacle mode refuses to start rather than split the board",
+          "[obstacle][TC-MODE-04][regression]") {
+    // Only 8 cells are eligible, and taking both (1,0) and (0,1) would seal
+    // the corner cell (0,0). At most 7 obstacles fit safely, so the session
+    // must refuse to start and keep the previous session's obstacles.
+    const Obstacles freeCells{{1, 0}, {0, 1}, {10, 15}, {12, 15},
+                              {14, 15}, {16, 15}, {18, 15}, {20, 15}};
+    const auto crowded = snakeCoveringAllBut({29, 19}, freeCells);
+
+    for (std::uint32_t seed = 0; seed < 20; ++seed) {
+        INFO("seed " << seed);
+        ModeManager modes({GameMode::Obstacle, Difficulty::Medium}, seed);
+        modes.startSession(startingSnake(), GridPosition{25, 5});
+        const Obstacles before = modes.obstacles();
+        REQUIRE(before.size() == 8);
+
+        REQUIRE_THROWS_AS(modes.startSession(crowded, std::nullopt), std::runtime_error);
+        REQUIRE(modes.obstacles() == before);
+
+        // The placement underneath stops at 7 and never seals the corner.
+        std::mt19937 random{seed};
+        const Obstacles placed = snake::placeObstacleCells(
+            8, random, crowded, std::nullopt, snake::config::ObstacleMinHeadDistance);
+        requireValidLayout(placed, crowded, std::nullopt, 7);
+    }
+}
+
+TEST_CASE("Placement keeps the board connected however many obstacles are asked for",
+          "[obstacle][TC-MODE-04]") {
+    // Dense layouts split the board easily, so this pushes the safety check
+    // much harder than the 8 obstacles of a real game.
+    const auto snakeBody = startingSnake();
+    const GridPosition food{3, 3};
+
+    for (std::uint32_t seed = 0; seed < 200; ++seed) {
+        const std::size_t count = 8 + seed % 150;
+        INFO("seed " << seed << ", " << count << " obstacles");
+        std::mt19937 random{seed};
+        const Obstacles placed = snake::placeObstacleCells(
+            count, random, snakeBody, food, snake::config::ObstacleMinHeadDistance);
+
+        requireValidLayout(placed, snakeBody, food, count);
     }
 }
 
