@@ -32,8 +32,17 @@ Renderer::Renderer() {
     if (pathSize > 0) {
         std::vector<char> executablePath(pathSize);
         if (_NSGetExecutablePath(executablePath.data(), &pathSize) == 0) {
-            executableDir =
-                std::filesystem::path(executablePath.data()).parent_path();
+            std::error_code pathError;
+            const auto canonicalExecutablePath = std::filesystem::canonical(
+                std::filesystem::path(executablePath.data()),
+                pathError
+            );
+            if (!pathError) {
+                executableDir = canonicalExecutablePath.parent_path();
+            } else {
+                executableDir =
+                    std::filesystem::path(executablePath.data()).parent_path();
+            }
         }
     }
 #elif defined(__linux__)
