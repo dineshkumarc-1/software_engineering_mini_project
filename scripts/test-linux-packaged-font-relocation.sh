@@ -47,6 +47,7 @@ else
     echo "Required ImageMagick command missing: magick/convert" >&2
     exit 1
 fi
+
 [[ -x "$executable" ]] || { echo "Built app missing: $executable" >&2; exit 1; }
 [[ -f "$build_assets/fonts/DejaVuSans.ttf" ]] || {
     echo "Bundled build font missing: $build_assets/fonts/DejaVuSans.ttf" >&2
@@ -57,8 +58,9 @@ fi
 
 cp "$executable" "$relocated_dir/SnakeXtreme"
 cp -a "$build_assets/." "$relocated_dir/assets/"
-[[ -f "$relocated_dir/assets/fonts/DejaVuSans.ttf" ]] || {
-    echo "Relocated package does not contain the expected font" >&2
+expected_font="$relocated_dir/assets/fonts/DejaVuSans.ttf"
+[[ -f "$expected_font" ]] || {
+    echo "Relocated package does not contain the expected font: $expected_font" >&2
     exit 1
 }
 
@@ -69,7 +71,7 @@ mv "$source_font" "$disabled_font"
 
 cd "$work_dir"
 echo "Launching relocated app from unrelated working directory: $PWD"
-echo "Expected bundled font: $relocated_dir/assets/fonts/DejaVuSans.ttf"
+echo "Expected bundled font: $expected_font"
 
 # Give the process a bound so a broken app cannot hang CI indefinitely.
 LIBGL_ALWAYS_SOFTWARE=1 timeout 20s strace -f -e trace=openat \
@@ -123,16 +125,8 @@ grep -Eiq 'High[[:space:]]+Score[ :]*0' <<< "$ocr_text" || {
     exit 1
 }
 
-if ! grep -F "\"$relocated_dir/assets/fonts/DejaVuSans.ttf\"" "$trace_log" | grep -Eq '= [0-9]+
-if grep -F "$source_font" "$trace_log" >/dev/null; then
-    echo "Trace shows an attempted source-tree font access despite the packaged copy" >&2
-    exit 1
-fi
-
-echo "[smoke] Font trace confirms the relocated bundled font was opened"
-echo "PASS: relocated executable opened bundled font, entered gameplay, and rendered Score/High Score."
-xdotool windowclose "$window" 2>/dev/null || true
-; then
+# Require a successful open (file descriptor returned), not merely an attempted path.
+if ! grep -F "$expected_font" "$trace_log" | grep -Eq ' = [0-9]+$'; then
     echo "Trace did not show a successful open of the relocated bundled font" >&2
     exit 1
 fi
@@ -141,6 +135,6 @@ if grep -F "$source_font" "$trace_log" >/dev/null; then
     exit 1
 fi
 
-echo "[smoke] Font trace confirms the relocated bundled font was opened"
+echo "[smoke] Font trace confirms the relocated bundled font was successfully opened"
 echo "PASS: relocated executable opened bundled font, entered gameplay, and rendered Score/High Score."
 xdotool windowclose "$window" 2>/dev/null || true
