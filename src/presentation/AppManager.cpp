@@ -137,16 +137,7 @@ void AppManager::update(sf::Time step) {
 
     while (movementAccumulator_ >= movementInterval &&
            !gameEngine_.isGameOver()) {
-        const auto previousCount = gameEngine_.foodEatenCount();
-
-        gameEngine_.tick();
-
-        const auto currentCount = gameEngine_.foodEatenCount();
-
-        if (currentCount > previousCount) {
-            gameSession_.foodEaten(activeMode_);
-        }
-
+        gameSession_.tick(gameEngine_, activeMode_);
         movementAccumulator_ -= movementInterval;
     }
 }
