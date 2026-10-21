@@ -88,8 +88,8 @@ jobs:
       - name: Test
         run: ctest --test-dir build --output-on-failure
 
-  # Full desktop build with the pinned SFML 2.5.1 (NFR-006). The Windows
-  # executable is kept as a download for manual testing and demos.
+  # Full desktop build with the pinned SFML 2.5.1. The Windows executable
+  # and its runtime assets are kept as a download for manual testing.
   app:
     name: App build (${{ matrix.name }})
     runs-on: ${{ matrix.os }}
@@ -114,7 +114,20 @@ jobs:
           sudo apt-get install -y --no-install-recommends \
             libx11-dev libxrandr-dev libudev-dev libgl1-mesa-dev libfreetype-dev
 
-      - name: Configure
+      # macos-latest currently uses Apple Silicon. Set the target architecture
+      # explicitly from the runner so every project and fetched SFML target
+      # uses the same architecture (avoids arm64/x86_64 link mismatches).
+      - name: Configure (macOS)
+        if: runner.os == 'macOS'
+        run: |
+          cmake -S . -B build \
+            -DSNAKE_FETCH_SFML=ON \
+            -DBUILD_SHARED_LIBS=OFF \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DCMAKE_OSX_ARCHITECTURES="$(uname -m)"
+
+      - name: Configure (Linux/Windows)
+        if: runner.os != 'macOS'
         run: >
           cmake -S . -B build
           -DSNAKE_FETCH_SFML=ON
