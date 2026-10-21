@@ -2,6 +2,7 @@
 #include <cstdint>
 #include <filesystem>
 #include <string>
+#include <system_error>
 #include <vector>
 
 #if defined(_WIN32)

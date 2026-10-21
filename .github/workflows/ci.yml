@@ -102,6 +102,8 @@ jobs:
             os: windows-latest
           - name: Linux GCC
             os: ubuntu-latest
+          - name: macOS Clang
+            os: macos-latest
     steps:
       - uses: actions/checkout@v4
 
