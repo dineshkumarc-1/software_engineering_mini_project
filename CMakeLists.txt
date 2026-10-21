@@ -50,6 +50,8 @@ if(SNAKE_BUILD_APP)
         src/presentation/AppManager.cpp
         src/presentation/Renderer.cpp)
     target_include_directories(snake_presentation PUBLIC include)
+    target_compile_definitions(snake_presentation PRIVATE
+        SNAKE_ASSET_DIR="${CMAKE_CURRENT_SOURCE_DIR}/assets")
     target_link_libraries(snake_presentation PUBLIC snake_app_state snake_engine sfml-graphics sfml-window sfml-system)
     snake_warnings(snake_presentation)
     add_executable(SnakeXtreme src/main.cpp)
@@ -95,7 +97,7 @@ if(BUILD_TESTING)
     add_test(NAME score_service COMMAND score_service_tests)
 
     add_executable(game_session_tests tests/GameSessionTests.cpp)
-    target_link_libraries(game_session_tests PRIVATE snake_scoring)
+    target_link_libraries(game_session_tests PRIVATE snake_scoring snake_engine)
     snake_warnings(game_session_tests)
     add_test(NAME game_session COMMAND game_session_tests)
 
@@ -105,4 +107,3 @@ if(BUILD_TESTING)
     snake_warnings(game_engine_tests)
     add_test(NAME game_engine COMMAND game_engine_tests)
 endif()
-
