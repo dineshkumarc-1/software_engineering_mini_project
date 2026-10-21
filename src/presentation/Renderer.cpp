@@ -1,37 +1,63 @@
 #include "snakextreme/Renderer.hpp"
 #include <filesystem>
 #include <string>
+#include <vector>
+
 #if defined(_WIN32)
 #include <windows.h>
+#elif defined(__APPLE__)
+#include <mach-o/dyld.h>
+#elif defined(__linux__)
+#include <unistd.h>
 #endif
 
 namespace snake {
 
 Renderer::Renderer() {
+    std::filesystem::path executableDir;
 #if defined(_WIN32)
     // Load the font bundled beside the executable.
-wchar_t executablePath[MAX_PATH];
-DWORD length = GetModuleFileNameW(
-    nullptr, executablePath, MAX_PATH);
+    wchar_t executablePath[MAX_PATH];
+    const DWORD length = GetModuleFileNameW(
+        nullptr, executablePath, MAX_PATH);
 
-if (length > 0 && length < MAX_PATH) {
-    const std::filesystem::path executableDir =
-        std::filesystem::path(executablePath).parent_path();
-
-    const auto fontPath =
-        executableDir / L"assets" / L"fonts" / L"DejaVuSans.ttf";
-
-    fontLoaded_ = font_.loadFromFile(fontPath.string());
-} else {
-    fontLoaded_ = false;
-}
-#else
-    const auto bundledFontPath = std::filesystem::path("assets")
-        / "fonts" / "DejaVuSans.ttf";
-    fontLoaded_ = font_.loadFromFile(bundledFontPath.string());
+    if (length > 0 && length < MAX_PATH) {
+        executableDir = std::filesystem::path(executablePath).parent_path();
+    }
+#elif defined(__APPLE__)
+    // _NSGetExecutablePath reports the required buffer size when too small.
+    std::uint32_t pathSize = 0;
+    (void)_NSGetExecutablePath(nullptr, &pathSize);
+    if (pathSize > 0) {
+        std::vector<char> executablePath(pathSize);
+        if (_NSGetExecutablePath(executablePath.data(), &pathSize) == 0) {
+            executableDir =
+                std::filesystem::path(executablePath.data()).parent_path();
+        }
+    }
+#elif defined(__linux__)
+    // readlink does not append a null terminator, so use the returned length.
+    std::vector<char> executablePath(4096);
+    const auto length = readlink(
+        "/proc/self/exe", executablePath.data(), executablePath.size());
+    if (length > 0 &&
+        static_cast<std::size_t>(length) < executablePath.size()) {
+        executableDir = std::filesystem::path(
+            std::string(executablePath.data(), static_cast<std::size_t>(length))
+        ).parent_path();
+    }
 #endif
 
+    if (!executableDir.empty()) {
+        const auto bundledFontPath =
+            executableDir / "assets" / "fonts" / "DejaVuSans.ttf";
+        fontLoaded_ = font_.loadFromFile(bundledFontPath.string());
+    } else {
+        fontLoaded_ = false;
+    }
+
 #if defined(SNAKE_ASSET_DIR)
+    // Development fallback; packaged builds should use the executable's assets.
     if (!fontLoaded_) {
         const auto sourceTreeFontPath = std::filesystem::path(SNAKE_ASSET_DIR)
             / "fonts" / "dejavu-sans-ttf-2.37" / "ttf" / "DejaVuSans.ttf";
@@ -40,7 +66,6 @@ if (length > 0 && length < MAX_PATH) {
 #endif
 
 }
-
 void Renderer::draw(
     sf::RenderTarget& target,
     Screen screen,
