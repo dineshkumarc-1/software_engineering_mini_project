@@ -68,12 +68,18 @@ if(SNAKE_BUILD_APP)
     target_include_directories(snake_presentation PUBLIC include)
     target_compile_definitions(snake_presentation PRIVATE
         SNAKE_ASSET_DIR="${CMAKE_CURRENT_SOURCE_DIR}/assets")
-    target_link_libraries(snake_presentation PUBLIC snake_app_state snake_engine sfml-graphics sfml-window sfml-system)
     target_link_libraries(snake_presentation PUBLIC
         snake_app_state snake_engine snake_modes snake_persistence
         sfml-graphics sfml-window sfml-system)
     snake_warnings(snake_presentation)
     add_executable(SnakeXtreme src/main.cpp)
+    add_custom_command(TARGET SnakeXtreme POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E make_directory
+            "$<TARGET_FILE_DIR:SnakeXtreme>/assets/fonts"
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            "${CMAKE_CURRENT_SOURCE_DIR}/assets/fonts/dejavu-sans-ttf-2.37/ttf/DejaVuSans.ttf"
+            "$<TARGET_FILE_DIR:SnakeXtreme>/assets/fonts/DejaVuSans.ttf"
+    )
     target_link_libraries(
         SnakeXtreme
         PRIVATE
@@ -116,12 +122,6 @@ if(BUILD_TESTING)
     target_link_libraries(game_session_tests PRIVATE snake_scoring snake_engine)
     snake_warnings(game_session_tests)
     add_test(NAME game_session COMMAND game_session_tests)
-
-    add_executable(game_engine_tests tests/GameEngineTests.cpp)
-    target_link_libraries(game_engine_tests PRIVATE
-        snake_engine Catch2::Catch2WithMain)
-    snake_warnings(game_engine_tests)
-    add_test(NAME game_engine COMMAND game_engine_tests)
     snake_add_catch2_test(game_engine_tests
         SOURCES tests/GameEngineTests.cpp
         LIBS snake_engine)

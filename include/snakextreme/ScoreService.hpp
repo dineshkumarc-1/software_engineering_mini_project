@@ -1,13 +1,9 @@
 
 #pragma once
 
-namespace snake {
+#include "snakextreme/GameMode.hpp"
 
-enum class GameMode {
-    Classic,
-    Timed,
-    Obstacle
-};
+namespace snake {
 
 class ScoreService {
 public:

@@ -1,24 +1,30 @@
 #include "snakextreme/Renderer.hpp"
+#include <windows.h>
+#include <filesystem>
 
 #include <string>
 
 namespace snake {
 
 Renderer::Renderer() {
-    // SNAKE_ASSET_DIR is set by CMake to an absolute source-tree asset path,
-    // so loading works whether the executable starts in the repo or build dir.
-    fontLoaded_ = font_.loadFromFile(
-        std::string(SNAKE_ASSET_DIR) +
-        "/fonts/dejavu-sans-ttf-2.37/ttf/DejaVuSans.ttf"
-    );
 
-    if (!fontLoaded_) {
-        fontLoaded_ = font_.loadFromFile("C:/Windows/Fonts/arial.ttf");
-    }
+    // Load the font bundled beside the executable.
+wchar_t executablePath[MAX_PATH];
+DWORD length = GetModuleFileNameW(
+    nullptr, executablePath, MAX_PATH);
 
-    if (!fontLoaded_) {
-        fontLoaded_ = font_.loadFromFile("C:/Windows/Fonts/segoeui.ttf");
-    }
+if (length > 0 && length < MAX_PATH) {
+    const std::filesystem::path executableDir =
+        std::filesystem::path(executablePath).parent_path();
+
+    const auto fontPath =
+        executableDir / L"assets" / L"fonts" / L"DejaVuSans.ttf";
+
+    fontLoaded_ = font_.loadFromFile(fontPath.string());
+} else {
+    fontLoaded_ = false;
+}
+
 }
 
 void Renderer::draw(
