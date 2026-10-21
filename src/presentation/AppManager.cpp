@@ -26,7 +26,13 @@ int AppManager::run() {
             accumulator -= fixedStep;
         }
         window_.clear(sf::Color(15, 23, 32));
-        renderer_.draw(window_, state_.screen());
+        renderer_.draw(
+            window_,
+            state_.screen(),
+            gameEngine_,
+            gameSession_.currentScore(),
+            gameSession_.highScore()
+        );
         window_.display();
     }
     return 0;
@@ -34,44 +40,106 @@ int AppManager::run() {
 
 void AppManager::pollEvents() {
     sf::Event event{};
+
     while (window_.pollEvent(event)) {
         if (event.type == sf::Event::Closed) {
             dispatch(Action::Quit);
             return;
         }
-        if (event.type == sf::Event::LostFocus && state_.screen() == Screen::Gameplay)
+
+        if (event.type == sf::Event::LostFocus &&
+            state_.screen() == Screen::Gameplay) {
             dispatch(Action::Pause);
-        if (event.type != sf::Event::KeyPressed) continue;
+        }
+
+        if (event.type != sf::Event::KeyPressed) {
+            continue;
+        }
+
+        if (state_.screen() == Screen::Gameplay) {
+            switch (event.key.code) {
+            case sf::Keyboard::Up:
+                gameEngine_.changeDirection(Direction::Up);
+                break;
+            case sf::Keyboard::Down:
+                gameEngine_.changeDirection(Direction::Down);
+                break;
+            case sf::Keyboard::Left:
+                gameEngine_.changeDirection(Direction::Left);
+                break;
+            case sf::Keyboard::Right:
+                gameEngine_.changeDirection(Direction::Right);
+                break;
+            default:
+                break;
+            }
+        }
+
         switch (event.key.code) {
         case sf::Keyboard::Enter:
-            if (state_.screen() == Screen::MainMenu) dispatch(Action::Start);
-            else if (state_.screen() == Screen::Paused) dispatch(Action::Resume);
+            if (state_.screen() == Screen::MainMenu) {
+                dispatch(Action::Start);
+            } else if (state_.screen() == Screen::Paused) {
+                dispatch(Action::Resume);
+            }
             break;
+
         case sf::Keyboard::Escape:
-            if (state_.screen() == Screen::MainMenu) dispatch(Action::Quit);
-            else if (state_.screen() == Screen::Gameplay) dispatch(Action::Pause);
-            else if (state_.screen() == Screen::Paused) dispatch(Action::Resume);
+            if (state_.screen() == Screen::MainMenu) {
+                dispatch(Action::Quit);
+            } else if (state_.screen() == Screen::Gameplay) {
+                dispatch(Action::Pause);
+            } else if (state_.screen() == Screen::Paused) {
+                dispatch(Action::Resume);
+            }
             break;
+
         case sf::Keyboard::M:
             dispatch(Action::BackToMenu);
             break;
-        default: break;
+
+        default:
+            break;
         }
-        if (!window_.isOpen()) return;
+
+        if (!window_.isOpen()) {
+            return;
+        }
     }
 }
 
 void AppManager::dispatch(Action action) {
-    state_.dispatch(action);
-    if (state_.screen() == Screen::Exiting) window_.close();
-    else updateTitle();
-}
+    if (action == Action::Start) {
+        gameEngine_ = GameEngine{};
+        gameSession_.start();
+        movementAccumulator_ = sf::Time::Zero;
+    }
 
+    state_.dispatch(action);
+
+    if (state_.screen() == Screen::Exiting) {
+        window_.close();
+    } else {
+        updateTitle();
+    }
+}
 void AppManager::update(sf::Time step) {
-    if (state_.screen() != Screen::Gameplay) return;
-    // Integration seam for the SFML-free engine; do not put game rules here.
-    // Engine tick intervals (200/120/70 ms) remain the engine owner's concern.
-    (void)step;
+    if (state_.screen() != Screen::Gameplay ||
+        gameEngine_.isGameOver()) {
+        return;
+    }
+
+    constexpr float movementIntervalSeconds = 0.120f;
+    const sf::Time movementInterval =
+        sf::seconds(movementIntervalSeconds);
+
+    movementAccumulator_ += step;
+
+    while (movementAccumulator_ >= movementInterval &&
+           !gameEngine_.isGameOver()) {
+        gameSession_.tick(gameEngine_, activeMode_);
+        movementAccumulator_ -= movementInterval;
+    }
 }
 
 void AppManager::updateTitle() {

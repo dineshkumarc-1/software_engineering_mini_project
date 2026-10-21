@@ -17,6 +17,10 @@ include(SnakeModules)
 # Each builds and tests on a machine without SFML or a display.
 # ---------------------------------------------------------------------------
 
+add_library(snake_scoring src/scoring/ScoreService.cpp)
+target_include_directories(snake_scoring PUBLIC include)
+snake_warnings(snake_scoring)
+
 # C1 navigation model (screen state flow).
 snake_add_module(snake_app_state SOURCES src/app/AppState.cpp)
 # C6 core gameplay engine.
@@ -62,12 +66,26 @@ if(SNAKE_BUILD_APP)
         src/presentation/AppManager.cpp
         src/presentation/Renderer.cpp)
     target_include_directories(snake_presentation PUBLIC include)
+    target_compile_definitions(snake_presentation PRIVATE
+        SNAKE_ASSET_DIR="${CMAKE_CURRENT_SOURCE_DIR}/assets")
     target_link_libraries(snake_presentation PUBLIC
         snake_app_state snake_engine snake_modes snake_persistence
         sfml-graphics sfml-window sfml-system)
     snake_warnings(snake_presentation)
     add_executable(SnakeXtreme src/main.cpp)
-    target_link_libraries(SnakeXtreme PRIVATE snake_presentation)
+    add_custom_command(TARGET SnakeXtreme POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E make_directory
+            "$<TARGET_FILE_DIR:SnakeXtreme>/assets/fonts"
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            "${CMAKE_CURRENT_SOURCE_DIR}/assets/fonts/dejavu-sans-ttf-2.37/ttf/DejaVuSans.ttf"
+            "$<TARGET_FILE_DIR:SnakeXtreme>/assets/fonts/DejaVuSans.ttf"
+    )
+    target_link_libraries(
+        SnakeXtreme
+        PRIVATE
+        snake_presentation
+        snake_scoring
+    )
     snake_warnings(SnakeXtreme)
     # Shared-library builds on Windows need the SFML DLLs beside the executable.
     if(WIN32 AND SNAKE_FETCH_SFML AND BUILD_SHARED_LIBS)
@@ -94,6 +112,16 @@ if(BUILD_TESTING)
     snake_warnings(app_state_tests)
     add_test(NAME app_state_flow COMMAND app_state_tests)
 
+
+    add_executable(score_service_tests tests/ScoreServiceTests.cpp)
+    target_link_libraries(score_service_tests PRIVATE snake_scoring)
+    snake_warnings(score_service_tests)
+    add_test(NAME score_service COMMAND score_service_tests)
+
+    add_executable(game_session_tests tests/GameSessionTests.cpp)
+    target_link_libraries(game_session_tests PRIVATE snake_scoring snake_engine)
+    snake_warnings(game_session_tests)
+    add_test(NAME game_session COMMAND game_session_tests)
     snake_add_catch2_test(game_engine_tests
         SOURCES tests/GameEngineTests.cpp
         LIBS snake_engine)
