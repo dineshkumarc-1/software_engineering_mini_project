@@ -102,8 +102,9 @@ jobs:
             os: windows-latest
           - name: Linux GCC
             os: ubuntu-latest
+          # SFML 2.5.1's macOS CMake currently requires the Intel architecture.
           - name: macOS Clang
-            os: macos-latest
+            os: macos-15-intel
     steps:
       - uses: actions/checkout@v4
 
@@ -114,9 +115,8 @@ jobs:
           sudo apt-get install -y --no-install-recommends \
             libx11-dev libxrandr-dev libudev-dev libgl1-mesa-dev libfreetype-dev
 
-      # macos-latest currently uses Apple Silicon. Set the target architecture
-      # explicitly from the runner so every project and fetched SFML target
-      # uses the same architecture (avoids arm64/x86_64 link mismatches).
+      # SFML 2.5.1 rejects arm64 in its macOS CMake configuration, so use
+      # the supported x86_64 target on the Intel macOS runner.
       - name: Configure (macOS)
         if: runner.os == 'macOS'
         run: |
@@ -124,7 +124,7 @@ jobs:
             -DSNAKE_FETCH_SFML=ON \
             -DBUILD_SHARED_LIBS=OFF \
             -DCMAKE_BUILD_TYPE=Release \
-            -DCMAKE_OSX_ARCHITECTURES="$(uname -m)"
+            -DCMAKE_OSX_ARCHITECTURES=x86_64
 
       - name: Configure (Linux/Windows)
         if: runner.os != 'macOS'
