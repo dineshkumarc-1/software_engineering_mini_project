@@ -1,4 +1,3 @@
-
 #include "snakextreme/Renderer.hpp"
 #include <array>
 
@@ -25,10 +24,10 @@ Renderer::Renderer() {
 void Renderer::draw(
     sf::RenderTarget& target,
     Screen screen,
+    const GameEngine& gameEngine,
     int currentScore,
     int highScore
-) const {
-    if (screen == Screen::Exiting) {
+)const{ if (screen == Screen::Exiting) {
         return;
     }
 
@@ -98,8 +97,50 @@ void Renderer::draw(
             "Score: " + std::to_string(currentScore) +
             "    High Score: " + std::to_string(highScore)
         );
-        target.draw(scoreText);
+    target.draw(scoreText);
+}
+    // Draw food.
+    if (screen == Screen::Gameplay && gameEngine.hasFood()) {
+        const auto food = gameEngine.food();
+
+        sf::CircleShape foodShape(
+            static_cast<float>(CellSize) / 2.f
+        );
+        foodShape.setFillColor(sf::Color(255, 90, 90));
+        foodShape.setPosition(
+            static_cast<float>(food.x * static_cast<int>(CellSize)),
+            static_cast<float>(food.y * static_cast<int>(CellSize))
+        );
+        target.draw(foodShape);
     }
+
+    // Draw the snake.
+    if (screen == Screen::Gameplay) {
+        const auto& body = gameEngine.snake();
+
+        for (std::size_t i = 0; i < body.size(); ++i) {
+            const auto& segment = body[i];
+
+            sf::RectangleShape segmentShape({
+                static_cast<float>(CellSize - 2),
+                static_cast<float>(CellSize - 2)
+            });
+
+            segmentShape.setPosition(
+                static_cast<float>(segment.x * static_cast<int>(CellSize) + 1),
+                static_cast<float>(segment.y * static_cast<int>(CellSize) + 1)
+            );
+
+            segmentShape.setFillColor(
+                i == 0
+                    ? sf::Color(63, 215, 155)
+                    : sf::Color(35, 160, 115)
+            );
+
+            target.draw(segmentShape);
+        }
+    }
+
 }
 
 } // namespace snake
