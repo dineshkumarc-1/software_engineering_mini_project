@@ -1,4 +1,5 @@
 #include "snakextreme/Renderer.hpp"
+#include <cstdint>
 #include <filesystem>
 #include <string>
 #include <vector>
