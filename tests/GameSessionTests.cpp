@@ -43,16 +43,17 @@ int main() {
     expect(session.highScore() == 35, "start preserves high score");
 
     // Regression: a real engine tick that eats food must update the session score.
+    GameSession integrationSession;
     std::deque<GridPosition> body = {
         {5, 5}, {4, 5}, {3, 5}
     };
     GameEngine game(body, Direction::Right, GridPosition{6, 5});
-    session.tick(game, GameMode::Classic);
+    integrationSession.tick(game, GameMode::Classic);
 
     expect(game.foodEatenCount() == 1, "engine records food consumption");
     expect(game.snake().size() == body.size() + 1, "snake grows after eating");
-    expect(session.currentScore() == 10, "food consumption updates current score");
-    expect(session.highScore() == 10, "food consumption updates high score");
+    expect(integrationSession.currentScore() == 10, "food consumption updates current score");
+    expect(integrationSession.highScore() == 10, "food consumption updates high score");
 
     std::cout << "All GameSession checks passed\n";
     return 0;
