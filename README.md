@@ -80,3 +80,31 @@ docs/issue-4.md                       Scope, traceability and validation
 ```
 
 Future engine integration should expose plain C++ game state; `Renderer` translates that state into SFML drawing. No SFML headers or types should be added to engine or persistence modules. Application's 60 Hz update seam is **not** the snake's movement interval (Easy 200 ms / Medium 120 ms / Hard 70 ms).
+
+## Core Engine Test Coverage — TC-CORE-01–08
+
+The headless engine tests validate core game logic independently of SFML
+rendering and real keyboard input. Run them with:
+
+```sh
+cmake --build build-headless
+ctest --test-dir build-headless --output-on-failure
+```
+
+| Test case | Requirement | Coverage status | Evidence / remaining work |
+| --- | --- | --- | --- |
+| TC-CORE-01 | Initial game state and startup | Partially covered; integration pending | Engine initialization is tested. First rendered frame, 10 application launches, and the <= 2000 ms startup target require application-level integration checks. |
+| TC-CORE-02 | Difficulty-based movement intervals | Partially covered; timing integration pending | Required intervals are Easy 200 ms, Medium 120 ms, and Hard 70 ms. Verify configured values and measure actual tick timing with a fake clock and system-level timestamps. |
+| TC-CORE-03 | Arrow-key and WASD controls | Partially covered; keyboard integration pending | Engine direction changes and queued turns are unit-tested. Actual arrow-key/WASD event handling requires integration testing. |
+| TC-CORE-04 | Reject 180-degree reversals | Covered by engine unit tests | Direct and queued reversal rejection are tested. |
+| TC-CORE-05 | Wall collision at all four boundaries | Covered by engine unit tests | Left, right, top, and bottom boundary collisions verify game-over state and the WALL reason. |
+| TC-CORE-06 | Self-collision and tail-vacate behavior | Covered by engine unit tests | Self-collision and moving into a tail cell that vacates on the same tick are tested. |
+| TC-CORE-07 | Food placement and respawning | Partially covered by engine unit tests | Tests cover 1,000 independent respawn trials, free-cell placement, the one-free-cell case, and a full board. Statistical uniformity is not established by these checks. |
+| TC-CORE-08 | Food consumption and snake growth | Covered by engine unit tests | Tests verify one-segment growth after eating and ten consecutive consumptions in one game, from length 3 to length 13. |
+
+### Integration checks still required
+
+- Verify initial rendering and startup latency across 10 launches.
+- Verify actual movement intervals using a fake clock and 50 system timestamps per required difficulty, applying the specified +/-10% tolerance.
+- Verify arrow-key and WASD input through the running application.
+- Record integration-test results separately from headless unit-test results.
