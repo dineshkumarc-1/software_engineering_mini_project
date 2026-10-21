@@ -1,5 +1,7 @@
 # SnakeXtreme — Team 16
 
+[![CI](https://github.com/dineshkumarc-1/software_engineering_mini_project/actions/workflows/ci.yml/badge.svg)](https://github.com/dineshkumarc-1/software_engineering_mini_project/actions/workflows/ci.yml)
+
 Offline C++17/SFML snake game. The submitted requirements, design and test-plan PDFs are in the repository root.
 
 ## Current implementation: issue #4
@@ -51,7 +53,34 @@ cmake --build build-headless
 ctest --test-dir build-headless --output-on-failure
 ```
 
-The small tests use explicit checks (including in Release builds), not `assert`. No test framework is downloaded; Catch2 integration remains with the build/test-environment story.
+Engine and game-mode tests use **Catch2 v3**. An installed Catch2 3.x is used if CMake finds one; otherwise v3.8.1 is downloaded on first configure (`-DSNAKE_FETCH_CATCH2=OFF` forbids the download). `cmake --build <dir> --target check` builds every test and runs the whole suite. The issue #4 navigation checks keep their small dependency-free harness.
+
+With CMake 3.21+ the same builds are available as presets (output in `build/<preset>`):
+
+```sh
+cmake --preset headless && cmake --build --preset headless && ctest --preset headless
+cmake --preset app      && cmake --build --preset app      && ctest --preset app
+```
+
+CI runs these checks on every pull request and push to `main` (Linux GCC, macOS Clang, Windows MSVC and MinGW-w64, plus full app builds on Windows and Linux). See [docs/modes-build-ci.md](docs/modes-build-ci.md).
+
+## Game modes and difficulty (issues #11, #12)
+
+`snake_modes` (SAD C7, SFML-free) provides the three mode strategies and the difficulty speeds. Values come from `GameConfig.hpp` (SRS Addendum §4).
+
+| Mode | Time limit | Obstacles | Points per food |
+| --- | --- | --- | --- |
+| Classic (default) | none | none | 10 |
+| Timed | 60 s countdown, game over (`TIME_UP`) at zero | none | 10 |
+| Obstacle | none | 8 static cells, game over (`OBSTACLE`) on contact | 15 |
+
+| Difficulty | Move interval |
+| --- | --- |
+| Easy | 200 ms |
+| Medium (default) | 120 ms |
+| Hard | 70 ms |
+
+The Mode & Difficulty screen and the HUD countdown are still to be wired in by the UI stories; docs/modes-build-ci.md shows the few lines the application loop needs.
 
 ## Controls for this scaffold
 
@@ -77,6 +106,45 @@ src/presentation/Renderer.cpp          Placeholder screen rendering
 src/main.cpp                          Entry point and exception boundary
 tests/AppStateTests.cpp               Headless navigation checks
 docs/issue-4.md                       Scope, traceability and validation
+include/snakextreme/GameMode.hpp       Mode/difficulty enums and stored names
+include/snakextreme/DifficultyProfile.hpp  Easy/Medium/Hard move intervals
+include/snakextreme/ModeStrategy.hpp   IModeStrategy: Classic, Timed, Obstacle
+include/snakextreme/ModeManager.hpp    Per-session mode state, countdown, obstacles
+src/modes/                            Mode strategies and obstacle placement
+tests/GameModeTests.cpp               TC-MODE-01..04 unit tests (Catch2)
+tests/ModeEngineIntegrationTests.cpp  Modes wired to the engine (Catch2)
+cmake/                                Module/test helpers, Catch2 setup, layering check
+CMakePresets.json                     headless and app build presets
+.github/workflows/ci.yml              CI pipeline
+docs/modes-build-ci.md                Issues #5, #10-#13: scope, traceability, validation
 ```
 
 Future engine integration should expose plain C++ game state; `Renderer` translates that state into SFML drawing. No SFML headers or types should be added to engine or persistence modules. Application's 60 Hz update seam is **not** the snake's movement interval (Easy 200 ms / Medium 120 ms / Hard 70 ms).
+
+## Core Engine Test Coverage — TC-CORE-01–08
+
+The headless engine tests validate core game logic independently of SFML
+rendering and real keyboard input. Run them with:
+
+```sh
+cmake --build build-headless
+ctest --test-dir build-headless --output-on-failure
+```
+
+| Test case | Requirement | Coverage status | Evidence / remaining work |
+| --- | --- | --- | --- |
+| TC-CORE-01 | Initial game state and startup | Partially covered; integration pending | Engine initialization is tested. First rendered frame, 10 application launches, and the <= 2000 ms startup target require application-level integration checks. |
+| TC-CORE-02 | Difficulty-based movement intervals | Partially covered; timing integration pending | Required intervals are Easy 200 ms, Medium 120 ms, and Hard 70 ms. Verify configured values and measure actual tick timing with a fake clock and system-level timestamps. |
+| TC-CORE-03 | Arrow-key and WASD controls | Partially covered; keyboard integration pending | Engine direction changes and queued turns are unit-tested. Actual arrow-key/WASD event handling requires integration testing. |
+| TC-CORE-04 | Reject 180-degree reversals | Covered by engine unit tests | Direct and queued reversal rejection are tested. |
+| TC-CORE-05 | Wall collision at all four boundaries | Covered by engine unit tests | Left, right, top, and bottom boundary collisions verify game-over state and the WALL reason. |
+| TC-CORE-06 | Self-collision and tail-vacate behavior | Covered by engine unit tests | Self-collision and moving into a tail cell that vacates on the same tick are tested. |
+| TC-CORE-07 | Food placement and respawning | Partially covered by engine unit tests | Tests cover 1,000 independent respawn trials, free-cell placement, the one-free-cell case, and a full board. Statistical uniformity is not established by these checks. |
+| TC-CORE-08 | Food consumption and snake growth | Covered by engine unit tests | Tests verify one-segment growth after eating and ten consecutive consumptions in one game, from length 3 to length 13. |
+
+### Integration checks still required
+
+- Verify initial rendering and startup latency across 10 launches.
+- Verify actual movement intervals using a fake clock and 50 system timestamps per required difficulty, applying the specified +/-10% tolerance.
+- Verify arrow-key and WASD input through the running application.
+- Record integration-test results separately from headless unit-test results.

@@ -1,0 +1,44 @@
+{
+  "version": 3,
+  "cmakeMinimumRequired": { "major": 3, "minor": 21, "patch": 0 },
+  "configurePresets": [
+    {
+      "name": "headless",
+      "displayName": "Headless logic + tests (no SFML)",
+      "binaryDir": "${sourceDir}/build/headless",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "SNAKE_BUILD_APP": "OFF"
+      }
+    },
+    {
+      "name": "app",
+      "displayName": "Desktop app + tests (downloads SFML 2.5.1)",
+      "binaryDir": "${sourceDir}/build/app",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "SNAKE_BUILD_APP": "ON",
+        "SNAKE_FETCH_SFML": "ON",
+        "BUILD_SHARED_LIBS": "OFF"
+      }
+    }
+  ],
+  "buildPresets": [
+    { "name": "headless", "configurePreset": "headless", "configuration": "Release" },
+    { "name": "app", "configurePreset": "app", "configuration": "Release" }
+  ],
+  "testPresets": [
+    {
+      "name": "headless",
+      "configurePreset": "headless",
+      "configuration": "Release",
+      "output": { "outputOnFailure": true }
+    },
+    {
+      "name": "app",
+      "configurePreset": "app",
+      "configuration": "Release",
+      "output": { "outputOnFailure": true }
+    }
+  ]
+}

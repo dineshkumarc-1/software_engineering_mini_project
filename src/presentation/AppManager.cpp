@@ -1,15 +1,15 @@
 
 #include "snakextreme/AppManager.hpp"
-#include "snakextreme/GameConfig.hpp"
 
 #include <algorithm>
 
 namespace snake {
 
 AppManager::AppManager()
-    : window_(sf::VideoMode(Renderer::Width, Renderer::Height),
-              "SnakeXtreme",
-              sf::Style::Titlebar | sf::Style::Close) {
+    : window_(
+          sf::VideoMode(Renderer::Width, Renderer::Height),
+          "SnakeXtreme",
+          sf::Style::Titlebar | sf::Style::Close) {
     window_.setFramerateLimit(60);
     window_.setKeyRepeatEnabled(false);
     updateTitle();
@@ -18,16 +18,19 @@ AppManager::AppManager()
 int AppManager::run() {
     sf::Clock clock;
     sf::Time accumulator = sf::Time::Zero;
-    const auto fixedStep = sf::seconds(1.f / 60.f);
+    const sf::Time fixedStep = sf::seconds(1.f / 60.f);
 
     while (window_.isOpen()) {
-        const auto elapsed = clock.restart();
+        const sf::Time elapsed = clock.restart();
+
         pollEvents();
 
+        // Do not update or render after the window closes.
         if (!window_.isOpen()) {
             break;
         }
 
+        // Limit catch-up updates after a pause or system stall.
         accumulator += std::min(elapsed, sf::milliseconds(250));
 
         while (accumulator >= fixedStep) {
@@ -36,7 +39,14 @@ int AppManager::run() {
         }
 
         window_.clear(sf::Color(15, 23, 32));
-        renderer_.draw(window_, state_.screen(), engine_);
+
+        renderer_.draw(
+            window_,
+            state_.screen(),
+            gameEngine_,
+            gameSession_.currentScore(),
+            gameSession_.highScore());
+
         window_.display();
     }
 
@@ -61,27 +71,27 @@ void AppManager::pollEvents() {
             continue;
         }
 
-        // Movement input is accepted only during gameplay.
+        // Movement controls: WASD or arrow keys.
         if (state_.screen() == Screen::Gameplay) {
             switch (event.key.code) {
             case sf::Keyboard::W:
             case sf::Keyboard::Up:
-                engine_.changeDirection(Direction::Up);
+                gameEngine_.changeDirection(Direction::Up);
                 break;
 
             case sf::Keyboard::S:
             case sf::Keyboard::Down:
-                engine_.changeDirection(Direction::Down);
+                gameEngine_.changeDirection(Direction::Down);
                 break;
 
             case sf::Keyboard::A:
             case sf::Keyboard::Left:
-                engine_.changeDirection(Direction::Left);
+                gameEngine_.changeDirection(Direction::Left);
                 break;
 
             case sf::Keyboard::D:
             case sf::Keyboard::Right:
-                engine_.changeDirection(Direction::Right);
+                gameEngine_.changeDirection(Direction::Right);
                 break;
 
             default:
@@ -89,6 +99,7 @@ void AppManager::pollEvents() {
             }
         }
 
+        // Menu and gameplay actions.
         switch (event.key.code) {
         case sf::Keyboard::Enter:
             if (state_.screen() == Screen::MainMenu) {
@@ -123,16 +134,13 @@ void AppManager::pollEvents() {
 }
 
 void AppManager::dispatch(Action action) {
-    state_.dispatch(action);
-
     if (action == Action::Start) {
-        engine_ = GameEngine{};
+        gameEngine_ = GameEngine{};
+        gameSession_.start();
         movementAccumulator_ = sf::Time::Zero;
     }
 
-    if (action == Action::Resume) {
-        movementAccumulator_ = sf::Time::Zero;
-    }
+    state_.dispatch(action);
 
     if (state_.screen() == Screen::Exiting) {
         window_.close();
@@ -142,36 +150,43 @@ void AppManager::dispatch(Action action) {
 }
 
 void AppManager::update(sf::Time step) {
-    if (state_.screen() != Screen::Gameplay || engine_.isGameOver()) {
+    if (state_.screen() != Screen::Gameplay ||
+        gameEngine_.isGameOver()) {
         return;
     }
 
+    // Keep movement timing independent of the rendering frame rate.
+    constexpr float movementIntervalSeconds = 0.120f;
+    const sf::Time movementInterval =
+        sf::seconds(movementIntervalSeconds);
+
     movementAccumulator_ += step;
 
-    const auto moveInterval =
-        sf::milliseconds(config::EasyMoveIntervalMs);
-
-    while (movementAccumulator_ >= moveInterval &&
-           !engine_.isGameOver()) {
-        engine_.tick();
-        movementAccumulator_ -= moveInterval;
+    while (movementAccumulator_ >= movementInterval &&
+           !gameEngine_.isGameOver()) {
+        gameSession_.tick(gameEngine_, activeMode_);
+        movementAccumulator_ -= movementInterval;
     }
 }
 
 void AppManager::updateTitle() {
+    // Keep the controls visible until the full menu UI is available.
     const char* title = "SnakeXtreme";
 
     switch (state_.screen()) {
     case Screen::MainMenu:
-        title = "SnakeXtreme | Main menu | Enter: start | Esc: exit";
+        title =
+            "SnakeXtreme | Main menu scaffold | Enter: preview | Esc: exit";
         break;
 
     case Screen::Gameplay:
-        title = "SnakeXtreme | WASD/Arrows: move | Esc: pause | M: menu";
+        title =
+            "SnakeXtreme | Gameplay placeholder | Esc: pause | M: menu";
         break;
 
     case Screen::Paused:
-        title = "SnakeXtreme | Paused | Esc/Enter: resume | M: menu";
+        title =
+            "SnakeXtreme | Paused | Esc/Enter: resume | M: menu";
         break;
 
     case Screen::Exiting:

@@ -3,7 +3,9 @@
 
 #include "snakextreme/AppState.hpp"
 #include "snakextreme/GameEngine.hpp"
+#include "snakextreme/GameSession.hpp"
 #include "snakextreme/Renderer.hpp"
+
 #include <SFML/Graphics.hpp>
 
 namespace snake {
@@ -22,8 +24,11 @@ private:
     sf::RenderWindow window_;
     AppState state_;
     Renderer renderer_;
-    GameEngine engine_;
+    GameEngine gameEngine_;
+    GameSession gameSession_;
+
     sf::Time movementAccumulator_{sf::Time::Zero};
+    GameMode activeMode_{GameMode::Classic};
 };
 
 } // namespace snake
