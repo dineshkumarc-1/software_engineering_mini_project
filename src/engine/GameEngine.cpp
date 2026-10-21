@@ -3,11 +3,26 @@
 #include "snakextreme/GameConfig.hpp"
 
 #include <algorithm>
+#include <stdexcept>
+#include <utility>
 #include <vector>
 
 namespace snake {
 
-// Default constructor: create a three-segment snake at the grid centre.
+namespace {
+
+void validateInitialSnake(
+    const std::deque<GridPosition>& body
+) {
+    if (body.empty()) {
+        throw std::invalid_argument(
+            "Initial snake must not be empty"
+        );
+    }
+}
+
+} // namespace
+
 GameEngine::GameEngine() {
     const int centerX = config::GridColumns / 2;
     const int centerY = config::GridRows / 2;
@@ -19,95 +34,97 @@ GameEngine::GameEngine() {
     spawnFood();
 }
 
-// Constructor for testing specific snake configurations.
-GameEngine::GameEngine(std::deque<GridPosition> initialSnake,
-                       Direction initialDirection)
-    : snake_(initialSnake), direction_(initialDirection) {
+GameEngine::GameEngine(
+    std::deque<GridPosition> initialSnake,
+    Direction initialDirection
+)
+    : snake_(std::move(initialSnake)),
+      direction_(initialDirection) {
+    validateInitialSnake(snake_);
     spawnFood();
 }
 
-// Constructor for tests that specify the initial food position.
-GameEngine::GameEngine(std::deque<GridPosition> initialSnake,
-                       Direction initialDirection,
-                       GridPosition initialFood)
-    : snake_(initialSnake), direction_(initialDirection) {
-    const bool insideGrid =
+GameEngine::GameEngine(
+    std::deque<GridPosition> initialSnake,
+    Direction initialDirection,
+    GridPosition initialFood
+)
+    : snake_(std::move(initialSnake)),
+      direction_(initialDirection) {
+    validateInitialSnake(snake_);
+
+    const bool inside =
         initialFood.x >= 0 &&
         initialFood.x < config::GridColumns &&
         initialFood.y >= 0 &&
         initialFood.y < config::GridRows;
 
     const bool occupied = std::find(
-        snake_.begin(), snake_.end(), initialFood) != snake_.end();
+        snake_.begin(), snake_.end(), initialFood
+    ) != snake_.end();
 
-    if (insideGrid && !occupied) {
-        food_ = initialFood;
-        hasFood_ = true;
+    if (!inside || occupied) {
+        throw std::invalid_argument(
+            "Initial food must be inside the grid and off the snake"
+        );
     }
+
+    food_ = initialFood;
+    hasFood_ = true;
 }
 
-// Return the snake's segments, with the head at the front.
+GameEngine::GameEngine(
+    std::deque<GridPosition> initialSnake,
+    Direction initialDirection,
+    GridPosition initialFood,
+    std::function<GridPosition(
+        const std::vector<GridPosition>&
+    )> foodSelector
+)
+    : GameEngine(
+          std::move(initialSnake),
+          initialDirection,
+          initialFood
+      ) {
+    if (!foodSelector) {
+        throw std::invalid_argument(
+            "Food selector must not be empty"
+        );
+    }
+
+    foodSelector_ = std::move(foodSelector);
+}
+
 const std::deque<GridPosition>& GameEngine::snake() const noexcept {
     return snake_;
 }
 
-// Return the current direction.
 Direction GameEngine::direction() const noexcept {
     return direction_;
 }
 
-// Return the current food position.
 GridPosition GameEngine::food() const noexcept {
     return food_;
 }
 
-// Return whether food currently exists on the board.
 bool GameEngine::hasFood() const noexcept {
     return hasFood_;
 }
 
-// Spawn food randomly on an unoccupied grid cell.
-bool GameEngine::spawnFood() {
-    std::vector<GridPosition> availableCells;
 
-    for (int y = 0; y < config::GridRows; ++y) {
-        for (int x = 0; x < config::GridColumns; ++x) {
-            const GridPosition candidate{x, y};
-
-            const bool occupied = std::find(
-                snake_.begin(), snake_.end(), candidate) != snake_.end();
-
-            if (!occupied) {
-                availableCells.push_back(candidate);
-            }
-        }
-    }
-
-    // If the board is full, no food can be spawned.
-    if (availableCells.empty()) {
-        hasFood_ = false;
-        gameOver_ = true;
-        gameOverReason_ = GameOverReason::BOARD_FULL;
-        return false;
-    }
-
-    std::uniform_int_distribution<std::size_t> distribution(
-        0, availableCells.size() - 1);
-
-    food_ = availableCells[distribution(randomEngine_)];
-    hasFood_ = true;
-
-    return true;
+std::size_t GameEngine::foodEatenCount() const noexcept {
+    return foodEatenCount_;
 }
 
-// Queue a direction change while preventing immediate reversals.
 void GameEngine::changeDirection(Direction next) {
     if (gameOver_) {
         return;
     }
 
     const Direction reference =
-        directionQueue_.empty() ? direction_ : directionQueue_.back();
+        directionQueue_.empty()
+            ? direction_
+            : directionQueue_.back();
 
     const bool reversing =
         (reference == Direction::Up && next == Direction::Down) ||
@@ -124,13 +141,61 @@ void GameEngine::changeDirection(Direction next) {
     }
 }
 
-// Advance the snake by one grid cell.
+bool GameEngine::spawnFood() {
+    std::vector<GridPosition> freeCells;
+
+    for (int y = 0; y < config::GridRows; ++y) {
+        for (int x = 0; x < config::GridColumns; ++x) {
+            const GridPosition cell{x, y};
+
+            const bool occupied = std::find(
+                snake_.begin(), snake_.end(), cell
+            ) != snake_.end();
+
+            if (!occupied) {
+                freeCells.push_back(cell);
+            }
+        }
+    }
+
+    if (freeCells.empty()) {
+        hasFood_ = false;
+        gameOver_ = true;
+        gameOverReason_ = GameOverReason::BOARD_FULL;
+        return false;
+    }
+
+    if (foodSelector_) {
+        const GridPosition selected = foodSelector_(freeCells);
+
+        const bool isFree = std::find(
+            freeCells.begin(), freeCells.end(), selected
+        ) != freeCells.end();
+
+        if (!isFree) {
+            throw std::invalid_argument(
+                "Food selector must choose a free cell"
+            );
+        }
+
+        food_ = selected;
+    } else {
+        std::uniform_int_distribution<std::size_t> choose(
+            0, freeCells.size() - 1
+        );
+
+        food_ = freeCells[choose(randomEngine_)];
+    }
+
+    hasFood_ = true;
+    return true;
+}
+
 void GameEngine::tick() {
     if (gameOver_) {
         return;
     }
 
-    // Apply at most one queued direction per tick.
     if (!directionQueue_.empty()) {
         direction_ = directionQueue_.front();
         directionQueue_.pop_front();
@@ -142,18 +207,20 @@ void GameEngine::tick() {
     case Direction::Up:
         --nextHead.y;
         break;
+
     case Direction::Down:
         ++nextHead.y;
         break;
+
     case Direction::Left:
         --nextHead.x;
         break;
+
     case Direction::Right:
         ++nextHead.x;
         break;
     }
 
-    // Check collision with the grid boundaries.
     if (nextHead.x < 0 ||
         nextHead.x >= config::GridColumns ||
         nextHead.y < 0 ||
@@ -163,15 +230,13 @@ void GameEngine::tick() {
         return;
     }
 
-    // Determine whether this move eats food.
     const bool eating = hasFood_ && nextHead == food_;
 
-    // The tail vacates its cell on a normal move, but stays when growing.
-    for (std::size_t i = 0; i < snake_.size(); ++i) {
-        if (!eating && i == snake_.size() - 1) {
-            continue;
-        }
+    // The tail remains occupied when eating; otherwise it vacates.
+    const std::size_t segmentsToCheck =
+        snake_.size() - (eating ? 0U : 1U);
 
+    for (std::size_t i = 0; i < segmentsToCheck; ++i) {
         if (nextHead == snake_[i]) {
             gameOver_ = true;
             gameOverReason_ = GameOverReason::SELF;
@@ -179,23 +244,22 @@ void GameEngine::tick() {
         }
     }
 
-    // Add the new head.
+
     snake_.push_front(nextHead);
 
     if (eating) {
-        // Keep the tail, increasing the snake's length by one.
+        ++foodEatenCount_;
         spawnFood();
     } else {
-        // Normal movement preserves the snake's length.
         snake_.pop_back();
     }
-}
+}  // This closes GameEngine::tick()
+
 
 bool GameEngine::isGameOver() const noexcept {
     return gameOver_;
 }
 
-// Return the reason the game ended.
 GameOverReason GameEngine::gameOverReason() const noexcept {
     return gameOverReason_;
 }

@@ -61,14 +61,27 @@ if(SNAKE_BUILD_APP)
     endif()
 endif()
 
+
 include(CTest)
 if(BUILD_TESTING)
+    include(FetchContent)
+
+    FetchContent_Declare(
+        Catch2
+        GIT_REPOSITORY https://github.com/catchorg/Catch2.git
+        GIT_TAG v3.8.1
+        GIT_SHALLOW TRUE
+    )
+    FetchContent_MakeAvailable(Catch2)
+
     add_executable(app_state_tests tests/AppStateTests.cpp)
     target_link_libraries(app_state_tests PRIVATE snake_app_state)
     snake_warnings(app_state_tests)
     add_test(NAME app_state_flow COMMAND app_state_tests)
+
     add_executable(game_engine_tests tests/GameEngineTests.cpp)
-    target_link_libraries(game_engine_tests PRIVATE snake_engine)
+    target_link_libraries(game_engine_tests PRIVATE
+        snake_engine Catch2::Catch2WithMain)
     snake_warnings(game_engine_tests)
     add_test(NAME game_engine COMMAND game_engine_tests)
 endif()
