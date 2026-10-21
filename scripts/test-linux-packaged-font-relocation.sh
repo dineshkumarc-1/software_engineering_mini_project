@@ -11,6 +11,7 @@ relocated_dir="$(mktemp -d /tmp/snakextreme-relocated.XXXXXX)"
 work_dir="$(mktemp -d /tmp/snakextreme-cwd.XXXXXX)"
 trace_log="$output_dir/font-open-trace.log"
 screenshot="$output_dir/gameplay.png"
+hud_crop="$output_dir/hud-crop.png"
 trace_pid=""
 
 mkdir -p "$output_dir" "$relocated_dir/assets" "$work_dir"
@@ -38,6 +39,14 @@ for tool in strace xdotool import tesseract timeout; do
         exit 1
     }
 done
+if command -v magick >/dev/null 2>&1; then
+    image_tool=(magick)
+elif command -v convert >/dev/null 2>&1; then
+    image_tool=(convert)
+else
+    echo "Required ImageMagick command missing: magick/convert" >&2
+    exit 1
+fi
 [[ -x "$executable" ]] || { echo "Built app missing: $executable" >&2; exit 1; }
 [[ -f "$build_assets/fonts/DejaVuSans.ttf" ]] || {
     echo "Bundled build font missing: $build_assets/fonts/DejaVuSans.ttf" >&2
@@ -98,9 +107,13 @@ echo "Window title after Enter: $window_title"
 
 echo "[smoke] Capturing gameplay window"
 timeout 10s import -window "$window" "$screenshot"
-echo "[smoke] Checking screenshot text"
-ocr_text="$(timeout 20s tesseract "$screenshot" stdout --psm 6 2>/dev/null | tr '\n' ' ')"
-echo "OCR of gameplay screenshot: $ocr_text"
+# Crop away the grid: full-screen OCR treats its repeated lines as text and
+# can miss the HUD even when the screenshot visibly contains it.
+"${image_tool[@]}" "$screenshot" -crop 390x42+10+8 +repage -resize 200% \
+    -colorspace Gray -contrast-stretch 1%x1% "$hud_crop"
+echo "[smoke] Checking cropped HUD text"
+ocr_text="$(timeout 20s tesseract "$hud_crop" stdout --psm 7 2>/dev/null | tr '\n' ' ')"
+echo "OCR of cropped HUD: $ocr_text"
 grep -Eiq 'Score[ :]*0' <<< "$ocr_text" || {
     echo "Screenshot did not show the current score" >&2
     exit 1
@@ -110,10 +123,19 @@ grep -Eiq 'High[[:space:]]+Score[ :]*0' <<< "$ocr_text" || {
     exit 1
 }
 
-grep -F "$relocated_dir/assets/fonts/DejaVuSans.ttf" "$trace_log" >/dev/null || {
-    echo "Trace did not show the relocated bundled font being opened" >&2
+if ! grep -F "\"$relocated_dir/assets/fonts/DejaVuSans.ttf\"" "$trace_log" | grep -Eq '= [0-9]+
+if grep -F "$source_font" "$trace_log" >/dev/null; then
+    echo "Trace shows an attempted source-tree font access despite the packaged copy" >&2
     exit 1
-}
+fi
+
+echo "[smoke] Font trace confirms the relocated bundled font was opened"
+echo "PASS: relocated executable opened bundled font, entered gameplay, and rendered Score/High Score."
+xdotool windowclose "$window" 2>/dev/null || true
+; then
+    echo "Trace did not show a successful open of the relocated bundled font" >&2
+    exit 1
+fi
 if grep -F "$source_font" "$trace_log" >/dev/null; then
     echo "Trace shows an attempted source-tree font access despite the packaged copy" >&2
     exit 1
