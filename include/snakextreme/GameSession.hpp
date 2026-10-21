@@ -1,6 +1,6 @@
-
 #pragma once
 
+#include "snakextreme/GameEngine.hpp"
 #include "snakextreme/ScoreService.hpp"
 
 namespace snake {
@@ -13,6 +13,17 @@ public:
 
     void foodEaten(GameMode mode) noexcept {
         scoreService_.foodEaten(mode);
+    }
+
+    // Advance the engine and apply score changes for any food consumed
+    // during this tick. Kept here so the integration can be tested headlessly.
+    void tick(GameEngine& gameEngine, GameMode mode) {
+        const auto previousCount = gameEngine.foodEatenCount();
+        gameEngine.tick();
+
+        if (gameEngine.foodEatenCount() > previousCount) {
+            foodEaten(mode);
+        }
     }
 
     [[nodiscard]] int currentScore() const noexcept {
@@ -28,4 +39,3 @@ private:
 };
 
 } // namespace snake
-
