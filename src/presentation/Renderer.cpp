@@ -1,23 +1,23 @@
 #include "snakextreme/Renderer.hpp"
-#include <array>
+
+#include <string>
 
 namespace snake {
 
 Renderer::Renderer() {
+    // SNAKE_ASSET_DIR is set by CMake to an absolute source-tree asset path,
+    // so loading works whether the executable starts in the repo or build dir.
     fontLoaded_ = font_.loadFromFile(
-        "assets/fonts/dejavu-sans-ttf-2.37/ttf/DejaVuSans.ttf"
+        std::string(SNAKE_ASSET_DIR) +
+        "/fonts/dejavu-sans-ttf-2.37/ttf/DejaVuSans.ttf"
     );
 
     if (!fontLoaded_) {
-        fontLoaded_ = font_.loadFromFile(
-            "C:/Windows/Fonts/arial.ttf"
-        );
+        fontLoaded_ = font_.loadFromFile("C:/Windows/Fonts/arial.ttf");
     }
 
     if (!fontLoaded_) {
-        fontLoaded_ = font_.loadFromFile(
-            "C:/Windows/Fonts/segoeui.ttf"
-        );
+        fontLoaded_ = font_.loadFromFile("C:/Windows/Fonts/segoeui.ttf");
     }
 }
 
@@ -27,7 +27,8 @@ void Renderer::draw(
     const GameEngine& gameEngine,
     int currentScore,
     int highScore
-)const{ if (screen == Screen::Exiting) {
+) const {
+    if (screen == Screen::Exiting) {
         return;
     }
 
@@ -48,11 +49,10 @@ void Renderer::draw(
         return;
     }
 
-    // Existing 30x20 grid preview.
     sf::VertexArray grid(sf::Lines);
     const sf::Color gridColor(43, 61, 72);
 
-    for (unsigned x = 0; x <= Width; x += 30) {
+    for (unsigned x = 0; x <= Width; x += CellSize) {
         grid.append(sf::Vertex(
             {static_cast<float>(x), 0.f}, gridColor));
         grid.append(sf::Vertex(
@@ -60,7 +60,7 @@ void Renderer::draw(
             gridColor));
     }
 
-    for (unsigned y = 0; y <= Height; y += 30) {
+    for (unsigned y = 0; y <= Height; y += CellSize) {
         grid.append(sf::Vertex(
             {0.f, static_cast<float>(y)}, gridColor));
         grid.append(sf::Vertex(
@@ -70,36 +70,7 @@ void Renderer::draw(
 
     target.draw(grid);
 
-    if (screen == Screen::Paused) {
-        sf::RectangleShape overlay({
-            static_cast<float>(Width),
-            static_cast<float>(Height)
-        });
-        overlay.setFillColor(sf::Color(0, 0, 0, 165));
-        target.draw(overlay);
-
-        sf::RectangleShape bar({24.f, 96.f});
-        bar.setFillColor(sf::Color(63, 215, 155));
-        bar.setPosition(414.f, 252.f);
-        target.draw(bar);
-        bar.setPosition(462.f, 252.f);
-        target.draw(bar);
-    }
-
-    // HUD is visible during gameplay and while paused.
-    if (fontLoaded_) {
-        sf::Text scoreText;
-        scoreText.setFont(font_);
-        scoreText.setCharacterSize(22);
-        scoreText.setFillColor(sf::Color(255, 255, 255));
-        scoreText.setPosition(20.f, 15.f);
-        scoreText.setString(
-            "Score: " + std::to_string(currentScore) +
-            "    High Score: " + std::to_string(highScore)
-        );
-    target.draw(scoreText);
-}
-    // Draw food.
+    // Draw gameplay objects first. The HUD is intentionally rendered last.
     if (screen == Screen::Gameplay && gameEngine.hasFood()) {
         const auto food = gameEngine.food();
 
@@ -114,7 +85,6 @@ void Renderer::draw(
         target.draw(foodShape);
     }
 
-    // Draw the snake.
     if (screen == Screen::Gameplay) {
         const auto& body = gameEngine.snake();
 
@@ -141,6 +111,42 @@ void Renderer::draw(
         }
     }
 
+    if (screen == Screen::Paused) {
+        sf::RectangleShape overlay({
+            static_cast<float>(Width),
+            static_cast<float>(Height)
+        });
+        overlay.setFillColor(sf::Color(0, 0, 0, 165));
+        target.draw(overlay);
+
+        sf::RectangleShape bar({24.f, 96.f});
+        bar.setFillColor(sf::Color(63, 215, 155));
+        bar.setPosition(414.f, 252.f);
+        target.draw(bar);
+        bar.setPosition(462.f, 252.f);
+        target.draw(bar);
+    }
+
+    // Opaque dark backing keeps the score legible over the grid and gameplay.
+    if (fontLoaded_) {
+        sf::RectangleShape hudBackground({390.f, 42.f});
+        hudBackground.setPosition(10.f, 8.f);
+        hudBackground.setFillColor(sf::Color(8, 14, 20, 235));
+        hudBackground.setOutlineColor(sf::Color(63, 215, 155));
+        hudBackground.setOutlineThickness(1.f);
+        target.draw(hudBackground);
+
+        sf::Text scoreText;
+        scoreText.setFont(font_);
+        scoreText.setCharacterSize(22);
+        scoreText.setFillColor(sf::Color(255, 255, 255));
+        scoreText.setPosition(20.f, 13.f);
+        scoreText.setString(
+            "Score: " + std::to_string(currentScore) +
+            "    High Score: " + std::to_string(highScore)
+        );
+        target.draw(scoreText);
+    }
 }
 
 } // namespace snake
