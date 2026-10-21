@@ -16,9 +16,13 @@ trace_pid=""
 mkdir -p "$output_dir" "$relocated_dir/assets" "$work_dir"
 
 cleanup() {
-    if [[ -n "$trace_pid" ]] && kill -0 "$trace_pid" 2>/dev/null; then
-        # timeout forwards SIGTERM to the traced app as well.
+    if [[ -n "$trace_pid" ]]; then
+        # Kill the traced app and strace as well as timeout to avoid orphaned
+        # GUI processes or an unbounded wait in a headless CI runner.
+        pkill -TERM -f "$relocated_dir/SnakeXtreme" 2>/dev/null || true
         kill -TERM "$trace_pid" 2>/dev/null || true
+        sleep 0.2
+        kill -KILL "$trace_pid" 2>/dev/null || true
         wait "$trace_pid" 2>/dev/null || true
     fi
     if [[ -f "$disabled_font" && ! -f "$source_font" ]]; then
@@ -59,13 +63,13 @@ echo "Launching relocated app from unrelated working directory: $PWD"
 echo "Expected bundled font: $relocated_dir/assets/fonts/DejaVuSans.ttf"
 
 # Give the process a bound so a broken app cannot hang CI indefinitely.
-LIBGL_ALWAYS_SOFTWARE=1 timeout --foreground 20s strace -f -e trace=openat \
+LIBGL_ALWAYS_SOFTWARE=1 timeout 20s strace -f -e trace=openat \
     -o "$trace_log" "$relocated_dir/SnakeXtreme" &
 trace_pid=$!
 
 window=""
-for attempt in $(seq 1 60); do
-    window="$(xdotool search --onlyvisible --name 'SnakeXtreme' 2>/dev/null | head -n 1 || true)"
+for attempt in $(seq 1 30); do
+    window="$(timeout 1s xdotool search --onlyvisible --name 'SnakeXtreme' 2>/dev/null | head -n 1 || true)"
     if [[ -n "$window" ]]; then
         break
     fi
@@ -81,6 +85,7 @@ done
 # Xvfb has no desktop window manager; avoid waiting indefinitely for an
 # active-window notification that a minimal display may never provide.
 timeout 5s xdotool windowfocus "$window" || true
+echo "[smoke] Sending Enter to open gameplay"
 timeout 5s xdotool key --clearmodifiers Return
 sleep 0.8
 
@@ -91,7 +96,9 @@ echo "Window title after Enter: $window_title"
     exit 1
 }
 
+echo "[smoke] Capturing gameplay window"
 timeout 10s import -window "$window" "$screenshot"
+echo "[smoke] Checking screenshot text"
 ocr_text="$(timeout 20s tesseract "$screenshot" stdout --psm 6 2>/dev/null | tr '\n' ' ')"
 echo "OCR of gameplay screenshot: $ocr_text"
 grep -Eiq 'Score[ :]*0' <<< "$ocr_text" || {
@@ -112,4 +119,6 @@ if grep -F "$source_font" "$trace_log" >/dev/null; then
     exit 1
 fi
 
+echo "[smoke] Font trace confirms the relocated bundled font was opened"
 echo "PASS: relocated executable opened bundled font, entered gameplay, and rendered Score/High Score."
+xdotool windowclose "$window" 2>/dev/null || true
