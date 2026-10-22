@@ -2,11 +2,14 @@
 #pragma once
 
 #include "snakextreme/AppState.hpp"
-#include "snakextreme/GameEngine.hpp"
-#include "snakextreme/GameSession.hpp"
+#include "snakextreme/GameplayController.hpp"
+#include "snakextreme/MenuSelection.hpp"
+#include "snakextreme/ModeManager.hpp"
 #include "snakextreme/Renderer.hpp"
 
 #include <SFML/Graphics.hpp>
+
+#include <string>
 
 namespace snake {
 
@@ -17,18 +20,26 @@ public:
 
 private:
     void pollEvents();
+    void handleKey(sf::Keyboard::Key key);
+    void select(MenuInput input);
+    void startGame();
     void dispatch(Action action);
     void update(sf::Time step);
-    void updateTitle();
+    void refreshTitle();
+    std::string titleText() const;
+    FrameView frame() const;
 
     sf::RenderWindow window_;
     AppState state_;
     Renderer renderer_;
-    GameEngine gameEngine_;
-    GameSession gameSession_;
 
-    sf::Time movementAccumulator_{sf::Time::Zero};
-    GameMode activeMode_{GameMode::Classic};
+    // Main-menu choice; Classic / Medium by default (FR-008, FR-009).
+    SessionConfig selectedConfig_{};
+    // Engine, ModeManager and score for the current game.
+    GameplayController gameplay_;
+    // Shown on the menu when a game could not start.
+    std::string menuError_;
+    std::string title_;
 };
 
 } // namespace snake
