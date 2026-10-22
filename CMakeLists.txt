@@ -28,6 +28,10 @@ snake_add_module(snake_engine SOURCES src/engine/GameEngine.cpp)
 # C7 game modes and difficulty profiles. Uses engine grid types only.
 snake_add_module(snake_modes
     SOURCES src/modes/ModeStrategy.cpp src/modes/ModeManager.cpp)
+# One game as the app runs it: engine + ModeManager + score session.
+snake_add_module(snake_gameplay
+    SOURCES src/gameplay/GameplayController.cpp
+    DEPS snake_app_state snake_engine snake_modes snake_scoring)
 # C11-C13 persistence. Placeholder until issue #15 adds sources, e.g.
 #   snake_add_module(snake_persistence SOURCES src/persistence/SecureFileStore.cpp)
 snake_add_module(snake_persistence)
@@ -56,6 +60,16 @@ if(SNAKE_BUILD_APP)
         endif()
         FetchContent_MakeAvailable(sfml)
         set(CMAKE_POLICY_VERSION_MINIMUM "${snake_saved_policy_minimum}")
+        # Treat SFML's headers as system headers (as an installed SFML is),
+        # so project warnings and SNAKE_WARNINGS_AS_ERRORS judge project
+        # code only, not SFML's own inline code.
+        foreach(module system window graphics)
+            get_target_property(snake_sfml_includes sfml-${module} INTERFACE_INCLUDE_DIRECTORIES)
+            if(snake_sfml_includes)
+                set_target_properties(sfml-${module} PROPERTIES
+                    INTERFACE_SYSTEM_INCLUDE_DIRECTORIES "${snake_sfml_includes}")
+            endif()
+        endforeach()
     else()
         find_package(SFML 2.5 COMPONENTS graphics window system REQUIRED)
         if(DEFINED SFML_VERSION AND NOT SFML_VERSION VERSION_LESS 3)
@@ -69,8 +83,8 @@ if(SNAKE_BUILD_APP)
     target_compile_definitions(snake_presentation PRIVATE
         SNAKE_ASSET_DIR="${CMAKE_CURRENT_SOURCE_DIR}/assets")
     target_link_libraries(snake_presentation PUBLIC
-        snake_app_state snake_engine snake_modes snake_persistence
-        sfml-graphics sfml-window sfml-system)
+        snake_app_state snake_engine snake_modes snake_scoring snake_gameplay
+        snake_persistence sfml-graphics sfml-window sfml-system)
     snake_warnings(snake_presentation)
     add_executable(SnakeXtreme src/main.cpp)
     add_custom_command(TARGET SnakeXtreme POST_BUILD
@@ -129,6 +143,11 @@ if(BUILD_TESTING)
     snake_add_catch2_test(game_mode_tests
         SOURCES tests/GameModeTests.cpp tests/ModeEngineIntegrationTests.cpp
         LIBS snake_modes snake_engine)
+
+    # Menu selection and the app's game wiring (modes, speed, timer, score).
+    snake_add_catch2_test(gameplay_tests
+        SOURCES tests/GameplayControllerTests.cpp
+        LIBS snake_gameplay)
 
     # TC-MNT-01: SFML-free code must not include SFML headers.
     add_test(NAME layering_core_is_sfml_free
