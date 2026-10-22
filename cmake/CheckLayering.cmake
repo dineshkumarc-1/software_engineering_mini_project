@@ -13,7 +13,7 @@ if(NOT SNAKE_SOURCE_DIR)
     message(FATAL_ERROR "Pass -DSNAKE_SOURCE_DIR=<repository root>")
 endif()
 
-set(core_dirs app engine modes scoring persistence)
+set(core_dirs app engine modes scoring gameplay persistence)
 set(pending "")
 foreach(dir IN LISTS core_dirs)
     file(GLOB_RECURSE found
@@ -50,7 +50,7 @@ list(LENGTH visited checked)
 if(violations)
     string(REPLACE ";" "\n  " report "${violations}")
     message(FATAL_ERROR
-        "SFML must not be used by engine, modes, scoring, persistence or "
-        "app-state code:\n  ${report}")
+        "SFML must not be used by engine, modes, scoring, gameplay, "
+        "persistence or app-state code:\n  ${report}")
 endif()
 message(STATUS "Layering OK: ${checked} SFML-free files checked")

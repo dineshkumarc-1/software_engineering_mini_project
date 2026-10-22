@@ -2,8 +2,18 @@
 #include "snakextreme/AppManager.hpp"
 
 #include <algorithm>
+#include <chrono>
 
 namespace snake {
+
+namespace {
+
+std::string settingsText(const SessionConfig& config) {
+    return std::string(toString(config.mode)) + " / " +
+           std::string(toString(config.difficulty));
+}
+
+} // namespace
 
 AppManager::AppManager()
     : window_(
@@ -12,7 +22,7 @@ AppManager::AppManager()
           sf::Style::Titlebar | sf::Style::Close) {
     window_.setFramerateLimit(60);
     window_.setKeyRepeatEnabled(false);
-    updateTitle();
+    refreshTitle();
 }
 
 int AppManager::run() {
@@ -38,15 +48,10 @@ int AppManager::run() {
             accumulator -= fixedStep;
         }
 
+        refreshTitle();
+
         window_.clear(sf::Color(15, 23, 32));
-
-        renderer_.draw(
-            window_,
-            state_.screen(),
-            gameEngine_,
-            gameSession_.currentScore(),
-            gameSession_.highScore());
-
+        renderer_.draw(window_, frame());
         window_.display();
     }
 
@@ -67,64 +72,8 @@ void AppManager::pollEvents() {
             dispatch(Action::Pause);
         }
 
-        if (event.type != sf::Event::KeyPressed) {
-            continue;
-        }
-
-        // Movement controls: WASD or arrow keys.
-        if (state_.screen() == Screen::Gameplay) {
-            switch (event.key.code) {
-            case sf::Keyboard::W:
-            case sf::Keyboard::Up:
-                gameEngine_.changeDirection(Direction::Up);
-                break;
-
-            case sf::Keyboard::S:
-            case sf::Keyboard::Down:
-                gameEngine_.changeDirection(Direction::Down);
-                break;
-
-            case sf::Keyboard::A:
-            case sf::Keyboard::Left:
-                gameEngine_.changeDirection(Direction::Left);
-                break;
-
-            case sf::Keyboard::D:
-            case sf::Keyboard::Right:
-                gameEngine_.changeDirection(Direction::Right);
-                break;
-
-            default:
-                break;
-            }
-        }
-
-        // Menu and gameplay actions.
-        switch (event.key.code) {
-        case sf::Keyboard::Enter:
-            if (state_.screen() == Screen::MainMenu) {
-                dispatch(Action::Start);
-            } else if (state_.screen() == Screen::Paused) {
-                dispatch(Action::Resume);
-            }
-            break;
-
-        case sf::Keyboard::Escape:
-            if (state_.screen() == Screen::MainMenu) {
-                dispatch(Action::Quit);
-            } else if (state_.screen() == Screen::Gameplay) {
-                dispatch(Action::Pause);
-            } else if (state_.screen() == Screen::Paused) {
-                dispatch(Action::Resume);
-            }
-            break;
-
-        case sf::Keyboard::M:
-            dispatch(Action::BackToMenu);
-            break;
-
-        default:
-            break;
+        if (event.type == sf::Event::KeyPressed) {
+            handleKey(event.key.code);
         }
 
         if (!window_.isOpen()) {
@@ -133,67 +82,198 @@ void AppManager::pollEvents() {
     }
 }
 
-void AppManager::dispatch(Action action) {
-    if (action == Action::Start) {
-        gameEngine_ = GameEngine{};
-        gameSession_.start();
-        movementAccumulator_ = sf::Time::Zero;
-    }
-
-    state_.dispatch(action);
-
-    if (state_.screen() == Screen::Exiting) {
-        window_.close();
-    } else {
-        updateTitle();
-    }
-}
-
-void AppManager::update(sf::Time step) {
-    if (state_.screen() != Screen::Gameplay ||
-        gameEngine_.isGameOver()) {
-        return;
-    }
-
-    // Keep movement timing independent of the rendering frame rate.
-    constexpr float movementIntervalSeconds = 0.120f;
-    const sf::Time movementInterval =
-        sf::seconds(movementIntervalSeconds);
-
-    movementAccumulator_ += step;
-
-    while (movementAccumulator_ >= movementInterval &&
-           !gameEngine_.isGameOver()) {
-        gameSession_.tick(gameEngine_, activeMode_);
-        movementAccumulator_ -= movementInterval;
-    }
-}
-
-void AppManager::updateTitle() {
-    // Keep the controls visible until the full menu UI is available.
-    const char* title = "SnakeXtreme";
-
+void AppManager::handleKey(sf::Keyboard::Key key) {
     switch (state_.screen()) {
     case Screen::MainMenu:
-        title =
-            "SnakeXtreme | Main menu scaffold | Enter: preview | Esc: exit";
+        // Mode and difficulty can only be chosen here, never during a game.
+        switch (key) {
+        case sf::Keyboard::Left:
+        case sf::Keyboard::A:
+            select(MenuInput::PreviousMode);
+            break;
+        case sf::Keyboard::Right:
+        case sf::Keyboard::D:
+            select(MenuInput::NextMode);
+            break;
+        case sf::Keyboard::Up:
+        case sf::Keyboard::W:
+            select(MenuInput::HarderDifficulty);
+            break;
+        case sf::Keyboard::Down:
+        case sf::Keyboard::S:
+            select(MenuInput::EasierDifficulty);
+            break;
+        case sf::Keyboard::Enter:
+            startGame();
+            break;
+        case sf::Keyboard::Escape:
+            dispatch(Action::Quit);
+            break;
+        default:
+            break;
+        }
         break;
 
     case Screen::Gameplay:
-        title =
-            "SnakeXtreme | Gameplay placeholder | Esc: pause | M: menu";
+        // Movement controls: WASD or arrow keys.
+        switch (key) {
+        case sf::Keyboard::W:
+        case sf::Keyboard::Up:
+            gameplay_.changeDirection(Direction::Up);
+            break;
+        case sf::Keyboard::S:
+        case sf::Keyboard::Down:
+            gameplay_.changeDirection(Direction::Down);
+            break;
+        case sf::Keyboard::A:
+        case sf::Keyboard::Left:
+            gameplay_.changeDirection(Direction::Left);
+            break;
+        case sf::Keyboard::D:
+        case sf::Keyboard::Right:
+            gameplay_.changeDirection(Direction::Right);
+            break;
+        case sf::Keyboard::Enter:
+            // Play again with the same settings once the game has stopped.
+            if (gameplay_.isGameOver()) {
+                startGame();
+            }
+            break;
+        case sf::Keyboard::Escape:
+            dispatch(Action::Pause);
+            break;
+        case sf::Keyboard::M:
+            dispatch(Action::BackToMenu);
+            break;
+        default:
+            break;
+        }
         break;
 
     case Screen::Paused:
-        title =
-            "SnakeXtreme | Paused | Esc/Enter: resume | M: menu";
+        switch (key) {
+        case sf::Keyboard::Enter:
+        case sf::Keyboard::Escape:
+            dispatch(Action::Resume);
+            break;
+        case sf::Keyboard::M:
+            dispatch(Action::BackToMenu);
+            break;
+        default:
+            break;
+        }
         break;
 
     case Screen::Exiting:
         break;
     }
+}
 
-    window_.setTitle(title);
+void AppManager::select(MenuInput input) {
+    selectedConfig_ = applyMenuInput(selectedConfig_, input, state_.screen());
+    menuError_.clear();
+}
+
+void AppManager::startGame() {
+    if (gameplay_.start(selectedConfig_)) {
+        menuError_.clear();
+        if (state_.screen() == Screen::MainMenu) {
+            dispatch(Action::Start);
+        }
+        return;
+    }
+
+    // Stay on (or return to) the menu and say why.
+    menuError_ = "Could not start the game: " + gameplay_.lastError();
+    if (state_.screen() != Screen::MainMenu) {
+        dispatch(Action::BackToMenu);
+    }
+}
+
+void AppManager::dispatch(Action action) {
+    state_.dispatch(action);
+
+    if (state_.screen() == Screen::Exiting) {
+        window_.close();
+    } else {
+        refreshTitle();
+    }
+}
+
+void AppManager::update(sf::Time step) {
+    // The controller ignores updates outside the Gameplay screen, so a
+    // paused game keeps both its position and its countdown.
+    gameplay_.update(std::chrono::microseconds{step.asMicroseconds()},
+                     state_.screen());
+}
+
+void AppManager::refreshTitle() {
+    // The title mirrors the HUD, so the state stays visible even if the
+    // bundled font cannot be loaded.
+    std::string title = titleText();
+    if (title != title_) {
+        title_ = std::move(title);
+        window_.setTitle(title_);
+    }
+}
+
+std::string AppManager::titleText() const {
+    std::string title = "SnakeXtreme";
+
+    switch (state_.screen()) {
+    case Screen::MainMenu:
+        title += " | Menu | " + settingsText(selectedConfig_);
+        if (!menuError_.empty()) {
+            title += " | " + menuError_;
+        }
+        title += " | Left/Right: mode, Up/Down: difficulty, Enter: start, Esc: exit";
+        break;
+
+    case Screen::Gameplay:
+    case Screen::Paused: {
+        if (gameplay_.isGameOver()) {
+            title += " | Game over: " +
+                     std::string(describeGameOver(gameplay_.gameOverReason()));
+        } else if (state_.screen() == Screen::Paused) {
+            title += " | Paused";
+        } else {
+            title += " | Playing";
+        }
+        title += " | " + settingsText(gameplay_.config()) +
+                 " | Score " + std::to_string(gameplay_.score()) +
+                 " | High " + std::to_string(gameplay_.highScore());
+        if (const auto remaining = gameplay_.remainingTime()) {
+            title += " | Time " + formatCountdown(*remaining);
+        }
+        if (state_.screen() == Screen::Paused) {
+            title += " | Esc/Enter: resume, M: menu";
+        } else if (gameplay_.isGameOver()) {
+            title += " | Enter: play again, M: menu";
+        } else {
+            title += " | Esc: pause, M: menu";
+        }
+        break;
+    }
+
+    case Screen::Exiting:
+        break;
+    }
+
+    return title;
+}
+
+FrameView AppManager::frame() const {
+    FrameView view;
+    view.screen = state_.screen();
+    view.engine = &gameplay_.engine();
+    view.selected = selectedConfig_;
+    view.active = gameplay_.config();
+    view.remainingTime = gameplay_.remainingTime();
+    view.gameOverReason = gameplay_.gameOverReason();
+    view.score = gameplay_.score();
+    view.highScore = gameplay_.highScore();
+    view.menuError = menuError_;
+    return view;
 }
 
 } // namespace snake

@@ -80,20 +80,24 @@ CI runs these checks on every pull request and push to `main` (Linux GCC, macOS 
 | Medium (default) | 120 ms |
 | Hard | 70 ms |
 
-The Mode & Difficulty screen and the HUD countdown are still to be wired in by the UI stories; docs/modes-build-ci.md shows the few lines the application loop needs.
+The main menu selects the mode and difficulty before a game starts, and the HUD shows them next to the score, the high score and the Timed countdown. See [docs/modes-integration.md](docs/modes-integration.md).
 
-## Controls for this scaffold
+## Controls
 
 | Screen | Key | Action |
 | --- | --- | --- |
-| Main menu | Enter | Open grid preview |
+| Main menu | Left / Right (or A / D) | Change mode: Classic, Timed, Obstacle |
+| Main menu | Up / Down (or W / S) | Change difficulty: Easy, Medium, Hard |
+| Main menu | Enter | Start a game with the selected settings |
 | Main menu | Esc | Exit |
-| Gameplay placeholder | Esc | Pause |
+| Gameplay | Arrow keys / WASD | Steer the snake |
+| Gameplay | Esc | Pause |
+| Game over | Enter | Play again with the same settings |
 | Paused | Esc / Enter | Resume |
-| Gameplay / Paused | M | Return to menu |
+| Gameplay / Paused / Game over | M | Return to the menu (the selection is kept) |
 | Any screen | Window close button | Exit |
 
-The title bar shows the current screen and shortcuts. The menu's triangle and pause bars are deliberately font-free placeholders, not final UI.
+Mode and difficulty can only change on the main menu. The window title also shows the screen, settings, score and countdown, so the state stays visible even if the bundled font cannot be loaded.
 
 ## Structure
 
@@ -102,7 +106,7 @@ include/snakextreme/AppState.hpp       SFML-free navigation model
 src/app/AppState.cpp                  State transitions
 include/snakextreme/AppManager.hpp     Window and application lifecycle
 src/presentation/AppManager.cpp        Events, fixed-step update seam, shutdown
-src/presentation/Renderer.cpp          Placeholder screen rendering
+src/presentation/Renderer.cpp          Menu, board, HUD and pause/game-over screens
 src/main.cpp                          Entry point and exception boundary
 tests/AppStateTests.cpp               Headless navigation checks
 docs/issue-4.md                       Scope, traceability and validation
@@ -117,6 +121,11 @@ cmake/                                Module/test helpers, Catch2 setup, layerin
 CMakePresets.json                     headless and app build presets
 .github/workflows/ci.yml              CI pipeline
 docs/modes-build-ci.md                Issues #5, #10-#13: scope, traceability, validation
+include/snakextreme/MenuSelection.hpp  Main-menu mode/difficulty choice
+include/snakextreme/GameplayController.hpp  One game: engine + ModeManager + score
+src/gameplay/                         Game wiring used by AppManager (SFML-free)
+tests/GameplayControllerTests.cpp     Menu and game-wiring integration tests (Catch2)
+docs/modes-integration.md             Modes and difficulty in the running game
 ```
 
 Future engine integration should expose plain C++ game state; `Renderer` translates that state into SFML drawing. No SFML headers or types should be added to engine or persistence modules. Application's 60 Hz update seam is **not** the snake's movement interval (Easy 200 ms / Medium 120 ms / Hard 70 ms).
