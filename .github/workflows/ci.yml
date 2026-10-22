@@ -17,7 +17,9 @@ permissions:
   contents: read
 
 concurrency:
-  group: ci-${{ github.ref }}
+  # Keep each commit's CI run distinct so rapid sequential PR updates don't cancel
+  # the run that exercises a newly added test step before it starts.
+  group: ci-${{ github.ref }}-${{ github.sha }}
   cancel-in-progress: true
 
 jobs:
@@ -88,8 +90,8 @@ jobs:
       - name: Test
         run: ctest --test-dir build --output-on-failure
 
-  # Full desktop build with the pinned SFML 2.5.1 (NFR-006). The Windows
-  # executable is kept as a download for manual testing and demos.
+  # Full desktop build with the pinned SFML 2.5.1. The Windows executable
+  # and its runtime assets are kept as a download for manual testing.
   app:
     name: App build (${{ matrix.name }})
     runs-on: ${{ matrix.os }}
@@ -102,6 +104,9 @@ jobs:
             os: windows-latest
           - name: Linux GCC
             os: ubuntu-latest
+          # SFML 2.5.1's macOS CMake currently requires the Intel architecture.
+          - name: macOS Clang
+            os: macos-15-intel
     steps:
       - uses: actions/checkout@v4
 
@@ -110,9 +115,22 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y --no-install-recommends \
-            libx11-dev libxrandr-dev libudev-dev libgl1-mesa-dev libfreetype-dev
+            libx11-dev libxrandr-dev libudev-dev libgl1-mesa-dev libfreetype-dev \
+            xvfb xauth xdotool strace imagemagick tesseract-ocr
 
-      - name: Configure
+      # SFML 2.5.1 rejects arm64 in its macOS CMake configuration, so use
+      # the supported x86_64 target on the Intel macOS runner.
+      - name: Configure (macOS)
+        if: runner.os == 'macOS'
+        run: |
+          cmake -S . -B build \
+            -DSNAKE_FETCH_SFML=ON \
+            -DBUILD_SHARED_LIBS=OFF \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DCMAKE_OSX_ARCHITECTURES=x86_64
+
+      - name: Configure (Linux/Windows)
+        if: runner.os != 'macOS'
         run: >
           cmake -S . -B build
           -DSNAKE_FETCH_SFML=ON
@@ -125,11 +143,26 @@ jobs:
       - name: Test
         run: ctest --test-dir build -C Release --output-on-failure
 
+      - name: Test packaged font relocation in gameplay (Linux/Xvfb)
+        if: runner.os == 'Linux'
+        run: LIBGL_ALWAYS_SOFTWARE=1 xvfb-run -a bash scripts/test-linux-packaged-font-relocation.sh
+
+      - name: Upload Linux relocation evidence
+        if: always() && runner.os == 'Linux'
+        uses: actions/upload-artifact@v4
+        with:
+          name: SnakeXtreme-linux-relocation-evidence
+          path: build/relocation-test-output/
+          if-no-files-found: ignore
+          retention-days: 7
+
       - name: Upload Windows executable
         if: runner.os == 'Windows'
         uses: actions/upload-artifact@v4
         with:
           name: SnakeXtreme-windows-x64
-          path: build/Release/SnakeXtreme.exe
+          path: |
+            build/Release/SnakeXtreme.exe
+            build/Release/assets/
           if-no-files-found: error
           retention-days: 14
