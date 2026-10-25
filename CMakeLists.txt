@@ -20,6 +20,9 @@ include(SnakeModules)
 add_library(snake_scoring src/scoring/ScoreService.cpp)
 target_include_directories(snake_scoring PUBLIC include)
 snake_warnings(snake_scoring)
+# C10 input validation (SEC-001, SEC-006).
+snake_add_module(snake_validation
+    SOURCES src/validation/InputValidator.cpp)
 
 # C1 navigation model (screen state flow).
 snake_add_module(snake_app_state SOURCES src/app/AppState.cpp)
@@ -34,7 +37,7 @@ snake_add_module(snake_gameplay
     DEPS snake_app_state snake_engine snake_modes snake_scoring)
 # C11-C13 persistence. Placeholder until issue #15 adds sources, e.g.
 #   snake_add_module(snake_persistence SOURCES src/persistence/SecureFileStore.cpp)
-snake_add_module(snake_persistence)
+snake_add_module(snake_persistence DEPS snake_validation)
 
 snake_assert_core_is_sfml_free()
 
@@ -82,9 +85,10 @@ if(SNAKE_BUILD_APP)
     target_include_directories(snake_presentation PUBLIC include)
     target_compile_definitions(snake_presentation PRIVATE
         SNAKE_ASSET_DIR="${CMAKE_CURRENT_SOURCE_DIR}/assets")
-    target_link_libraries(snake_presentation PUBLIC
-        snake_app_state snake_engine snake_modes snake_scoring snake_gameplay
-        snake_persistence sfml-graphics sfml-window sfml-system)
+   target_link_libraries(snake_presentation PUBLIC
+    snake_app_state snake_engine snake_modes snake_scoring snake_gameplay
+    snake_persistence snake_validation
+    sfml-graphics sfml-window sfml-system)
     snake_warnings(snake_presentation)
     add_executable(SnakeXtreme src/main.cpp)
     add_custom_command(TARGET SnakeXtreme POST_BUILD
@@ -131,6 +135,11 @@ if(BUILD_TESTING)
     target_link_libraries(score_service_tests PRIVATE snake_scoring)
     snake_warnings(score_service_tests)
     add_test(NAME score_service COMMAND score_service_tests)
+
+    # C10 input validator tests (SEC-001, SEC-006).
+snake_add_catch2_test(input_validator_tests
+    SOURCES tests/InputValidatorTests.cpp
+    LIBS snake_validation)
 
     add_executable(game_session_tests tests/GameSessionTests.cpp)
     target_link_libraries(game_session_tests PRIVATE snake_scoring snake_engine)
