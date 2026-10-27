@@ -183,3 +183,12 @@ ctest --test-dir build-headless --output-on-failure
 - Verify actual movement intervals using a fake clock and 50 system timestamps per required difficulty, applying the specified +/-10% tolerance.
 - Verify arrow-key and WASD input through the running application.
 - Record integration-test results separately from headless unit-test results.
+
+
+## Owner UI/Settings follow-up and performance diagnostics
+
+The stacked owner follow-up adds mouse navigation, Settings row-gap safety and
+opt-in diagnostics. See [probe usage and measurement limits](docs/sprint2/performance-probes.md)
+and [executed follow-up evidence](docs/sprint2/evidence/owner-followup-results.md).
+Normal launches remain uninstrumented; use `--help` for optional flags. Draft
+work and Linux synthetic smoke are not final Windows/performance acceptance.

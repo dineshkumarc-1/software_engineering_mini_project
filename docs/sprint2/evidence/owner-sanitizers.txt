@@ -1,0 +1,7 @@
+262 navigation/name-entry checks passed
+RNG seed: 1582177561
+All tests passed (81 assertions in 11 test cases)
+
+
+RNG seed: 3551095488
+All tests passed (191 assertions in 16 test cases)

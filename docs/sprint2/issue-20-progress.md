@@ -1,3 +1,16 @@
+# Current owner follow-up — #20 remains In Progress
+
+Settings pointer hit testing now excludes the three-pixel gaps between visible
+rows, so a gap cannot trigger key capture, defaults, Save or Cancel. Runtime
+follow-up covers duplicate rejection, independent volume dragging/clamping and
+mouse Save, alongside the existing missing/corrupt/restart smoke. Audio and
+Settings remain implemented as described in the later audio addendum; earlier
+baseline gaps below are historical. Current evidence:
+`evidence/owner-followup-results.md`. Windows listening/manual acceptance and
+C13 integration remain pending; no merge or issue closure is claimed.
+
+---
+
 # Issue #20 — Settings implementation slice
 
 Owner: C Dinesh Kumar. AI-assisted implementation. **Draft; #20 remains open.**

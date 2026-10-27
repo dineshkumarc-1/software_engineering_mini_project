@@ -1,5 +1,6 @@
 #include "snakextreme/AppState.hpp"
 #include "snakextreme/NameEntry.hpp"
+#include "snakextreme/UiHitTest.hpp"
 #include <cstdlib>
 #include <iostream>
 
@@ -136,5 +137,31 @@ int main() {
     if (entry.confirm()) submitted.dispatch(Action::ConfirmName);
     expect(submitted.screen() == Screen::ModeSelection && entry.value() == "Ayushi",
            "valid padded name advances UI flow with normalized value");
+    for (Screen screen : {Screen::NameEntry, Screen::ModeSelection, Screen::Leaderboard, Screen::Paused, Screen::GameOver}) {
+        for (const auto& button : footerButtons(screen)) {
+            const auto& r = button.area;
+            auto hit = navigationHit(screen, r.left, r.top);
+            expect(hit && hit->command == button.command, "visible button top-left hits correct command");
+            hit = navigationHit(screen, r.left + r.width - 1, r.top + r.height - 1);
+            expect(hit && hit->command == button.command, "visible button last pixel hits correct command");
+            expect(!navigationHit(screen, r.left + r.width, r.top), "button right edge excluded");
+            expect(!navigationHit(screen, r.left, r.top + r.height), "button bottom edge excluded");
+        }
+    }
+    for (std::size_t i = 0; i < 3; ++i) {
+        auto hit = navigationHit(Screen::ModeSelection, 170 + static_cast<int>(i) * 200, 220);
+        expect(hit && hit->command == UiCommand::Mode && hit->index == i, "mouse selects each mode");
+        hit = navigationHit(Screen::ModeSelection, 170 + static_cast<int>(i) * 200, 350);
+        expect(hit && hit->command == UiCommand::Difficulty && hit->index == i, "mouse selects each difficulty");
+    }
+    expect(!navigationHit(Screen::ModeSelection, 350, 220), "mode gap is inactive");
+    expect(!navigationHit(Screen::Gameplay, 500, 450), "gameplay does not activate hidden menu controls");
+    expect(!navigationHit(Screen::Settings, 500, 450), "settings has separate pointer handling");
+    for (std::size_t i = 0; i < 10; ++i) {
+        expect(settingsRowAt(160, 120 + static_cast<int>(i) * 35) == i, "settings row first pixel");
+        expect(settingsRowAt(739, 151 + static_cast<int>(i) * 35) == i, "settings row last pixel");
+        expect(!settingsRowAt(200, 152 + static_cast<int>(i) * 35), "settings row gap is inactive");
+    }
+    expect(!settingsRowAt(159, 120) && !settingsRowAt(740, 120) && !settingsRowAt(160, 470), "settings exterior excluded");
     std::cout << checks << " navigation/name-entry checks passed\n";
 }

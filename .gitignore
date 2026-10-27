@@ -7,3 +7,8 @@
 # Local settings and atomic-save temporaries
 /config.json
 /config.json.tmp-*
+
+# Local Python caches and measurement output
+__pycache__/
+*.pyc
+/performance-reports/

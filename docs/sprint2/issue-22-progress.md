@@ -1,3 +1,17 @@
+# Current owner follow-up — #22 remains In Progress
+
+Opt-in bounded FPS/input/first-frame diagnostics, strict JSON analysis, external
+launch collection, and real navigation/probe smoke scripts are now implemented.
+See `performance-probes.md` for commands, scope limits, caps and the remaining
+target Windows campaign. Current results: `evidence/owner-followup-results.md`.
+
+The historical table below predates the probes. Instrumentation availability
+and synthetic Linux smoke do **not** change target performance/usability rows
+to accepted. Corrupt-config Linux recovery is regression evidence, not Windows
+or C13 final sign-off. No new probe report can automatically grant acceptance.
+
+---
+
 # Issue #22 — Linux Settings/recovery system smoke slice
 
 Owner: C Dinesh Kumar. AI-assisted. **Partial; issue stays open.**

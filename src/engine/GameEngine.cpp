@@ -116,9 +116,11 @@ std::size_t GameEngine::foodEatenCount() const noexcept {
     return foodEatenCount_;
 }
 
-void GameEngine::changeDirection(Direction next) {
+void GameEngine::changeDirection(Direction next) { (void)tryQueueDirection(next); }
+
+bool GameEngine::tryQueueDirection(Direction next) {
     if (gameOver_) {
-        return;
+        return false;
     }
 
     const Direction reference =
@@ -133,12 +135,14 @@ void GameEngine::changeDirection(Direction next) {
         (reference == Direction::Right && next == Direction::Left);
 
     if (reversing || next == reference) {
-        return;
+        return false;
     }
 
     if (directionQueue_.size() < 2) {
         directionQueue_.push_back(next);
+        return true;
     }
+    return false;
 }
 
 bool GameEngine::spawnFood() {
@@ -199,6 +203,7 @@ void GameEngine::tick() {
     if (!directionQueue_.empty()) {
         direction_ = directionQueue_.front();
         directionQueue_.pop_front();
+        ++appliedDirectionCount_;
     }
 
     GridPosition nextHead = snake_.front();

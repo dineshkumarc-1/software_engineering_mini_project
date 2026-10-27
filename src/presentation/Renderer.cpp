@@ -1,4 +1,5 @@
 #include "snakextreme/Renderer.hpp"
+#include "snakextreme/UiHitTest.hpp"
 #include <cstdint>
 #include <filesystem>
 #include <string>
@@ -184,10 +185,12 @@ void Renderer::draw(sf::RenderTarget& target, const FrameView& frame) const {
     if (frame.screen == Screen::MainMenu || frame.screen == Screen::NameEntry ||
         frame.screen == Screen::Leaderboard) {
         drawNavigation(target, frame);
+        drawFooter(target, frame.screen);
         return;
     }
     if (frame.screen == Screen::ModeSelection) {
         drawMenu(target, frame);
+        drawFooter(target, frame.screen);
         return;
     }
 
@@ -203,6 +206,23 @@ void Renderer::draw(sf::RenderTarget& target, const FrameView& frame) const {
 
     // The HUD is drawn last so it stays readable over every overlay.
     drawHud(target, frame);
+    drawFooter(target, frame.screen);
+}
+
+void Renderer::drawFooter(sf::RenderTarget& target, Screen screen) const {
+    for (const auto& button : footerButtons(screen)) {
+        const auto& area = button.area;
+        sf::RectangleShape box({static_cast<float>(area.width), static_cast<float>(area.height)});
+        box.setPosition(static_cast<float>(area.left), static_cast<float>(area.top));
+        box.setFillColor(PanelFill); box.setOutlineColor(Accent); box.setOutlineThickness(1.f);
+        target.draw(box);
+        if (fontLoaded_) {
+            auto label = text(button.label, 20, TextMain);
+            centreOn(label, static_cast<float>(area.left) + static_cast<float>(area.width) / 2.f,
+                     static_cast<float>(area.top) + static_cast<float>(area.height) / 2.f);
+            target.draw(label);
+        }
+    }
 }
 
 void Renderer::drawNavigation(sf::RenderTarget& target, const FrameView& frame) const {
@@ -328,7 +348,7 @@ void Renderer::drawMenu(sf::RenderTarget& target, const FrameView& frame) const 
     centreOn(title, 450.f, 78.f);
     target.draw(title);
 
-    sf::Text subtitle = text("Choose a mode and a difficulty, then press Enter", 18, TextDim);
+    sf::Text subtitle = text("Choose a mode and difficulty; click Start or press Enter", 18, TextDim);
     centreOn(subtitle, 450.f, 126.f);
     target.draw(subtitle);
 
@@ -382,19 +402,19 @@ void Renderer::drawMenu(sf::RenderTarget& target, const FrameView& frame) const 
         std::string(ArrowLeft) + " " + ArrowRight + "  mode       " +
         ArrowUp + " " + ArrowDown + "  difficulty       Enter  start       Esc  back";
     sf::Text hint = text(controls, 18, TextMain);
-    centreOn(hint, 450.f, 468.f);
+    centreOn(hint, 450.f, 510.f);
     target.draw(hint);
 
     if (frame.highScore > 0) {
         sf::Text best = text("Best score this session: " + std::to_string(frame.highScore),
                              16, TextDim);
-        centreOn(best, 450.f, 508.f);
+        centreOn(best, 450.f, 548.f);
         target.draw(best);
     }
 
     if (!frame.menuError.empty()) {
         sf::Text error = text(frame.menuError, 17, Danger);
-        centreOn(error, 450.f, 548.f);
+        centreOn(error, 450.f, 580.f);
         target.draw(error);
     }
 }

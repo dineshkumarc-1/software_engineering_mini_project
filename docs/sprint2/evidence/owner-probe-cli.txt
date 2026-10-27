@@ -1,0 +1,2 @@
+--probe-seconds requires --perf-probe
+PASS: invalid arguments return 2 before creating a window

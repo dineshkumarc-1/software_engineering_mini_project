@@ -1,5 +1,6 @@
 
 #include "snakextreme/AppManager.hpp"
+#include "snakextreme/UiHitTest.hpp"
 
 #include <algorithm>
 #include <chrono>
@@ -21,8 +22,9 @@ std::string settingsText(const SessionConfig& config) {
 
 } // namespace
 
-AppManager::AppManager()
-    : window_(
+AppManager::AppManager(PerformanceProbe* probe, std::chrono::steady_clock::time_point mainEntry,
+                       std::optional<int> probeSeconds)
+    : probe_(probe), probeStart_(mainEntry), probeSeconds_(probeSeconds), window_(
           sf::VideoMode(Renderer::Width, Renderer::Height),
           "SnakeXtreme",
           sf::Style::Titlebar | sf::Style::Close) {
@@ -74,15 +76,46 @@ int AppManager::run() {
             ? settingsEditor_.value().theme : settings_.theme));
         renderer_.draw(window_, frame());
         window_.display();
+        if (probe_ != nullptr) {
+            const auto now = probeNow();
+            const bool first = !probe_->firstFrameUs();
+            probe_->frame(now, probeContext());
+            if (first) std::cout << "SNAKEXTREME_PROBE_FIRST_FRAME\n" << std::flush;
+            if (probeSeconds_ && probe_->firstFrameUs() &&
+                now - *probe_->firstFrameUs() >= static_cast<std::int64_t>(*probeSeconds_) * 1000000)
+                dispatch(Action::Quit);
+        }
     }
 
     return 0;
+}
+
+std::int64_t AppManager::probeNow() const {
+    return std::chrono::duration_cast<std::chrono::microseconds>(
+        std::chrono::steady_clock::now() - probeStart_).count();
+}
+ProbeContext AppManager::probeContext() const {
+    const char* screen = "Other";
+    switch (state_.screen()) {
+    case Screen::MainMenu: screen = "MainMenu"; break;
+    case Screen::NameEntry: screen = "NameEntry"; break;
+    case Screen::ModeSelection: screen = "ModeSelection"; break;
+    case Screen::Gameplay: screen = "Gameplay"; break;
+    case Screen::Paused: screen = "Paused"; break;
+    case Screen::GameOver: screen = "GameOver"; break;
+    case Screen::Leaderboard: screen = "Leaderboard"; break;
+    case Screen::Settings: screen = "Settings"; break;
+    case Screen::Exiting: screen = "Exiting"; break;
+    }
+    return {screen, std::string(toString(gameplay_.config().mode)),
+                    std::string(toString(gameplay_.config().difficulty))};
 }
 
 void AppManager::pollEvents() {
     sf::Event event{};
 
     while (window_.pollEvent(event)) {
+        if (probe_ != nullptr) inputDequeuedUs_ = probeNow();
         const int oldSfxVolume = state_.screen() == Screen::Settings
             ? settingsEditor_.value().sfxVolume : settings_.sfxVolume;
         if (event.type == sf::Event::Closed) {
@@ -98,17 +131,9 @@ void AppManager::pollEvents() {
         if (event.type == sf::Event::TextEntered && state_.screen() == Screen::NameEntry) {
             nameEntry_.input(event.text.unicode);
         }
-        if (event.type == sf::Event::MouseButtonPressed &&
-            event.mouseButton.button == sf::Mouse::Left && state_.screen() == Screen::MainMenu) {
-            const int x = event.mouseButton.x;
-            const int y = event.mouseButton.y;
-            if (x >= 260 && x < 640 && y >= 190 && y < 430 && (y - 190) % 60 < 48) {
-                menuIndex_ = static_cast<std::size_t>((y - 190) / 60);
-                handleKey(sf::Keyboard::Enter);
-            }
-        } else if (event.type == sf::Event::MouseButtonPressed &&
-            event.mouseButton.button == sf::Mouse::Left && state_.screen() == Screen::Settings) {
-            clickSettings(event.mouseButton.x, event.mouseButton.y);
+        if (event.type == sf::Event::MouseButtonPressed && event.mouseButton.button == sf::Mouse::Left) {
+            if (state_.screen() == Screen::Settings) clickSettings(event.mouseButton.x, event.mouseButton.y);
+            else clickNavigation(event.mouseButton.x, event.mouseButton.y);
         }
         if (event.type == sf::Event::MouseButtonReleased || event.type == sf::Event::LostFocus)
             draggingVolume_ = false;
@@ -191,7 +216,11 @@ void AppManager::handleKey(sf::Keyboard::Key key) {
         // Primary bindings plus permanent WASD aliases, independent of SFML in the model.
         if (const auto movement = movementForKey(settings_, static_cast<int>(key))) {
             constexpr Direction directions[] = {Direction::Up, Direction::Down, Direction::Left, Direction::Right};
-            gameplay_.changeDirection(directions[*movement]);
+            const bool accepted = gameplay_.requestDirection(directions[*movement]);
+            if (probe_ != nullptr) {
+                constexpr const char* names[] = {"Up", "Down", "Left", "Right"};
+                probe_->input(inputDequeuedUs_, probeNow(), accepted, names[*movement]);
+            }
             break;
         }
         switch (key) {
@@ -269,12 +298,28 @@ void AppManager::activateSettings() {
 }
 void AppManager::clickSettings(int x, int y) {
     draggingVolume_ = false;
-    if (settingsEditor_.capturing() || x < 160 || x >= 740 || y < 120 || y >= 470) return;
-    settingsEditor_.selectRow(static_cast<std::size_t>((y - 120) / 35));
+    const auto row = settingsRowAt(x, y);
+    if (settingsEditor_.capturing() || !row) return;
+    settingsEditor_.selectRow(*row);
     if ((settingsEditor_.row() == 4 || settingsEditor_.row() == 5) && x >= 400 && x <= 700) {
         draggingVolume_ = true;
         settingsEditor_.setVolume((x - 400) / 3);
     } else activateSettings();
+}
+
+void AppManager::clickNavigation(int x, int y) {
+    const auto hit = navigationHit(state_.screen(), x, y);
+    if (!hit) return;
+    switch (hit->command) {
+    case UiCommand::MainItem: menuIndex_ = hit->index; handleKey(sf::Keyboard::Enter); break;
+    case UiCommand::Mode: selectedConfig_.mode = AllGameModes[hit->index]; menuError_.clear(); break;
+    case UiCommand::Difficulty: selectedConfig_.difficulty = AllDifficulties[hit->index]; menuError_.clear(); break;
+    case UiCommand::Confirm: handleKey(sf::Keyboard::Enter); break;
+    case UiCommand::Back: dispatch(Action::Back); break;
+    case UiCommand::Resume: dispatch(Action::Resume); break;
+    case UiCommand::Restart: startGame(); break;
+    case UiCommand::Menu: dispatch(Action::BackToMenu); break;
+    }
 }
 
 void AppManager::select(MenuInput input) {
@@ -284,6 +329,7 @@ void AppManager::select(MenuInput input) {
 
 void AppManager::startGame() {
     if (gameplay_.start(selectedConfig_)) {
+        if (probe_ != nullptr) probe_->beginSession();
         menuError_.clear();
         if (state_.screen() == Screen::ModeSelection) dispatch(Action::BeginGame);
         else if (state_.screen() == Screen::GameOver) dispatch(Action::Restart);
@@ -320,6 +366,7 @@ void AppManager::update(sf::Time step) {
     const int previousScore = gameplay_.score();
     gameplay_.update(std::chrono::microseconds{step.asMicroseconds()},
                      state_.screen());
+    if (probe_ != nullptr) probe_->engineApplied(gameplay_.engine().appliedDirectionCount(), probeNow());
     if (state_.screen() == Screen::Gameplay && gameplay_.score() > previousScore)
         audio_.playSfx(SoundCue::Food);
     if (state_.screen() == Screen::Gameplay && gameplay_.isGameOver()) {

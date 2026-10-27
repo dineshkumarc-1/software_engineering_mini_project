@@ -56,6 +56,9 @@ jobs:
       - name: Test
         run: ctest --test-dir build -C Release --output-on-failure
 
+      - name: Performance report tooling tests
+        run: python -m unittest discover -s tests -p test_performance_tools.py
+
   mingw:
     name: Tests (Windows MinGW-w64)
     runs-on: windows-latest
@@ -111,7 +114,7 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y --no-install-recommends \
             libx11-dev libxrandr-dev libudev-dev libgl1-mesa-dev libfreetype-dev \
-            libopenal-dev libflac-dev libogg-dev libvorbis-dev
+            libopenal-dev libflac-dev libogg-dev libvorbis-dev xvfb xdotool
 
       - name: Configure
         run: >
@@ -131,6 +134,12 @@ jobs:
         env:
           ALSOFT_DRIVERS: 'null'
         run: ./build/audio_backend_smoke
+
+      - name: Desktop navigation and Settings regression (Linux only)
+        if: runner.os == 'Linux'
+        run: |
+          python tools/desktop_navigation_smoke.py "$PWD/build/SnakeXtreme"
+          python tools/desktop_settings_smoke.py "$PWD/build/SnakeXtreme"
 
       - name: Upload Windows executable
         if: runner.os == 'Windows'

@@ -47,6 +47,7 @@ public:
     void draw(sf::RenderTarget& target, const FrameView& frame) const;
 
 private:
+    void drawFooter(sf::RenderTarget& target, Screen screen) const;
     void drawNavigation(sf::RenderTarget& target, const FrameView& frame) const;
     void drawSettings(sf::RenderTarget& target, const FrameView& frame) const;
     void drawMenu(sf::RenderTarget& target, const FrameView& frame) const;

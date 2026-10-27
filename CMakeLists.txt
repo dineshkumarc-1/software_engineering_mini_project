@@ -51,6 +51,10 @@ snake_add_module(snake_settings
     SOURCES src/persistence/Settings.cpp src/persistence/SettingsRepository.cpp)
 target_link_libraries(snake_settings PRIVATE nlohmann_json::nlohmann_json)
 
+# Optional C1 performance diagnostics; no SFML or player data in reports.
+snake_add_module(snake_probe SOURCES src/diagnostics/PerformanceProbe.cpp)
+target_link_libraries(snake_probe PRIVATE nlohmann_json::nlohmann_json)
+
 # C5 waveform generation and volume policy remain SFML-free.
 snake_add_module(snake_audio_model SOURCES src/audio/AudioModel.cpp)
 snake_assert_core_is_sfml_free()
@@ -107,7 +111,7 @@ if(SNAKE_BUILD_APP)
         SNAKE_ASSET_DIR="${CMAKE_CURRENT_SOURCE_DIR}/assets")
    target_link_libraries(snake_presentation PUBLIC
     snake_app_state snake_engine snake_modes snake_scoring snake_gameplay
-    snake_persistence snake_validation snake_settings snake_audio_model
+    snake_persistence snake_validation snake_settings snake_audio_model snake_probe
     sfml-graphics sfml-window sfml-system sfml-audio)
     snake_warnings(snake_presentation)
     add_executable(SnakeXtreme src/main.cpp)
@@ -203,6 +207,10 @@ snake_add_catch2_test(input_validator_tests
     snake_add_catch2_test(audio_model_tests
         SOURCES tests/AudioModelTests.cpp
         LIBS snake_audio_model snake_settings)
+
+    snake_add_catch2_test(performance_probe_tests
+        SOURCES tests/PerformanceProbeTests.cpp
+        LIBS snake_probe snake_gameplay nlohmann_json::nlohmann_json)
 
     # Optional real SFML/OpenAL smoke executable; not a device-dependent CTest.
     if(SNAKE_BUILD_APP)

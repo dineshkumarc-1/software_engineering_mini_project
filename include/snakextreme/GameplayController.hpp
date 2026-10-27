@@ -39,6 +39,7 @@ public:
     // Queues a turn (WASD / arrow keys). The engine keeps its reversal rule
     // and two-turn queue.
     void changeDirection(Direction direction);
+    bool requestDirection(Direction direction);
 
     bool hasGame() const noexcept;
     bool isGameOver() const noexcept;
