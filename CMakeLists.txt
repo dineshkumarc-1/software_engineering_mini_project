@@ -76,6 +76,11 @@ if(SNAKE_BUILD_APP)
             set(CMAKE_POLICY_VERSION_MINIMUM 3.5)
         endif()
         FetchContent_MakeAvailable(sfml)
+        # SFML 2.5.1 AudioDevice.cpp uses std::auto_ptr. Compile this legacy
+        # dependency target as C++14 (where it exists), not the project's C++17.
+        # No app/core standard or warning flags are weakened.
+        set_target_properties(sfml-audio PROPERTIES
+            CXX_STANDARD 14 CXX_STANDARD_REQUIRED YES)
         set(CMAKE_POLICY_VERSION_MINIMUM "${snake_saved_policy_minimum}")
         # Treat SFML's headers as system headers (as an installed SFML is),
         # so project warnings and SNAKE_WARNINGS_AS_ERRORS judge project

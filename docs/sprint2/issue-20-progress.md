@@ -197,3 +197,17 @@ runtime and mouse-drag/manual acceptance still need verification. C13 shared
 store/logging integration remains separate. Keep #20 open and this PR draft;
 CI on the new head is separate from the previously green run. No release tag,
 freeze or complete-product demo is justified by this slice.
+
+### Pinned SFML/MSVC compatibility follow-up
+
+The first audio-enabled head (`85e288b`) passed five GitHub jobs but failed the
+Windows app build inside SFML 2.5.1's `AudioDevice.cpp`: `std::auto_ptr` is removed
+in C++17. Failed job:
+https://github.com/dineshkumarc-1/software_engineering_mini_project/actions/runs/40455495249/job/122027755032
+
+The fetched `sfml-audio` dependency target is now explicitly compiled as C++14,
+which supports SFML's legacy source. SnakeXtreme's app/core/tests stay C++17;
+no warnings were disabled and no dependency source was edited. Installed SFML
+builds must already be compatible. Local full app rebuild, 10 CTests and the
+7-check real audio backend smoke still pass; Windows CI on the new head must
+confirm this compatibility fix before it is called verified.
