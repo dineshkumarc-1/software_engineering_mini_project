@@ -48,3 +48,44 @@ TEST_CASE("Sanitization never returns more than 15 characters",
     CHECK(sanitizePlayerName(input) == "123456789012345");
     CHECK(sanitizePlayerName(input).size() == 15);
 }
+
+TEST_CASE("Rejects empty and whitespace-only player names",
+          "[validation][player-name]") {
+    CHECK_FALSE(isValidPlayerName(""));
+    CHECK_FALSE(isValidPlayerName(" "));
+    CHECK_FALSE(isValidPlayerName("     "));
+}
+
+TEST_CASE("Trims leading and trailing spaces from padded names",
+          "[validation][player-name]") {
+    CHECK(isValidPlayerName("  Bharath  "));
+    CHECK(sanitizePlayerName("  Bharath  ") == "Bharath");
+
+    CHECK(isValidPlayerName("Cool Player"));
+    CHECK(sanitizePlayerName("  Cool Player  ") == "Cool Player");
+
+    CHECK(sanitizePlayerName("     ").empty());
+}
+
+TEST_CASE("Enforces the 15-character limit after trimming",
+          "[validation][player-name]") {
+    const std::string fifteenCharacters(15, 'A');
+    const std::string sixteenCharacters(16, 'A');
+
+    CHECK(isValidPlayerName("  " + fifteenCharacters + "  "));
+    CHECK(sanitizePlayerName("  " + fifteenCharacters + "  ")
+          == fifteenCharacters);
+
+    CHECK_FALSE(isValidPlayerName("  " + sixteenCharacters + "  "));
+    CHECK(sanitizePlayerName("  " + sixteenCharacters + "  ")
+          == fifteenCharacters);
+}
+
+TEST_CASE("Character-level validation permits spaces but rejects symbols",
+          "[validation][player-name]") {
+    CHECK(snake::isAllowedPlayerNameCharacter(' '));
+    CHECK(snake::isAllowedPlayerNameCharacter('A'));
+    CHECK(snake::isAllowedPlayerNameCharacter('_'));
+    CHECK_FALSE(snake::isAllowedPlayerNameCharacter('@'));
+    CHECK_FALSE(snake::isAllowedPlayerNameCharacter('#'));
+}

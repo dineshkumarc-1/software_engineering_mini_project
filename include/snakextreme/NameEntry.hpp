@@ -15,7 +15,7 @@ public:
             return;
         }
         if (codepoint == 13 || codepoint == 10) return;
-        if (codepoint > 127 || !isValidPlayerName(std::string(1, static_cast<char>(codepoint)))) {
+        if (codepoint > 127 || !isAllowedPlayerNameCharacter(static_cast<char>(codepoint))) {
             error_ = "Use letters, numbers, spaces, underscore or hyphen.";
             return;
         }
@@ -27,18 +27,15 @@ public:
         error_.clear();
     }
     bool confirm() {
-        const auto first = value_.find_first_not_of(' ');
-        if (first == std::string::npos) {
-            error_ = "Enter a name (1-15 characters), not only spaces.";
+        // Character entry and complete-name validation have different contracts:
+        // spaces are valid keystrokes, but blank submissions are not names.
+        // Validate before sanitizing so submission never silently fixes an
+        // invalid name; C10 owns trimming and final normalization.
+        if (!isValidPlayerName(value_)) {
+            error_ = "Enter a valid name (1-15 characters), not only spaces.";
             return false;
         }
-        const auto last = value_.find_last_not_of(' ');
-        const std::string trimmed = value_.substr(first, last - first + 1);
-        if (!isValidPlayerName(trimmed)) {
-            error_ = "Invalid player name.";
-            return false;
-        }
-        value_ = trimmed;
+        value_ = sanitizePlayerName(value_);
         error_.clear();
         return true;
     }

@@ -86,5 +86,55 @@ int main() {
     expect(entry.confirm(), "15 character name accepted");
     entry.input(8);
     expect(entry.value().size() == 14, "backspace");
+    // Integration regression for C10 PR #42 revision 517c169. Calling the
+    // complete-name validator for one typed space would wrongly reject it.
+    entry = NameEntry{};
+    entry.input(' ');
+    expect(entry.value() == " " && entry.error().empty(), "space accepted while typing");
+    entry.input(' ');
+    expect(entry.value() == "  " && entry.error().empty(), "multiple typed spaces retained");
+    expect(!entry.confirm() && entry.value() == "  " && !entry.error().empty(),
+           "shared validator rejects blank submission without mutating input");
+    entry.input('A');
+    expect(entry.error().empty(), "editing clears submission error");
+    entry.input(' ');
+    expect(entry.confirm() && entry.value() == "A", "shared sanitizer trims submitted name");
+    expect(entry.confirm() && entry.value() == "A", "confirmation is idempotent");
+    entry = NameEntry{};
+    const std::string padded = "  C Dinesh_1-  ";
+    for (const unsigned char ch : padded) entry.input(ch);
+    expect(entry.value() == padded, "padded and internal spaces preserved while editing");
+    expect(entry.confirm() && entry.value() == sanitizePlayerName(padded),
+           "complete-name submission reuses shared normalization");
+    expect(isValidPlayerName(entry.value()), "confirmed value satisfies C10 contract");
+    // Every ASCII keystroke uses C10's character API, with only editing and
+    // submit control characters handled specially by the input widget.
+    for (unsigned cp = 0; cp < 128; ++cp) {
+        if (cp == 8 || cp == 10 || cp == 13) continue;
+        NameEntry character;
+        character.input(cp);
+        const bool allowed = isAllowedPlayerNameCharacter(static_cast<char>(cp));
+        expect(allowed ? character.value() == std::string(1, static_cast<char>(cp)) && character.error().empty()
+                       : character.value().empty() && !character.error().empty(),
+               "ASCII entry agrees with shared per-character API");
+    }
+    entry = NameEntry{};
+    for (int i = 0; i < 15; ++i) entry.input('B');
+    const auto boundary = entry.value();
+    entry.input('C');
+    expect(entry.value() == boundary && !entry.error().empty(), "16th character rejected, not silently truncated");
+    expect(entry.confirm() && entry.value() == boundary, "15-character submission remains intact");
+    entry.input(13); entry.input(10);
+    expect(entry.value() == boundary, "submit control events do not insert characters");
+    for (int i = 0; i < 15; ++i) entry.input(8);
+    expect(entry.value().empty() && !entry.confirm(), "backspacing to empty restores rejection");
+    AppState submitted;
+    submitted.dispatch(Action::Start);
+    if (entry.confirm()) submitted.dispatch(Action::ConfirmName);
+    expect(submitted.screen() == Screen::NameEntry, "invalid name cannot advance UI flow");
+    for (const unsigned char ch : std::string(" Ayushi ")) entry.input(ch);
+    if (entry.confirm()) submitted.dispatch(Action::ConfirmName);
+    expect(submitted.screen() == Screen::ModeSelection && entry.value() == "Ayushi",
+           "valid padded name advances UI flow with normalized value");
     std::cout << checks << " navigation/name-entry checks passed\n";
 }

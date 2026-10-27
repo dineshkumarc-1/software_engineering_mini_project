@@ -17,6 +17,13 @@
 namespace snake {
 namespace {
 using Json = nlohmann::json;
+// A concrete deleter avoids GCC's ignored-attributes warning when glibc marks
+// fclose with attributes that do not survive a function-pointer template type.
+struct FileCloser {
+    void operator()(std::FILE* file) const noexcept {
+        if (file != nullptr) (void)std::fclose(file);
+    }
+};
 constexpr std::size_t MaxBytes = 65536;
 SettingsLoadResult defaults(const char* code) { return {Settings{}, true, code}; }
 bool integerInRange(const Json& j, int low, int high) {
@@ -77,7 +84,7 @@ bool SettingsRepository::save(const Settings& settings, std::string& error) cons
             {"theme", themeName(settings.theme)}};
         const std::string bytes = json.dump(2) + "\n";
         std::random_device random;
-        std::unique_ptr<std::FILE, decltype(&std::fclose)> file(nullptr, &std::fclose);
+        std::unique_ptr<std::FILE, FileCloser> file;
         for (int attempt = 0; attempt < 8 && !file; ++attempt) {
             temporary = path_; temporary += ".tmp-" + std::to_string(random());
 #if defined(_WIN32)

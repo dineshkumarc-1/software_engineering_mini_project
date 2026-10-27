@@ -97,3 +97,30 @@ theme; Cancel and reopen (old settings retained); Save and relaunch (values
 restored). Restore defaults then Cancel, then repeat and Save. Test unwritable
 config target: error stays visible and active settings remain unchanged. Launch
 with corrupt config and check default recovery. Exercise all of this on Windows.
+
+## Updated validator integration and Linux CI fix (2026-10-27 UTC)
+
+Synchronized UI integration from PR #44 snapshot
+`0abc73f8d44ee7e8fb6dac96ea025f975e3527a0` into this Settings branch.
+The shared validator header/source/tests match Bharath PR #42 revision
+`517c169433b4139d047acaead806314dd524de03` exactly. Name-entry typing uses
+`isAllowedPlayerNameCharacter`; submission calls `isValidPlayerName` before
+`sanitizePlayerName`. UI-specific blank/trim implementation removed.
+
+Revalidation on the combined Settings branch: 9/9 CTest suites, 186 navigation/
+name-entry checks, 191 Settings assertions, and 20 consecutive gameplay suite
+runs pass. Settings ASan+UBSan tests (191 assertions) pass with leak detection;
+UI model ASan+UBSan coverage is recorded in the #19 report. Presentation passes
+strict syntax checks against SFML 2.5.1. Environment/commands as above.
+New raw results: `evidence/validator-settings-*.txt`.
+
+The previous Settings CI run at b0daa54 had 5 passing jobs but Linux GCC failed:
+`SettingsRepository.cpp:80: error: ignoring attributes on template argument
+'int (*)(FILE*)' [-Werror=ignored-attributes]`. Job:
+https://github.com/dineshkumarc-1/software_engineering_mini_project/actions/runs/40452633928/job/122018661569?pr=45
+
+Replaced the fclose function-pointer deleter with a concrete FileCloser functor.
+RAII ownership/close behavior is unchanged; no warning flag was weakened.
+Local warnings-as-errors build and tests pass; the new GitHub CI run must confirm
+this on its compiler before the portability fix is considered CI-verified.
+These updates do not resolve audio/manual/Windows/C13 acceptance gaps above.
