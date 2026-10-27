@@ -35,9 +35,31 @@ snake_add_module(snake_modes
 snake_add_module(snake_gameplay
     SOURCES src/gameplay/GameplayController.cpp
     DEPS snake_app_state snake_engine snake_modes snake_scoring)
-# C11-C13 persistence. Placeholder until issue #15 adds sources, e.g.
-#   snake_add_module(snake_persistence SOURCES src/persistence/SecureFileStore.cpp)
-snake_add_module(snake_persistence DEPS snake_validation)
+# JSON dependency required by persistence.
+find_package(nlohmann_json 3.11 QUIET)
+
+if(NOT TARGET nlohmann_json::nlohmann_json)
+    include(FetchContent)
+
+    FetchContent_Declare(
+        nlohmann_json
+        GIT_REPOSITORY https://github.com/nlohmann/json.git
+        GIT_TAG v3.11.3
+        GIT_SHALLOW TRUE
+    )
+
+    FetchContent_MakeAvailable(nlohmann_json)
+endif()
+
+# C11-C13 persistence.
+snake_add_module(snake_persistence
+    SOURCES
+        src/persistence/SecureFileStore.cpp
+        src/persistence/LeaderboardRepository.cpp
+    DEPS
+        snake_validation
+        nlohmann_json::nlohmann_json
+)
 
 snake_assert_core_is_sfml_free()
 
@@ -140,6 +162,15 @@ if(BUILD_TESTING)
 snake_add_catch2_test(input_validator_tests
     SOURCES tests/InputValidatorTests.cpp
     LIBS snake_validation)
+        snake_add_catch2_test(secure_file_store_tests
+        SOURCES tests/SecureFileStoreTests.cpp
+        LIBS snake_persistence
+    )
+
+    snake_add_catch2_test(leaderboard_repository_tests
+        SOURCES tests/LeaderboardRepositoryTests.cpp
+        LIBS snake_persistence
+    )
 
     add_executable(game_session_tests tests/GameSessionTests.cpp)
     target_link_libraries(game_session_tests PRIVATE snake_scoring snake_engine)
