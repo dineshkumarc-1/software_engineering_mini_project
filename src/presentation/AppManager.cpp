@@ -72,6 +72,18 @@ void AppManager::pollEvents() {
             dispatch(Action::Pause);
         }
 
+        if (event.type == sf::Event::TextEntered && state_.screen() == Screen::NameEntry) {
+            nameEntry_.input(event.text.unicode);
+        }
+        if (event.type == sf::Event::MouseButtonPressed &&
+            event.mouseButton.button == sf::Mouse::Left && state_.screen() == Screen::MainMenu) {
+            const int x = event.mouseButton.x;
+            const int y = event.mouseButton.y;
+            if (x >= 260 && x < 640 && y >= 190 && y < 430 && (y - 190) % 60 < 48) {
+                menuIndex_ = static_cast<std::size_t>((y - 190) / 60);
+                handleKey(sf::Keyboard::Enter);
+            }
+        }
         if (event.type == sf::Event::KeyPressed) {
             handleKey(event.key.code);
         }
@@ -85,6 +97,28 @@ void AppManager::pollEvents() {
 void AppManager::handleKey(sf::Keyboard::Key key) {
     switch (state_.screen()) {
     case Screen::MainMenu:
+        if (key == sf::Keyboard::Up || key == sf::Keyboard::W) menuIndex_ = (menuIndex_ + 3) % 4;
+        if (key == sf::Keyboard::Down || key == sf::Keyboard::S) menuIndex_ = (menuIndex_ + 1) % 4;
+        if (key == sf::Keyboard::Escape) dispatch(Action::Quit);
+        if (key == sf::Keyboard::Enter) {
+            const Action actions[] = {Action::Start, Action::OpenLeaderboard, Action::OpenSettings, Action::Quit};
+            if (menuIndex_ == 0) nameEntry_ = NameEntry{};
+            dispatch(actions[menuIndex_]);
+        }
+        break;
+    case Screen::NameEntry:
+        if (key == sf::Keyboard::Escape) dispatch(Action::Back);
+        if (key == sf::Keyboard::Enter && nameEntry_.confirm()) dispatch(Action::ConfirmName);
+        break;
+    case Screen::Leaderboard:
+    case Screen::Settings:
+        if (key == sf::Keyboard::Escape) dispatch(Action::Back);
+        break;
+    case Screen::GameOver:
+        if (key == sf::Keyboard::Enter) startGame();
+        if (key == sf::Keyboard::M || key == sf::Keyboard::Escape) dispatch(Action::BackToMenu);
+        break;
+    case Screen::ModeSelection:
         // Mode and difficulty can only be chosen here, never during a game.
         switch (key) {
         case sf::Keyboard::Left:
@@ -107,7 +141,7 @@ void AppManager::handleKey(sf::Keyboard::Key key) {
             startGame();
             break;
         case sf::Keyboard::Escape:
-            dispatch(Action::Quit);
+            dispatch(Action::Back);
             break;
         default:
             break;
@@ -177,9 +211,8 @@ void AppManager::select(MenuInput input) {
 void AppManager::startGame() {
     if (gameplay_.start(selectedConfig_)) {
         menuError_.clear();
-        if (state_.screen() == Screen::MainMenu) {
-            dispatch(Action::Start);
-        }
+        if (state_.screen() == Screen::ModeSelection) dispatch(Action::BeginGame);
+        else if (state_.screen() == Screen::GameOver) dispatch(Action::Restart);
         return;
     }
 
@@ -205,6 +238,7 @@ void AppManager::update(sf::Time step) {
     // paused game keeps both its position and its countdown.
     gameplay_.update(std::chrono::microseconds{step.asMicroseconds()},
                      state_.screen());
+    if (state_.screen() == Screen::Gameplay && gameplay_.isGameOver()) dispatch(Action::EndGame);
 }
 
 void AppManager::refreshTitle() {
@@ -222,7 +256,19 @@ std::string AppManager::titleText() const {
 
     switch (state_.screen()) {
     case Screen::MainMenu:
-        title += " | Menu | " + settingsText(selectedConfig_);
+        title += " | Main menu | Up/Down: select, Enter: confirm, Esc: exit";
+        break;
+    case Screen::NameEntry:
+        title += " | Name: " + nameEntry_.value() + " | " + nameEntry_.error();
+        break;
+    case Screen::Leaderboard:
+        title += " | Leaderboard integration pending (#21) | Esc: back";
+        break;
+    case Screen::Settings:
+        title += " | Settings implementation pending (#20) | Esc: back";
+        break;
+    case Screen::ModeSelection:
+        title +=  " | Menu | " + settingsText(selectedConfig_);
         if (!menuError_.empty()) {
             title += " | " + menuError_;
         }
@@ -230,6 +276,7 @@ std::string AppManager::titleText() const {
         break;
 
     case Screen::Gameplay:
+    case Screen::GameOver:
     case Screen::Paused: {
         if (gameplay_.isGameOver()) {
             title += " | Game over: " +
@@ -273,6 +320,9 @@ FrameView AppManager::frame() const {
     view.score = gameplay_.score();
     view.highScore = gameplay_.highScore();
     view.menuError = menuError_;
+    view.playerName = nameEntry_.value();
+    view.nameError = nameEntry_.error();
+    view.menuIndex = menuIndex_;
     return view;
 }
 

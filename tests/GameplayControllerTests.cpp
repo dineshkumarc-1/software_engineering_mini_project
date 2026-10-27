@@ -168,7 +168,8 @@ TEST_CASE("Every mode and difficulty pair can be selected from the menu", "[menu
 }
 
 TEST_CASE("The selection cannot change during a game", "[menu]") {
-    const Screen screen = GENERATE(Screen::Gameplay, Screen::Paused, Screen::Exiting);
+    const Screen screen = GENERATE(Screen::Gameplay, Screen::Paused, Screen::NameEntry,
+                                 Screen::Leaderboard, Screen::Settings, Screen::GameOver, Screen::Exiting);
     const MenuInput input = GENERATE(MenuInput::PreviousMode, MenuInput::NextMode,
                                      MenuInput::HarderDifficulty, MenuInput::EasierDifficulty);
 

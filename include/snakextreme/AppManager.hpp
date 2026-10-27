@@ -2,6 +2,7 @@
 #pragma once
 
 #include "snakextreme/AppState.hpp"
+#include "snakextreme/NameEntry.hpp"
 #include "snakextreme/GameplayController.hpp"
 #include "snakextreme/MenuSelection.hpp"
 #include "snakextreme/ModeManager.hpp"
@@ -29,6 +30,8 @@ private:
     std::string titleText() const;
     FrameView frame() const;
 
+    NameEntry nameEntry_;
+    std::size_t menuIndex_{0};
     sf::RenderWindow window_;
     AppState state_;
     Renderer renderer_;

@@ -126,7 +126,7 @@ if(BUILD_TESTING)
 
     # Small dependency-free harness kept from issue #4.
     add_executable(app_state_tests tests/AppStateTests.cpp)
-    target_link_libraries(app_state_tests PRIVATE snake_app_state)
+    target_link_libraries(app_state_tests PRIVATE snake_app_state snake_validation)
     snake_warnings(app_state_tests)
     add_test(NAME app_state_flow COMMAND app_state_tests)
 

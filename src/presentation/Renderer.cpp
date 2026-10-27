@@ -171,7 +171,12 @@ void Renderer::draw(sf::RenderTarget& target, const FrameView& frame) const {
         return;
     }
 
-    if (frame.screen == Screen::MainMenu) {
+    if (frame.screen == Screen::MainMenu || frame.screen == Screen::NameEntry ||
+        frame.screen == Screen::Leaderboard || frame.screen == Screen::Settings) {
+        drawNavigation(target, frame);
+        return;
+    }
+    if (frame.screen == Screen::ModeSelection) {
         drawMenu(target, frame);
         return;
     }
@@ -188,6 +193,40 @@ void Renderer::draw(sf::RenderTarget& target, const FrameView& frame) const {
 
     // The HUD is drawn last so it stays readable over every overlay.
     drawHud(target, frame);
+}
+
+void Renderer::drawNavigation(sf::RenderTarget& target, const FrameView& frame) const {
+    if (!fontLoaded_) return; // Window title remains the text fallback.
+    const auto label = [&](const std::string& value, unsigned size, float y, sf::Color color) {
+        auto item = text(value, size, color);
+        centreOn(item, 450.f, y);
+        target.draw(item);
+    };
+    label("SnakeXtreme", 46, 78.f, Accent);
+    if (frame.screen == Screen::MainMenu) {
+        const char* entries[] = {"New Game", "Leaderboard", "Settings", "Exit"};
+        for (std::size_t i = 0; i < 4; ++i) {
+            const float top = 190.f + 60.f * static_cast<float>(i);
+            sf::RectangleShape box({380.f, 48.f});
+            box.setPosition(260.f, top);
+            box.setFillColor(i == frame.menuIndex ? Accent : PanelFill);
+            target.draw(box);
+            label(entries[i], 24, top + 24.f, i == frame.menuIndex ? sf::Color(15, 23, 32) : TextMain);
+        }
+        label("Up/Down or W/S: select   Enter / click: confirm   Esc: exit", 17, 500.f, TextDim);
+    } else if (frame.screen == Screen::NameEntry) {
+        label("Enter your display name", 28, 190.f, TextMain);
+        label(frame.playerName + "_", 32, 275.f, Accent);
+        label(std::to_string(frame.playerName.size()) + "/15", 18, 320.f, TextDim);
+        label(frame.nameError, 18, 380.f, Danger);
+        label("Type name   Backspace: delete   Enter: continue   Esc: back", 17, 500.f, TextDim);
+    } else {
+        const bool leaderboard = frame.screen == Screen::Leaderboard;
+        label(leaderboard ? "Leaderboard" : "Settings", 30, 210.f, TextMain);
+        label(leaderboard ? "Persistence integration pending (issue #21)" :
+                            "Settings implementation pending (issue #20)", 20, 300.f, TextDim);
+        label("Esc: back to main menu", 18, 500.f, TextDim);
+    }
 }
 
 void Renderer::drawMenu(sf::RenderTarget& target, const FrameView& frame) const {
@@ -297,7 +336,7 @@ void Renderer::drawMenu(sf::RenderTarget& target, const FrameView& frame) const 
 
     const std::string controls =
         std::string(ArrowLeft) + " " + ArrowRight + "  mode       " +
-        ArrowUp + " " + ArrowDown + "  difficulty       Enter  start       Esc  quit";
+        ArrowUp + " " + ArrowDown + "  difficulty       Enter  start       Esc  back";
     sf::Text hint = text(controls, 18, TextMain);
     centreOn(hint, 450.f, 468.f);
     target.draw(hint);
