@@ -1,0 +1,2 @@
+Restored backend gains: music=25 sfx=80
+7 real SFML/OpenAL audio backend checks passed

@@ -40,6 +40,8 @@ AppManager::AppManager()
         }
     }
     settingsEditor_.open(settings_);
+    if (!audio_.start(settings_.musicVolume, settings_.sfxVolume))
+        std::cerr << "[WARN] AudioService: playback unavailable; silent fallback\n";
     refreshTitle();
 }
 
@@ -81,6 +83,8 @@ void AppManager::pollEvents() {
     sf::Event event{};
 
     while (window_.pollEvent(event)) {
+        const int oldSfxVolume = state_.screen() == Screen::Settings
+            ? settingsEditor_.value().sfxVolume : settings_.sfxVolume;
         if (event.type == sf::Event::Closed) {
             dispatch(Action::Quit);
             return;
@@ -121,6 +125,9 @@ void AppManager::pollEvents() {
         if (!window_.isOpen()) {
             return;
         }
+        const int currentSfxVolume = state_.screen() == Screen::Settings
+            ? settingsEditor_.value().sfxVolume : settings_.sfxVolume;
+        syncAudio(state_.screen() == Screen::Settings && currentSfxVolume != oldSfxVolume);
     }
 }
 
@@ -224,12 +231,20 @@ void AppManager::handleKey(sf::Keyboard::Key key) {
     }
 }
 
+void AppManager::syncAudio(bool previewSfx) {
+    const auto& volumes = state_.screen() == Screen::Settings ? settingsEditor_.value() : settings_;
+    audio_.setVolumes(volumes.musicVolume, volumes.sfxVolume);
+    audio_.setPaused(state_.screen() == Screen::Paused || state_.screen() == Screen::Exiting);
+    if (previewSfx) audio_.playSfx(SoundCue::Preview);
+}
+
 void AppManager::handleSettingsKey(sf::Keyboard::Key key) {
     if (settingsEditor_.capturing()) {
         if (key == sf::Keyboard::Escape) settingsEditor_.cancelCapture();
         else settingsEditor_.bind(static_cast<int>(key));
         return;
     }
+    if (key == sf::Keyboard::F5) { audio_.playSfx(SoundCue::Preview); return; }
     switch (key) {
     case sf::Keyboard::Up: settingsEditor_.move(-1); break;
     case sf::Keyboard::Down: settingsEditor_.move(1); break;
@@ -291,6 +306,7 @@ void AppManager::dispatch(Action action) {
         settingsEditor_.error(settingsNotice_);
     }
 
+    syncAudio();
     if (state_.screen() == Screen::Exiting) {
         window_.close();
     } else {
@@ -301,9 +317,15 @@ void AppManager::dispatch(Action action) {
 void AppManager::update(sf::Time step) {
     // The controller ignores updates outside the Gameplay screen, so a
     // paused game keeps both its position and its countdown.
+    const int previousScore = gameplay_.score();
     gameplay_.update(std::chrono::microseconds{step.asMicroseconds()},
                      state_.screen());
-    if (state_.screen() == Screen::Gameplay && gameplay_.isGameOver()) dispatch(Action::EndGame);
+    if (state_.screen() == Screen::Gameplay && gameplay_.score() > previousScore)
+        audio_.playSfx(SoundCue::Food);
+    if (state_.screen() == Screen::Gameplay && gameplay_.isGameOver()) {
+        dispatch(Action::EndGame);
+        audio_.playSfx(SoundCue::GameOver);
+    }
 }
 
 void AppManager::refreshTitle() {
@@ -380,6 +402,7 @@ std::string AppManager::titleText() const {
 
 FrameView AppManager::frame() const {
     FrameView view;
+    view.audioAvailable = audio_.available();
     view.settings = state_.screen() == Screen::Settings ? settingsEditor_.value() : settings_;
     view.settingsRow = settingsEditor_.row();
     view.capturingKey = settingsEditor_.capturing();

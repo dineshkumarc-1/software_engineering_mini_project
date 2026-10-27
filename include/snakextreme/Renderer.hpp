@@ -16,6 +16,7 @@ namespace snake {
 // Everything one frame shows, gathered by AppManager. The renderer only
 // draws it; no game rules live here.
 struct FrameView {
+    bool audioAvailable{false};
     Settings settings{};
     std::size_t settingsRow{0};
     bool capturingKey{false};

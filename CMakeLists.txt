@@ -51,6 +51,8 @@ snake_add_module(snake_settings
     SOURCES src/persistence/Settings.cpp src/persistence/SettingsRepository.cpp)
 target_link_libraries(snake_settings PRIVATE nlohmann_json::nlohmann_json)
 
+# C5 waveform generation and volume policy remain SFML-free.
+snake_add_module(snake_audio_model SOURCES src/audio/AudioModel.cpp)
 snake_assert_core_is_sfml_free()
 
 # ---------------------------------------------------------------------------
@@ -59,7 +61,7 @@ snake_assert_core_is_sfml_free()
 if(SNAKE_BUILD_APP)
     if(SNAKE_FETCH_SFML)
         include(FetchContent)
-        set(SFML_BUILD_AUDIO OFF CACHE BOOL "" FORCE)
+        set(SFML_BUILD_AUDIO ON CACHE BOOL "" FORCE)
         set(SFML_BUILD_NETWORK OFF CACHE BOOL "" FORCE)
         set(SFML_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
         set(SFML_BUILD_DOC OFF CACHE BOOL "" FORCE)
@@ -78,7 +80,7 @@ if(SNAKE_BUILD_APP)
         # Treat SFML's headers as system headers (as an installed SFML is),
         # so project warnings and SNAKE_WARNINGS_AS_ERRORS judge project
         # code only, not SFML's own inline code.
-        foreach(module system window graphics)
+        foreach(module system window graphics audio)
             get_target_property(snake_sfml_includes sfml-${module} INTERFACE_INCLUDE_DIRECTORIES)
             if(snake_sfml_includes)
                 set_target_properties(sfml-${module} PROPERTIES
@@ -86,21 +88,22 @@ if(SNAKE_BUILD_APP)
             endif()
         endforeach()
     else()
-        find_package(SFML 2.5 COMPONENTS graphics window system REQUIRED)
+        find_package(SFML 2.5 COMPONENTS graphics window system audio REQUIRED)
         if(DEFINED SFML_VERSION AND NOT SFML_VERSION VERSION_LESS 3)
             message(FATAL_ERROR "SnakeXtreme requires SFML 2.x, not SFML 3")
         endif()
     endif()
     add_library(snake_presentation
         src/presentation/AppManager.cpp
-        src/presentation/Renderer.cpp)
+        src/presentation/Renderer.cpp
+        src/presentation/AudioService.cpp)
     target_include_directories(snake_presentation PUBLIC include)
     target_compile_definitions(snake_presentation PRIVATE
         SNAKE_ASSET_DIR="${CMAKE_CURRENT_SOURCE_DIR}/assets")
    target_link_libraries(snake_presentation PUBLIC
     snake_app_state snake_engine snake_modes snake_scoring snake_gameplay
-    snake_persistence snake_validation snake_settings
-    sfml-graphics sfml-window sfml-system)
+    snake_persistence snake_validation snake_settings snake_audio_model
+    sfml-graphics sfml-window sfml-system sfml-audio)
     snake_warnings(snake_presentation)
     add_executable(SnakeXtreme src/main.cpp)
     add_custom_command(TARGET SnakeXtreme POST_BUILD
@@ -109,6 +112,12 @@ if(SNAKE_BUILD_APP)
         COMMAND ${CMAKE_COMMAND} -E copy_if_different
             "${CMAKE_CURRENT_SOURCE_DIR}/assets/fonts/dejavu-sans-ttf-2.37/ttf/DejaVuSans.ttf"
             "$<TARGET_FILE_DIR:SnakeXtreme>/assets/fonts/DejaVuSans.ttf"
+        COMMAND ${CMAKE_COMMAND} -E copy_directory
+            "${CMAKE_CURRENT_SOURCE_DIR}/assets/licenses"
+            "$<TARGET_FILE_DIR:SnakeXtreme>/assets/licenses"
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            "${CMAKE_CURRENT_SOURCE_DIR}/THIRD_PARTY_NOTICES.md"
+            "$<TARGET_FILE_DIR:SnakeXtreme>/THIRD_PARTY_NOTICES.md"
     )
     target_link_libraries(
         SnakeXtreme
@@ -119,11 +128,23 @@ if(SNAKE_BUILD_APP)
     snake_warnings(SnakeXtreme)
     # Shared-library builds on Windows need the SFML DLLs beside the executable.
     if(WIN32 AND SNAKE_FETCH_SFML AND BUILD_SHARED_LIBS)
-        foreach(module graphics window system)
+        foreach(module graphics window system audio)
             add_custom_command(TARGET SnakeXtreme POST_BUILD
                 COMMAND ${CMAKE_COMMAND} -E copy_if_different
                 $<TARGET_FILE:sfml-${module}> $<TARGET_FILE_DIR:SnakeXtreme>)
         endforeach()
+    endif()
+    if(WIN32 AND SNAKE_FETCH_SFML)
+        if(CMAKE_SIZEOF_VOID_P EQUAL 8)
+            set(SNAKE_OPENAL_ARCH x64)
+        else()
+            set(SNAKE_OPENAL_ARCH x86)
+        endif()
+        # SFML 2.5.1 ships the matching OpenAL runtime with its Windows sources.
+        add_custom_command(TARGET SnakeXtreme POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            "${sfml_SOURCE_DIR}/extlibs/bin/${SNAKE_OPENAL_ARCH}/openal32.dll"
+            "$<TARGET_FILE_DIR:SnakeXtreme>/openal32.dll")
     endif()
 endif()
 
@@ -173,6 +194,17 @@ snake_add_catch2_test(input_validator_tests
     snake_add_catch2_test(settings_tests
         SOURCES tests/SettingsTests.cpp
         LIBS snake_settings nlohmann_json::nlohmann_json)
+
+    snake_add_catch2_test(audio_model_tests
+        SOURCES tests/AudioModelTests.cpp
+        LIBS snake_audio_model snake_settings)
+
+    # Optional real SFML/OpenAL smoke executable; not a device-dependent CTest.
+    if(SNAKE_BUILD_APP)
+        add_executable(audio_backend_smoke tests/AudioBackendSmoke.cpp)
+        target_link_libraries(audio_backend_smoke PRIVATE snake_presentation)
+        snake_warnings(audio_backend_smoke)
+    endif()
 
     # TC-MNT-01: SFML-free code must not include SFML headers.
     add_test(NAME layering_core_is_sfml_free

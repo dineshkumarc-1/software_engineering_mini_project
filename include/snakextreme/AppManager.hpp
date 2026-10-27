@@ -2,6 +2,7 @@
 #pragma once
 
 #include "snakextreme/AppState.hpp"
+#include "snakextreme/AudioService.hpp"
 #include "snakextreme/NameEntry.hpp"
 #include "snakextreme/SettingsRepository.hpp"
 #include "snakextreme/GameplayController.hpp"
@@ -24,6 +25,7 @@ private:
     void pollEvents();
     void handleKey(sf::Keyboard::Key key);
     void select(MenuInput input);
+    void syncAudio(bool previewSfx = false);
     void handleSettingsKey(sf::Keyboard::Key key);
     void activateSettings();
     void clickSettings(int x, int y);
@@ -34,6 +36,7 @@ private:
     std::string titleText() const;
     FrameView frame() const;
 
+    AudioService audio_;
     SettingsRepository settingsRepository_;
     Settings settings_;
     SettingsEditor settingsEditor_;

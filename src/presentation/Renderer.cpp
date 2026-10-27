@@ -267,7 +267,9 @@ void Renderer::drawSettings(sf::RenderTarget& target, const FrameView& frame) co
     auto message = text(frame.settingsMessage, 15, Warning); centreOn(message, 450.f, 490.f); target.draw(message);
     auto help = text("Up/Down: row   Left/Right: adjust   Enter / click: edit   Esc: cancel", 16, TextDim);
     centreOn(help, 450.f, 525.f); target.draw(help);
-    auto note = text("WASD always enabled. Volumes stored; audio playback integration pending.", 15, TextDim);
+    auto note = text(frame.audioAvailable
+        ? "Live audio preview. F5: test SFX. Save applies; Cancel restores. WASD always enabled."
+        : "Audio unavailable: silent fallback. Values still save. WASD always enabled.", 15, TextDim);
     centreOn(note, 450.f, 555.f); target.draw(note);
 }
 

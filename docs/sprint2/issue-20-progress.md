@@ -2,6 +2,10 @@
 
 Owner: C Dinesh Kumar. AI-assisted implementation. **Draft; #20 remains open.**
 
+**Current update:** the audio implementation and Linux desktop smoke tests below
+supersede the earlier audio-not-implemented/local-runtime-pending notes. Human
+Windows listening and C13 integration are still pending.
+
 ## Dependencies and contract
 
 Based on UI PR #44 (`5331dd639122f00d4c36929268aa6d684b87c581`), which in
@@ -124,3 +128,72 @@ RAII ownership/close behavior is unchanged; no warning flag was weakened.
 Local warnings-as-errors build and tests pass; the new GitHub CI run must confirm
 this on its compiler before the portability fix is considered CI-verified.
 These updates do not resolve audio/manual/Windows/C13 acceptance gaps above.
+
+## AudioService and Linux desktop integration (2026-10-27 UTC)
+
+Base: published Settings head `b380a921eb2a08026e22d12d9fc41eb9794237ff`.
+C5 now plays an original generated musical loop and preview/food/game-over SFX
+through SFML Audio, using independent music and SFX gains. The two channels are
+not mixed into one gain. Volume edits preview immediately; F5 plays a test SFX.
+Save persists values, Cancel restores saved levels, pause suspends music/SFX,
+and unavailable audio leaves a playable silent fallback with a Settings notice.
+The waveform model is SFML-free, deterministic, bounded to a four-second music
+loop and <=350-ms SFX, and uses no third-party audio assets. Buffers outlive sound
+sources. SFML audio and its runtime/dependencies are now enabled in CMake/CI.
+
+Windows packaging now includes fonts, runtime notices and the matching SFML
+bundled OpenAL 1.18.1 DLL, plus its LGPL v2 text and upstream source link. The
+new optional `audio_backend_smoke` executable is not an audio-device-dependent
+CTest; Linux CI runs it explicitly using OpenAL Soft's null output driver.
+
+### Executed validation (not final system acceptance)
+
+Environment: Amazon Linux 2023; GCC 11.5.0; CMake 4.4.4; SFML 2.5.1; Catch2
+v3.8.1; local OpenAL Soft 1.23.1 (`d3875f333fb6abe2f39d82caca329414871ae53b`).
+OpenAL was built under `/data/audio-deps` because this agent's distribution did
+not package its development headers. This is a local build detail, not a new
+project dependency/version mandate. CI uses system OpenAL on Linux and SFML's
+bundled 1.18.1 DLL on Windows. Xvfb/xdotool test a real Linux SFML window.
+
+- Full desktop configure/link/build succeeds with project warnings as errors.
+- Headless CTest: **10/10**; full-app-build CTest: **10/10**.
+- Audio model: **4 cases / 147 assertions**, also ASan+UBSan/leak-detection pass.
+- Real SFML/OpenAL backend: **7 checks** pass, using a null output driver.
+  Includes separate 0/100 and 100/0 gains, clamping, pause/resume and restored
+  gains. Non-boundary backend float gains use a 0.01 tolerance (OpenAL roundoff).
+- Real Linux/Xvfb Settings UI: **17 checks** pass, including independent slider
+  states, Save/Cancel, I/K/J/L remapping, theme selection, real process relaunch,
+  missing/corrupt config regeneration and no-audio-backend silent fallback.
+- Existing name-entry, shared validator, Settings and gameplay tests remain in
+  the full CTest pass. Prior 20-run gameplay evidence is historical, not rerun
+  as part of this audio slice.
+
+Raw evidence: `docs/sprint2/evidence/audio-*.txt`. These results apply to the
+source snapshot containing this addendum; use its published PR head SHA.
+
+### Reproduction
+
+```
+cmake --preset headless -DSNAKE_WARNINGS_AS_ERRORS=ON
+cmake --build --preset headless -j4
+ctest --preset headless --output-on-failure
+./build/headless/audio_model_tests --reporter compact
+cmake --preset app -DSNAKE_WARNINGS_AS_ERRORS=ON
+cmake --build --preset app -j4
+ctest --preset app --output-on-failure
+ALSOFT_DRIVERS=null ./build/app/audio_backend_smoke
+python tools/desktop_settings_smoke.py /absolute/path/to/build/app/SnakeXtreme
+```
+
+For the agent's non-system OpenAL prefix, add CMAKE_PREFIX_PATH=/data/audio-deps
+and LD_LIBRARY_PATH=/data/audio-deps/lib. Optional
+`SNAKE_SMOKE_SCREENSHOT=/path/to/settings.png` captures a Pillow screenshot.
+The script creates/cleans an isolated Xvfb display :99 and temporary config dir,
+refuses to attach to an occupied display, and never edits real player data.
+
+**Remaining:** no human has listened to music/SFX on the required Windows device;
+null audio proves backend routing/status, not audible correctness. Windows app
+runtime and mouse-drag/manual acceptance still need verification. C13 shared
+store/logging integration remains separate. Keep #20 open and this PR draft;
+CI on the new head is separate from the previously green run. No release tag,
+freeze or complete-product demo is justified by this slice.

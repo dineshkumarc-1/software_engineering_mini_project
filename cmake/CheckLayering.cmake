@@ -13,7 +13,7 @@ if(NOT SNAKE_SOURCE_DIR)
     message(FATAL_ERROR "Pass -DSNAKE_SOURCE_DIR=<repository root>")
 endif()
 
-set(core_dirs app engine modes scoring gameplay persistence)
+set(core_dirs app engine modes scoring gameplay persistence audio)
 set(pending "")
 foreach(dir IN LISTS core_dirs)
     file(GLOB_RECURSE found
