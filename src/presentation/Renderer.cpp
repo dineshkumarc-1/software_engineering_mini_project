@@ -166,13 +166,23 @@ sf::Text Renderer::text(const std::string& utf8, unsigned size, sf::Color color)
     return label;
 }
 
+sf::Color Renderer::background(Theme theme) {
+    if (theme == Theme::Neon) return sf::Color(14, 8, 32);
+    if (theme == Theme::Retro) return sf::Color(29, 40, 24);
+    return sf::Color(15, 23, 32);
+}
+
 void Renderer::draw(sf::RenderTarget& target, const FrameView& frame) const {
     if (frame.screen == Screen::Exiting) {
         return;
     }
 
+    if (frame.screen == Screen::Settings) {
+        drawSettings(target, frame);
+        return;
+    }
     if (frame.screen == Screen::MainMenu || frame.screen == Screen::NameEntry ||
-        frame.screen == Screen::Leaderboard || frame.screen == Screen::Settings) {
+        frame.screen == Screen::Leaderboard) {
         drawNavigation(target, frame);
         return;
     }
@@ -182,7 +192,7 @@ void Renderer::draw(sf::RenderTarget& target, const FrameView& frame) const {
     }
 
     if (frame.engine != nullptr) {
-        drawBoard(target, *frame.engine);
+        drawBoard(target, *frame.engine, frame.settings.theme);
     }
 
     if (frame.screen == Screen::Paused) {
@@ -221,12 +231,44 @@ void Renderer::drawNavigation(sf::RenderTarget& target, const FrameView& frame) 
         label(frame.nameError, 18, 380.f, Danger);
         label("Type name   Backspace: delete   Enter: continue   Esc: back", 17, 500.f, TextDim);
     } else {
-        const bool leaderboard = frame.screen == Screen::Leaderboard;
-        label(leaderboard ? "Leaderboard" : "Settings", 30, 210.f, TextMain);
-        label(leaderboard ? "Persistence integration pending (issue #21)" :
-                            "Settings implementation pending (issue #20)", 20, 300.f, TextDim);
+        label("Leaderboard", 30, 210.f, TextMain);
+        label("Persistence integration pending (issue #21)", 20, 300.f, TextDim);
         label("Esc: back to main menu", 18, 500.f, TextDim);
     }
+}
+
+void Renderer::drawSettings(sf::RenderTarget& target, const FrameView& frame) const {
+    if (!fontLoaded_) return;
+    auto heading = text("Settings", 34, Accent); centreOn(heading, 450.f, 65.f); target.draw(heading);
+    const char* names[] = {"Move Up", "Move Down", "Move Left", "Move Right", "Music", "SFX",
+                           "Theme", "Restore defaults", "Save & back", "Cancel"};
+    for (std::size_t i = 0; i < 10; ++i) {
+        const float top = 120.f + 35.f * static_cast<float>(i);
+        sf::RectangleShape row({580.f, 32.f}); row.setPosition(160.f, top);
+        row.setFillColor(i == frame.settingsRow ? sf::Color(45, 65, 75) : PanelFill); target.draw(row);
+        auto name = text(names[i], 19, i == frame.settingsRow ? Accent : TextMain);
+        name.setPosition(175.f, top + 3.f); target.draw(name);
+        std::string value;
+        if (i < 4) value = frame.capturingKey && frame.settingsRow == i ? "Press key..." : keyName(frame.settings.keys[i]);
+        if (i == 6) value = std::string(themeName(frame.settings.theme)) + "  < >";
+        if (i == 4 || i == 5) {
+            const int volume = i == 4 ? frame.settings.musicVolume : frame.settings.sfxVolume;
+            sf::RectangleShape track({300.f, 5.f}); track.setPosition(400.f, top + 16.f);
+            track.setFillColor(PanelEdge); target.draw(track);
+            sf::RectangleShape fill({static_cast<float>(volume) * 3.f, 5.f}); fill.setPosition(track.getPosition());
+            fill.setFillColor(Accent); target.draw(fill);
+            sf::CircleShape knob(6.f); knob.setPosition(394.f + static_cast<float>(volume) * 3.f, top + 12.f);
+            knob.setFillColor(TextMain); target.draw(knob);
+            auto number = text(std::to_string(volume), 16, TextMain); number.setPosition(345.f, top + 4.f); target.draw(number);
+        } else {
+            auto item = text(value, 18, TextMain); item.setPosition(400.f, top + 3.f); target.draw(item);
+        }
+    }
+    auto message = text(frame.settingsMessage, 15, Warning); centreOn(message, 450.f, 490.f); target.draw(message);
+    auto help = text("Up/Down: row   Left/Right: adjust   Enter / click: edit   Esc: cancel", 16, TextDim);
+    centreOn(help, 450.f, 525.f); target.draw(help);
+    auto note = text("WASD always enabled. Volumes stored; audio playback integration pending.", 15, TextDim);
+    centreOn(note, 450.f, 555.f); target.draw(note);
 }
 
 void Renderer::drawMenu(sf::RenderTarget& target, const FrameView& frame) const {
@@ -355,9 +397,14 @@ void Renderer::drawMenu(sf::RenderTarget& target, const FrameView& frame) const 
     }
 }
 
-void Renderer::drawBoard(sf::RenderTarget& target, const GameEngine& engine) const {
+void Renderer::drawBoard(sf::RenderTarget& target, const GameEngine& engine, Theme theme) const {
     sf::VertexArray grid(sf::Lines);
-    const sf::Color gridColor(43, 61, 72);
+    const sf::Color gridColor = theme == Theme::Neon ? sf::Color(85, 40, 115) :
+        theme == Theme::Retro ? sf::Color(63, 82, 47) : sf::Color(43, 61, 72);
+    const sf::Color headColor = theme == Theme::Neon ? sf::Color(30, 255, 245) :
+        theme == Theme::Retro ? sf::Color(190, 210, 100) : Accent;
+    const sf::Color bodyColor = theme == Theme::Neon ? sf::Color(220, 45, 230) :
+        theme == Theme::Retro ? sf::Color(125, 155, 65) : sf::Color(35, 160, 115);
 
     for (unsigned x = 0; x <= Width; x += CellSize) {
         grid.append(sf::Vertex({static_cast<float>(x), 0.f}, gridColor));
@@ -399,7 +446,7 @@ void Renderer::drawBoard(sf::RenderTarget& target, const GameEngine& engine) con
         sf::RectangleShape segment({Cell - 2.f, Cell - 2.f});
         segment.setPosition(static_cast<float>(body[i].x) * Cell + 1.f,
                             static_cast<float>(body[i].y) * Cell + 1.f);
-        segment.setFillColor(i == 0 ? Accent : sf::Color(35, 160, 115));
+        segment.setFillColor(i == 0 ? headColor : bodyColor);
         target.draw(segment);
     }
 }

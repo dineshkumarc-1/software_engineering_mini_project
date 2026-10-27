@@ -3,6 +3,7 @@
 
 #include "snakextreme/AppState.hpp"
 #include "snakextreme/NameEntry.hpp"
+#include "snakextreme/SettingsRepository.hpp"
 #include "snakextreme/GameplayController.hpp"
 #include "snakextreme/MenuSelection.hpp"
 #include "snakextreme/ModeManager.hpp"
@@ -23,6 +24,9 @@ private:
     void pollEvents();
     void handleKey(sf::Keyboard::Key key);
     void select(MenuInput input);
+    void handleSettingsKey(sf::Keyboard::Key key);
+    void activateSettings();
+    void clickSettings(int x, int y);
     void startGame();
     void dispatch(Action action);
     void update(sf::Time step);
@@ -30,6 +34,11 @@ private:
     std::string titleText() const;
     FrameView frame() const;
 
+    SettingsRepository settingsRepository_;
+    Settings settings_;
+    SettingsEditor settingsEditor_;
+    std::string settingsNotice_;
+    bool draggingVolume_{false};
     NameEntry nameEntry_;
     std::size_t menuIndex_{0};
     sf::RenderWindow window_;

@@ -2,6 +2,7 @@
 #pragma once
 
 #include "snakextreme/AppState.hpp"
+#include "snakextreme/Settings.hpp"
 #include "snakextreme/GameEngine.hpp"
 #include "snakextreme/ModeManager.hpp"
 #include <SFML/Graphics.hpp>
@@ -15,6 +16,10 @@ namespace snake {
 // Everything one frame shows, gathered by AppManager. The renderer only
 // draws it; no game rules live here.
 struct FrameView {
+    Settings settings{};
+    std::size_t settingsRow{0};
+    bool capturingKey{false};
+    std::string settingsMessage;
     Screen screen{Screen::MainMenu};
     const GameEngine* engine{nullptr};
     SessionConfig selected{};  // main-menu choice
@@ -36,13 +41,15 @@ public:
     static constexpr unsigned CellSize = 30;
 
     Renderer();
+    static sf::Color background(Theme theme);
 
     void draw(sf::RenderTarget& target, const FrameView& frame) const;
 
 private:
     void drawNavigation(sf::RenderTarget& target, const FrameView& frame) const;
+    void drawSettings(sf::RenderTarget& target, const FrameView& frame) const;
     void drawMenu(sf::RenderTarget& target, const FrameView& frame) const;
-    void drawBoard(sf::RenderTarget& target, const GameEngine& engine) const;
+    void drawBoard(sf::RenderTarget& target, const GameEngine& engine, Theme theme) const;
     void drawHud(sf::RenderTarget& target, const FrameView& frame) const;
     void drawPaused(sf::RenderTarget& target) const;
     void drawGameOver(sf::RenderTarget& target, const FrameView& frame) const;

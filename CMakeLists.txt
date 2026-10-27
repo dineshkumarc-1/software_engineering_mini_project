@@ -39,6 +39,18 @@ snake_add_module(snake_gameplay
 #   snake_add_module(snake_persistence SOURCES src/persistence/SecureFileStore.cpp)
 snake_add_module(snake_persistence DEPS snake_validation)
 
+# C12 settings schema/editor and interim atomic file adapter (#20).
+include(FetchContent)
+set(JSON_BuildTests OFF CACHE BOOL "" FORCE)
+FetchContent_Declare(nlohmann_json
+    GIT_REPOSITORY https://github.com/nlohmann/json.git
+    GIT_TAG v3.11.3
+    GIT_SHALLOW TRUE)
+FetchContent_MakeAvailable(nlohmann_json)
+snake_add_module(snake_settings
+    SOURCES src/persistence/Settings.cpp src/persistence/SettingsRepository.cpp)
+target_link_libraries(snake_settings PRIVATE nlohmann_json::nlohmann_json)
+
 snake_assert_core_is_sfml_free()
 
 # ---------------------------------------------------------------------------
@@ -87,7 +99,7 @@ if(SNAKE_BUILD_APP)
         SNAKE_ASSET_DIR="${CMAKE_CURRENT_SOURCE_DIR}/assets")
    target_link_libraries(snake_presentation PUBLIC
     snake_app_state snake_engine snake_modes snake_scoring snake_gameplay
-    snake_persistence snake_validation
+    snake_persistence snake_validation snake_settings
     sfml-graphics sfml-window sfml-system)
     snake_warnings(snake_presentation)
     add_executable(SnakeXtreme src/main.cpp)
@@ -157,6 +169,10 @@ snake_add_catch2_test(input_validator_tests
     snake_add_catch2_test(gameplay_tests
         SOURCES tests/GameplayControllerTests.cpp
         LIBS snake_gameplay)
+
+    snake_add_catch2_test(settings_tests
+        SOURCES tests/SettingsTests.cpp
+        LIBS snake_settings nlohmann_json::nlohmann_json)
 
     # TC-MNT-01: SFML-free code must not include SFML headers.
     add_test(NAME layering_core_is_sfml_free

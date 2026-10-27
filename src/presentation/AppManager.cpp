@@ -3,8 +3,14 @@
 
 #include <algorithm>
 #include <chrono>
+#include <iostream>
 
 namespace snake {
+static_assert(sf::Keyboard::Up == 73 && sf::Keyboard::Down == 74 &&
+              sf::Keyboard::Left == 71 && sf::Keyboard::Right == 72 &&
+              sf::Keyboard::W == 22 && sf::Keyboard::S == 18 &&
+              sf::Keyboard::A == 0 && sf::Keyboard::D == 3,
+              "Settings schema requires SFML 2.x key codes");
 
 namespace {
 
@@ -22,6 +28,18 @@ AppManager::AppManager()
           sf::Style::Titlebar | sf::Style::Close) {
     window_.setFramerateLimit(60);
     window_.setKeyRepeatEnabled(false);
+    const auto loaded = settingsRepository_.load();
+    settings_ = loaded.settings;
+    if (loaded.usedDefaults) {
+        settingsNotice_ = loaded.warning;
+        std::cerr << "[WARN] SettingsRepository: " << loaded.warning << '\n';
+        std::string error;
+        if (!settingsRepository_.save(settings_, error)) {
+            settingsNotice_ += "; " + error;
+            std::cerr << "[WARN] SettingsRepository: " << error << '\n';
+        }
+    }
+    settingsEditor_.open(settings_);
     refreshTitle();
 }
 
@@ -50,7 +68,8 @@ int AppManager::run() {
 
         refreshTitle();
 
-        window_.clear(sf::Color(15, 23, 32));
+        window_.clear(Renderer::background(state_.screen() == Screen::Settings
+            ? settingsEditor_.value().theme : settings_.theme));
         renderer_.draw(window_, frame());
         window_.display();
     }
@@ -83,6 +102,17 @@ void AppManager::pollEvents() {
                 menuIndex_ = static_cast<std::size_t>((y - 190) / 60);
                 handleKey(sf::Keyboard::Enter);
             }
+        } else if (event.type == sf::Event::MouseButtonPressed &&
+            event.mouseButton.button == sf::Mouse::Left && state_.screen() == Screen::Settings) {
+            clickSettings(event.mouseButton.x, event.mouseButton.y);
+        }
+        if (event.type == sf::Event::MouseButtonReleased || event.type == sf::Event::LostFocus)
+            draggingVolume_ = false;
+        if (event.type == sf::Event::MouseMoved && state_.screen() == Screen::Settings &&
+            draggingVolume_ && !settingsEditor_.capturing()) {
+            // Continue a slider drag even when the pointer leaves its track.
+            if (settingsEditor_.row() == 4 || settingsEditor_.row() == 5)
+                settingsEditor_.setVolume((event.mouseMove.x - 400) / 3);
         }
         if (event.type == sf::Event::KeyPressed) {
             handleKey(event.key.code);
@@ -110,8 +140,10 @@ void AppManager::handleKey(sf::Keyboard::Key key) {
         if (key == sf::Keyboard::Escape) dispatch(Action::Back);
         if (key == sf::Keyboard::Enter && nameEntry_.confirm()) dispatch(Action::ConfirmName);
         break;
-    case Screen::Leaderboard:
     case Screen::Settings:
+        handleSettingsKey(key);
+        break;
+    case Screen::Leaderboard:
         if (key == sf::Keyboard::Escape) dispatch(Action::Back);
         break;
     case Screen::GameOver:
@@ -149,24 +181,13 @@ void AppManager::handleKey(sf::Keyboard::Key key) {
         break;
 
     case Screen::Gameplay:
-        // Movement controls: WASD or arrow keys.
+        // Primary bindings plus permanent WASD aliases, independent of SFML in the model.
+        if (const auto movement = movementForKey(settings_, static_cast<int>(key))) {
+            constexpr Direction directions[] = {Direction::Up, Direction::Down, Direction::Left, Direction::Right};
+            gameplay_.changeDirection(directions[*movement]);
+            break;
+        }
         switch (key) {
-        case sf::Keyboard::W:
-        case sf::Keyboard::Up:
-            gameplay_.changeDirection(Direction::Up);
-            break;
-        case sf::Keyboard::S:
-        case sf::Keyboard::Down:
-            gameplay_.changeDirection(Direction::Down);
-            break;
-        case sf::Keyboard::A:
-        case sf::Keyboard::Left:
-            gameplay_.changeDirection(Direction::Left);
-            break;
-        case sf::Keyboard::D:
-        case sf::Keyboard::Right:
-            gameplay_.changeDirection(Direction::Right);
-            break;
         case sf::Keyboard::Enter:
             // Play again with the same settings once the game has stopped.
             if (gameplay_.isGameOver()) {
@@ -203,6 +224,44 @@ void AppManager::handleKey(sf::Keyboard::Key key) {
     }
 }
 
+void AppManager::handleSettingsKey(sf::Keyboard::Key key) {
+    if (settingsEditor_.capturing()) {
+        if (key == sf::Keyboard::Escape) settingsEditor_.cancelCapture();
+        else settingsEditor_.bind(static_cast<int>(key));
+        return;
+    }
+    switch (key) {
+    case sf::Keyboard::Up: settingsEditor_.move(-1); break;
+    case sf::Keyboard::Down: settingsEditor_.move(1); break;
+    case sf::Keyboard::Left: settingsEditor_.adjust(settingsEditor_.row() == 6 ? -1 : -5); break;
+    case sf::Keyboard::Right: settingsEditor_.adjust(settingsEditor_.row() == 6 ? 1 : 5); break;
+    case sf::Keyboard::Enter: activateSettings(); break;
+    case sf::Keyboard::Escape: dispatch(Action::Back); break;
+    default: break;
+    }
+}
+void AppManager::activateSettings() {
+    if (settingsEditor_.row() == 8) {
+        std::string error;
+        if (!settingsRepository_.save(settingsEditor_.value(), error)) {
+            settingsEditor_.error(error); return;
+        }
+        settings_ = settingsEditor_.value();
+        settingsNotice_.clear();
+        dispatch(Action::Back);
+    } else if (settingsEditor_.row() == 9) dispatch(Action::Back);
+    else settingsEditor_.activate();
+}
+void AppManager::clickSettings(int x, int y) {
+    draggingVolume_ = false;
+    if (settingsEditor_.capturing() || x < 160 || x >= 740 || y < 120 || y >= 470) return;
+    settingsEditor_.selectRow(static_cast<std::size_t>((y - 120) / 35));
+    if ((settingsEditor_.row() == 4 || settingsEditor_.row() == 5) && x >= 400 && x <= 700) {
+        draggingVolume_ = true;
+        settingsEditor_.setVolume((x - 400) / 3);
+    } else activateSettings();
+}
+
 void AppManager::select(MenuInput input) {
     selectedConfig_ = applyMenuInput(selectedConfig_, input, state_.screen());
     menuError_.clear();
@@ -224,7 +283,13 @@ void AppManager::startGame() {
 }
 
 void AppManager::dispatch(Action action) {
+    draggingVolume_ = false;
+    const Screen previous = state_.screen();
     state_.dispatch(action);
+    if (state_.screen() == Screen::Settings && previous != Screen::Settings) {
+        settingsEditor_.open(settings_);
+        settingsEditor_.error(settingsNotice_);
+    }
 
     if (state_.screen() == Screen::Exiting) {
         window_.close();
@@ -265,7 +330,11 @@ std::string AppManager::titleText() const {
         title += " | Leaderboard integration pending (#21) | Esc: back";
         break;
     case Screen::Settings:
-        title += " | Settings implementation pending (#20) | Esc: back";
+        title += " | Settings | row " + std::to_string(settingsEditor_.row() + 1) +
+            " | Music " + std::to_string(settingsEditor_.value().musicVolume) +
+            " SFX " + std::to_string(settingsEditor_.value().sfxVolume) +
+            " | " + std::string(themeName(settingsEditor_.value().theme)) +
+            " | " + settingsEditor_.message() + " | Enter: edit/save, Esc: cancel";
         break;
     case Screen::ModeSelection:
         title +=  " | Menu | " + settingsText(selectedConfig_);
@@ -311,6 +380,10 @@ std::string AppManager::titleText() const {
 
 FrameView AppManager::frame() const {
     FrameView view;
+    view.settings = state_.screen() == Screen::Settings ? settingsEditor_.value() : settings_;
+    view.settingsRow = settingsEditor_.row();
+    view.capturingKey = settingsEditor_.capturing();
+    view.settingsMessage = settingsEditor_.message();
     view.screen = state_.screen();
     view.engine = &gameplay_.engine();
     view.selected = selectedConfig_;

@@ -3,3 +3,7 @@
 *.log
 .vs/
 .vscode/
+
+# Local settings and atomic-save temporaries
+/config.json
+/config.json.tmp-*
