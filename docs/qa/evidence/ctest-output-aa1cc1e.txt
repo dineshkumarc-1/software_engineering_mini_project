@@ -1,0 +1,19 @@
+Test project /tmp/SnakeXtreme-qa-evidence/build/headless
+    Start 1: app_state_flow
+1/7 Test #1: app_state_flow ...................   Passed    0.80 sec
+    Start 2: score_service
+2/7 Test #2: score_service ....................   Passed    0.32 sec
+    Start 3: game_session
+3/7 Test #3: game_session .....................   Passed    0.33 sec
+    Start 4: game_engine_tests
+4/7 Test #4: game_engine_tests ................   Passed    0.35 sec
+    Start 5: game_mode_tests
+5/7 Test #5: game_mode_tests ..................   Passed    0.50 sec
+    Start 6: gameplay_tests
+6/7 Test #6: gameplay_tests ...................   Passed    0.34 sec
+    Start 7: layering_core_is_sfml_free
+7/7 Test #7: layering_core_is_sfml_free .......   Passed    0.05 sec
+
+100% tests passed out of 7
+
+Total Test time (real) =   2.70 sec
