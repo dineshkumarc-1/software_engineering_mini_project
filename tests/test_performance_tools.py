@@ -71,6 +71,30 @@ class PerformanceToolsTests(unittest.TestCase):
         for key in ("fps_windows", "inputs"):
             report = copy.deepcopy(self.report); report[key] = [42]
             with self.assertRaises(ValueError): self.run_report(report)
+    def test_overlapping_duplicate_and_reversed_windows_are_rejected(self):
+        for starts in ((0, 1), (0, 999999), (0, 0), (1000000, 0)):
+            with self.subTest(starts=starts):
+                self.report["fps_windows"] = [self.window(start) for start in starts]
+                with self.assertRaises(ValueError): self.run_report()
+    def test_off_grid_and_pre_first_frame_windows_are_rejected(self):
+        self.report["first_frame_us"] = 12345
+        for starts in ((0,), (12346,), (12345, 1012346)):
+            with self.subTest(starts=starts):
+                self.report["fps_windows"] = [self.window(start) for start in starts]
+                with self.assertRaises(ValueError): self.run_report()
+    def test_nonzero_anchor_boundary_and_aligned_gap(self):
+        self.report["first_frame_us"] = 12345
+        self.report["fps_windows"] = [self.window(12345), self.window(1012345, fps=0),
+                                      self.window(3012345), self.window(4012345)]
+        result = self.run_report()
+        self.assertEqual(result["all_complete_window_fps"]["count"], 4)
+        self.assertEqual(result["all_complete_window_fps"]["min"], 0)
+        self.assertEqual(result["longest_same_session_eligible_seconds"], 2)
+    def test_windows_without_first_frame_are_rejected(self):
+        self.report["first_frame_us"] = None
+        self.report["fps_windows"] = [self.window(0)]
+        with self.assertRaises(ValueError): self.run_report()
+
     def test_300_good_windows_still_require_target_hardware_and_powerups(self):
         self.report["fps_windows"] = [self.window(i * 1000000) for i in range(300)]
         result = self.run_report()

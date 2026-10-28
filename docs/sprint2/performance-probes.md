@@ -34,6 +34,12 @@ Do not use a report filename that is also a player configuration/save file.
   observes a flushed marker emitted after that first display. IPC and parent
   scheduling add delay: this is an external readiness **upper bound**. Each run
   has an isolated missing-config fixture; real player files are never modified.
+  Collection succeeds only when the process exits zero without timeout, the
+  marker is observed, and its regular, non-symlink raw report passes the shared
+  analyzer validation with a non-null first-frame timestamp. Per-run
+  `report_valid`, `report_error`, and `collection_ok` preserve failure evidence.
+  Collector exit codes are 0 for all runs collected, 1 for any incomplete run,
+  and 2 for invocation/setup failure. A marker alone is never success.
   The collector does not clear OS caches or verify the machine specification.
 - FPS uses exact non-overlapping 1,000,000-us windows anchored on first display.
   A frame exactly on a boundary belongs to the next window. Stalls generate
@@ -58,7 +64,10 @@ Do not use a report filename that is also a player configuration/save file.
   records; timestamps limited to 24 h. Drops/invalid counters are explicit and
   make a run unsuitable for acceptance. JSON is written only at shutdown, not
   per frame. The analyzer bounds reports to 8 MiB and rejects duplicate keys,
-  invalid types, ordering and inconsistent timestamps.
+  invalid types, ordering and inconsistent timestamps. It also rejects overlapping,
+  duplicate, reversed, pre-first-frame and off-grid FPS windows. Grid alignment
+  uses the report's actual `first_frame_us`, not zero. Aligned gaps are allowed
+  but break continuity; exact boundary and zero-frame windows remain valid.
 
 Every report/summary retains `acceptance: not_assessed`. Power-ups are not
 implemented on this dependency base, so the required power-up-active campaign
@@ -88,7 +97,7 @@ cannot be accepted here, regardless of the numbers.
 
 ```
 ctest --preset headless --output-on-failure
-python -m unittest discover -s tests -p test_performance_tools.py -v
+python -m unittest discover -s tests -p 'test_*.py' -v
 python tools/desktop_navigation_smoke.py /absolute/path/to/SnakeXtreme
 python tools/desktop_settings_smoke.py /absolute/path/to/SnakeXtreme
 python tools/desktop_probe_smoke.py /absolute/path/to/SnakeXtreme NEW-output-directory
@@ -100,3 +109,6 @@ isolated temporary settings with null audio/software rendering. Null audio is
 not a human listening check. The probe smoke sends 100 synthetic seeded-random
 requests and collects three launch traces; **tooling smoke, not STP acceptance**.
 See `evidence/owner-followup-results.md` for this follow-up's executed results.
+
+See `evidence/owner-tooling-fix-results.md` for the subsequent PR #46 collector
+and FPS-grid regression fixes; earlier evidence applies to its own snapshot.

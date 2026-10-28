@@ -42,6 +42,11 @@ def summarize(path):
         raise ValueError("invalid/bounds-exceeding sample lists")
     for field in ("dropped_windows", "dropped_inputs", "invalid_samples"):
         integer(report[field])
+    first_frame = report.get("first_frame_us")
+    if first_frame is not None:
+        integer(first_frame)
+    if windows and first_frame is None:
+        raise ValueError("FPS windows require a first-frame timestamp")
     eligible, previous, longest, chain = [], None, 0, 0
     all_fps = []
     for window in windows:
@@ -54,8 +59,10 @@ def summarize(path):
         session = integer(window["session"])
         if type(window.get("uniform_context")) is not bool:
             raise ValueError("invalid context-uniformity flag")
-        if previous is not None and start <= previous[0]:
-            raise ValueError("out-of-order FPS windows")
+        if previous is not None and start < previous[0] + 1000000:
+            raise ValueError("overlapping or out-of-order FPS windows")
+        if start < first_frame or (start - first_frame) % 1000000 != 0:
+            raise ValueError("FPS window is off the first-frame one-second grid")
         all_fps.append(fps)
         valid = window["uniform_context"] and window.get("screen") == "Gameplay" and window.get("mode") == "Obstacle" and window.get("difficulty") == "Hard"
         if valid:
@@ -89,9 +96,6 @@ def summarize(path):
             rejected += 1
             if applied is not None or visible is not None:
                 raise ValueError("rejected input cannot have application/display timestamps")
-    first_frame = report.get("first_frame_us")
-    if first_frame is not None:
-        integer(first_frame)
     warnings = ["Diagnostic tooling only; target-hardware acceptance is not assessed.",
                 "Registration latency excludes OS/SFML queue wait; it is a lower bound, not end-to-end input latency.",
                 "First-frame time starts at main entry; use collect_launch.py for an external process-launch readiness upper bound.",

@@ -79,7 +79,7 @@ try:
     # Preserve environment only for this script's child collector (no global OS settings).
     os.environ.update({k: env[k] for k in ("DISPLAY", "ALSOFT_DRIVERS", "LIBGL_ALWAYS_SOFTWARE")})
     launched = collect(exe, output / "launches", 3, "uncommitted probe smoke working-tree; not a release build")
-    assert all(r["process_exit"] == 0 and r["launch_to_observed_first_frame_marker_us"] is not None for r in launched["runs"])
+    assert all(r["collection_ok"] and r["report_valid"] for r in launched["runs"])
     print("PASS: 3 isolated external launch-marker traces; cache condition and target hardware unverified")
     print("All instrumentation smoke checks pass; target performance acceptance NOT ASSESSED")
 finally:

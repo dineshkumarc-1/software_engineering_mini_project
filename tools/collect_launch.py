@@ -13,6 +13,8 @@ import tempfile
 import threading
 import time
 
+from analyze_performance import summarize
+
 MARKER = "SNAKEXTREME_PROBE_FIRST_FRAME"
 
 def collect(executable, output_dir, runs, snapshot):
@@ -41,7 +43,17 @@ def collect(executable, output_dir, runs, snapshot):
                     code = process.wait()
                 reader.join(timeout=5)
                 process.stdout.close()
-        records.append({"run": index + 1, "process_exit": code, "timed_out": timed_out,
+        report_error = None
+        try:
+            if report.is_symlink() or not report.is_file():
+                report_error = "missing_or_non_regular_report"
+            elif summarize(report)["main_to_first_frame_us"] is None:
+                report_error = "missing_first_frame"
+        except (OSError, ValueError, KeyError, TypeError, RecursionError):
+            report_error = "invalid_or_unreadable_report"
+        collection_ok = (code == 0 and not timed_out and bool(observed) and report_error is None)
+        records.append({"report_valid": report_error is None, "report_error": report_error,
+                        "collection_ok": collection_ok, "run": index + 1, "process_exit": code, "timed_out": timed_out,
                         "launch_to_observed_first_frame_marker_us": observed[0] if observed else None,
                         "report": report.name, "config_fixture": "missing_temporary_config"})
     result = {"acceptance": "not_assessed", "source_snapshot_operator_supplied": snapshot,
@@ -69,7 +81,7 @@ def main():
     except (OSError, ValueError) as error:
         parser.exit(2, f"Launch collection failed: {error}\n")
     print(json.dumps(result, indent=2))
-    return 0 if all(r["process_exit"] == 0 and r["launch_to_observed_first_frame_marker_us"] is not None for r in result["runs"]) else 1
+    return 0 if all(r["collection_ok"] for r in result["runs"]) else 1
 
 if __name__ == "__main__":
     raise SystemExit(main())
