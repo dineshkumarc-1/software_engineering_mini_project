@@ -46,10 +46,19 @@ The environment capture was recorded at 17:08:35 IST. This is the environment-ca
 - Platform: Windows x64
 - Test type: Manual functional testing
 - Reported result: 7 passed, 0 failed
-- Exact artifact version or commit: Not yet recorded
-- Individual evidence references: Not yet recorded
+- Artifact name: `SnakeXtreme-windows-x64`
+- Artifact ID: `12712437257`
+- Artifact page: https://github.com/dineshkumarc-1/software_engineering_mini_project/suites/109649240767/artifacts/12712437257
+- Workflow job: App build (Windows MSVC)
+- Workflow result: Succeeded
+- Workflow run commit SHA: `53465b167128caa787c182d36a859a51a5fec8a9`
+- Workflow run URL: https://github.com/dineshkumarc-1/software_engineering_mini_project/actions/runs/40456104168/job/122029676098
+- Artifact usage: Downloaded and launched for Windows x64 manual testing.
+- Individual screenshots, recordings, or other evidence references: Not yet attached.
 
 These results are based on the reported manual observations documented in Section 5.1. They are separate from the automated headless CTest runs.
+
+The recorded SHA identifies the source revision checked out by the documented workflow. The workflow and artifact references are included to support build traceability.
 
 ## 2. Commands Executed
 
@@ -138,13 +147,39 @@ The following results were reported for manual testing of the Windows x64 artifa
 
 **Reported manual-test total:** 7 tests; 7 reported passes; 0 reported failures.
 
-**Evidence and traceability limitations:**
+The total above covers only WIN-MAN-01 through WIN-MAN-07. The F5 observation and four pending key-remapping tests are excluded from this total.
 
-- The exact Windows artifact version or commit has not yet been recorded.
+### Additional Key-Remapping Coverage
+
+| Test area | Result or evidence | Status |
+|---|---|---|
+| W and Up Arrow both move upward | Both keys reportedly moved the snake upward. | Reported pass — WIN-MAN-06 |
+| Change a movement binding and test the new binding | No test result recorded yet. | Pending |
+| Reject assigning a key already assigned to another action | No test result recorded yet. | Pending |
+| Verify WASD aliases remain active after remapping | No test result recorded yet. | Pending |
+| Verify the old primary key stops working after remapping | No test result recorded yet. | Pending |
+
+The four pending tests must be executed and their actual results recorded before they can be marked as passed or failed. Expected behavior should be checked against the approved requirements and STP v1.0.
+
+### Additional Observation — F5 During Gameplay
+
+- **Test date:** 28 October 2026
+- **Environment:** Windows x64
+- **Artifact:** `SnakeXtreme-windows-x64`
+- **Action:** Pressed F5 while the snake was moving.
+- **Actual result:** The snake continued moving; gameplay did not pause.
+- **Expected result:** Pending confirmation against the approved requirements and STP v1.0.
+- **Disposition:** Observation recorded; not counted among the seven reported passes and not classified as a defect.
+- **Implementation note:** The inspected gameplay key handler explicitly handles Escape for pause/resume but contains no explicit F5 handling in the relevant key switch.
+
+This observation requires a requirements check before deciding whether corrective action is necessary.
+
+### Evidence and Traceability Limitations
+
+- The Windows app-build workflow checked out commit `53465b167128caa787c182d36a859a51a5fec8a9`. The workflow job and artifact references are recorded in Section 1, and the artifact was downloaded and launched for manual testing.
 - Individual screenshots, recordings, or other evidence references have not yet been attached to this log.
 - The reported observations have not been independently reproduced as part of this documentation update.
-- The tests still need to be mapped to their corresponding approved STP v1.0 test-case IDs.
-- F5 behavior was not included in the seven reported results and must be verified separately if required by the approved test plan.
+- The seven reported Windows tests still need to be mapped to their corresponding approved STP v1.0 test-case IDs.
 
 These manual results must not be combined with the automated CTest totals or treated as evidence that the complete planned test inventory has passed.
 
@@ -160,9 +195,10 @@ The following activities still require execution or verification against the pro
 - Complete security, portability, and applicable static-analysis checks.
 - Review outstanding defects and release exit criteria.
 - Complete requirements traceability against SRS v1.0, SRS Addendum v1.1, SAD v1.0, and STP v1.0.
-- Reconcile the reported Windows manual-test results with the exact artifact version and supporting evidence.
+- Attach or reference available evidence for the Windows manual tests.
 - Map the seven reported Windows tests to approved STP test-case IDs.
-- Verify F5 behavior against the approved test plan and record the result if applicable.
+- Confirm the expected F5 behavior against the approved requirements and test plan. If F5 is required to pause gameplay, investigate and track the discrepancy; otherwise, document that F5 is not a specified control.
+- Execute and record the four pending key-remapping tests: changed binding, duplicate-key rejection, WASD aliases after remapping, and old-primary-key behavior.
 - Verify all other required Windows platform, integration, and acceptance tests.
 - Complete the test summary report with traceable execution metrics.
 
@@ -173,7 +209,9 @@ Both recorded headless runs reported successful results for their respective reg
 - Run A: 8/8 tests passed, with 0 reported failures.
 - Run B: 7/7 tests passed, with 0 reported failures, at commit `aa1cc1e22319f018f7dd515e77f70d45d5a3712d`.
 
-Additionally, seven Windows x64 manual tests were reported as passing on 28 October 2026. The exact Windows artifact version and individual evidence references remain outstanding.
+Additionally, seven Windows x64 manual tests were reported as passing on 28 October 2026. The associated artifact, workflow job, and workflow commit SHA are recorded in Section 1. Individual evidence references have not yet been attached, and the reported manual results still require mapping to approved STP v1.0 test-case IDs.
+
+The F5 observation and four pending key-remapping tests are recorded separately and are not included in the seven reported Windows passes.
 
 The automated and manual results cover different test activities and must be reported separately. They do not establish completion of the full planned test inventory, successful execution of every High-priority test case, complete requirements conformance, or satisfaction of all release exit criteria.
 
