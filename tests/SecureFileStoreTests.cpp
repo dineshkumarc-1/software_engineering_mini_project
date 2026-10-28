@@ -52,6 +52,102 @@ TEST_CASE(
 }
 
 TEST_CASE(
+    "SecureFileStore rejects directories",
+    "[persistence][store][security]") {
+
+    TemporaryDirectory directory;
+
+    const auto folder = directory.path() / "folder";
+    REQUIRE(std::filesystem::create_directory(folder));
+
+    const snake::SecureFileStore store(folder);
+
+    CHECK(
+        store.readJson().status ==
+        snake::StoreReadStatus::UnsafeFile);
+}
+
+TEST_CASE(
+    "SecureFileStore rejects symbolic links",
+    "[persistence][store][security]") {
+
+    TemporaryDirectory directory;
+
+    const auto target = directory.path() / "target.json";
+    const auto link = directory.path() / "link.json";
+
+    {
+        std::ofstream output(target, std::ios::binary);
+        REQUIRE(output.good());
+        output << R"({"value":42})";
+    }
+
+    std::error_code ec;
+    std::filesystem::create_symlink(target, link, ec);
+
+    // Some Windows environments do not permit creating
+    // symbolic links without additional privileges.
+    if (ec) {
+        WARN("Could not create symbolic link in this environment: "
+             << ec.message());
+        return;
+    }
+
+    const snake::SecureFileStore store(link);
+
+    CHECK(
+        store.readJson().status ==
+        snake::StoreReadStatus::UnsafeFile);
+}
+
+TEST_CASE(
+    "SecureFileStore refuses writes through symbolic links",
+    "[persistence][store][security]") {
+
+    TemporaryDirectory directory;
+
+    const auto target = directory.path() / "target.json";
+    const auto link = directory.path() / "link.json";
+
+    const std::string originalContents = R"({"value":42})";
+
+    {
+        std::ofstream output(target, std::ios::binary);
+        REQUIRE(output.good());
+        output << originalContents;
+    }
+
+    std::error_code ec;
+    std::filesystem::create_symlink(target, link, ec);
+
+    if (ec) {
+        WARN("Could not create symbolic link in this environment: "
+             << ec.message());
+        return;
+    }
+
+    const snake::SecureFileStore store(link);
+
+    const nlohmann::json replacement = {
+        {"value", 99}
+    };
+
+    CHECK_FALSE(store.writeJson(replacement));
+
+    // The target must remain unchanged.
+    std::ifstream input(target, std::ios::binary);
+    REQUIRE(input.good());
+
+    const std::string contentsAfter(
+        (std::istreambuf_iterator<char>(input)),
+        std::istreambuf_iterator<char>());
+
+    CHECK(contentsAfter == originalContents);
+}
+
+
+
+TEST_CASE(
     "SecureFileStore writes and reads JSON",
     "[persistence][store]") {
 
@@ -91,6 +187,51 @@ TEST_CASE(
     CHECK(
         store.readJson().status ==
         snake::StoreReadStatus::InvalidJson);
+}
+
+TEST_CASE(
+    "SecureFileStore rejects duplicate JSON object keys",
+    "[persistence][store][security]") {
+
+    TemporaryDirectory directory;
+
+    const auto file = directory.path() / "duplicate.json";
+
+    {
+        std::ofstream output(file, std::ios::binary);
+        REQUIRE(output.good());
+        output << R"({"score":10,"score":99})";
+    }
+
+    const snake::SecureFileStore store(file);
+    const auto result = store.readJson();
+
+    CHECK(result.status == snake::StoreReadStatus::UnsafeJson);
+}
+
+TEST_CASE(
+    "SecureFileStore rejects JSON nested beyond the depth limit",
+    "[persistence][store][security]") {
+
+    TemporaryDirectory directory;
+
+    const auto file = directory.path() / "deep.json";
+
+    // The configured limit is 64 nested structures.
+    std::string deeplyNested(65U, '[');
+    deeplyNested += "0";
+    deeplyNested.append(65U, ']');
+
+    {
+        std::ofstream output(file, std::ios::binary);
+        REQUIRE(output.good());
+        output << deeplyNested;
+    }
+
+    const snake::SecureFileStore store(file);
+    const auto result = store.readJson();
+
+    CHECK(result.status == snake::StoreReadStatus::UnsafeJson);
 }
 
 TEST_CASE(

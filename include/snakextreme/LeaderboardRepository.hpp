@@ -1,7 +1,9 @@
 #pragma once
 
+#include "snakextreme/GameMode.hpp"
 #include "snakextreme/SecureFileStore.hpp"
 
+#include <cstddef>
 #include <filesystem>
 #include <optional>
 #include <string>
@@ -10,9 +12,30 @@
 
 namespace snake {
 
+// Version of the persisted leaderboard JSON schema.
+inline constexpr int LeaderboardSchemaVersion = 1;
+
 struct LeaderboardEntry {
     std::string playerName;
     int score{0};
+    GameMode gameMode{DefaultGameMode};
+    Difficulty difficulty{DefaultDifficulty};
+    std::string dateAchieved;
+};
+enum class ScoreSubmissionStatus {
+    Submitted,
+    NotQualified,
+    Error
+};
+
+struct ScoreSubmissionResult {
+    ScoreSubmissionStatus status{
+        ScoreSubmissionStatus::Error
+    };
+
+    std::optional<std::size_t> rank{};
+
+    std::string warning{};
 };
 
 class LeaderboardRepository {
@@ -20,22 +43,21 @@ public:
     explicit LeaderboardRepository(
         std::filesystem::path filePath);
 
-    // Returns validated entries sorted by descending score.
-    // The result contains at most 10 entries.
+    // Returns up to 10 entries, sorted by descending score.
     [[nodiscard]] std::vector<LeaderboardEntry>
     top10() const;
 
-    // Rejects invalid names and negative scores.
-    // Accepted names are normalized before saving.
-    [[nodiscard]] bool addScore(
+    // Validates and normalizes the name before saving.
+    // Game mode and difficulty describe the completed session.
+        [[nodiscard]] ScoreSubmissionResult addScore(
         std::string_view playerName,
-        int score);
+        int score,
+        GameMode gameMode,
+        Difficulty difficulty);
 
 private:
-    [[nodiscard]]
-    std::optional<std::vector<LeaderboardEntry>>
-    loadValidatedEntries() const;
-
+    [[nodiscard]] std::optional<std::vector<LeaderboardEntry>>
+    loadValidatedEntries(bool* corruptJson = nullptr) const;
     [[nodiscard]]
     static std::vector<LeaderboardEntry> rankedTop10(
         std::vector<LeaderboardEntry> entries);

@@ -14,6 +14,8 @@ enum class StoreReadStatus {
     EmptyFile,
     TooLarge,
     InvalidJson,
+    UnsafeJson,
+    UnsafeFile,
     IoError
 };
 

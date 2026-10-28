@@ -14,6 +14,8 @@
 #include <utility>
 #include <algorithm>
 #include <cctype>
+#include <set>
+#include <vector>
 
 #ifdef _WIN32
 #ifndef NOMINMAX
@@ -29,6 +31,10 @@
 
 namespace snake {
 namespace {
+  constexpr int MaxJsonNestingDepth = 64;
+
+struct JsonDepthLimitExceeded {};
+struct DuplicateJsonKey {};
 
 std::filesystem::path makeTemporaryPath(
     const std::filesystem::path& destination,
@@ -220,6 +226,36 @@ StoreReadResult SecureFileStore::readJson() const {
             "No file path was configured.");
     }
 
+    // Inspect the path without following a final-component symlink.
+    std::error_code statusError;
+    const auto fileStatus =
+        std::filesystem::symlink_status(filePath_, statusError);
+
+    if (statusError) {
+        if (statusError == std::errc::no_such_file_or_directory) {
+            return readFailure(
+                StoreReadStatus::NotFound,
+                "File does not exist.");
+        }
+
+        return readFailure(
+            StoreReadStatus::IoError,
+            "Could not inspect the file path.");
+    }
+
+    if (!std::filesystem::exists(fileStatus)) {
+        return readFailure(
+            StoreReadStatus::NotFound,
+            "File does not exist.");
+    }
+
+    if (std::filesystem::is_symlink(fileStatus) ||
+        !std::filesystem::is_regular_file(fileStatus)) {
+        return readFailure(
+            StoreReadStatus::UnsafeFile,
+            "Only regular files are allowed; symlinks are rejected.");
+    }
+
     std::ifstream input(filePath_, std::ios::binary);
 
     if (!input) {
@@ -284,19 +320,89 @@ if (isEmpty) {
         StoreReadStatus::EmptyFile,
         "File contains no JSON data.");
 }
+
     try {
-        auto parsed = nlohmann::json::parse(bytes);
+        std::vector<std::set<std::string>> seenKeys;
+
+        const auto callback = [&seenKeys](
+            int depth,
+            nlohmann::json::parse_event_t event,
+            nlohmann::json& parsed) -> bool {
+
+            using Event = nlohmann::json::parse_event_t;
+
+            // Reject structures nested beyond the configured limit.
+            if ((event == Event::object_start ||
+                 event == Event::array_start) &&
+                depth >= MaxJsonNestingDepth) {
+                throw JsonDepthLimitExceeded{};
+            }
+
+            // Object keys are reported one level deeper than
+            // the corresponding object_start event.
+            if (event == Event::object_start) {
+                const auto keysDepth =
+                    static_cast<std::size_t>(depth) + 1U;
+
+                if (seenKeys.size() <= keysDepth) {
+                    seenKeys.resize(keysDepth + 1U);
+                }
+
+                seenKeys[keysDepth].clear();
+            }
+
+            // Reject duplicate keys before the parser can
+            // silently replace an earlier value.
+            if (event == Event::key) {
+                const auto keysDepth =
+                    static_cast<std::size_t>(depth);
+
+                if (seenKeys.size() <= keysDepth) {
+                    seenKeys.resize(keysDepth + 1U);
+                }
+
+                const auto& key =
+                    parsed.get_ref<const std::string&>();
+
+                if (!seenKeys[keysDepth].insert(key).second) {
+                    throw DuplicateJsonKey{};
+                }
+            }
+
+            // Release the key set when the object closes.
+            if (event == Event::object_end) {
+                const auto keysDepth =
+                    static_cast<std::size_t>(depth) + 1U;
+
+                if (seenKeys.size() > keysDepth) {
+                    seenKeys[keysDepth].clear();
+                }
+            }
+
+            return true;
+        };
+
+        auto parsed = nlohmann::json::parse(bytes, callback);
 
         return StoreReadResult{
             StoreReadStatus::Ok,
             std::move(parsed),
             {}
         };
+    } catch (const JsonDepthLimitExceeded&) {
+        return readFailure(
+            StoreReadStatus::UnsafeJson,
+            "JSON nesting exceeds the permitted depth.");
+    } catch (const DuplicateJsonKey&) {
+        return readFailure(
+            StoreReadStatus::UnsafeJson,
+            "JSON contains a duplicate object key.");
     } catch (const nlohmann::json::exception&) {
         return readFailure(
             StoreReadStatus::InvalidJson,
             "File does not contain valid JSON.");
     }
+
 }
 
 bool SecureFileStore::writeJson(
@@ -305,6 +411,25 @@ bool SecureFileStore::writeJson(
     if (filePath_.empty()) {
         return false;
     }
+
+    // Reject existing symlinks and non-regular destinations.
+    // A destination that does not exist yet is allowed.
+    std::error_code statusError;
+    const auto destinationStatus =
+        std::filesystem::symlink_status(filePath_, statusError);
+
+    if (statusError) {
+        if (statusError !=
+            std::errc::no_such_file_or_directory) {
+            return false;
+        }
+    } else if (
+        std::filesystem::is_symlink(destinationStatus) ||
+        (std::filesystem::exists(destinationStatus) &&
+         !std::filesystem::is_regular_file(destinationStatus))) {
+        return false;
+    }
+
 
     std::string bytes;
 

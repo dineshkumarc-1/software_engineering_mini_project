@@ -3,27 +3,74 @@
 #include "snakextreme/InputValidator.hpp"
 
 #include <algorithm>
+#include <chrono>
 #include <cstdint>
+#include <ctime>
+#include <iomanip>
 #include <limits>
+#include <sstream>
+#include <string>
 #include <utility>
 
 namespace snake {
 namespace {
 
+std::string currentUtcTimestamp() {
+    const auto now = std::chrono::system_clock::now();
+    const std::time_t timeValue =
+        std::chrono::system_clock::to_time_t(now);
+
+    std::tm utcTime{};
+
+#ifdef _WIN32
+    if (gmtime_s(&utcTime, &timeValue) != 0) {
+        return {};
+    }
+#else
+    if (gmtime_r(&timeValue, &utcTime) == nullptr) {
+        return {};
+    }
+#endif
+
+    std::ostringstream output;
+    output << std::put_time(
+        &utcTime, "%Y-%m-%dT%H:%M:%SZ");
+
+    return output.str();
+}
+
 nlohmann::json serializeEntries(
     const std::vector<LeaderboardEntry>& entries) {
 
     nlohmann::json document;
+    document["version"] = LeaderboardSchemaVersion;
     document["entries"] = nlohmann::json::array();
 
     for (const auto& entry : entries) {
         document["entries"].push_back({
-            {"playerName", entry.playerName},
-            {"score", entry.score}
+            {"player_name", entry.playerName},
+            {"score", entry.score},
+            {"game_mode", std::string(toString(entry.gameMode))},
+            {"difficulty", std::string(toString(entry.difficulty))},
+            {"date_achieved", entry.dateAchieved}
         });
     }
 
     return document;
+}
+
+bool isValidVersion(const nlohmann::json& value) {
+    if (!value.is_number_integer() &&
+        !value.is_number_unsigned()) {
+        return false;
+    }
+
+    try {
+        return value.get<std::int64_t>() ==
+            LeaderboardSchemaVersion;
+    } catch (const nlohmann::json::exception&) {
+        return false;
+    }
 }
 
 } // namespace
@@ -33,32 +80,41 @@ LeaderboardRepository::LeaderboardRepository(
     : store_(std::move(filePath)) {}
 
 std::optional<std::vector<LeaderboardEntry>>
-LeaderboardRepository::loadValidatedEntries() const {
-
+LeaderboardRepository::loadValidatedEntries(
+    bool* corruptJson) const {
+      if (corruptJson != nullptr) {
+    *corruptJson = false;
+}
     const StoreReadResult result = store_.readJson();
 
     // A missing or empty file represents a new leaderboard.
-if (result.status == StoreReadStatus::NotFound ||
-    result.status == StoreReadStatus::EmptyFile) {
-    return std::vector<LeaderboardEntry>{};
-}
+    if (result.status == StoreReadStatus::NotFound ||
+        result.status == StoreReadStatus::EmptyFile) {
+        return std::vector<LeaderboardEntry>{};
+    }
 
-if (result.status == StoreReadStatus::InvalidJson) {
-    // Reading can fall back to an empty display, but callers
-    // must not silently overwrite the corrupt file.
+    // Do not silently overwrite malformed JSON.
+    if (result.status == StoreReadStatus::InvalidJson) {
+    // Only addScore() opts into recovery from malformed JSON.
+    if (corruptJson != nullptr) {
+        *corruptJson = true;
+        return std::vector<LeaderboardEntry>{};
+    }
+
     return std::nullopt;
 }
 
-    // Do not overwrite an oversized file or silently ignore
-    // other I/O errors.
+    // Do not silently replace oversized files or ignore I/O errors.
     if (result.status != StoreReadStatus::Ok) {
         return std::nullopt;
     }
 
     const auto& document = result.value;
 
-    // Validate the top-level schema.
+    // Validate the document and schema version.
     if (!document.is_object() ||
+        !document.contains("version") ||
+        !isValidVersion(document.at("version")) ||
         !document.contains("entries") ||
         !document.at("entries").is_array()) {
         return std::nullopt;
@@ -69,9 +125,18 @@ if (result.status == StoreReadStatus::InvalidJson) {
 
     for (const auto& item : document.at("entries")) {
         if (!item.is_object() ||
-            !item.contains("playerName") ||
+            !item.contains("player_name") ||
             !item.contains("score") ||
-            !item.at("playerName").is_string()) {
+            !item.contains("game_mode") ||
+            !item.contains("difficulty") ||
+            !item.contains("date_achieved")) {
+            return std::nullopt;
+        }
+
+        if (!item.at("player_name").is_string() ||
+            !item.at("game_mode").is_string() ||
+            !item.at("difficulty").is_string() ||
+            !item.at("date_achieved").is_string()) {
             return std::nullopt;
         }
 
@@ -96,18 +161,35 @@ if (result.status == StoreReadStatus::InvalidJson) {
         }
 
         const std::string name =
-            item.at("playerName").get<std::string>();
+            item.at("player_name").get<std::string>();
 
-        // Stored names must already be valid and normalized.
-        // Do not silently repair a modified or crafted entry.
+        const std::string modeText =
+            item.at("game_mode").get<std::string>();
+
+        const std::string difficultyText =
+            item.at("difficulty").get<std::string>();
+
+        const std::string date =
+            item.at("date_achieved").get<std::string>();
+
+        const auto mode = parseGameMode(modeText);
+        const auto difficulty = parseDifficulty(difficultyText);
+
+        // Stored player names must already be valid and normalized.
         if (!isValidPlayerName(name) ||
-            sanitizePlayerName(name) != name) {
+            sanitizePlayerName(name) != name ||
+            !mode.has_value() ||
+            !difficulty.has_value() ||
+            date.empty()) {
             return std::nullopt;
         }
 
         entries.push_back(LeaderboardEntry{
             name,
-            static_cast<int>(score64)
+            static_cast<int>(score64),
+            *mode,
+            *difficulty,
+            date
         });
     }
 
@@ -118,8 +200,6 @@ std::vector<LeaderboardEntry>
 LeaderboardRepository::rankedTop10(
     std::vector<LeaderboardEntry> entries) {
 
-    // Highest score first. Stable sort preserves the relative
-    // order of entries that have equal scores.
     std::stable_sort(
         entries.begin(),
         entries.end(),
@@ -137,7 +217,6 @@ LeaderboardRepository::rankedTop10(
 
 std::vector<LeaderboardEntry>
 LeaderboardRepository::top10() const {
-
     auto entries = loadValidatedEntries();
 
     if (!entries) {
@@ -147,42 +226,114 @@ LeaderboardRepository::top10() const {
     return rankedTop10(std::move(*entries));
 }
 
-bool LeaderboardRepository::addScore(
-    std::string_view playerName,
-    int score) {
 
-    // Validate the original input first.
-    // Invalid symbols and whitespace-only names are rejected.
+ScoreSubmissionResult LeaderboardRepository::addScore(
+    std::string_view playerName,
+    int score,
+    GameMode gameMode,
+    Difficulty difficulty) {
+
+    const auto errorResult = [] {
+        return ScoreSubmissionResult{
+            ScoreSubmissionStatus::Error,
+            std::nullopt
+        };
+    };
+
+    // Validate the supplied name and score.
     if (!isValidPlayerName(playerName) || score < 0) {
-        return false;
+        return errorResult();
     }
 
-    // Normalize accepted input, then validate it again before
-    // it is serialized to persistent storage.
+    // Reject invalid enum values.
+    switch (gameMode) {
+    case GameMode::Classic:
+    case GameMode::Timed:
+    case GameMode::Obstacle:
+        break;
+    default:
+        return errorResult();
+    }
+
+    switch (difficulty) {
+    case Difficulty::Easy:
+    case Difficulty::Medium:
+    case Difficulty::Hard:
+        break;
+    default:
+        return errorResult();
+    }
+
     std::string normalizedName =
         sanitizePlayerName(playerName);
 
     if (normalizedName.empty() ||
         !isValidPlayerName(normalizedName)) {
-        return false;
+        return errorResult();
     }
 
-    auto entries = loadValidatedEntries();
+    bool recoveredCorruptJson = false;
 
-    if (!entries) {
-        return false;
-    }
+auto entries = loadValidatedEntries(&recoveredCorruptJson);
 
-    entries->push_back(LeaderboardEntry{
-        std::move(normalizedName),
-        score
-    });
+// Do not overwrite unreadable data or invalid schemas.
+if (!entries) {
+    return errorResult();
+}
 
+    // Rank the existing leaderboard before evaluating
+    // whether the new score qualifies.
     auto ranked = rankedTop10(std::move(*entries));
 
-    // SecureFileStore enforces the 64 KiB limit and writes
-    // through a temporary file followed by atomic replacement.
-    return store_.writeJson(serializeEntries(ranked));
+    // On a full board, a score must be strictly greater
+    // than tenth place. A tie at tenth place is rejected.
+    if (ranked.size() == 10U &&
+        score <= ranked.back().score) {
+        return ScoreSubmissionResult{
+            ScoreSubmissionStatus::NotQualified,
+            std::nullopt
+        };
+    }
+
+    // Equal scores rank after existing entries with that score.
+    std::size_t rank = 1U;
+
+    for (const auto& entry : ranked) {
+        if (entry.score >= score) {
+            ++rank;
+        }
+    }
+
+    const std::string achievedAt = currentUtcTimestamp();
+
+if (achievedAt.empty()) {
+    return errorResult();
+}
+
+LeaderboardEntry newEntry{
+    std::move(normalizedName),
+    score,
+    gameMode,
+    difficulty,
+    achievedAt
+};
+
+    ranked.push_back(std::move(newEntry));
+    ranked = rankedTop10(std::move(ranked));
+
+    // SecureFileStore writes the updated JSON atomically.
+    if (!store_.writeJson(serializeEntries(ranked))) {
+        return errorResult();
+    }
+
+    return ScoreSubmissionResult{
+    ScoreSubmissionStatus::Submitted,
+    rank,
+    recoveredCorruptJson
+        ? "Warning: the previous leaderboard JSON was malformed. "
+          "A new leaderboard was saved."
+        : std::string{}
+};
 }
 
 } // namespace snake
