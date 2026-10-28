@@ -337,9 +337,13 @@ TEST_CASE("Pausing freezes movement and the countdown",
 TEST_CASE("Time up ends the game and stops all movement",
           "[gameplay][timed][TC-MODE-03]") {
     GameplayController game;
+    // No random power-ups: the circling below assumes one move per update,
+    // and a Speed power-up on the square would change that.
+    snake::PowerUpSchedule noPowerUps;
+    noPowerUps.randomSpawns = false;
     REQUIRE(game.start({GameMode::Timed, Difficulty::Easy},
                        GameEngine({{10, 10}, {9, 10}, {8, 10}}, Direction::Right, {29, 19}),
-                       1u));
+                       1u, noPowerUps));
 
     // Easy: one move per 200 ms update. Circle a 6 x 6 square to stay alive.
     const Direction turns[] = {Direction::Down, Direction::Left, Direction::Up, Direction::Right};
