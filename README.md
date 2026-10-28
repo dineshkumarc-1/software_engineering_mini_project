@@ -82,6 +82,18 @@ CI runs these checks on every pull request and push to `main` (Linux GCC, macOS 
 
 The main menu selects the mode and difficulty before a game starts, and the HUD shows them next to the score, the high score and the Timed countdown. See [docs/modes-integration.md](docs/modes-integration.md).
 
+## Power-ups (issue #14)
+
+`snake_powerups` (SAD C8, SFML-free) places power-ups and runs their timed effects. Values come from `GameConfig.hpp` (SRS Addendum §4).
+
+| Power-up | On the board | Effect |
+| --- | --- | --- |
+| Speed | Blue diamond with » | The snake moves every 0.6 × interval for 5 s (Easy 120 ms, Medium 72 ms, Hard 42 ms) |
+| Multiplier | Gold diamond with x2 | Food is worth twice its points for 10 s |
+| Shrink | Violet diamond with − | The tail loses one segment at once, never below 3 segments |
+
+A power-up appears on a random free cell 8–15 s after the previous one and disappears after 5 s if it is not collected. There is at most one on the board. Only one effect runs at a time: collecting a power-up ends the current effect first. The HUD and the window title show the running effect with its seconds left, and pausing freezes every power-up timer. See [docs/powerups.md](docs/powerups.md).
+
 ## Controls
 
 | Screen | Key | Action |
@@ -126,6 +138,12 @@ include/snakextreme/GameplayController.hpp  One game: engine + ModeManager + sco
 src/gameplay/                         Game wiring used by AppManager (SFML-free)
 tests/GameplayControllerTests.cpp     Menu and game-wiring integration tests (Catch2)
 docs/modes-integration.md             Modes and difficulty in the running game
+include/snakextreme/PowerUp.hpp        Power-up types, effects (Speed, Multiplier, Shrink), schedule
+include/snakextreme/PowerUpManager.hpp Spawn schedule, pick-up, one active effect
+src/powerups/                         Power-up effects and manager (SFML-free)
+tests/PowerUpTests.cpp                TC-PWR-01..05 unit tests (Catch2)
+tests/PowerUpGameplayTests.cpp        Power-ups in the running game (Catch2)
+docs/powerups.md                      Power-ups: rules, design, tests, validation
 ```
 
 Future engine integration should expose plain C++ game state; `Renderer` translates that state into SFML drawing. No SFML headers or types should be added to engine or persistence modules. Application's 60 Hz update seam is **not** the snake's movement interval (Easy 200 ms / Medium 120 ms / Hard 70 ms).
