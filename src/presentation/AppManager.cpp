@@ -245,6 +245,9 @@ std::string AppManager::titleText() const {
         if (const auto remaining = gameplay_.remainingTime()) {
             title += " | Time " + formatCountdown(*remaining);
         }
+        if (const auto effect = gameplay_.activeEffect(); effect && !gameplay_.isGameOver()) {
+            title += " | " + describeEffect(*effect);
+        }
         if (state_.screen() == Screen::Paused) {
             title += " | Esc/Enter: resume, M: menu";
         } else if (gameplay_.isGameOver()) {
@@ -269,6 +272,8 @@ FrameView AppManager::frame() const {
     view.selected = selectedConfig_;
     view.active = gameplay_.config();
     view.remainingTime = gameplay_.remainingTime();
+    view.powerUp = gameplay_.powerUpOnGrid();
+    view.activeEffect = gameplay_.activeEffect();
     view.gameOverReason = gameplay_.gameOverReason();
     view.score = gameplay_.score();
     view.highScore = gameplay_.highScore();
