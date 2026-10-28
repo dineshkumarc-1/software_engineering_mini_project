@@ -208,6 +208,27 @@ TEST_CASE(
         std::istreambuf_iterator<char>());
 
     CHECK(contentsAfter == contentsBefore);
+        // A score below tenth place must also be rejected.
+    const auto belowResult = repository.addScore(
+        "BelowPlayer",
+        0,
+        snake::GameMode::Classic,
+        snake::Difficulty::Medium);
+
+    CHECK(
+        belowResult.status ==
+        snake::ScoreSubmissionStatus::NotQualified);
+    CHECK_FALSE(belowResult.rank.has_value());
+
+    // A below-qualifying score must not rewrite the file either.
+    std::ifstream afterBelowInput(file, std::ios::binary);
+    REQUIRE(afterBelowInput.good());
+
+    const std::string contentsAfterBelow(
+        (std::istreambuf_iterator<char>(afterBelowInput)),
+        std::istreambuf_iterator<char>());
+
+    CHECK(contentsAfterBelow == contentsBefore);
 
     // The leaderboard must still contain exactly ten entries.
     const auto entries = repository.top10();
