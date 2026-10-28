@@ -133,3 +133,90 @@ TEST_CASE(
     CHECK_FALSE(store.writeJson(large));
     CHECK_FALSE(std::filesystem::exists(file));
 }
+TEST_CASE(
+    "SecureFileStore accepts a file exactly 64 KiB",
+    "[persistence][store]") {
+
+    TemporaryDirectory directory;
+
+    const auto file = directory.path() / "exact.json";
+    const auto limit =
+        snake::SecureFileStore::MaxFileSizeBytes;
+
+    const std::string prefix = "{\"padding\":\"";
+    const std::string suffix = "\"}";
+
+    const std::string bytes =
+        prefix +
+        std::string(limit - prefix.size() - suffix.size(), ' ') +
+        suffix;
+
+    REQUIRE(bytes.size() == limit);
+
+    {
+        std::ofstream output(file, std::ios::binary);
+        REQUIRE(output.good());
+
+        output.write(
+            bytes.data(),
+            static_cast<std::streamsize>(bytes.size()));
+
+        REQUIRE(output.good());
+    }
+
+    const snake::SecureFileStore store(file);
+    const auto result = store.readJson();
+
+    CHECK(result.status == snake::StoreReadStatus::Ok);
+}
+TEST_CASE(
+    "SecureFileStore accepts JSON serialized to exactly 64 KiB",
+    "[persistence][store]") {
+
+    TemporaryDirectory directory;
+
+    const auto file = directory.path() / "exact-write.json";
+    const snake::SecureFileStore store(file);
+    const auto limit =
+        snake::SecureFileStore::MaxFileSizeBytes;
+
+    const nlohmann::json empty = {{"data", ""}};
+    const auto baseSize = empty.dump(2).size();
+
+    REQUIRE(baseSize < limit);
+
+    const nlohmann::json exact = {
+        {"data", std::string(limit - baseSize, 'x')}
+    };
+
+    REQUIRE(exact.dump(2).size() == limit);
+    REQUIRE(store.writeJson(exact));
+
+    CHECK(std::filesystem::file_size(file) == limit);
+}
+TEST_CASE(
+    "Oversized write preserves the previous valid file",
+    "[persistence][store]") {
+
+    TemporaryDirectory directory;
+
+    const auto file = directory.path() / "preserve.json";
+    const snake::SecureFileStore store(file);
+
+    const nlohmann::json original = {
+        {"value", 42}
+    };
+
+    REQUIRE(store.writeJson(original));
+
+    const nlohmann::json oversized = {
+        {"data", std::string(70U * 1024U, 'x')}
+    };
+
+    CHECK_FALSE(store.writeJson(oversized));
+
+    const auto result = store.readJson();
+
+    REQUIRE(result.status == snake::StoreReadStatus::Ok);
+    CHECK(result.value == original);
+}

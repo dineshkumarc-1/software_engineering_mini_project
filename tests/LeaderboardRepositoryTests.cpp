@@ -6,6 +6,7 @@
 #include <filesystem>
 #include <fstream>
 #include <string>
+#include <iterator>
 
 namespace {
 
@@ -134,12 +135,15 @@ TEST_CASE(
 
     CHECK(repository.top10().empty());
 
-    REQUIRE(repository.addScore("Alice", 10));
+// Do not overwrite the corrupt file silently.
+CHECK_FALSE(repository.addScore("Alice", 10));
 
-    const auto entries = repository.top10();
+std::ifstream input(file, std::ios::binary);
+const std::string contents(
+    (std::istreambuf_iterator<char>(input)),
+    std::istreambuf_iterator<char>());
 
-    REQUIRE(entries.size() == 1U);
-    CHECK(entries[0].playerName == "Alice");
+CHECK(contents == "{ not valid JSON");
 }
 
 TEST_CASE(

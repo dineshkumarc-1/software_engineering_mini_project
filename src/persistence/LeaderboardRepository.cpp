@@ -39,10 +39,16 @@ LeaderboardRepository::loadValidatedEntries() const {
 
     // A new installation starts with an empty leaderboard.
     // Syntactically corrupt JSON also falls back to empty.
-    if (result.status == StoreReadStatus::NotFound ||
-        result.status == StoreReadStatus::InvalidJson) {
-        return std::vector<LeaderboardEntry>{};
-    }
+    if (result.status == StoreReadStatus::NotFound) {
+    // A new installation starts with an empty leaderboard.
+    return std::vector<LeaderboardEntry>{};
+}
+
+if (result.status == StoreReadStatus::InvalidJson) {
+    // Reading can fall back to an empty display, but callers
+    // must not silently overwrite the corrupt file.
+    return std::nullopt;
+}
 
     // Do not overwrite an oversized file or silently ignore
     // other I/O errors.
