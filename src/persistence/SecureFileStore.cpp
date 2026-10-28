@@ -31,7 +31,6 @@
 
 namespace snake {
 namespace {
-  constexpr int MaxJsonNestingDepth = 64;
 
 struct JsonDepthLimitExceeded {};
 struct DuplicateJsonKey {};
@@ -219,12 +218,23 @@ SecureFileStore::SecureFileStore(
     std::filesystem::path filePath)
     : filePath_(std::move(filePath)) {}
 
-StoreReadResult SecureFileStore::readJson() const {
+StoreReadResult SecureFileStore::readJson(
+    std::size_t maxNestingDepth) const {
     if (filePath_.empty()) {
         return readFailure(
             StoreReadStatus::IoError,
             "No file path was configured.");
     }
+        if (maxNestingDepth == 0U) {
+        return readFailure(
+            StoreReadStatus::IoError,
+            "JSON nesting limit must be positive.");
+    }
+
+    // Callers may use a stricter limit, never a higher one.
+    const auto nestingLimit = std::min(
+        maxNestingDepth,
+        MaxJsonNestingDepth);
 
     // Inspect the path without following a final-component symlink.
     std::error_code statusError;
@@ -324,7 +334,7 @@ if (isEmpty) {
     try {
         std::vector<std::set<std::string>> seenKeys;
 
-        const auto callback = [&seenKeys](
+        const auto callback = [&seenKeys, nestingLimit](
             int depth,
             nlohmann::json::parse_event_t event,
             nlohmann::json& parsed) -> bool {
@@ -334,7 +344,7 @@ if (isEmpty) {
             // Reject structures nested beyond the configured limit.
             if ((event == Event::object_start ||
                  event == Event::array_start) &&
-                depth >= MaxJsonNestingDepth) {
+                static_cast<std::size_t>(depth) >= nestingLimit) {
                 throw JsonDepthLimitExceeded{};
             }
 

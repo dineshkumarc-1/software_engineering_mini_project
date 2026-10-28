@@ -32,10 +32,12 @@ struct StoreReadResult {
 class SecureFileStore {
 public:
     static constexpr std::size_t MaxFileSizeBytes = 64U * 1024U;
+    static constexpr std::size_t MaxJsonNestingDepth = 64U;
 
     explicit SecureFileStore(std::filesystem::path filePath);
 
-    [[nodiscard]] StoreReadResult readJson() const;
+    [[nodiscard]] StoreReadResult readJson(
+    std::size_t maxNestingDepth = MaxJsonNestingDepth) const;
 
     [[nodiscard]] bool writeJson(
         const nlohmann::json& value) const;

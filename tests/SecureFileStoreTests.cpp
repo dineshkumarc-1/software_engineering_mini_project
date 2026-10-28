@@ -233,6 +233,32 @@ TEST_CASE(
 
     CHECK(result.status == snake::StoreReadStatus::UnsafeJson);
 }
+TEST_CASE(
+    "SecureFileStore supports a stricter caller depth limit",
+    "[persistence][store][security]") {
+
+    TemporaryDirectory directory;
+
+    const auto file = directory.path() / "limited-depth.json";
+
+    std::string nested(9U, '[');
+    nested += "0";
+    nested.append(9U, ']');
+
+    {
+        std::ofstream output(file, std::ios::binary);
+        REQUIRE(output.good());
+        output << nested;
+    }
+
+    const snake::SecureFileStore store(file);
+
+    CHECK(store.readJson().status == snake::StoreReadStatus::Ok);
+
+    CHECK(
+        store.readJson(8U).status ==
+        snake::StoreReadStatus::UnsafeJson);
+}
 
 TEST_CASE(
     "SecureFileStore enforces the 64 KiB read cap",
