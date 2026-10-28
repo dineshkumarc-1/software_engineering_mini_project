@@ -1,16 +1,21 @@
 #pragma once
 
 #include "snakextreme/InputValidator.hpp"
+#include <algorithm>
+#include <array>
 #include <cstdint>
 #include <string>
+#include <string_view>
 
 namespace snake {
-// SFML-free text-entry model. Reuses C10 rather than duplicating its whitelist.
+// SFML-free, physically fixed-capacity name input (SEC-006). C10 remains the
+// single source of truth for allowed characters and complete-name validation.
 class NameEntry {
 public:
+    static constexpr std::size_t Capacity = MaxPlayerNameLength;
     void input(std::uint32_t codepoint) {
         if (codepoint == 8) {
-            if (!value_.empty()) value_.pop_back();
+            if (length_ != 0) buffer_[--length_] = '\0';
             error_.clear();
             return;
         }
@@ -19,30 +24,39 @@ public:
             error_ = "Use letters, numbers, spaces, underscore or hyphen.";
             return;
         }
-        if (value_.size() >= MaxPlayerNameLength) {
+        if (length_ == Capacity) {
             error_ = "Maximum 15 characters.";
             return;
         }
-        value_.push_back(static_cast<char>(codepoint));
+        buffer_[length_++] = static_cast<char>(codepoint);
         error_.clear();
     }
     bool confirm() {
-        // Character entry and complete-name validation have different contracts:
-        // spaces are valid keystrokes, but blank submissions are not names.
-        // Validate before sanitizing so submission never silently fixes an
-        // invalid name; C10 owns trimming and final normalization.
-        if (!isValidPlayerName(value_)) {
+        // Spaces are valid while typing; the shared complete-name validator
+        // rejects empty/blank submissions before shared normalization.
+        const std::string_view entered(buffer_.data(), length_);
+        if (!isValidPlayerName(entered)) {
             error_ = "Enter a valid name (1-15 characters), not only spaces.";
             return false;
         }
-        value_ = sanitizePlayerName(value_);
+        const auto normalized = sanitizePlayerName(entered);
+        if (normalized.size() > Capacity || !isValidPlayerName(normalized)) {
+            error_ = "Enter a valid name (1-15 characters), not only spaces.";
+            return false;
+        }
+        buffer_.fill('\0');
+        std::copy(normalized.begin(), normalized.end(), buffer_.begin());
+        length_ = normalized.size();
         error_.clear();
         return true;
     }
-    const std::string& value() const noexcept { return value_; }
+    // Return a display snapshot, not a mutable view or a pointer requiring a
+    // terminator. The input's backing storage itself never grows or allocates.
+    std::string value() const { return {buffer_.data(), length_}; }
     const std::string& error() const noexcept { return error_; }
 private:
-    std::string value_;
+    std::array<char, Capacity> buffer_{};
+    std::size_t length_{0};
     std::string error_;
 };
 } // namespace snake

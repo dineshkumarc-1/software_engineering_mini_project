@@ -1,0 +1,3 @@
+PASS: 100 synthetic randomized requests; accepted/rejected/consumed/displayed separated; no display-name leakage
+PASS: 3 isolated external launch-marker traces; cache condition and target hardware unverified
+All instrumentation smoke checks pass; target performance acceptance NOT ASSESSED

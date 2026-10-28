@@ -1,5 +1,14 @@
 # Current owner follow-up — #22 remains In Progress
 
+## Subsequent owner hardening — still In Progress
+
+`tools/prepare_acceptance.py` creates exact-file hashes plus an entirely Pending
+manual-test template using an explicitly operator-supplied commit and CI URL.
+It does not prove source provenance, execute tests or grant acceptance. This
+prepares owner handoff without editing QA-owned documents. See
+`owner-acceptance-workflow.md` and `evidence/owner-hardening-results.md`.
+
+
 Opt-in bounded FPS/input/first-frame diagnostics, strict JSON analysis, external
 launch collection, and real navigation/probe smoke scripts are now implemented.
 See `performance-probes.md` for commands, scope limits, caps and the remaining

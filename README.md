@@ -192,3 +192,6 @@ opt-in diagnostics. See [probe usage and measurement limits](docs/sprint2/perfor
 and [executed follow-up evidence](docs/sprint2/evidence/owner-followup-results.md).
 Normal launches remain uninstrumented; use `--help` for optional flags. Draft
 work and Linux synthetic smoke are not final Windows/performance acceptance.
+
+For the fixed-capacity name field, failed-Save regression and unexecuted
+exact-build acceptance bundle, see the [owner acceptance workflow](docs/sprint2/owner-acceptance-workflow.md).

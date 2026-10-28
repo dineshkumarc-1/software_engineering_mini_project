@@ -56,8 +56,8 @@ jobs:
       - name: Test
         run: ctest --test-dir build -C Release --output-on-failure
 
-      - name: Performance report tooling tests
-        run: python -m unittest discover -s tests -p test_performance_tools.py
+      - name: Performance and acceptance tooling tests
+        run: python -m unittest discover -s tests -p "test_*.py"
 
   mingw:
     name: Tests (Windows MinGW-w64)

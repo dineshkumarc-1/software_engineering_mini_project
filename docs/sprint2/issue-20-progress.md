@@ -1,5 +1,13 @@
 # Current owner follow-up — #20 remains In Progress
 
+## Subsequent owner hardening — still In Progress
+
+The real Settings smoke now checks failed Save: remain on Settings, visible
+error, unchanged target, owned-temp cleanup, Cancel restoring active values,
+and fixture recovery. This does not replace C13 or clear Windows acceptance.
+See `evidence/owner-hardening-results.md`.
+
+
 Settings pointer hit testing now excludes the three-pixel gaps between visible
 rows, so a gap cannot trigger key capture, defaults, Save or Cancel. Runtime
 follow-up covers duplicate rejection, independent volume dragging/clamping and

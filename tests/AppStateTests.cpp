@@ -163,5 +163,28 @@ int main() {
         expect(!settingsRowAt(200, 152 + static_cast<int>(i) * 35), "settings row gap is inactive");
     }
     expect(!settingsRowAt(159, 120) && !settingsRowAt(740, 120) && !settingsRowAt(160, 470), "settings exterior excluded");
+    static_assert(NameEntry::Capacity == 15, "SEC-006 fixes name storage at 15 bytes");
+    entry = NameEntry{};
+    for (int cycle = 0; cycle < 40; ++cycle) {
+        for (int i = 0; i < 10000; ++i) entry.input('X');
+        expect(entry.value() == std::string(15, 'X'), "repeated flood cannot grow fixed name storage");
+        const std::string snapshot = entry.value();
+        entry.input(8);
+        expect(snapshot.size() == 15 && entry.value().size() == 14, "display snapshot remains independent of later edits");
+        for (int i = 0; i < 10000; ++i) entry.input(8);
+        expect(entry.value().empty() && !entry.confirm(), "repeated backspace cannot underflow storage");
+        for (const unsigned char ch : std::string("  Dinesh_1-  ")) entry.input(ch);
+        expect(entry.confirm() && entry.value() == "Dinesh_1-", "fixed storage normalizes via shared validator");
+        entry = NameEntry{};
+    }
+    for (const auto codepoint : {128u, 255u, 0x10ffffu, 0x110000u, 0xffffffffu}) {
+        entry.input(codepoint);
+        expect(entry.value().empty() && !entry.error().empty(), "wide codepoint never narrows into allowed ASCII");
+    }
+    NameEntry copy;
+    for (const unsigned char ch : std::string("CopiedName")) copy.input(ch);
+    NameEntry independent = copy;
+    copy.input(8);
+    expect(independent.value() == "CopiedName" && copy.value() == "CopiedNam", "fixed buffers copy independently");
     std::cout << checks << " navigation/name-entry checks passed\n";
 }

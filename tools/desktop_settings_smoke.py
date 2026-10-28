@@ -110,6 +110,22 @@ try:
         expected = json.loads(config.read_text())
         check([expected[k] for k in ("key_up", "key_down", "key_left", "key_right")] == [8, 10, 9, 11],
               "desktop remap to I/K/J/L persists SFML key codes")
+        # Force deterministic replacement failure without chmod/root assumptions:
+        # a directory cannot be replaced by the settings file. Real saves are
+        # isolated in this test's TemporaryDirectory.
+        keys("Return"); wait_title("Settings | row 1")
+        repeated("Down", 4); keys("Right"); wait_title("Music 5 SFX 100")
+        config.unlink(); config.mkdir()
+        repeated("Down", 4); keys("Return"); wait_title("E_WRITE_FAILED")
+        check("Settings | row 9" in title(), "failed Save stays on Settings with visible error")
+        check(config.is_dir() and not list(config.iterdir()), "failed Save preserves existing target directory")
+        check(not list(root.glob("config.json.tmp-*")), "failed Save removes only its owned temporary file")
+        keys("Escape"); wait_title("Main menu")
+        config.rmdir(); config.write_text(json.dumps(expected))
+        keys("Return"); wait_title("Music 0 SFX 100 | Neon")
+        check(True, "Cancel after failed Save restores previously active values")
+        check(json.loads(config.read_text()) == expected, "recovered fixture retains all saved settings")
+        keys("Escape"); wait_title("Main menu")
         stop()
         window = launch(); wait_title("Main menu")
         keys("Down", "Down", "Return"); wait_title("Music 0 SFX 100 | Neon")

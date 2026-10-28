@@ -1,5 +1,13 @@
 # Current owner follow-up — #19 remains In Progress
 
+## Subsequent owner hardening — still In Progress
+
+Name-entry backing storage is now a physical 15-byte array, rather than a
+length-limited growable string. C10 remains unchanged; display snapshots and
+normalization use bounded strings. See `owner-acceptance-workflow.md` and
+`evidence/owner-hardening-results.md` for scoped stress/sanitizer evidence.
+
+
 Mouse controls now cover Name Entry Continue/Back, all three modes and all
 three difficulties, Start/Back, leaderboard-placeholder Back, pause Resume/Menu
 and game-over Restart/Menu. Keyboard flow and shared validator are retained.
