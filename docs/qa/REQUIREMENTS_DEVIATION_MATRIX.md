@@ -1,9 +1,9 @@
 # Requirements and Design Deviation Matrix
 
-**Project:** SnakeXtreme  
-**QA Issue:** #25 — QA Sign-off, Test Summary Report & Documentation  
-**Sprint:** Sprint 2 (26–30 October 2026)  
-**Prepared by:** Ayushi Srivastava  
+**Project:** SnakeXtreme
+**QA Issue:** #25 — QA Sign-off, Test Summary Report & Documentation
+**Sprint:** Sprint 2 (26–30 October 2026)
+**Prepared by:** Ayushi Srivastava
 **Document status:** Preliminary — verification in progress
 
 ## 1. Purpose
