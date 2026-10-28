@@ -12,6 +12,8 @@
 #include <string_view>
 #include <system_error>
 #include <utility>
+#include <algorithm>
+#include <cctype>
 
 #ifdef _WIN32
 #ifndef NOMINMAX
@@ -270,7 +272,18 @@ StoreReadResult SecureFileStore::readJson() const {
             StoreReadStatus::IoError,
             "Failed while reading the file.");
     }
+const bool isEmpty = std::all_of(
+    bytes.begin(),
+    bytes.end(),
+    [](unsigned char ch) {
+        return std::isspace(ch) != 0;
+    });
 
+if (isEmpty) {
+    return readFailure(
+        StoreReadStatus::EmptyFile,
+        "File contains no JSON data.");
+}
     try {
         auto parsed = nlohmann::json::parse(bytes);
 

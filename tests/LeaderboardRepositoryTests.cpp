@@ -170,3 +170,30 @@ TEST_CASE(
     // when adding another entry.
     CHECK_FALSE(repository.addScore("Bob", 10));
 }
+TEST_CASE(
+    "An empty leaderboard file accepts a new score",
+    "[persistence][leaderboard]") {
+
+    TemporaryDirectory directory;
+
+    const auto file =
+        directory.path() / "leaderboard.json";
+
+    // Create a file that exists but contains no data.
+    {
+        std::ofstream output(file, std::ios::binary);
+        REQUIRE(output.good());
+    }
+
+    snake::LeaderboardRepository repository(file);
+
+    CHECK(repository.top10().empty());
+
+    REQUIRE(repository.addScore("Alice", 25));
+
+    const auto entries = repository.top10();
+
+    REQUIRE(entries.size() == 1U);
+    CHECK(entries[0].playerName == "Alice");
+    CHECK(entries[0].score == 25);
+}

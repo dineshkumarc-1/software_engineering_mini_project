@@ -37,10 +37,9 @@ LeaderboardRepository::loadValidatedEntries() const {
 
     const StoreReadResult result = store_.readJson();
 
-    // A new installation starts with an empty leaderboard.
-    // Syntactically corrupt JSON also falls back to empty.
-    if (result.status == StoreReadStatus::NotFound) {
-    // A new installation starts with an empty leaderboard.
+    // A missing or empty file represents a new leaderboard.
+if (result.status == StoreReadStatus::NotFound ||
+    result.status == StoreReadStatus::EmptyFile) {
     return std::vector<LeaderboardEntry>{};
 }
 

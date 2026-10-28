@@ -11,6 +11,7 @@ namespace snake {
 enum class StoreReadStatus {
     Ok,
     NotFound,
+    EmptyFile,
     TooLarge,
     InvalidJson,
     IoError
