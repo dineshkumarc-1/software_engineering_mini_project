@@ -4,6 +4,7 @@
 #include "snakextreme/AppState.hpp"
 #include "snakextreme/GameEngine.hpp"
 #include "snakextreme/ModeManager.hpp"
+#include "snakextreme/PowerUp.hpp"
 #include <SFML/Graphics.hpp>
 
 #include <chrono>
@@ -20,6 +21,8 @@ struct FrameView {
     SessionConfig selected{};  // main-menu choice
     SessionConfig active{};    // settings of the current game
     std::optional<std::chrono::milliseconds> remainingTime; // Timed only
+    std::optional<PowerUp> powerUp;           // waiting on the grid
+    std::optional<ActiveEffect> activeEffect; // running on the snake
     GameOverReason gameOverReason{GameOverReason::None};
     int score{0};
     int highScore{0};
@@ -42,6 +45,7 @@ private:
     void drawHud(sf::RenderTarget& target, const FrameView& frame) const;
     void drawPaused(sf::RenderTarget& target) const;
     void drawGameOver(sf::RenderTarget& target, const FrameView& frame) const;
+    void drawPowerUp(sf::RenderTarget& target, const PowerUp& item) const;
     sf::Text text(const std::string& utf8, unsigned size, sf::Color color) const;
 
     sf::Font font_;
