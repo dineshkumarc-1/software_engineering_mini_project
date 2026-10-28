@@ -60,9 +60,17 @@ try:
             type_name("               "); click(550, 456)
             check("| Name:" in title(), "whitespace-only name cannot advance")
             key(*(["BackSpace"] * 15)); type_name("ABCDEFGHIJKLMNOZ")
-            screen("| Name: ABCDEFGHIJKLMNO |")
+            wait(lambda: "| Name: ABCDEFGHIJKLMNO |" in title() and
+                 "Maximum 15 characters." in title(),
+                 "16th-character rejection/title update missing")
             check("15 characters" in title() or "15" in title(), "16th character is rejected at runtime")
-            key(*(["BackSpace"] * 15)); type_name("Dinesh@");
+            key(*(["BackSpace"] * 15)); type_name("Dinesh@")
+            # xdotool returning does not mean the app consumed TextEntered.
+            # Wait for both the retained name and the final '@' rejection,
+            # without weakening the assertion or adding a fixed sleep.
+            wait(lambda: "| Name: Dinesh |" in title() and
+                 "Use letters, numbers, spaces, underscore or hyphen." in title(),
+                 "invalid-character name/title update missing")
             check("| Name: Dinesh |" in title(), "invalid character rejected without inserting it")
             click(350, 456); screen("Main menu")
             check(True, "mouse Back returns from name entry")

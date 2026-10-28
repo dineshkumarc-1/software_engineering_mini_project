@@ -1,0 +1,1 @@
+0d275ddb9b90dcbe9d6dc6a5cc53b62f0b3ea5d303725f6b4bde839522e811d5  tools/desktop_navigation_smoke.py
