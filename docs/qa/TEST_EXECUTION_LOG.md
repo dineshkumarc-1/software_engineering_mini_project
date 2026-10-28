@@ -48,11 +48,12 @@ The environment capture was recorded at 17:08:35 IST. This is the environment-ca
 - Reported result: 7 passed, 0 failed
 - Artifact name: `SnakeXtreme-windows-x64`
 - Artifact ID: `12712437257`
-- Artifact page: https://github.com/dineshkumarc-1/software_engineering_mini_project/suites/109649240767/artifacts/12712437257
+- Artifact page: https://github.com/dineshkumarc-1/software_engineering_mini_project/actions/runs/40456104168/artifacts/12712437257
+- Workflow run: https://github.com/dineshkumarc-1/software_engineering_mini_project/actions/runs/40456104168
 - Workflow job: App build (Windows MSVC)
+- Workflow job URL: https://github.com/dineshkumarc-1/software_engineering_mini_project/actions/runs/40456104168/job/122029676098
 - Workflow result: Succeeded
 - Workflow run commit SHA: `53465b167128caa787c182d36a859a51a5fec8a9`
-- Workflow run URL: https://github.com/dineshkumarc-1/software_engineering_mini_project/actions/runs/40456104168/job/122029676098
 - Artifact usage: Downloaded and launched for Windows x64 manual testing.
 - Individual screenshots, recordings, or other evidence references: Not yet attached.
 
@@ -79,7 +80,6 @@ ctest --preset headless --output-on-failure 2>&1 | tee ctest-output.txt
 ## 3. Results — Run A
 
 The original recorded run reported the following results:
-
 | Registered test | Result |
 |---|---|
 | `app_state_flow` | Passed |
@@ -102,7 +102,6 @@ The exact tested commit and tool versions were not captured for this run.
 ## 4. Results — Run B
 
 The new CTest run at commit `aa1cc1e22319f018f7dd515e77f70d45d5a3712d` reported:
-
 | Registered test | Result |
 |---|---|
 | `app_state_flow` | Passed |
@@ -134,7 +133,6 @@ The two runs have different registered test inventories. In particular, `input_v
 ## 5.1 Windows Manual Tests — Reported Results
 
 The following results were reported for manual testing of the Windows x64 artifact on 28 October 2026.
-
 | Test ID | Test area | Expected behavior | Reported actual result | Status |
 |---|---|---|---|---|
 | WIN-MAN-01 | Audio controls — music 0%, SFX 100% | Music is silent while sound effects remain audible. | Music was silent; eating sound was audible. | Reported pass |
@@ -147,32 +145,35 @@ The following results were reported for manual testing of the Windows x64 artifa
 
 **Reported manual-test total:** 7 tests; 7 reported passes; 0 reported failures.
 
-The total above covers only WIN-MAN-01 through WIN-MAN-07. The F5 observation and four pending key-remapping tests are excluded from this total.
+The total above covers only WIN-MAN-01 through WIN-MAN-07. The F5 observation and supplemental key-remapping checks are excluded from this total.
 
 ### Additional Key-Remapping Coverage
 
-| Test area | Result or evidence | Status |
-|---|---|---|
-| W and Up Arrow both move upward | Both keys reportedly moved the snake upward. | Reported pass — WIN-MAN-06 |
-| Change a movement binding and test the new binding | No test result recorded yet. | Pending |
-| Reject assigning a key already assigned to another action | No test result recorded yet. | Pending |
-| Verify WASD aliases remain active after remapping | No test result recorded yet. | Pending |
-| Verify the old primary key stops working after remapping | No test result recorded yet. | Pending |
+The following results were reported for Windows x64 manual testing on 28 October 2026 using the `SnakeXtreme-windows-x64` artifact from workflow run `40456104168`.
+| Test area | Expected behavior | Reported actual result | Status |
+|---|---|---|---|
+| Change a movement binding | The newly assigned key moves the snake in the intended direction. | Changed Move Up from Up Arrow to U; pressing U moved the snake upward. | Reported pass |
+| Duplicate-key rejection | Assigning one key to two actions is rejected with an error message. | With Move Up assigned to U, assigning U to Move Down was rejected and an error message appeared. | Reported pass |
+| WASD aliases after remapping to U | WASD aliases continue to move the snake in their respective directions. | W, A, S, and D worked in their respective directions after Move Up was changed to U. | Reported pass |
+| Old primary key after remapping to U | The replaced primary key no longer performs the remapped action. | Up Arrow no longer moved the snake upward after Move Up was changed to U. | Reported pass |
+| Approved STP v1.0 I/K/J/L remapping sequence | I, K, J, and L control the intended movement directions. | Move Up/Down/Left/Right were changed to I/K/J/L; each key moved the snake in its intended direction. | Reported pass |
+| WASD aliases after remapping to I/K/J/L | WASD aliases remain functional after the prescribed remapping. | W, A, S, and D continued to work in their respective directions. | Reported pass |
+| Old primary keys after remapping to I/K/J/L | The old primary keys stop performing their previous movement actions. | This behavior was not separately verified after the I/K/J/L remapping. | Pending |
 
-The four pending tests must be executed and their actual results recorded before they can be marked as passed or failed. Expected behavior should be checked against the approved requirements and STP v1.0.
+The U remapping checks are supplemental observations. The I/K/J/L sequence directly exercises the remapping sequence specified by STP v1.0, TC-SET-01 (FR-026). These results are based on reported manual observations and have not been independently reproduced during this documentation update.
 
 ### Additional Observation — F5 During Gameplay
 
 - **Test date:** 28 October 2026
 - **Environment:** Windows x64
 - **Artifact:** `SnakeXtreme-windows-x64`
+- **Workflow run:** `40456104168`
+- **Tested workflow commit SHA:** `53465b167128caa787c182d36a859a51a5fec8a9`
 - **Action:** Pressed F5 while the snake was moving.
 - **Actual result:** The snake continued moving; gameplay did not pause.
-- **Expected result:** Pending confirmation against the approved requirements and STP v1.0.
-- **Disposition:** Observation recorded; not counted among the seven reported passes and not classified as a defect.
+- **Expected behavior:** Approved STP v1.0 TC-UI-03 specifies Esc for pausing and resuming gameplay. It does not specify F5 as a pause control.
+- **Disposition:** Exploratory observation recorded. It is not counted among the seven original Windows passes and is not classified as a defect based on the currently cited requirement.
 - **Implementation note:** The inspected gameplay key handler explicitly handles Escape for pause/resume but contains no explicit F5 handling in the relevant key switch.
-
-This observation requires a requirements check before deciding whether corrective action is necessary.
 
 ### Evidence and Traceability Limitations
 
@@ -197,8 +198,8 @@ The following activities still require execution or verification against the pro
 - Complete requirements traceability against SRS v1.0, SRS Addendum v1.1, SAD v1.0, and STP v1.0.
 - Attach or reference available evidence for the Windows manual tests.
 - Map the seven reported Windows tests to approved STP test-case IDs.
-- Confirm the expected F5 behavior against the approved requirements and test plan. If F5 is required to pause gameplay, investigate and track the discrepancy; otherwise, document that F5 is not a specified control.
-- Execute and record the four pending key-remapping tests: changed binding, duplicate-key rejection, WASD aliases after remapping, and old-primary-key behavior.
+- Revisit the F5 observation if further requirements evidence identifies F5 as a required pause control; the currently cited STP v1.0 TC-UI-03 specifies Esc for pausing and resuming.
+- The changed-binding, duplicate-key rejection, and WASD-after-remapping observations are recorded in Section 5. The remaining key-remapping check is to verify whether the old primary movement keys stop working after switching to I/K/J/L.
 - Verify all other required Windows platform, integration, and acceptance tests.
 - Complete the test summary report with traceable execution metrics.
 
@@ -211,7 +212,7 @@ Both recorded headless runs reported successful results for their respective reg
 
 Additionally, seven Windows x64 manual tests were reported as passing on 28 October 2026. The associated artifact, workflow job, and workflow commit SHA are recorded in Section 1. Individual evidence references have not yet been attached, and the reported manual results still require mapping to approved STP v1.0 test-case IDs.
 
-The F5 observation and four pending key-remapping tests are recorded separately and are not included in the seven reported Windows passes.
+The F5 observation and supplemental key-remapping observations are recorded separately and are not included in the seven reported Windows passes. The old-primary-key behavior after switching to I/K/J/L remains unverified.
 
 The automated and manual results cover different test activities and must be reported separately. They do not establish completion of the full planned test inventory, successful execution of every High-priority test case, complete requirements conformance, or satisfaction of all release exit criteria.
 

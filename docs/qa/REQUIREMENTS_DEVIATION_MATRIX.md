@@ -47,7 +47,6 @@ A status of **Pending verification** means sufficient evidence has not yet been 
 The reported Windows manual tests provide evidence for selected settings and gameplay behaviors, but the exact mapping from those tests to FR-001 through FR-007 has not yet been established.
 
 ## 4. SRS v1.0 — Non-Functional Requirements
-
 | Reference | Requirement or scope | Evidence reviewed | Deviation / finding | Status |
 |---|---|---|---|---|
 | NFR-001 | Frames-per-second performance requirement | No completed reference-hardware performance measurement is recorded in the preliminary test log. | Performance conformance has not been demonstrated. | Pending verification |
@@ -55,7 +54,6 @@ The reported Windows manual tests provide evidence for selected settings and gam
 | Other applicable NFRs | Review each non-functional requirement in SRS v1.0. | Requirement-by-requirement evidence remains incomplete. | No overall conformance conclusion can yet be made. | Pending verification |
 
 ## 5. SRS Addendum v1.1
-
 | Reference | Requirement or scope | Evidence reviewed | Deviation / finding | Status |
 |---|---|---|---|---|
 | Player-name whitelist | Names must follow the permitted character rules. | `InputValidator` provides player-name validation and sanitization functions. Validator unit tests passed in the recorded test run. | The reviewed branch did not show call sites integrating these functions into UI input or persistence. Integration into the final implementation remains to be verified. | Pending verification |
@@ -65,7 +63,6 @@ The reported Windows manual tests provide evidence for selected settings and gam
 | Other addendum requirements | Review all remaining applicable requirements in SRS Addendum v1.1. | Requirement-by-requirement verification remains incomplete. | No overall conformance conclusion can yet be made. | Pending verification |
 
 ## 6. SAD v1.0 — Architecture and Design
-
 | Design reference | Expected design property | Evidence reviewed | Deviation / finding | Status |
 |---|---|---|---|---|
 | Core-layer separation | Core logic should remain independent of SFML where required by the architecture. | The registered `layering_core_is_sfml_free` test passed in the recorded headless run. | **No deviation identified** for the specific core-layer separation property checked by this test. This does not establish conformance of the entire architecture. | No deviation identified — limited scope |
@@ -74,29 +71,27 @@ The reported Windows manual tests provide evidence for selected settings and gam
 | Persistence architecture | Persistence behavior should conform to the approved design. | No complete persistence implementation and architecture comparison has been recorded. | Conformance has not been demonstrated. | Pending verification |
 
 ## 7. STP v1.0 — Test Plan and Execution
-
 | Test-plan reference | Expected QA activity | Evidence reviewed | Deviation / finding | Status |
 |---|---|---|---|---|
 | Planned test execution | Execute 100% of planned test cases. | The execution log contains separate headless CTest runs and seven reported Windows manual checks. | These results do not yet demonstrate that every planned STP test case has been executed. Full execution tracking remains outstanding. | Pending verification |
 | High-priority tests | Achieve a 100% pass rate for High-priority test cases. | A complete priority-tagged execution matrix has not been recorded. | The required pass rate has not been demonstrated. | Pending verification |
 | Defect exit criteria | Confirm there are no open Critical or High defects, as required by the release exit criteria. | No complete defect-status audit is included in the preliminary test log. | Exit-criteria compliance remains unverified. | Pending verification |
 | Performance testing | Execute the applicable performance tests on the required environment. | No completed reference-hardware FPS or input-latency results are recorded. | Performance testing evidence remains outstanding. | Pending verification |
-| Platform and integration testing | Execute applicable runtime, integration, and acceptance tests. | Seven Windows x64 manual checks have been reported as passing. The exact artifact commit/version and supporting evidence have not yet been recorded. | The reported checks provide preliminary evidence for selected behaviors. Remaining platform, integration, and acceptance tests must be tracked and executed as applicable. | Pending verification |
+| Platform and integration testing | Execute applicable runtime, integration, and acceptance tests. | Seven Windows x64 manual checks have been reported as passing. The tested artifact is identified in the execution log by workflow run 40456104168, artifact ID 12712437257, and commit SHA 53465b167128caa787c182d36a859a51a5fec8a9. Individual screenshots, recordings, and other supporting evidence have not yet been attached. | The reported checks provide preliminary evidence for selected behaviors. Remaining platform, integration, and acceptance tests must be tracked and executed as applicable. | Pending verification |
 | Coverage and static analysis | Verify applicable coverage and static-analysis exit criteria. | No complete coverage or static-analysis report is recorded in the preliminary evidence. | Compliance remains unverified. | Pending verification |
 
 ## 8. Windows x64 Manual-Test Evidence
 
-The following results were reported for manual testing of a Windows x64 artifact on 28 October 2026. They are recorded as **reported results**, not as independently verified evidence, because the exact artifact commit/version and supporting test evidence have not yet been recorded in the available execution log.
-
+The following results were reported for Windows x64 manual testing on 28 October 2026. The execution log records the tested artifact ID, workflow run, and commit SHA. Individual screenshots or recordings and complete mapping to approved test cases remain outstanding; these results are therefore reported results, not independently verified evidence.
 | Test | Scope checked | Reported result | Evidence limitation |
 |---|---|---|---|
-| Music 0 / SFX 100 | Music was silent while the eating sound remained audible. | Pass reported | Exact artifact version and supporting evidence not recorded. |
-| Music 100 / SFX 0 | Music was audible while the eating sound was silent. | Pass reported | Exact artifact version and supporting evidence not recorded. |
-| Save / Cancel | Cancel restored the previous setting. | Pass reported | Exact artifact version and supporting evidence not recorded. |
-| Pause / Resume | Esc paused and resumed gameplay. | Pass reported | Exact artifact version and supporting evidence not recorded. |
-| Relaunch persistence | Saved settings persisted after relaunch. | Pass reported | Exact artifact version and supporting evidence not recorded. |
-| Key remapping | W and Up Arrow both moved the snake upward. | Pass reported | Exact artifact version and supporting evidence not recorded. |
-| Theme switching | Theme name and appearance changed. | Pass reported | Exact artifact version and supporting evidence not recorded. |
+| Music 0 / SFX 100 | Music was silent while the eating sound remained audible. | Pass reported | Artifact identified in the execution log; individual screenshots or recordings not attached. |
+| Music 100 / SFX 0 | Music was audible while the eating sound was silent. | Pass reported | Artifact identified in the execution log; individual screenshots or recordings not attached. |
+| Save / Cancel | Cancel restored the previous setting. | Pass reported | Artifact identified in the execution log; individual screenshots or recordings not attached. |
+| Pause / Resume | Esc paused and resumed gameplay. | Pass reported | Artifact identified in the execution log; individual screenshots or recordings not attached. |
+| Relaunch persistence | Saved settings persisted after relaunch. | Pass reported | Artifact identified in the execution log; individual screenshots or recordings not attached. |
+| Key remapping | W and Up Arrow both moved the snake upward. | Pass reported | Artifact identified in the execution log; individual screenshots or recordings not attached. |
+| Theme switching | Theme name and appearance changed. | Pass reported | Artifact identified in the execution log; individual screenshots or recordings not attached. |
 
 **Interpretation:** These seven reported passes support the specific behaviors listed in the table, subject to confirmation of the artifact and evidence. They do not establish that all Windows behavior, all requirements, or all planned test cases conform.
 
@@ -118,7 +113,7 @@ Before relying on these results for final sign-off:
 4. The recorded validator unit tests passed.
 5. The `layering_core_is_sfml_free` test passed for the specific property it checks.
 6. The reviewed branch did not show call sites for `isValidPlayerName()` or `sanitizePlayerName()` outside the validator component.
-7. Seven Windows x64 manual checks covering audio settings, Save/Cancel, pause/resume, settings persistence, key remapping, and theme switching have been reported as passing. Artifact identification and supporting evidence remain outstanding.
+7. Seven Windows x64 manual checks covering audio settings, Save/Cancel, pause/resume, settings persistence, key remapping, and theme switching have been reported as passing. Artifact identification is recorded in the execution log; individual supporting evidence and complete test-case mapping remain outstanding.
 
 ### 9.2 Items requiring further verification
 
@@ -130,7 +125,7 @@ Before relying on these results for final sign-off:
 6. Execution tracking for every planned STP v1.0 test case.
 7. High-priority test pass rate and outstanding defect status.
 8. Required performance, platform, coverage, static-analysis, and acceptance evidence.
-9. Exact Windows artifact commit/version and supporting evidence for the seven reported manual checks.
+9. Individual supporting evidence and complete approved test-case mapping for the seven reported Windows manual checks.
 10. F5 behavior, if required by the applicable test plan.
 11. Confirmation that reported manual results correspond to the implementation version under review.
 
