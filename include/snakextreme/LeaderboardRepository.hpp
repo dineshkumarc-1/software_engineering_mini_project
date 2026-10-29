@@ -43,7 +43,8 @@ public:
     explicit LeaderboardRepository(
         std::filesystem::path filePath);
 
-    // Returns up to 10 entries, sorted by descending score.
+    // Returns up to 10 entries, sorted by descending score. If data cannot
+    // be loaded safely, returns an empty table and optionally reports a warning.
     [[nodiscard]] std::vector<LeaderboardEntry>
     top10(std::string* warning = nullptr) const;
 
