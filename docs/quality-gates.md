@@ -63,6 +63,16 @@ Rerun on the integrated candidate **#53 at `dbf08b5`**, which contains this bran
 | Banned-API scan | **0 hits in 46 files.** The self-test finds 12/12 planted calls and reports nothing in the look-alike code |
 | Layering | Pass |
 
+### With the persistence fix (#48 at `31602b5`, then `0d516f3`)
+
+The same checks were run again with Bharath's persistence fix merged into the candidate, plus #52's promoted tests. Evidence: `docs/qa/evidence/issue-18-run3-fix-verification.txt` in #52.
+
+| Check | Result |
+| --- | --- |
+| Clang 18 ASan + UBSan and GCC 13.3, game and all tests, normal user | 21/21 pass, 0 sanitizer reports. The real ASan game also reports nothing in every runtime check |
+| cppcheck 2.13 | **0 findings with `0d516f3`.** `31602b5` had one (`src/persistence/SecureFileStore.cpp:445`, knownConditionTrueFalse); Bharath's `0d516f3` removed it. All 21 suites were re-run on `0d516f3` with the same results |
+| Banned-API scan | 0 hits in 46 files |
+
 ## Results on this branch (28 Oct 2026)
 
 All checks below were run on this branch, which is main plus #49 plus this change.
