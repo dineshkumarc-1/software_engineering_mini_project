@@ -1,0 +1,75 @@
+{
+  "version": 1,
+  "entries": [
+    {
+      "player_name": "Player1",
+      "score": 1000,
+      "game_mode": "Classic",
+      "difficulty": "Medium",
+      "date_achieved": "2026-10-28"
+    },
+    {
+      "player_name": "Player2",
+      "score": 900,
+      "game_mode": "Classic",
+      "difficulty": "Medium",
+      "date_achieved": "2026-10-28"
+    },
+    {
+      "player_name": "Player3",
+      "score": 800,
+      "game_mode": "Classic",
+      "difficulty": "Medium",
+      "date_achieved": "2026-10-28"
+    },
+    {
+      "player_name": "Player4",
+      "score": 700,
+      "game_mode": "Classic",
+      "difficulty": "Medium",
+      "date_achieved": "2026-10-28"
+    },
+    {
+      "player_name": "Player5",
+      "score": 600,
+      "game_mode": "Classic",
+      "difficulty": "Medium",
+      "date_achieved": "2026-10-28"
+    },
+    {
+      "player_name": "Player6",
+      "score": 500,
+      "game_mode": "Classic",
+      "difficulty": "Medium",
+      "date_achieved": "2026-10-28"
+    },
+    {
+      "player_name": "Player7",
+      "score": 400,
+      "game_mode": "Classic",
+      "difficulty": "Medium",
+      "date_achieved": "2026-10-28"
+    },
+    {
+      "player_name": "Player8",
+      "score": 300,
+      "game_mode": "Classic",
+      "difficulty": "Medium",
+      "date_achieved": "2026-10-28"
+    },
+    {
+      "player_name": "Player9",
+      "score": 200,
+      "game_mode": "Classic",
+      "difficulty": "Medium",
+      "date_achieved": "2026-10-28"
+    },
+    {
+      "player_name": "Player10",
+      "score": 100,
+      "game_mode": "Classic",
+      "difficulty": "Medium",
+      "date_achieved": "2026-10-28"
+    }
+  ]
+}
