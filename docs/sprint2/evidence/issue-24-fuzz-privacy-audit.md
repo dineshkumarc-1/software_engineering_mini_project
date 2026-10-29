@@ -24,7 +24,7 @@ The earlier source scan under src and include reported no matches for the common
 
 ## 4. Repeatable TCP/UDP and firewall capture
 
-The companion collector Collect-Issue24-OfflineEvidence.ps1 launches the specified executable, creates a temporary outbound block rule scoped to that executable, verifies the rule in Windows Firewall ActiveStore at the start and end, samples process-owned TCP connections and UDP endpoints once per second, writes JSON evidence, and removes only the temporary rule it created.
+The companion collector Collect-Issue24-OfflineEvidence.ps1 launches the specified executable, creates a temporary outbound block rule scoped to that executable, verifies the rule in Windows Firewall ActiveStore at the start and end, samples process-owned TCP connections and UDP endpoints once per loop with a one-second sleep (actual intervals also include query overhead), writes JSON evidence, and removes only the temporary rule it created.
 
 Run from an elevated PowerShell session, using the actual local executable path:
 
