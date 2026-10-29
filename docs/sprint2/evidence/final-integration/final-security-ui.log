@@ -7,7 +7,7 @@ PASS TC-SEC-01: 'Ab,cd': each refused character shows the message; field keeps '
 PASS TC-SEC-01: 'a"b': each refused character shows the message; field keeps 'ab' - name='ab', refused 1/1 with message
 PASS TC-SEC-01: '../x': each refused character shows the message; field keeps 'x' - name='x', refused 3/3 with message
 PASS TC-SEC-01: '{"x":1}': each refused character shows the message; field keeps 'x1' - name='x1', refused 5/5 with message
-PASS TC-SEC-01: 'C:\\x': each refused character shows the message; field keeps 'Cx' - name='Cx', refused 2/2 with message
+PASS TC-SEC-01: '<redacted-local-path>': each refused character shows the message; field keeps 'Cx' - name='Cx', refused 2/2 with message
 PASS TC-SEC-01: 'a;b|c': each refused character shows the message; field keeps 'abc' - name='abc', refused 2/2 with message
 PASS TC-SEC-01: 'España': each refused character shows the message; field keeps 'Espaa' - name='Espaa', refused 1/1 with message
 PASS TC-SEC-01: 'emoji😀': each refused character shows the message; field keeps 'emoji' - name='emoji', refused 1/1 with message
