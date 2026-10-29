@@ -589,8 +589,23 @@ TEST_CASE(
     CHECK(repository.top10(&warning).empty());
     CHECK(warning.empty()); // Missing file is a normal empty leaderboard.
 
+    // An existing zero-byte board is corrupt, unlike a missing board.
     {
-        std::ofstream output(file, std::ios::binary);
+        std::ofstream output(file, std::ios::binary | std::ios::trunc);
+        REQUIRE(output.good());
+    }
+    warning = "stale warning";
+    CHECK(repository.top10(&warning).empty());
+    CHECK_FALSE(warning.empty());
+    CHECK(warning.find("E_LEADERBOARD_READ") != std::string::npos);
+    const auto recovered = repository.addScore(
+        "Alice", 10, snake::GameMode::Classic, snake::Difficulty::Medium);
+    REQUIRE(recovered.status == snake::ScoreSubmissionStatus::Submitted);
+    CHECK_FALSE(recovered.warning.empty());
+    CHECK(repository.top10().size() == 1U);
+
+    {
+        std::ofstream output(file, std::ios::binary | std::ios::trunc);
         REQUIRE(output.good());
         output << R"({"version":1,"entries":[{"player_name":"Alice","score":-1,"game_mode":"Classic","difficulty":"Medium","date_achieved":"2026-10-29"}]})";
     }
