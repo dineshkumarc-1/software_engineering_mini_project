@@ -439,7 +439,7 @@ void removeStaleTemporaryFiles(
 
                 now = std::filesystem::file_time_type::clock::now();
                 // Recheck after acquiring the lease to close the TOCTOU window.
-                // cppcheck-suppress knownConditionTrueFalse ; Required post-lock recheck: file age or temp-path state may change while acquiring the lock.
+                // Keep the post-lock recheck: file age or temp-path state may change while acquiring the lock.
                 if (!isStaleRegularTemporary(lockPath, now) ||
                     !pathIsAbsentWithoutFollowing(temporary)) {
                     lease.release();
