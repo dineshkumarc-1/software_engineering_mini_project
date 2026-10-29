@@ -1,0 +1,12 @@
+{
+  "version": 1,
+  "entries": [
+    {
+      "player_name": "Max",
+      "score": 2147483647,
+      "game_mode": "Classic",
+      "difficulty": "Medium",
+      "date_achieved": "2026-10-28"
+    }
+  ]
+}

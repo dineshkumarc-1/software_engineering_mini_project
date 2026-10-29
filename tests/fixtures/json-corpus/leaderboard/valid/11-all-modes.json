@@ -1,0 +1,26 @@
+{
+  "version": 1,
+  "entries": [
+    {
+      "player_name": "Classic",
+      "score": 30,
+      "game_mode": "Classic",
+      "difficulty": "Medium",
+      "date_achieved": "2026-10-28"
+    },
+    {
+      "player_name": "Timed",
+      "score": 20,
+      "game_mode": "Timed",
+      "difficulty": "Medium",
+      "date_achieved": "2026-10-28"
+    },
+    {
+      "player_name": "Obstacle",
+      "score": 15,
+      "game_mode": "Obstacle",
+      "difficulty": "Medium",
+      "date_achieved": "2026-10-28"
+    }
+  ]
+}

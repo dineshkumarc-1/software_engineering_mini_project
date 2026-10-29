@@ -1,0 +1,10 @@
+{
+  "version": 1,
+  "key_up": 22,
+  "key_down": 18,
+  "key_left": 0,
+  "key_right": 3,
+  "music_volume": 70,
+  "sfx_volume": 70,
+  "theme": "Classic"
+}
