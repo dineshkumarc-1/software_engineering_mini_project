@@ -1,0 +1,54 @@
+# Issue #18 - config.json corpus, per file (SettingsRepository::load, integration build)
+# set | file | size | result | warning | load time
+valid | 01-defaults.json | 154 B | loaded | - | 0 ms
+valid | 02-wasd.json | 152 B | loaded | - | 0 ms
+valid | 03-ijkl.json | 152 B | loaded | - | 0 ms
+valid | 04-mixed-letters-arrows.json | 153 B | loaded | - | 0 ms
+valid | 05-volumes-zero.json | 152 B | loaded | - | 0 ms
+valid | 06-volumes-max.json | 156 B | loaded | - | 0 ms
+valid | 07-volumes-mixed.json | 153 B | loaded | - | 0 ms
+valid | 08-theme-neon.json | 151 B | loaded | - | 0 ms
+valid | 09-theme-retro.json | 152 B | loaded | - | 0 ms
+valid | 10-theme-classic-quiet.json | 153 B | loaded | - | 0 ms
+valid | 11-reordered-keys.json | 154 B | loaded | - | 0 ms
+valid | 12-minified.json | 120 B | loaded | - | 0 ms
+valid | 13-crlf-tabs.json | 153 B | loaded | - | 0 ms
+valid | 14-unknown-key.json | 192 B | loaded | - | 0 ms
+valid | 15-unknown-nested-object.json | 196 B | loaded | - | 0 ms
+valid | 16-surrounding-whitespace.json | 159 B | loaded | - | 0 ms
+valid | 17-letter-a-to-d.json | 150 B | loaded | - | 0 ms
+valid | 18-letters-near-m.json | 154 B | loaded | - | 0 ms
+valid | 19-letters-high.json | 154 B | loaded | - | 0 ms
+valid | 20-arrows-swapped.json | 154 B | loaded | - | 0 ms
+valid | 21-up-is-w.json | 154 B | loaded | - | 0 ms
+valid | 22-right-is-d.json | 153 B | loaded | - | 0 ms
+valid | 23-volume-fifty.json | 154 B | loaded | - | 0 ms
+valid | 24-retro-wasd.json | 150 B | loaded | - | 0 ms
+valid | 25-neon-ijkl-silent.json | 147 B | loaded | - | 0 ms
+malformed | 01-empty-file.json | 0 B | defaults | E_PARSE: defaults loaded | 0 ms
+malformed | 02-whitespace-only.json | 4 B | defaults | E_PARSE: defaults loaded | 0 ms
+malformed | 03-truncated.json | 60 B | defaults | E_PARSE: defaults loaded | 0 ms
+malformed | 04-binary.json | 96 B | defaults | E_PARSE: defaults loaded | 0 ms
+malformed | 05-not-json.json | 11 B | defaults | E_PARSE: defaults loaded | 0 ms
+malformed | 06-root-array.json | 178 B | defaults | E_SCHEMA: defaults loaded | 0 ms
+malformed | 07-missing-version.json | 138 B | defaults | E_SCHEMA: defaults loaded | 0 ms
+malformed | 08-wrong-version.json | 154 B | defaults | E_SCHEMA: defaults loaded | 0 ms
+malformed | 09-version-as-string.json | 156 B | defaults | E_SCHEMA: defaults loaded | 0 ms
+malformed | 10-key-as-string.json | 156 B | defaults | E_SCHEMA: defaults loaded | 0 ms
+malformed | 11-key-m-reserved.json | 154 B | defaults | E_SCHEMA: defaults loaded | 0 ms
+malformed | 12-key-not-movement.json | 154 B | defaults | E_SCHEMA: defaults loaded | 0 ms
+malformed | 13-key-negative.json | 154 B | defaults | E_SCHEMA: defaults loaded | 0 ms
+malformed | 14-key-out-of-range.json | 155 B | defaults | E_SCHEMA: defaults loaded | 0 ms
+malformed | 15-duplicate-key-codes.json | 154 B | defaults | E_SCHEMA: defaults loaded | 0 ms
+malformed | 16-key-is-other-alias.json | 154 B | defaults | E_SCHEMA: defaults loaded | 0 ms
+malformed | 17-volume-negative.json | 154 B | defaults | E_SCHEMA: defaults loaded | 0 ms
+malformed | 18-volume-above-100.json | 155 B | defaults | E_SCHEMA: defaults loaded | 0 ms
+malformed | 19-volume-fractional.json | 156 B | defaults | E_SCHEMA: defaults loaded | 0 ms
+malformed | 20-unknown-theme.json | 151 B | defaults | E_SCHEMA: defaults loaded | 0 ms
+malformed | 21-lowercase-theme.json | 151 B | defaults | E_SCHEMA: defaults loaded | 0 ms
+malformed | 22-theme-as-number.json | 146 B | defaults | E_SCHEMA: defaults loaded | 0 ms
+malformed | 23-missing-theme.json | 132 B | defaults | E_SCHEMA: defaults loaded | 0 ms
+malformed | 24-duplicate-json-key.json | 150 B | defaults | E_PARSE: defaults loaded | 0 ms
+malformed | 25-deep-nesting-10000.json | 20024 B | defaults | E_PARSE: defaults loaded | 0 ms
+
+# settings_corpus_tests (Clang 18 ASan+UBSan): All tests passed (362 assertions in 3 test cases)
