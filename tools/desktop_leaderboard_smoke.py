@@ -62,7 +62,13 @@ try:
                 return ids[0]
             def stop(window):
                 # Close through the app's menu, not X server forced destruction.
-                xdo("key", "--window", window, "Escape")
+                try:
+                    xdo("key", "--window", window, "Escape")
+                except subprocess.CalledProcessError:
+                    # Escape key-down may close the app before xdotool sends
+                    # key-up (BadWindow). Still require the actual child to
+                    # exit zero below; an unrelated error/hang cannot pass.
+                    pass
                 process.wait(timeout=10)
                 check(process.returncode == 0, "clean app exit")
             board.write_text(json.dumps(entries(10)), encoding="utf-8")

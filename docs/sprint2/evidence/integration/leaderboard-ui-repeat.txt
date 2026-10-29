@@ -1,0 +1,42 @@
+RUN 1
+PASS: Top-10 table exposes rank name and descending score for every row
+PASS: Escape returns to menu
+PASS: mouse Back returns to menu
+PASS: clean app exit
+PASS: completed session saves normalized player name
+PASS: Game Over frames do not resubmit score
+PASS: new score appears in the real UI table
+PASS: clean app exit
+PASS: saved leaderboard survives process restart
+PASS: clean app exit
+PASS: corrupt board displays empty table and warning without crashing
+PASS: clean app exit
+12 leaderboard integration checks passed; Windows/manual acceptance pending
+RUN 2
+PASS: Top-10 table exposes rank name and descending score for every row
+PASS: Escape returns to menu
+PASS: mouse Back returns to menu
+PASS: clean app exit
+PASS: completed session saves normalized player name
+PASS: Game Over frames do not resubmit score
+PASS: new score appears in the real UI table
+PASS: clean app exit
+PASS: saved leaderboard survives process restart
+PASS: clean app exit
+PASS: corrupt board displays empty table and warning without crashing
+PASS: clean app exit
+12 leaderboard integration checks passed; Windows/manual acceptance pending
+RUN 3
+PASS: Top-10 table exposes rank name and descending score for every row
+PASS: Escape returns to menu
+PASS: mouse Back returns to menu
+PASS: clean app exit
+PASS: completed session saves normalized player name
+PASS: Game Over frames do not resubmit score
+PASS: new score appears in the real UI table
+PASS: clean app exit
+PASS: saved leaderboard survives process restart
+PASS: clean app exit
+PASS: corrupt board displays empty table and warning without crashing
+PASS: clean app exit
+12 leaderboard integration checks passed; Windows/manual acceptance pending

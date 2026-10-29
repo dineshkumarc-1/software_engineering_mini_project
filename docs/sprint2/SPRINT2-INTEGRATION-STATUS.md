@@ -100,3 +100,21 @@ must be checked separately. Local source hashes identify the tested file inputs.
 before #52; owner #44 -> #45 -> #46. Recheck conflicts and CI at each final
 integration head. Do not close the sprint, tag `v1.0.0-final`, claim 100% tests,
 freeze development or record the final demo from this candidate.
+
+## First published-head CI follow-up
+
+On candidate `6f753d67184e897440bb1db65877ecec511010d4`, Linux app configure,
+build, CTest, audio, navigation and Settings checks passed. The new leaderboard
+smoke then reached its second normal exit and xdotool reported BadWindow: the
+Escape key-down closed the app before xdotool could send key-up. This failed CI
+run is retained, not counted as green:
+https://github.com/dineshkumarc-1/software_engineering_mini_project/actions/runs/40841815410
+
+The smoke now tolerates that command error only at the intentional app-exit
+step, then still requires the actual child to exit within 10 seconds with
+status **zero**. An app hang, crash or nonzero exit cannot pass. No production
+behavior or test expectations changed. Three consecutive local leaderboard
+runs pass **12 checks each** after the correction, and all **33 Python tests**
+still pass. See `evidence/integration/leaderboard-ui-repeat.txt`. Fresh-head
+CI must be checked separately before claiming CI success; D1–D5 and manual
+acceptance blockers remain unchanged.
