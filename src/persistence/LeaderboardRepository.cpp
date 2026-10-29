@@ -123,16 +123,30 @@ LeaderboardRepository::LeaderboardRepository(
     : store_(std::move(filePath)) {}
 
 std::optional<std::vector<LeaderboardEntry>>
-LeaderboardRepository::loadValidatedEntries(bool* corruptJson) const {
+LeaderboardRepository::loadValidatedEntries(
+    bool* corruptJson,
+    bool* emptyFile) const {
     if (corruptJson != nullptr) {
         *corruptJson = false;
+    }
+    if (emptyFile != nullptr) {
+        *emptyFile = false;
     }
 
     const StoreReadResult result = store_.readJson();
 
-    // Missing or empty files represent a new leaderboard.
-    if (result.status == StoreReadStatus::NotFound ||
-        result.status == StoreReadStatus::EmptyFile) {
+    // A genuinely missing file is a normal first-run empty leaderboard.
+    if (result.status == StoreReadStatus::NotFound) {
+        return std::vector<LeaderboardEntry>{};
+    }
+
+    // Keep an existing zero-byte/whitespace-only file distinguishable for
+    // top10() warnings. addScore() still treats it as an empty board and
+    // follows its existing submission/recovery behavior.
+    if (result.status == StoreReadStatus::EmptyFile) {
+        if (emptyFile != nullptr) {
+            *emptyFile = true;
+        }
         return std::vector<LeaderboardEntry>{};
     }
 
@@ -275,9 +289,10 @@ LeaderboardRepository::top10(std::string* warning) const {
         warning->clear();
     }
 
-    auto entries = loadValidatedEntries();
+    bool emptyFile = false;
+    auto entries = loadValidatedEntries(nullptr, &emptyFile);
 
-    if (!entries) {
+    if (!entries || emptyFile) {
         if (warning != nullptr) {
             *warning =
                 "E_LEADERBOARD_READ: invalid or unreadable board; empty table shown";
