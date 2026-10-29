@@ -1,0 +1,26 @@
+PASS main menu shown - SnakeXtreme | Main menu | Up/Down: select, Enter: confirm, Esc: exit
+PASS New Game opens name entry - SnakeXtreme | Name:  |
+PASS TC-SEC-06: memory stays stable while 10,000 characters are typed - RSS 99888 kB -> 99888 kB
+PASS TC-SEC-06: 10,000 typed characters leave exactly 15 in the field - name='AAAAAAAAAAAAAAA', 13.7 s, title: SnakeXtreme | Name: AAAAAAAAAAAAAAA | Maximum 15 characters.
+PASS TC-SEC-06: the 16th and later characters are refused with a message - SnakeXtreme | Name: AAAAAAAAAAAAAAA | Maximum 15 characters.
+PASS TC-SEC-01: 'Ab,cd': each refused character shows the message; field keeps 'Abcd' - name='Abcd', refused 1/1 with message
+PASS TC-SEC-01: 'a"b': each refused character shows the message; field keeps 'ab' - name='ab', refused 1/1 with message
+PASS TC-SEC-01: '../x': each refused character shows the message; field keeps 'x' - name='x', refused 3/3 with message
+PASS TC-SEC-01: '{"x":1}': each refused character shows the message; field keeps 'x1' - name='x1', refused 5/5 with message
+PASS TC-SEC-01: 'C:\\x': each refused character shows the message; field keeps 'Cx' - name='Cx', refused 2/2 with message
+PASS TC-SEC-01: 'a;b|c': each refused character shows the message; field keeps 'abc' - name='abc', refused 2/2 with message
+PASS TC-SEC-01: 'España': each refused character shows the message; field keeps 'Espaa' - name='Espaa', refused 1/1 with message
+PASS TC-SEC-01: 'emoji😀': each refused character shows the message; field keeps 'emoji' - name='emoji', refused 1/1 with message
+PASS TC-SEC-01: Tab inserts nothing - name=''
+PASS TC-SEC-01: an empty name cannot be confirmed - SnakeXtreme | Name:  | Enter a valid name (1-15 characters), not only spaces.
+PASS TC-SEC-01: the valid name A_b-1 x is accepted - SnakeXtreme | Menu | Classic / Medium | Left/Right: mode, Up/Down: difficulty, Enter: start, Esc: exit
+PASS game starts - SnakeXtreme | Playing | Classic / Medium | Score 0 | High 0 | Esc: pause, M: menu
+PASS game over reached - SnakeXtreme | Game over: You hit the wall | Classic / Medium | Score 0 | High 0 | Score saved: rank 1 | Enter: play agai
+PASS clean exit - exit code 0
+files written: ['config.json', 'leaderboard.json', 'runtime.log']
+PASS TC-SEC-02: config.json has no user name, host name or absolute path - 153 bytes
+PASS TC-SEC-02: leaderboard.json has no user name, host name or absolute path - 196 bytes
+PASS TC-SEC-02: runtime.log has no user name, host name or absolute path - 95 bytes
+PASS TC-SEC-02: config.json holds only the Appendix B fields - ['key_down', 'key_left', 'key_right', 'key_up', 'music_volume', 'sfx_volume', 'theme', 'version']
+runtime log: Setting vertical sync not supported | [WARN] SettingsRepository: E_FILE_MISSING: defaults loaded
+SUMMARY 23/23 passed

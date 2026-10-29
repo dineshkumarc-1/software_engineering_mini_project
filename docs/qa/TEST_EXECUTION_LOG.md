@@ -48,10 +48,10 @@ The environment capture was recorded at 17:08:35 IST. This is the environment-ca
 - Reported result: 7 passed, 0 failed
 - Artifact name: `SnakeXtreme-windows-x64`
 - Artifact ID: `12712437257`
-- Artifact page: https://github.com/dineshkumarc-1/software_engineering_mini_project/actions/runs/40456104168/artifacts/12712437257
-- Workflow run: https://github.com/dineshkumarc-1/software_engineering_mini_project/actions/runs/40456104168
+- Artifact page: [SnakeXtreme Windows x64 artifact](https://github.com/dineshkumarc-1/software_engineering_mini_project/actions/runs/40456104168/artifacts/12712437257)
+- Workflow run: [Windows build workflow run](https://github.com/dineshkumarc-1/software_engineering_mini_project/actions/runs/40456104168)
 - Workflow job: App build (Windows MSVC)
-- Workflow job URL: https://github.com/dineshkumarc-1/software_engineering_mini_project/actions/runs/40456104168/job/122029676098
+- Workflow job URL: [App build (Windows MSVC)](https://github.com/dineshkumarc-1/software_engineering_mini_project/actions/runs/40456104168/job/122029676098)
 - Workflow result: Succeeded
 - Workflow run commit SHA: `53465b167128caa787c182d36a859a51a5fec8a9`
 - Artifact usage: Downloaded and launched for Windows x64 manual testing.
@@ -59,7 +59,7 @@ The environment capture was recorded at 17:08:35 IST. This is the environment-ca
 
 These results are based on the reported manual observations documented in Section 5.1. They are separate from the automated headless CTest runs.
 
-The recorded SHA identifies the source revision checked out by the documented workflow. The workflow and artifact references are included to support build traceability.
+The recorded SHA identifies the source revision checked out by the documented workflow. The workflow and artifact references are included to support build traceability. This SHA must not automatically be treated as the exact tested artifact version unless that relationship is verified.
 
 ## 2. Commands Executed
 
@@ -80,6 +80,7 @@ ctest --preset headless --output-on-failure 2>&1 | tee ctest-output.txt
 ## 3. Results — Run A
 
 The original recorded run reported the following results:
+
 | Registered test | Result |
 |---|---|
 | `app_state_flow` | Passed |
@@ -102,6 +103,7 @@ The exact tested commit and tool versions were not captured for this run.
 ## 4. Results — Run B
 
 The new CTest run at commit `aa1cc1e22319f018f7dd515e77f70d45d5a3712d` reported:
+
 | Registered test | Result |
 |---|---|
 | `app_state_flow` | Passed |
@@ -125,14 +127,15 @@ The two runs have different registered test inventories. In particular, `input_v
 - The headless configuration and build succeeded for Run B.
 - All seven CTest tests registered for Run B passed.
 - All eight tests in the earlier Run A were reported as passing.
-- The earlier validator unit tests covered allowed characters, invalid characters, length limits, sanitization, and maximum sanitized output length. This is historical evidence for the validator component on `review/issue-16-validator`, not a test result for the current QA branch.
-- Historical commit `d2a8a36` on `review/issue-16-validator` contains the validator source, header, tests, and CMake registration. These files and registration are absent from the current QA branch's tracked source. Searches of tracked C++ source on the current QA branch found no matches for the historical validator APIs or the searched player-name validation terms. This does not rule out equivalent validation under different names or in unsearched locations.
-- The existing local `build/headless/input_validator_tests` executable is a build artifact. Its individual passing result does not establish that the current QA branch can build or reproduce the validator tests from source. UI input integration and pre-persistence sanitization remain pending verification. Confirm whether equivalent validation exists in the current implementation and meets the approved requirements before drawing a conformance conclusion.
+- The earlier validator unit tests covered allowed characters, invalid characters, length limits, sanitization, and maximum sanitized output length.
+- Searches of the inspected source and header directories on the earlier review branch did not identify calls to `isValidPlayerName()` or `sanitizePlayerName()` outside the validator component itself.
+- UI input integration and pre-persistence sanitization remain pending verification.
 - The automated results cover only the registered headless CTest tests for their respective runs.
 
-## 5.1 Windows Manual Tests — Reported Results
+### 5.1 Windows Manual Tests — Reported Results
 
 The following results were reported for manual testing of the Windows x64 artifact on 28 October 2026.
+
 | Test ID | Test area | Expected behavior | Reported actual result | Status |
 |---|---|---|---|---|
 | WIN-MAN-01 | Audio controls — music 0%, SFX 100% | Music is silent while sound effects remain audible. | Music was silent; eating sound was audible. | Reported pass |
@@ -150,6 +153,7 @@ The total above covers only WIN-MAN-01 through WIN-MAN-07. The F5 observation an
 ### Additional Key-Remapping Coverage
 
 The following results were reported for Windows x64 manual testing on 28 October 2026 using the `SnakeXtreme-windows-x64` artifact from workflow run `40456104168`.
+
 | Test area | Expected behavior | Reported actual result | Status |
 |---|---|---|---|
 | Change a movement binding | The newly assigned key moves the snake in the intended direction. | Changed Move Up from Up Arrow to U; pressing U moved the snake upward. | Reported pass |
@@ -175,6 +179,8 @@ The U remapping checks are supplemental observations. The I/K/J/L sequence direc
 - **Disposition:** Exploratory observation recorded. It is not counted among the seven original Windows passes and is not classified as a defect based on the currently cited requirement.
 - **Implementation note:** The inspected gameplay key handler explicitly handles Escape for pause/resume but contains no explicit F5 handling in the relevant key switch.
 
+Review the other applicable approved requirements before deciding whether F5 requires corrective action. Do not classify the observation as a defect solely because F5 does not pause gameplay.
+
 ### Evidence and Traceability Limitations
 
 - The Windows app-build workflow checked out commit `53465b167128caa787c182d36a859a51a5fec8a9`. The workflow job and artifact references are recorded in Section 1, and the artifact was downloaded and launched for manual testing.
@@ -198,10 +204,28 @@ The following activities still require execution or verification against the pro
 - Complete requirements traceability against SRS v1.0, SRS Addendum v1.1, SAD v1.0, and STP v1.0.
 - Attach or reference available evidence for the Windows manual tests.
 - Map the seven reported Windows tests to approved STP test-case IDs.
-- Revisit the F5 observation if further requirements evidence identifies F5 as a required pause control; the currently cited STP v1.0 TC-UI-03 specifies Esc for pausing and resuming.
-- The changed-binding, duplicate-key rejection, and WASD-after-remapping observations are recorded in Section 5. The remaining key-remapping check is to verify whether the old primary movement keys stop working after switching to I/K/J/L.
+- Review any additional approved requirement that may specify F5 behavior; STP v1.0 TC-UI-03 specifies Esc, not F5, for pause/resume.
+- Verify whether the old primary movement keys stop working after the prescribed I/K/J/L remapping.
 - Verify all other required Windows platform, integration, and acceptance tests.
 - Complete the test summary report with traceable execution metrics.
+
+### Windows 11 Offline Network Collector — Limited Evidence
+
+- **Platform:** Windows 11 Home Single Language.
+- **Evidence source:** Collaborator-reported result and reviewed collector JSON, referenced by the PR #50 evidence note.
+- **Raw evidence:** The JSON was retained outside Git because it contains local machine and path details; it is not independently available in this repository.
+- **Process monitoring:** SnakeXtreme remained running in 60 of 60 samples.
+- **Process-owned network endpoints:** Zero TCP connection records and zero UDP endpoint records were reported across the collected snapshots.
+- **Outbound firewall rule:** ActiveStore checks reportedly found the enabled outbound block rule scoped to the game executable at both the beginning and end of collection.
+- **Gameplay:** The collaborator reported that normal gameplay remained usable with the rule enabled.
+- **Timing limitation:** Although the configured collection duration was 60 seconds, sample timestamps spanned approximately 98.35 seconds because of per-loop query overhead.
+- **Result classification:** Limited supporting evidence; not a complete network-security acceptance result.
+
+The collector observations apply only to this Windows 11 collection. They do not establish that all network activity is impossible, demonstrate Windows 10 conformance, or prove acceptance of the final integrated candidate. The exact final candidate SHA and corresponding artifact remain to be established.
+
+**Outstanding:** Verify traceability to the approved requirements and STP test cases, execute the corresponding Windows 10 test, and repeat applicable checks against the identified final integrated candidate.
+
+**Final QA sign-off remains pending.**
 
 ## 7. Preliminary QA Conclusion
 
@@ -210,9 +234,11 @@ Both recorded headless runs reported successful results for their respective reg
 - Run A: 8/8 tests passed, with 0 reported failures.
 - Run B: 7/7 tests passed, with 0 reported failures, at commit `aa1cc1e22319f018f7dd515e77f70d45d5a3712d`.
 
-Additionally, seven Windows x64 manual tests were reported as passing on 28 October 2026. The associated artifact, workflow job, and workflow commit SHA are recorded in Section 1. Individual evidence references have not yet been attached, and the reported manual results still require mapping to approved STP v1.0 test-case IDs.
+Additionally, seven Windows x64 manual tests were reported as passing on 28 October 2026. The associated artifact, workflow run, and workflow commit SHA are recorded in Section 1. Individual evidence references have not yet been attached, and the reported manual results still require mapping to approved STP v1.0 test-case IDs.
 
-The F5 observation and supplemental key-remapping observations are recorded separately and are not included in the seven reported Windows passes. The old-primary-key behavior after switching to I/K/J/L remains unverified.
+Supplemental key-remapping observations are recorded separately. The old-primary-key behavior after the prescribed I/K/J/L remapping remains pending verification. The F5 observation is exploratory and is not included in the seven reported Windows passes.
+
+The Windows 11 offline network collector result is recorded as limited supporting evidence. Its scope is restricted to the reported Windows 11 collection and does not establish Windows 10 conformance or final-candidate acceptance.
 
 The automated and manual results cover different test activities and must be reported separately. They do not establish completion of the full planned test inventory, successful execution of every High-priority test case, complete requirements conformance, or satisfaction of all release exit criteria.
 
@@ -229,6 +255,8 @@ The execution history and requirement findings are also documented in:
 
 - `docs/qa/QA_TEST_CHECKLIST.md`
 - `docs/qa/REQUIREMENTS_DEVIATION_MATRIX.md`
+
+The Windows 11 collector's raw JSON is not included in this repository. Refer to the PR #50 evidence note for its provenance.
 
 Update this log whenever additional tests are executed or existing results are reproduced, corrected, or superseded.
 

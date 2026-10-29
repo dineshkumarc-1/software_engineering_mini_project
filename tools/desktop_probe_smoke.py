@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Linux/Xvfb instrumentation smoke only, NOT performance acceptance.
 Usage: python tools/desktop_probe_smoke.py /path/to/SnakeXtreme NEW_OUTPUT_DIR
-Produces 100 synthetic randomized gameplay key requests, plus 3 launch traces.
+Produces 100 synthetic randomized gameplay key requests in a bounded burst, plus 3 launch traces.
 Needs Xvfb and xdotool; accepts normal LD_LIBRARY_PATH/OpenAL environment.
 """
 import json
@@ -55,27 +55,31 @@ try:
             # The report must not contain this private display-name sentinel.
             xdo("type", "--window", window, "--delay", "20", "ProbePrivate")
             key("Return"); wait(lambda: "| Menu |" in title(), "no mode screen")
-            key("Right", "Right", "Up", "Return")
-            wait(lambda: "Playing | Obstacle / Hard" in title(), "not Hard/Obstacle gameplay")
+            key("Down", "Return")
+            wait(lambda: "Playing | Classic / Easy" in title(), "not Easy/Classic gameplay")
+            # This is a probe-wiring smoke, not the Hard/Obstacle performance
+            # acceptance campaign. The previous per-key polling could send a
+            # key during a Game Over transition and then falsely call it a
+            # missing gameplay sample. Use a clear, slow board and a short
+            # random-direction burst; still require EVERY request below.
             randomizer = random.Random(22)
-            for _ in range(100):
-                if "Game over" in title():
-                    key("Return")
-                    wait(lambda: "Playing" in title(), "restart failed")
-                key(randomizer.choice(("Up", "Down", "Left", "Right")))
-                time.sleep(randomizer.uniform(0.005, 0.025))
+            requests = [randomizer.choice(("Up", "Down", "Left", "Right"))
+                        for _ in range(100)]
+            xdo("key", "--window", window, "--clearmodifiers", "--delay", "5", *requests)
+            assert "Playing" in title(), "game ended during the input-wiring smoke"
             process.wait(timeout=20)
             assert process.returncode == 0, "instrumented app failed"
         raw = report.read_text(encoding="utf-8")
         assert "ProbePrivate" not in raw, "probe leaked display name"
         parsed = json.loads(raw)
         assert len(parsed["inputs"]) == 100, "not all 100 requested keys were recorded"
+        assert [sample["direction"] for sample in parsed["inputs"]] == requests, "input order/directions differ"
         assert any(i["accepted"] for i in parsed["inputs"]), "no accepted engine input"
         assert any(i["displayed_us"] is not None for i in parsed["inputs"]), "no application/display correlation"
         assert not any(parsed[k] for k in ("dropped_inputs", "dropped_windows", "invalid_samples")), "lost/invalid measurements"
         summary = summarize(report)
         (output / "gameplay-summary.json").write_text(json.dumps(summary, indent=2), encoding="utf-8")
-        print("PASS: 100 synthetic randomized requests; accepted/rejected/consumed/displayed separated; no display-name leakage")
+        print("PASS: all 100 synthetic burst requests recorded in order; accepted/rejected/consumed/displayed separated; no display-name leakage")
     # Preserve environment only for this script's child collector (no global OS settings).
     os.environ.update({k: env[k] for k in ("DISPLAY", "ALSOFT_DRIVERS", "LIBGL_ALWAYS_SOFTWARE")})
     launched = collect(exe, output / "launches", 3, "uncommitted probe smoke working-tree; not a release build")

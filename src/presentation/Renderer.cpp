@@ -1,4 +1,5 @@
 #include "snakextreme/Renderer.hpp"
+#include "snakextreme/LeaderboardTable.hpp"
 #include "snakextreme/UiHitTest.hpp"
 #include <cstdint>
 #include <filesystem>
@@ -276,18 +277,27 @@ void Renderer::drawNavigation(sf::RenderTarget& target, const FrameView& frame) 
         label("Type name   Backspace: delete   Enter: continue   Esc: back", 17, 500.f, TextDim);
     } else {
         label("Leaderboard - Top 10", 28, 138.f, TextMain);
-        const auto cell = [&](const std::string& value, float x, float y, sf::Color color) {
-            auto item = text(value, 19, color); item.setPosition(x, y); target.draw(item);
+        const auto cell = [&](const std::string& value, const LeaderboardColumn& column,
+                              float y, sf::Color color) {
+            auto item = text(value, 17, color);
+            // A legal 15-character name (including wide W glyphs) and a maximum
+            // integer score must fit without overlapping the adjacent column.
+            while (item.getLocalBounds().width > column.width &&
+                   item.getCharacterSize() > 12U) {
+                item.setCharacterSize(item.getCharacterSize() - 1U);
+            }
+            item.setPosition(column.left - item.getLocalBounds().left, y);
+            target.draw(item);
         };
-        cell("Rank", 190.f, 165.f, Accent);
-        cell("Player name", 285.f, 165.f, Accent);
-        cell("Score", 610.f, 165.f, Accent);
+        for (const auto& column : LeaderboardColumns) {
+            cell(std::string(column.heading), column, 165.f, Accent);
+        }
         for (std::size_t i = 0; i < frame.leaderboard.size(); ++i) {
             const float y = 194.f + static_cast<float>(i) * 22.f;
-            const auto& entry = frame.leaderboard[i];
-            cell(std::to_string(i + 1), 205.f, y, TextDim);
-            cell(entry.playerName, 285.f, y, TextMain);
-            cell(std::to_string(entry.score), 610.f, y, TextMain);
+            const auto row = leaderboardRow(i + 1U, frame.leaderboard[i]);
+            for (std::size_t j = 0; j < row.size(); ++j) {
+                cell(row[j], LeaderboardColumns[j], y, j == 0U ? TextDim : TextMain);
+            }
         }
         if (frame.leaderboard.empty()) label("No scores yet", 22, 280.f, TextDim);
         // Constant warning text is deliberately bounded to the available row.

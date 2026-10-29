@@ -1,0 +1,641 @@
+# Issue #18 run 3 - Bharath's persistence fix (#48 at 31602b5) verified with the #18 tests
+# Sections 1-9: candidate #53 dbf08b5 + #48 fix 31602b5 (persistence files taken from #48) + #52 tests at eb91f1d
+#   + the promotion (known-defect tags of D1-D5 removed, corpus exceptions removed, D6 known-defect test added; later 15892ba).
+# Section 10: the same with #48 0d516f3 (cppcheck fix). Section 11: #52 itself at 5915e58 + 15892ba on the new base #50 6e28118.
+# Every run as a normal user (tester). Ubuntu 24.04.
+
+## 1. The #52 tests as pushed (eb91f1d, D1-D5 still tagged [!shouldfail]), before and after the fix
+# Before = #52 on its base #50 (07d37d2). After = the same tree with 31602b5 merged.
+# 'failed' after the fix means a known-defect test now passes, so its [!shouldfail] tag no longer holds.
+before, GCC:  security_corpus_tests  test cases: 20 | 14 passed | 6 failed as expected
+before, GCC:  secure_write_fault_tests test cases: 7 | 6 passed | 1 failed as expected
+before, ASan: security_corpus_tests  test cases: 20 | 14 passed | 6 failed as expected; secure_write_fault_tests 7 | 6 passed | 1 failed as expected; 12/12 CTest pass
+after,  GCC:  security_corpus_tests  test cases: 20 | 14 passed | 6 failed (all 726 assertions pass)
+after,  GCC:  secure_write_fault_tests test cases: 7 | 6 passed | 1 failed (all 155 assertions pass)
+after,  ASan: same as GCC, 0 sanitizer reports
+
+## 2. Promoted tests on the candidate + fix: GCC 13.3 Release, app + tests
+uid=30033(tester) gid=30033(tester) groups=30033(tester)
+ 1/21 Test  #5: leaderboard_repository_tests ...................   Passed    0.11 sec
+ 2/21 Test  #4: secure_file_store_tests ........................   Passed    0.23 sec
+ 3/21 Test #15: settings_tests .................................   Passed    0.06 sec
+ 4/21 Test  #7: security_corpus_tests ..........................   Passed    0.21 sec
+ 5/21 Test  #9: secure_write_fault_tests .......................   Passed    0.12 sec
+ 6/21 Test #12: game_mode_tests ................................   Passed    0.16 sec
+ 7/21 Test  #8: settings_corpus_tests ..........................   Passed    0.02 sec
+ 8/21 Test #11: game_engine_tests ..............................   Passed    0.03 sec
+ 9/21 Test #18: layering_core_is_sfml_free .....................   Passed    0.01 sec
+10/21 Test #14: gameplay_tests .................................   Passed    0.02 sec
+11/21 Test #13: powerup_tests ..................................   Passed    0.02 sec
+12/21 Test  #6: leaderboard_model_tests ........................   Passed    0.01 sec
+13/21 Test  #1: app_state_flow .................................   Passed    0.00 sec
+14/21 Test #16: audio_model_tests ..............................   Passed    0.00 sec
+15/21 Test #17: performance_probe_tests ........................   Passed    0.00 sec
+16/21 Test  #3: input_validator_tests ..........................   Passed    0.00 sec
+17/21 Test  #2: score_service ..................................   Passed    0.00 sec
+18/21 Test #21: security_banned_api_scan_ignores_lookalikes ....   Passed    0.01 sec
+19/21 Test #20: security_banned_api_scan_finds_planted_calls ...   Passed    0.01 sec
+20/21 Test #10: game_session ...................................   Passed    0.00 sec
+21/21 Test #19: security_banned_api_scan .......................   Passed    0.18 sec
+100% tests passed, 0 tests failed out of 21
+Total Test time (real) =   0.63 sec
+Catch2 totals per suite:
+  audio_model_tests: All tests passed (147 assertions in 4 test cases)
+  game_engine_tests: All tests passed (10213 assertions in 22 test cases)
+  game_mode_tests: All tests passed (84890 assertions in 37 test cases)
+  gameplay_tests: All tests passed (460 assertions in 22 test cases)
+  input_validator_tests: All tests passed (34 assertions in 9 test cases)
+  leaderboard_model_tests: All tests passed (12 assertions in 2 test cases)
+  leaderboard_repository_tests: All tests passed (192 assertions in 13 test cases)
+  performance_probe_tests: All tests passed (81 assertions in 11 test cases)
+  powerup_tests: All tests passed (22031 assertions in 41 test cases)
+  secure_file_store_tests: All tests passed (387 assertions in 20 test cases)
+  secure_write_fault_tests: All tests passed (214 assertions in 8 test cases)
+  security_corpus_tests: assertions: 732 | 730 passed | 2 failed as expected
+  security_corpus_tests: test cases:  21 |  20 passed | 1 failed as expected
+  settings_corpus_tests: All tests passed (362 assertions in 3 test cases)
+  settings_tests: All tests passed (195 assertions in 17 test cases)
+
+## 3. Promoted tests on the candidate + fix: Clang 18 ASan+UBSan Debug, app + tests
+# ASAN_OPTIONS=detect_leaks=1:abort_on_error=1:strict_string_checks=1:detect_stack_use_after_return=1:check_initialization_order=1
+uid=30033(tester) gid=30033(tester) groups=30033(tester)
+ 1/21 Test #13: powerup_tests ..................................   Passed    0.85 sec
+ 2/21 Test  #9: secure_write_fault_tests .......................   Passed    0.42 sec
+ 3/21 Test  #7: security_corpus_tests ..........................   Passed    0.35 sec
+ 4/21 Test #11: game_engine_tests ..............................   Passed    0.38 sec
+ 5/21 Test  #4: secure_file_store_tests ........................   Passed    0.21 sec
+ 6/21 Test #14: gameplay_tests .................................   Passed    0.33 sec
+ 7/21 Test  #5: leaderboard_repository_tests ...................   Passed    0.14 sec
+ 8/21 Test #19: security_banned_api_scan .......................   Passed    0.17 sec
+ 9/21 Test  #8: settings_corpus_tests ..........................   Passed    0.07 sec
+10/21 Test #15: settings_tests .................................   Passed    0.07 sec
+11/21 Test #16: audio_model_tests ..............................   Passed    0.03 sec
+12/21 Test  #6: leaderboard_model_tests ........................   Passed    0.03 sec
+13/21 Test #17: performance_probe_tests ........................   Passed    0.02 sec
+14/21 Test  #1: app_state_flow .................................   Passed    0.02 sec
+15/21 Test  #3: input_validator_tests ..........................   Passed    0.01 sec
+16/21 Test #18: layering_core_is_sfml_free .....................   Passed    0.01 sec
+17/21 Test #10: game_session ...................................   Passed    0.01 sec
+18/21 Test #20: security_banned_api_scan_finds_planted_calls ...   Passed    0.01 sec
+19/21 Test #21: security_banned_api_scan_ignores_lookalikes ....   Passed    0.01 sec
+20/21 Test  #2: score_service ..................................   Passed    0.01 sec
+21/21 Test #12: game_mode_tests ................................   Passed    7.18 sec
+100% tests passed, 0 tests failed out of 21
+Total Test time (real) =   7.18 sec
+Catch2 totals per suite:
+  audio_model_tests: All tests passed (147 assertions in 4 test cases)
+  game_engine_tests: All tests passed (10213 assertions in 22 test cases)
+  game_mode_tests: All tests passed (84890 assertions in 37 test cases)
+  gameplay_tests: All tests passed (460 assertions in 22 test cases)
+  input_validator_tests: All tests passed (34 assertions in 9 test cases)
+  leaderboard_model_tests: All tests passed (12 assertions in 2 test cases)
+  leaderboard_repository_tests: All tests passed (192 assertions in 13 test cases)
+  performance_probe_tests: All tests passed (81 assertions in 11 test cases)
+  powerup_tests: All tests passed (22031 assertions in 41 test cases)
+  secure_file_store_tests: All tests passed (387 assertions in 20 test cases)
+  secure_write_fault_tests: All tests passed (214 assertions in 8 test cases)
+  security_corpus_tests: assertions: 732 | 730 passed | 2 failed as expected
+  security_corpus_tests: test cases:  21 |  20 passed | 1 failed as expected
+  settings_corpus_tests: All tests passed (362 assertions in 3 test cases)
+  settings_tests: All tests passed (195 assertions in 17 test cases)
+Sanitizer reports in the full test log: 0
+# The one expected failure left is 'Known defect D6' (empty or whitespace-only board shows no warning).
+
+## 4. cppcheck gate (cmake -P cmake/RunCppcheck.cmake) on the candidate + fix
+-- Running Cppcheck 2.13.0
+src/persistence/SecureFileStore.cpp:445: style: Condition '!pathIsAbsentWithoutFollowing(temporary)' is always false [knownConditionTrueFalse]
+CMake Error at cmake/RunCppcheck.cmake:43 (message):
+  cppcheck reported findings (listed above)
+## Banned-API scan: -- Banned-API scan OK: 0 hits in 46 files
+
+## 5-gcc. tools/leaderboard_ui_check.py, GCC 13.3 Release game (TC-LB-01, 02, 04)
+== TC-LB-01 persist Top 10 with all fields
+  attempt 1, game Ann: Classic / Easy, score 30 - You hit the wall | Classic / Easy | Score 30 | High 30 | Score saved: rank 1 | Enter: play
+  attempt 1, game Ben: Timed / Medium, score 10 - You hit the wall | Timed / Medium | Score 10 | High 30 | Time 0:58 | Score saved: rank 2 |
+  attempt 1, game Cara: Obstacle / Hard, score 15 - You hit the wall | Obstacle / Hard | Score 15 | High 30 | Score saved: rank 2 | Enter: pla
+  attempt 1, game Dev: Classic / Hard, score 0 - You hit the wall | Classic / Hard | Score 0 | High 30 | Score saved: rank 4 | Enter: play 
+  attempt 1, game Eli: Obstacle / Easy, score 45 - You hit the wall | Obstacle / Easy | Score 45 | High 45 | Score saved: rank 1 | Enter: pla
+PASS TC-LB-01: Ann's game over screen reports the save - c / Easy | Score 30 | High 30 | Score saved: rank 1 | Enter: play again, M: menu
+PASS TC-LB-01: Ben's game over screen reports the save - core 10 | High 30 | Time 0:58 | Score saved: rank 2 | Enter: play again, M: menu
+PASS TC-LB-01: Cara's game over screen reports the save - e / Hard | Score 15 | High 30 | Score saved: rank 2 | Enter: play again, M: menu
+PASS TC-LB-01: Dev's game over screen reports the save - ic / Hard | Score 0 | High 30 | Score saved: rank 4 | Enter: play again, M: menu
+PASS TC-LB-01: Eli's game over screen reports the save - e / Easy | Score 45 | High 45 | Score saved: rank 1 | Enter: play again, M: menu
+PASS TC-LB-01: the 5 games have different scores - {'Ann': 30, 'Ben': 10, 'Cara': 15, 'Dev': 0, 'Eli': 45}
+PASS TC-LB-01: the app exits normally - exit code 0
+PASS TC-LB-01: leaderboard.json is valid JSON - 809 bytes
+PASS TC-LB-01: version 1 and all 5 games stored - 5 entries
+PASS TC-LB-01: sorted by score, descending - [45, 30, 15, 10, 0]
+PASS TC-LB-01: every entry has exactly the 5 Appendix B fields - ['date_achieved', 'difficulty', 'game_mode', 'player_name', 'score']
+PASS TC-LB-01: name, score, mode and difficulty match each game played - Eli 45 Obstacle/Easy; Ann 30 Classic/Easy; Cara 15 Obstacle/Hard; Ben 10 Timed/Medium; Dev 0 Classic/Hard
+PASS TC-LB-01: date_achieved is today's date as YYYY-MM-DD - ['2026-10-29']
+PASS TC-LB-01: no temporary file is left - []
+PASS TC-LB-01: after a restart the Leaderboard shows the 5 saved games in order - SnakeXtreme | Leaderboard | 5 entries | 1. Eli 45 | 2. Ann 30 | 3. Cara 15 | 4. Ben 10 | 5. Dev 0 |  | Esc: back
+PASS TC-LB-01: the app exits normally after the restart
+PASS TC-LB-01: viewing the board does not rewrite the file
+== TC-LB-02 view leaderboard
+PASS TC-LB-02: Leaderboard opens from the main menu - SnakeXtreme | Leaderboard | 10 entries | 1. Top-9999999 9999999 | 2. Nine00 900 | 3. FifteenCharsXYZ 750 | 4. Mid_500 50
+PASS TC-LB-02: 10 rows with rank, name and score in descending order - SnakeXtreme | Leaderboard | 10 entries | 1. Top-9999999 9999999 | 2. Nine00 900 | 3. FifteenCharsXYZ 750 | 4. Mid_500 500 | 5. B 300 | 6. Tie_A 200 | 7. Tie_B 200 | 8. Hundred 100 | 9. Low 10 10 | 10. Zero 0 |  | Esc: back
+PASS TC-LB-02: equal scores keep their stored order (Tie_A before Tie_B)
+PASS TC-LB-02: Esc returns to the main menu - SnakeXtreme | Main menu | Up/Down: select, Enter: confirm, Esc: exit
+PASS TC-LB-02: the app exits normally
+PASS TC-LB-02: the empty board shows no rows and no warning - SnakeXtreme | Leaderboard | 0 entries |  | Esc: back
+PASS TC-LB-02: Esc returns to the main menu from the empty board
+PASS TC-LB-02: the app exits normally
+  The screenshots lb02-*.png are inspected by eye for the columns and "No scores yet".
+== TC-LB-04 missing/corrupt leaderboard fallback
+PASS TC-LB-04 missing: no crash and an empty leaderboard is shown - SnakeXtreme | Leaderboard | 0 entries |  | Esc: back
+PASS TC-LB-04 missing: the next real game's score (10) is saved - Score saved: rank 1
+PASS TC-LB-04 missing: the app exits normally - exit code 0
+PASS TC-LB-04 missing: the bad file is replaced by a valid board holding only that score - file now 1 entries
+PASS TC-LB-04 missing: no temporary file is left - []
+  runtime log lines about the leaderboard: none
+PASS TC-LB-04 empty: no crash and an empty leaderboard is shown - SnakeXtreme | Leaderboard | 0 entries |  | Esc: back
+FAIL TC-LB-04 empty: a warning is shown on the Leaderboard screen - SnakeXtreme | Leaderboard | 0 entries |  | Esc: back
+PASS TC-LB-04 empty: the next real game's score (10) is saved - Score saved: rank 1
+PASS TC-LB-04 empty: the app exits normally - exit code 0
+PASS TC-LB-04 empty: the bad file is replaced by a valid board holding only that score - file now 1 entries
+PASS TC-LB-04 empty: no temporary file is left - []
+  runtime log lines about the leaderboard: none
+PASS TC-LB-04 truncated: no crash and an empty leaderboard is shown - SnakeXtreme | Leaderboard | 0 entries | E_LEADERBOARD_READ: invalid or unreadable board; empty table shown | Esc: back
+PASS TC-LB-04 truncated: a warning is shown on the Leaderboard screen - 0 entries | E_LEADERBOARD_READ: invalid or unreadable board; empty table shown | Esc: back
+PASS TC-LB-04 truncated: the next real game's score (10) is saved - Score saved: rank 1; Warning: the previous leaderboard JSON was malformed or schema-invalid. A fresh leaderboard was saved.
+PASS TC-LB-04 truncated: the app exits normally - exit code 0
+PASS TC-LB-04 truncated: the bad file is replaced by a valid board holding only that score - file now 1 entries
+PASS TC-LB-04 truncated: no temporary file is left - []
+  runtime log lines about the leaderboard: ['[WARN] E_LEADERBOARD_READ: invalid or unreadable board; empty table shown', '[WARN] Score saved: rank 1; Warning: the previous leaderboard JSON was malformed or schema-invalid. A fresh leaderboard was saved.']
+PASS TC-LB-04 wrong type: no crash and an empty leaderboard is shown - SnakeXtreme | Leaderboard | 0 entries | E_LEADERBOARD_READ: invalid or unreadable board; empty table shown | Esc: back
+PASS TC-LB-04 wrong type: a warning is shown on the Leaderboard screen - 0 entries | E_LEADERBOARD_READ: invalid or unreadable board; empty table shown | Esc: back
+PASS TC-LB-04 wrong type: the next real game's score (10) is saved - Score saved: rank 1; Warning: the previous leaderboard JSON was malformed or schema-invalid. A fresh leaderboard was saved.
+PASS TC-LB-04 wrong type: the app exits normally - exit code 0
+PASS TC-LB-04 wrong type: the bad file is replaced by a valid board holding only that score - file now 1 entries
+PASS TC-LB-04 wrong type: no temporary file is left - []
+  runtime log lines about the leaderboard: ['[WARN] E_LEADERBOARD_READ: invalid or unreadable board; empty table shown', '[WARN] Score saved: rank 1; Warning: the previous leaderboard JSON was malformed or schema-invalid. A fresh leaderboard was saved.']
+PASS TC-LB-04 negative score: no crash and an empty leaderboard is shown - SnakeXtreme | Leaderboard | 0 entries | E_LEADERBOARD_READ: invalid or unreadable board; empty table shown | Esc: back
+PASS TC-LB-04 negative score: a warning is shown on the Leaderboard screen - 0 entries | E_LEADERBOARD_READ: invalid or unreadable board; empty table shown | Esc: back
+PASS TC-LB-04 negative score: the next real game's score (10) is saved - Score saved: rank 1; Warning: the previous leaderboard JSON was malformed or schema-invalid. A fresh leaderboard was saved.
+PASS TC-LB-04 negative score: the app exits normally - exit code 0
+PASS TC-LB-04 negative score: the bad file is replaced by a valid board holding only that score - file now 1 entries
+PASS TC-LB-04 negative score: no temporary file is left - []
+  runtime log lines about the leaderboard: ['[WARN] E_LEADERBOARD_READ: invalid or unreadable board; empty table shown', '[WARN] Score saved: rank 1; Warning: the previous leaderboard JSON was malformed or schema-invalid. A fresh leaderboard was saved.']
+PASS TC-LB-04 bad enum: no crash and an empty leaderboard is shown - SnakeXtreme | Leaderboard | 0 entries | E_LEADERBOARD_READ: invalid or unreadable board; empty table shown | Esc: back
+PASS TC-LB-04 bad enum: a warning is shown on the Leaderboard screen - 0 entries | E_LEADERBOARD_READ: invalid or unreadable board; empty table shown | Esc: back
+PASS TC-LB-04 bad enum: the next real game's score (10) is saved - Score saved: rank 1; Warning: the previous leaderboard JSON was malformed or schema-invalid. A fresh leaderboard was saved.
+PASS TC-LB-04 bad enum: the app exits normally - exit code 0
+PASS TC-LB-04 bad enum: the bad file is replaced by a valid board holding only that score - file now 1 entries
+PASS TC-LB-04 bad enum: no temporary file is left - []
+  runtime log lines about the leaderboard: ['[WARN] E_LEADERBOARD_READ: invalid or unreadable board; empty table shown', '[WARN] Score saved: rank 1; Warning: the previous leaderboard JSON was malformed or schema-invalid. A fresh leaderboard was saved.']
+PASS TC-LB-04 11 entries: no crash and an empty leaderboard is shown - SnakeXtreme | Leaderboard | 0 entries | E_LEADERBOARD_READ: invalid or unreadable board; empty table shown | Esc: back
+PASS TC-LB-04 11 entries: a warning is shown on the Leaderboard screen - 0 entries | E_LEADERBOARD_READ: invalid or unreadable board; empty table shown | Esc: back
+PASS TC-LB-04 11 entries: the next real game's score (10) is saved - Score saved: rank 1; Warning: the previous leaderboard JSON was malformed or schema-invalid. A fresh leaderboard was saved.
+PASS TC-LB-04 11 entries: the app exits normally - exit code 0
+PASS TC-LB-04 11 entries: the bad file is replaced by a valid board holding only that score - file now 1 entries
+PASS TC-LB-04 11 entries: no temporary file is left - []
+  runtime log lines about the leaderboard: ['[WARN] E_LEADERBOARD_READ: invalid or unreadable board; empty table shown', '[WARN] Score saved: rank 1; Warning: the previous leaderboard JSON was malformed or schema-invalid. A fresh leaderboard was saved.']
+SUMMARY 65/66 passed
+rc=1
+
+## 6-gcc. tools/leaderboard_ui_check.py sec04, GCC 13.3 Release game, normal user
+== TC-SEC-04 app level: a refused save keeps the old board
+PASS TC-SEC-04 app level: the game over screen reports that the score was not saved - E_LEADERBOARD_SAVE: score not saved
+PASS TC-SEC-04 app level: the Leaderboard still shows the old board - SnakeXtreme | Leaderboard | 3 entries | 1. Old300 300 | 2. Old200 200 | 3. Old100 100 |  | Esc: back
+PASS TC-SEC-04 app level: the app exits normally - exit code 0
+PASS TC-SEC-04 app level: leaderboard.json is unchanged, byte for byte
+PASS TC-SEC-04 app level: no temporary file is left - []
+PASS TC-SEC-04 app level: the failure is logged - [WARN] E_LEADERBOARD_SAVE: score not saved
+SUMMARY 6/6 passed
+rc=0
+
+## 7-gcc. tools/powerup_runtime_check.py, GCC 13.3 Release game
+PASS main menu ready - SnakeXtreme | Main menu | Up/Down: select, Enter: confirm, Esc: exit
+PASS name entered - SnakeXtreme | Name: Tejas |
+PASS mode menu ready - SnakeXtreme | Menu | Classic / Medium | Left/Right: mode, Up/Down: difficulty, Enter: start, Esc: exit
+PASS Classic / Medium game started - SnakeXtreme | Playing | Classic / Medium | Score 0 | High 0 | Esc: pause, M: menu
+process exit code: 0
+PASS clean exit - exit code 0
+files written: ['config.json', 'leaderboard.json', 'runtime.log']
+played 150.7 s, 868 moves, state Playing
+food with x2: [20, 20, 20, 20, 20, 20, 20] food without: [10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10]
+log: head not visible at 35.8 s
+log: game over at 36.8 s: SnakeXtreme | Game over: You hit the wall | Classic / Medium | Score 130 | High 130 | Score saved: rank 1 | Enter: play again, M: menu
+log: game over at 49.2 s: SnakeXtreme | Game over: You hit the wall | Classic / Medium | Score 40 | High 130 | Score saved: rank 2 | Enter: play again, M: menu
+PASS power-ups keep appearing during play - 12 seen in 151 s (2 restarts)
+gaps between seen appearances (s): 13.1, 9.8, 12.2, 16.7, 14.1, 12.5, 9.1, 15.0, 14.2, 11.8, 9.3
+PASS Speed: title shows "Speed boost" with seconds left - ('Speed', 5.0)
+PASS Speed: moves every ~72 ms during the boost - 71.9 ms over 29 moves
+PASS Speed: boost ends after ~5 s - 5.08 s
+PASS Speed: back to ~120 ms afterwards - 120.0 ms
+PASS Multiplier: title shows "Score x2" with seconds left - ('Multiplier', 10.0)
+PASS Multiplier: pause freezes the effect time - before 10.0, paused Paused 10.0
+PASS food during x2 scores +20 - [20, 20, 20, 20, 20, 20, 20]
+PASS food without x2 scores +10 - [10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10]
+PASS Shrink: length 11 -> 10 - measured 10
+PASS Shrink: length 22 -> 21 - measured 21
+PASS Shrink: length 22 -> 21 - measured 21
+PASS Shrink: length 21 -> 20 - measured 20
+SUMMARY 18/18 passed
+rc=0
+
+## 8-gcc. tools/security_ui_smoke.py, GCC 13.3 Release game
+PASS main menu shown - SnakeXtreme | Main menu | Up/Down: select, Enter: confirm, Esc: exit
+PASS New Game opens name entry - SnakeXtreme | Name:  |
+PASS TC-SEC-06: memory stays stable while 10,000 characters are typed - RSS 108752 kB -> 108752 kB
+PASS TC-SEC-06: 10,000 typed characters leave exactly 15 in the field - name='AAAAAAAAAAAAAAA', 12.5 s, title: SnakeXtreme | Name: AAAAAAAAAAAAAAA | Maximum 15 characters.
+PASS TC-SEC-06: the 16th and later characters are refused with a message - SnakeXtreme | Name: AAAAAAAAAAAAAAA | Maximum 15 characters.
+PASS TC-SEC-01: 'Ab,cd': each refused character shows the message; field keeps 'Abcd' - name='Abcd', refused 1/1 with message
+PASS TC-SEC-01: 'a"b': each refused character shows the message; field keeps 'ab' - name='ab', refused 1/1 with message
+PASS TC-SEC-01: '../x': each refused character shows the message; field keeps 'x' - name='x', refused 3/3 with message
+PASS TC-SEC-01: '{"x":1}': each refused character shows the message; field keeps 'x1' - name='x1', refused 5/5 with message
+PASS TC-SEC-01: 'C:\\x': each refused character shows the message; field keeps 'Cx' - name='Cx', refused 2/2 with message
+PASS TC-SEC-01: 'a;b|c': each refused character shows the message; field keeps 'abc' - name='abc', refused 2/2 with message
+PASS TC-SEC-01: 'España': each refused character shows the message; field keeps 'Espaa' - name='Espaa', refused 1/1 with message
+PASS TC-SEC-01: 'emoji😀': each refused character shows the message; field keeps 'emoji' - name='emoji', refused 1/1 with message
+PASS TC-SEC-01: Tab inserts nothing - name=''
+PASS TC-SEC-01: an empty name cannot be confirmed - SnakeXtreme | Name:  | Enter a valid name (1-15 characters), not only spaces.
+PASS TC-SEC-01: the valid name A_b-1 x is accepted - SnakeXtreme | Menu | Classic / Medium | Left/Right: mode, Up/Down: difficulty, Enter: start, Esc: exit
+PASS game starts - SnakeXtreme | Playing | Classic / Medium | Score 0 | High 0 | Esc: pause, M: menu
+PASS game over reached - SnakeXtreme | Game over: You hit the wall | Classic / Medium | Score 0 | High 0 | Score saved: rank 1 | Enter: play agai
+PASS clean exit - exit code 0
+files written: ['config.json', 'leaderboard.json', 'runtime.log']
+PASS TC-SEC-02: config.json has no user name, host name or absolute path - 153 bytes
+PASS TC-SEC-02: leaderboard.json has no user name, host name or absolute path - 196 bytes
+PASS TC-SEC-02: runtime.log has no user name, host name or absolute path - 95 bytes
+PASS TC-SEC-02: config.json holds only the Appendix B fields - ['key_down', 'key_left', 'key_right', 'key_up', 'music_volume', 'sfx_volume', 'theme', 'version']
+runtime log: Setting vertical sync not supported | [WARN] SettingsRepository: E_FILE_MISSING: defaults loaded
+SUMMARY 23/23 passed
+rc=0
+
+## 5-san. tools/leaderboard_ui_check.py, Clang 18 ASan+UBSan game (TC-LB-01, 02, 04)
+== TC-LB-01 persist Top 10 with all fields
+  attempt 1, game Ann: Classic / Easy, score 30 - You hit the wall | Classic / Easy | Score 30 | High 30 | Score saved: rank 1 | Enter: play
+  attempt 1, game Ben: Timed / Medium, score 10 - You hit the wall | Timed / Medium | Score 10 | High 30 | Time 0:59 | Score saved: rank 2 |
+  attempt 1, game Cara: Obstacle / Hard, score 15 - You hit the wall | Obstacle / Hard | Score 15 | High 30 | Score saved: rank 2 | Enter: pla
+  attempt 1, game Dev: Classic / Hard, score 0 - You hit the wall | Classic / Hard | Score 0 | High 30 | Score saved: rank 4 | Enter: play 
+  attempt 1, game Eli: Obstacle / Easy, score 45 - You hit the wall | Obstacle / Easy | Score 45 | High 45 | Score saved: rank 1 | Enter: pla
+PASS TC-LB-01: Ann's game over screen reports the save - c / Easy | Score 30 | High 30 | Score saved: rank 1 | Enter: play again, M: menu
+PASS TC-LB-01: Ben's game over screen reports the save - core 10 | High 30 | Time 0:59 | Score saved: rank 2 | Enter: play again, M: menu
+PASS TC-LB-01: Cara's game over screen reports the save - e / Hard | Score 15 | High 30 | Score saved: rank 2 | Enter: play again, M: menu
+PASS TC-LB-01: Dev's game over screen reports the save - ic / Hard | Score 0 | High 30 | Score saved: rank 4 | Enter: play again, M: menu
+PASS TC-LB-01: Eli's game over screen reports the save - e / Easy | Score 45 | High 45 | Score saved: rank 1 | Enter: play again, M: menu
+PASS TC-LB-01: the 5 games have different scores - {'Ann': 30, 'Ben': 10, 'Cara': 15, 'Dev': 0, 'Eli': 45}
+PASS TC-LB-01: the app exits normally - exit code 0
+PASS TC-LB-01: leaderboard.json is valid JSON - 809 bytes
+PASS TC-LB-01: version 1 and all 5 games stored - 5 entries
+PASS TC-LB-01: sorted by score, descending - [45, 30, 15, 10, 0]
+PASS TC-LB-01: every entry has exactly the 5 Appendix B fields - ['date_achieved', 'difficulty', 'game_mode', 'player_name', 'score']
+PASS TC-LB-01: name, score, mode and difficulty match each game played - Eli 45 Obstacle/Easy; Ann 30 Classic/Easy; Cara 15 Obstacle/Hard; Ben 10 Timed/Medium; Dev 0 Classic/Hard
+PASS TC-LB-01: date_achieved is today's date as YYYY-MM-DD - ['2026-10-29']
+PASS TC-LB-01: no temporary file is left - []
+PASS TC-LB-01: after a restart the Leaderboard shows the 5 saved games in order - SnakeXtreme | Leaderboard | 5 entries | 1. Eli 45 | 2. Ann 30 | 3. Cara 15 | 4. Ben 10 | 5. Dev 0 |  | Esc: back
+PASS TC-LB-01: the app exits normally after the restart
+PASS TC-LB-01: viewing the board does not rewrite the file
+== TC-LB-02 view leaderboard
+PASS TC-LB-02: Leaderboard opens from the main menu - SnakeXtreme | Leaderboard | 10 entries | 1. Top-9999999 9999999 | 2. Nine00 900 | 3. FifteenCharsXYZ 750 | 4. Mid_500 50
+PASS TC-LB-02: 10 rows with rank, name and score in descending order - SnakeXtreme | Leaderboard | 10 entries | 1. Top-9999999 9999999 | 2. Nine00 900 | 3. FifteenCharsXYZ 750 | 4. Mid_500 500 | 5. B 300 | 6. Tie_A 200 | 7. Tie_B 200 | 8. Hundred 100 | 9. Low 10 10 | 10. Zero 0 |  | Esc: back
+PASS TC-LB-02: equal scores keep their stored order (Tie_A before Tie_B)
+PASS TC-LB-02: Esc returns to the main menu - SnakeXtreme | Main menu | Up/Down: select, Enter: confirm, Esc: exit
+PASS TC-LB-02: the app exits normally
+PASS TC-LB-02: the empty board shows no rows and no warning - SnakeXtreme | Leaderboard | 0 entries |  | Esc: back
+PASS TC-LB-02: Esc returns to the main menu from the empty board
+PASS TC-LB-02: the app exits normally
+  The screenshots lb02-*.png are inspected by eye for the columns and "No scores yet".
+== TC-LB-04 missing/corrupt leaderboard fallback
+PASS TC-LB-04 missing: no crash and an empty leaderboard is shown - SnakeXtreme | Leaderboard | 0 entries |  | Esc: back
+PASS TC-LB-04 missing: the next real game's score (10) is saved - Score saved: rank 1
+PASS TC-LB-04 missing: the app exits normally - exit code 0
+PASS TC-LB-04 missing: the bad file is replaced by a valid board holding only that score - file now 1 entries
+PASS TC-LB-04 missing: no temporary file is left - []
+  runtime log lines about the leaderboard: none
+PASS TC-LB-04 empty: no crash and an empty leaderboard is shown - SnakeXtreme | Leaderboard | 0 entries |  | Esc: back
+FAIL TC-LB-04 empty: a warning is shown on the Leaderboard screen - SnakeXtreme | Leaderboard | 0 entries |  | Esc: back
+PASS TC-LB-04 empty: the next real game's score (10) is saved - Score saved: rank 1
+PASS TC-LB-04 empty: the app exits normally - exit code 0
+PASS TC-LB-04 empty: the bad file is replaced by a valid board holding only that score - file now 1 entries
+PASS TC-LB-04 empty: no temporary file is left - []
+  runtime log lines about the leaderboard: none
+PASS TC-LB-04 truncated: no crash and an empty leaderboard is shown - SnakeXtreme | Leaderboard | 0 entries | E_LEADERBOARD_READ: invalid or unreadable board; empty table shown | Esc: back
+PASS TC-LB-04 truncated: a warning is shown on the Leaderboard screen - 0 entries | E_LEADERBOARD_READ: invalid or unreadable board; empty table shown | Esc: back
+PASS TC-LB-04 truncated: the next real game's score (10) is saved - Score saved: rank 1; Warning: the previous leaderboard JSON was malformed or schema-invalid. A fresh leaderboard was saved.
+PASS TC-LB-04 truncated: the app exits normally - exit code 0
+PASS TC-LB-04 truncated: the bad file is replaced by a valid board holding only that score - file now 1 entries
+PASS TC-LB-04 truncated: no temporary file is left - []
+  runtime log lines about the leaderboard: ['[WARN] E_LEADERBOARD_READ: invalid or unreadable board; empty table shown', '[WARN] Score saved: rank 1; Warning: the previous leaderboard JSON was malformed or schema-invalid. A fresh leaderboard was saved.']
+PASS TC-LB-04 wrong type: no crash and an empty leaderboard is shown - SnakeXtreme | Leaderboard | 0 entries | E_LEADERBOARD_READ: invalid or unreadable board; empty table shown | Esc: back
+PASS TC-LB-04 wrong type: a warning is shown on the Leaderboard screen - 0 entries | E_LEADERBOARD_READ: invalid or unreadable board; empty table shown | Esc: back
+PASS TC-LB-04 wrong type: the next real game's score (10) is saved - Score saved: rank 1; Warning: the previous leaderboard JSON was malformed or schema-invalid. A fresh leaderboard was saved.
+PASS TC-LB-04 wrong type: the app exits normally - exit code 0
+PASS TC-LB-04 wrong type: the bad file is replaced by a valid board holding only that score - file now 1 entries
+PASS TC-LB-04 wrong type: no temporary file is left - []
+  runtime log lines about the leaderboard: ['[WARN] E_LEADERBOARD_READ: invalid or unreadable board; empty table shown', '[WARN] Score saved: rank 1; Warning: the previous leaderboard JSON was malformed or schema-invalid. A fresh leaderboard was saved.']
+PASS TC-LB-04 negative score: no crash and an empty leaderboard is shown - SnakeXtreme | Leaderboard | 0 entries | E_LEADERBOARD_READ: invalid or unreadable board; empty table shown | Esc: back
+PASS TC-LB-04 negative score: a warning is shown on the Leaderboard screen - 0 entries | E_LEADERBOARD_READ: invalid or unreadable board; empty table shown | Esc: back
+PASS TC-LB-04 negative score: the next real game's score (10) is saved - Score saved: rank 1; Warning: the previous leaderboard JSON was malformed or schema-invalid. A fresh leaderboard was saved.
+PASS TC-LB-04 negative score: the app exits normally - exit code 0
+PASS TC-LB-04 negative score: the bad file is replaced by a valid board holding only that score - file now 1 entries
+PASS TC-LB-04 negative score: no temporary file is left - []
+  runtime log lines about the leaderboard: ['[WARN] E_LEADERBOARD_READ: invalid or unreadable board; empty table shown', '[WARN] Score saved: rank 1; Warning: the previous leaderboard JSON was malformed or schema-invalid. A fresh leaderboard was saved.']
+PASS TC-LB-04 bad enum: no crash and an empty leaderboard is shown - SnakeXtreme | Leaderboard | 0 entries | E_LEADERBOARD_READ: invalid or unreadable board; empty table shown | Esc: back
+PASS TC-LB-04 bad enum: a warning is shown on the Leaderboard screen - 0 entries | E_LEADERBOARD_READ: invalid or unreadable board; empty table shown | Esc: back
+PASS TC-LB-04 bad enum: the next real game's score (10) is saved - Score saved: rank 1; Warning: the previous leaderboard JSON was malformed or schema-invalid. A fresh leaderboard was saved.
+PASS TC-LB-04 bad enum: the app exits normally - exit code 0
+PASS TC-LB-04 bad enum: the bad file is replaced by a valid board holding only that score - file now 1 entries
+PASS TC-LB-04 bad enum: no temporary file is left - []
+  runtime log lines about the leaderboard: ['[WARN] E_LEADERBOARD_READ: invalid or unreadable board; empty table shown', '[WARN] Score saved: rank 1; Warning: the previous leaderboard JSON was malformed or schema-invalid. A fresh leaderboard was saved.']
+PASS TC-LB-04 11 entries: no crash and an empty leaderboard is shown - SnakeXtreme | Leaderboard | 0 entries | E_LEADERBOARD_READ: invalid or unreadable board; empty table shown | Esc: back
+PASS TC-LB-04 11 entries: a warning is shown on the Leaderboard screen - 0 entries | E_LEADERBOARD_READ: invalid or unreadable board; empty table shown | Esc: back
+PASS TC-LB-04 11 entries: the next real game's score (0) is saved - Score saved: rank 1; Warning: the previous leaderboard JSON was malformed or schema-invalid. A fresh leaderboard was saved.
+PASS TC-LB-04 11 entries: the app exits normally - exit code 0
+PASS TC-LB-04 11 entries: the bad file is replaced by a valid board holding only that score - file now 1 entries
+PASS TC-LB-04 11 entries: no temporary file is left - []
+  runtime log lines about the leaderboard: ['[WARN] E_LEADERBOARD_READ: invalid or unreadable board; empty table shown', '[WARN] Score saved: rank 1; Warning: the previous leaderboard JSON was malformed or schema-invalid. A fresh leaderboard was saved.']
+SUMMARY 65/66 passed
+rc=1
+
+## 6-san. tools/leaderboard_ui_check.py sec04, Clang 18 ASan+UBSan game, normal user
+== TC-SEC-04 app level: a refused save keeps the old board
+PASS TC-SEC-04 app level: the game over screen reports that the score was not saved - E_LEADERBOARD_SAVE: score not saved
+PASS TC-SEC-04 app level: the Leaderboard still shows the old board - SnakeXtreme | Leaderboard | 3 entries | 1. Old300 300 | 2. Old200 200 | 3. Old100 100 |  | Esc: back
+PASS TC-SEC-04 app level: the app exits normally - exit code 0
+PASS TC-SEC-04 app level: leaderboard.json is unchanged, byte for byte
+PASS TC-SEC-04 app level: no temporary file is left - []
+PASS TC-SEC-04 app level: the failure is logged - [WARN] E_LEADERBOARD_SAVE: score not saved
+SUMMARY 6/6 passed
+rc=0
+
+## 7-san. tools/powerup_runtime_check.py, Clang 18 ASan+UBSan game
+PASS main menu ready - SnakeXtreme | Main menu | Up/Down: select, Enter: confirm, Esc: exit
+PASS name entered - SnakeXtreme | Name: Tejas |
+PASS mode menu ready - SnakeXtreme | Menu | Classic / Medium | Left/Right: mode, Up/Down: difficulty, Enter: start, Esc: exit
+PASS Classic / Medium game started - SnakeXtreme | Playing | Classic / Medium | Score 0 | High 0 | Esc: pause, M: menu
+process exit code: 0
+PASS clean exit - exit code 0
+files written: ['config.json', 'leaderboard.json', 'runtime.log']
+played 120.7 s, 283 moves, state Playing
+food with x2: [20] food without: [10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10]
+log: game over at 91.0 s: SnakeXtreme | Game over: You hit the wall | Classic / Medium | Score 60 | High 60 | Score saved: rank 1 | Enter: play again, M: menu
+PASS power-ups keep appearing during play - 9 seen in 121 s (1 restarts)
+gaps between seen appearances (s): 14.7, 14.8, 9.5, 13.6, 13.1, 12.7, 15.8, 9.2
+PASS Speed: title shows "Speed boost" with seconds left - ('Speed', 4.9)
+PASS Speed: moves every ~72 ms during the boost - 71.7 ms over 29 moves
+PASS Speed: boost ends after ~5 s - 5.09 s
+PASS Speed: back to ~120 ms afterwards - 120.9 ms
+PASS Multiplier: title shows "Score x2" with seconds left - ('Multiplier', 10.0)
+PASS Multiplier: pause freezes the effect time - before 10.0, paused Paused 10.0
+PASS food during x2 scores +20 - [20]
+PASS food without x2 scores +10 - [10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10]
+PASS Shrink: length 8 -> 7 - measured 7
+SUMMARY 15/15 passed
+rc=0
+
+## 8-san. tools/security_ui_smoke.py, Clang 18 ASan+UBSan game
+PASS main menu shown - SnakeXtreme | Main menu | Up/Down: select, Enter: confirm, Esc: exit
+PASS New Game opens name entry - SnakeXtreme | Name:  |
+FAIL TC-SEC-06: memory stays stable while 10,000 characters are typed - RSS 419508 kB -> 447924 kB
+PASS TC-SEC-06: 10,000 typed characters leave exactly 15 in the field - name='AAAAAAAAAAAAAAA', 12.8 s, title: SnakeXtreme | Name: AAAAAAAAAAAAAAA | Maximum 15 characters.
+PASS TC-SEC-06: the 16th and later characters are refused with a message - SnakeXtreme | Name: AAAAAAAAAAAAAAA | Maximum 15 characters.
+PASS TC-SEC-01: 'Ab,cd': each refused character shows the message; field keeps 'Abcd' - name='Abcd', refused 1/1 with message
+PASS TC-SEC-01: 'a"b': each refused character shows the message; field keeps 'ab' - name='ab', refused 1/1 with message
+PASS TC-SEC-01: '../x': each refused character shows the message; field keeps 'x' - name='x', refused 3/3 with message
+PASS TC-SEC-01: '{"x":1}': each refused character shows the message; field keeps 'x1' - name='x1', refused 5/5 with message
+PASS TC-SEC-01: 'C:\\x': each refused character shows the message; field keeps 'Cx' - name='Cx', refused 2/2 with message
+PASS TC-SEC-01: 'a;b|c': each refused character shows the message; field keeps 'abc' - name='abc', refused 2/2 with message
+PASS TC-SEC-01: 'España': each refused character shows the message; field keeps 'Espaa' - name='Espaa', refused 1/1 with message
+PASS TC-SEC-01: 'emoji😀': each refused character shows the message; field keeps 'emoji' - name='emoji', refused 1/1 with message
+PASS TC-SEC-01: Tab inserts nothing - name=''
+PASS TC-SEC-01: an empty name cannot be confirmed - SnakeXtreme | Name:  | Enter a valid name (1-15 characters), not only spaces.
+PASS TC-SEC-01: the valid name A_b-1 x is accepted - SnakeXtreme | Menu | Classic / Medium | Left/Right: mode, Up/Down: difficulty, Enter: start, Esc: exit
+PASS game starts - SnakeXtreme | Playing | Classic / Medium | Score 0 | High 0 | Esc: pause, M: menu
+PASS game over reached - SnakeXtreme | Game over: You hit the wall | Classic / Medium | Score 0 | High 0 | Score saved: rank 1 | Enter: play agai
+PASS clean exit - exit code 0
+files written: ['config.json', 'leaderboard.json', 'runtime.log']
+PASS TC-SEC-02: config.json has no user name, host name or absolute path - 153 bytes
+PASS TC-SEC-02: leaderboard.json has no user name, host name or absolute path - 196 bytes
+PASS TC-SEC-02: runtime.log has no user name, host name or absolute path - 95 bytes
+PASS TC-SEC-02: config.json holds only the Appendix B fields - ['key_down', 'key_left', 'key_right', 'key_up', 'music_volume', 'sfx_volume', 'theme', 'version']
+runtime log: Setting vertical sync not supported | [WARN] SettingsRepository: E_FILE_MISSING: defaults loaded
+SUMMARY 22/23 passed
+rc=1
+
+## 8-san-q0. tools/security_ui_smoke.py, ASan game with quarantine_size_mb=0
+PASS main menu shown - SnakeXtreme | Main menu | Up/Down: select, Enter: confirm, Esc: exit
+PASS New Game opens name entry - SnakeXtreme | Name:  |
+PASS TC-SEC-06: memory stays stable while 10,000 characters are typed - RSS 158848 kB -> 159912 kB
+PASS TC-SEC-06: 10,000 typed characters leave exactly 15 in the field - name='AAAAAAAAAAAAAAA', 12.8 s, title: SnakeXtreme | Name: AAAAAAAAAAAAAAA | Maximum 15 characters.
+PASS TC-SEC-06: the 16th and later characters are refused with a message - SnakeXtreme | Name: AAAAAAAAAAAAAAA | Maximum 15 characters.
+PASS TC-SEC-01: 'Ab,cd': each refused character shows the message; field keeps 'Abcd' - name='Abcd', refused 1/1 with message
+PASS TC-SEC-01: 'a"b': each refused character shows the message; field keeps 'ab' - name='ab', refused 1/1 with message
+PASS TC-SEC-01: '../x': each refused character shows the message; field keeps 'x' - name='x', refused 3/3 with message
+PASS TC-SEC-01: '{"x":1}': each refused character shows the message; field keeps 'x1' - name='x1', refused 5/5 with message
+PASS TC-SEC-01: 'C:\\x': each refused character shows the message; field keeps 'Cx' - name='Cx', refused 2/2 with message
+PASS TC-SEC-01: 'a;b|c': each refused character shows the message; field keeps 'abc' - name='abc', refused 2/2 with message
+PASS TC-SEC-01: 'España': each refused character shows the message; field keeps 'Espaa' - name='Espaa', refused 1/1 with message
+PASS TC-SEC-01: 'emoji😀': each refused character shows the message; field keeps 'emoji' - name='emoji', refused 1/1 with message
+PASS TC-SEC-01: Tab inserts nothing - name=''
+PASS TC-SEC-01: an empty name cannot be confirmed - SnakeXtreme | Name:  | Enter a valid name (1-15 characters), not only spaces.
+PASS TC-SEC-01: the valid name A_b-1 x is accepted - SnakeXtreme | Menu | Classic / Medium | Left/Right: mode, Up/Down: difficulty, Enter: start, Esc: exit
+PASS game starts - SnakeXtreme | Playing | Classic / Medium | Score 0 | High 0 | Esc: pause, M: menu
+PASS game over reached - SnakeXtreme | Game over: You hit the wall | Classic / Medium | Score 0 | High 0 | Score saved: rank 1 | Enter: play agai
+PASS clean exit - exit code 0
+files written: ['config.json', 'leaderboard.json', 'runtime.log']
+PASS TC-SEC-02: config.json has no user name, host name or absolute path - 153 bytes
+PASS TC-SEC-02: leaderboard.json has no user name, host name or absolute path - 196 bytes
+PASS TC-SEC-02: runtime.log has no user name, host name or absolute path - 95 bytes
+PASS TC-SEC-02: config.json holds only the Appendix B fields - ['key_down', 'key_left', 'key_right', 'key_up', 'music_volume', 'sfx_volume', 'theme', 'version']
+runtime log: Setting vertical sync not supported | [WARN] SettingsRepository: E_FILE_MISSING: defaults loaded
+SUMMARY 23/23 passed
+rc=0
+
+## 9. #53's desktop smoke tests
+# GCC: desktop_leaderboard_smoke failed once to find the app window at launch (Xvfb start-up); rerun below passed.
+gcc:     raise AssertionError(message)
+gcc: AssertionError: app window missing
+gcc: rc=1
+gcc: 23 desktop navigation/settings checks passed; target Windows/manual acceptance pending
+gcc: rc=0
+gcc: 22 Linux/Xvfb desktop Settings checks passed; null output, no audible or Windows acceptance.
+gcc: rc=0
+gcc rerun desktop_leaderboard_smoke: 12 leaderboard integration checks passed; Windows/manual acceptance pending
+gcc rerun desktop_leaderboard_smoke: rc=0
+asan: 12 leaderboard integration checks passed; Windows/manual acceptance pending
+asan: rc=0
+asan: 23 desktop navigation/settings checks passed; target Windows/manual acceptance pending
+asan: rc=0
+asan: 22 Linux/Xvfb desktop Settings checks passed; null output, no audible or Windows acceptance.
+asan: rc=0
+
+## 10. #48 at 0d516f3 (cppcheck fix) on the candidate, promoted tests
+### GCC 13.3 Release
+uid=30033(tester) gid=30033(tester) groups=30033(tester)
+100% tests passed, 0 tests failed out of 21
+### Clang 18 ASan+UBSan
+uid=30033(tester) gid=30033(tester) groups=30033(tester)
+100% tests passed, 0 tests failed out of 21
+Catch2 totals per suite:
+  audio_model_tests: All tests passed (147 assertions in 4 test cases)
+  game_engine_tests: All tests passed (10213 assertions in 22 test cases)
+  game_mode_tests: All tests passed (84890 assertions in 37 test cases)
+  gameplay_tests: All tests passed (460 assertions in 22 test cases)
+  input_validator_tests: All tests passed (34 assertions in 9 test cases)
+  leaderboard_model_tests: All tests passed (12 assertions in 2 test cases)
+  leaderboard_repository_tests: All tests passed (192 assertions in 13 test cases)
+  performance_probe_tests: All tests passed (81 assertions in 11 test cases)
+  powerup_tests: All tests passed (22031 assertions in 41 test cases)
+  secure_file_store_tests: All tests passed (387 assertions in 20 test cases)
+  secure_write_fault_tests: All tests passed (214 assertions in 8 test cases)
+  security_corpus_tests: assertions: 732 | 730 passed | 2 failed as expected
+  security_corpus_tests: test cases:  21 |  20 passed | 1 failed as expected
+  settings_corpus_tests: All tests passed (362 assertions in 3 test cases)
+  settings_tests: All tests passed (195 assertions in 17 test cases)
+Sanitizer reports: 0
+### cppcheck
+-- Running Cppcheck 2.13.0
+-- cppcheck: no findings in src/, include/ and tests/
+### tools/leaderboard_ui_check.py, GCC game with 0d516f3
+== TC-LB-01 persist Top 10 with all fields
+  attempt 1, game Ann: Classic / Easy, score 30 - You hit the wall | Classic / Easy | Score 30 | High 30 | Score saved: rank 1 | Enter: play
+  attempt 1, game Ben: Timed / Medium, score 10 - You hit the wall | Timed / Medium | Score 10 | High 30 | Time 0:57 | Score saved: rank 2 |
+  attempt 1, game Cara: Obstacle / Hard, score 15 - You hit the wall | Obstacle / Hard | Score 15 | High 30 | Score saved: rank 2 | Enter: pla
+  attempt 1, game Dev: Classic / Hard, score 0 - You hit the wall | Classic / Hard | Score 0 | High 30 | Score saved: rank 4 | Enter: play 
+  attempt 1, game Eli: Obstacle / Easy, score 45 - You hit the wall | Obstacle / Easy | Score 45 | High 45 | Score saved: rank 1 | Enter: pla
+PASS TC-LB-01: Ann's game over screen reports the save - c / Easy | Score 30 | High 30 | Score saved: rank 1 | Enter: play again, M: menu
+PASS TC-LB-01: Ben's game over screen reports the save - core 10 | High 30 | Time 0:57 | Score saved: rank 2 | Enter: play again, M: menu
+PASS TC-LB-01: Cara's game over screen reports the save - e / Hard | Score 15 | High 30 | Score saved: rank 2 | Enter: play again, M: menu
+PASS TC-LB-01: Dev's game over screen reports the save - ic / Hard | Score 0 | High 30 | Score saved: rank 4 | Enter: play again, M: menu
+PASS TC-LB-01: Eli's game over screen reports the save - e / Easy | Score 45 | High 45 | Score saved: rank 1 | Enter: play again, M: menu
+PASS TC-LB-01: the 5 games have different scores - {'Ann': 30, 'Ben': 10, 'Cara': 15, 'Dev': 0, 'Eli': 45}
+PASS TC-LB-01: the app exits normally - exit code 0
+PASS TC-LB-01: leaderboard.json is valid JSON - 809 bytes
+PASS TC-LB-01: version 1 and all 5 games stored - 5 entries
+PASS TC-LB-01: sorted by score, descending - [45, 30, 15, 10, 0]
+PASS TC-LB-01: every entry has exactly the 5 Appendix B fields - ['date_achieved', 'difficulty', 'game_mode', 'player_name', 'score']
+PASS TC-LB-01: name, score, mode and difficulty match each game played - Eli 45 Obstacle/Easy; Ann 30 Classic/Easy; Cara 15 Obstacle/Hard; Ben 10 Timed/Medium; Dev 0 Classic/Hard
+PASS TC-LB-01: date_achieved is today's date as YYYY-MM-DD - ['2026-10-29']
+PASS TC-LB-01: no temporary file is left - []
+PASS TC-LB-01: after a restart the Leaderboard shows the 5 saved games in order - SnakeXtreme | Leaderboard | 5 entries | 1. Eli 45 | 2. Ann 30 | 3. Cara 15 | 4. Ben 10 | 5. Dev 0 |  | Esc: back
+PASS TC-LB-01: the app exits normally after the restart
+PASS TC-LB-01: viewing the board does not rewrite the file
+== TC-LB-02 view leaderboard
+PASS TC-LB-02: Leaderboard opens from the main menu - SnakeXtreme | Leaderboard | 10 entries | 1. Top-9999999 9999999 | 2. Nine00 900 | 3. FifteenCharsXYZ 750 | 4. Mid_500 50
+PASS TC-LB-02: 10 rows with rank, name and score in descending order - SnakeXtreme | Leaderboard | 10 entries | 1. Top-9999999 9999999 | 2. Nine00 900 | 3. FifteenCharsXYZ 750 | 4. Mid_500 500 | 5. B 300 | 6. Tie_A 200 | 7. Tie_B 200 | 8. Hundred 100 | 9. Low 10 10 | 10. Zero 0 |  | Esc: back
+PASS TC-LB-02: equal scores keep their stored order (Tie_A before Tie_B)
+PASS TC-LB-02: Esc returns to the main menu - SnakeXtreme | Main menu | Up/Down: select, Enter: confirm, Esc: exit
+PASS TC-LB-02: the app exits normally
+PASS TC-LB-02: the empty board shows no rows and no warning - SnakeXtreme | Leaderboard | 0 entries |  | Esc: back
+PASS TC-LB-02: Esc returns to the main menu from the empty board
+PASS TC-LB-02: the app exits normally
+  The screenshots lb02-*.png are inspected by eye for the columns and "No scores yet".
+== TC-LB-04 missing/corrupt leaderboard fallback
+PASS TC-LB-04 missing: no crash and an empty leaderboard is shown - SnakeXtreme | Leaderboard | 0 entries |  | Esc: back
+PASS TC-LB-04 missing: the next real game's score (10) is saved - Score saved: rank 1
+PASS TC-LB-04 missing: the app exits normally - exit code 0
+PASS TC-LB-04 missing: the bad file is replaced by a valid board holding only that score - file now 1 entries
+PASS TC-LB-04 missing: no temporary file is left - []
+  runtime log lines about the leaderboard: none
+PASS TC-LB-04 empty: no crash and an empty leaderboard is shown - SnakeXtreme | Leaderboard | 0 entries |  | Esc: back
+FAIL TC-LB-04 empty: a warning is shown on the Leaderboard screen - SnakeXtreme | Leaderboard | 0 entries |  | Esc: back
+PASS TC-LB-04 empty: the next real game's score (10) is saved - Score saved: rank 1
+PASS TC-LB-04 empty: the app exits normally - exit code 0
+PASS TC-LB-04 empty: the bad file is replaced by a valid board holding only that score - file now 1 entries
+PASS TC-LB-04 empty: no temporary file is left - []
+  runtime log lines about the leaderboard: none
+PASS TC-LB-04 truncated: no crash and an empty leaderboard is shown - SnakeXtreme | Leaderboard | 0 entries | E_LEADERBOARD_READ: invalid or unreadable board; empty table shown | Esc: back
+PASS TC-LB-04 truncated: a warning is shown on the Leaderboard screen - 0 entries | E_LEADERBOARD_READ: invalid or unreadable board; empty table shown | Esc: back
+PASS TC-LB-04 truncated: the next real game's score (10) is saved - Score saved: rank 1; Warning: the previous leaderboard JSON was malformed or schema-invalid. A fresh leaderboard was saved.
+PASS TC-LB-04 truncated: the app exits normally - exit code 0
+PASS TC-LB-04 truncated: the bad file is replaced by a valid board holding only that score - file now 1 entries
+PASS TC-LB-04 truncated: no temporary file is left - []
+  runtime log lines about the leaderboard: ['[WARN] E_LEADERBOARD_READ: invalid or unreadable board; empty table shown', '[WARN] Score saved: rank 1; Warning: the previous leaderboard JSON was malformed or schema-invalid. A fresh leaderboard was saved.']
+PASS TC-LB-04 wrong type: no crash and an empty leaderboard is shown - SnakeXtreme | Leaderboard | 0 entries | E_LEADERBOARD_READ: invalid or unreadable board; empty table shown | Esc: back
+PASS TC-LB-04 wrong type: a warning is shown on the Leaderboard screen - 0 entries | E_LEADERBOARD_READ: invalid or unreadable board; empty table shown | Esc: back
+PASS TC-LB-04 wrong type: the next real game's score (10) is saved - Score saved: rank 1; Warning: the previous leaderboard JSON was malformed or schema-invalid. A fresh leaderboard was saved.
+PASS TC-LB-04 wrong type: the app exits normally - exit code 0
+PASS TC-LB-04 wrong type: the bad file is replaced by a valid board holding only that score - file now 1 entries
+PASS TC-LB-04 wrong type: no temporary file is left - []
+  runtime log lines about the leaderboard: ['[WARN] E_LEADERBOARD_READ: invalid or unreadable board; empty table shown', '[WARN] Score saved: rank 1; Warning: the previous leaderboard JSON was malformed or schema-invalid. A fresh leaderboard was saved.']
+PASS TC-LB-04 negative score: no crash and an empty leaderboard is shown - SnakeXtreme | Leaderboard | 0 entries | E_LEADERBOARD_READ: invalid or unreadable board; empty table shown | Esc: back
+PASS TC-LB-04 negative score: a warning is shown on the Leaderboard screen - 0 entries | E_LEADERBOARD_READ: invalid or unreadable board; empty table shown | Esc: back
+PASS TC-LB-04 negative score: the next real game's score (10) is saved - Score saved: rank 1; Warning: the previous leaderboard JSON was malformed or schema-invalid. A fresh leaderboard was saved.
+PASS TC-LB-04 negative score: the app exits normally - exit code 0
+PASS TC-LB-04 negative score: the bad file is replaced by a valid board holding only that score - file now 1 entries
+PASS TC-LB-04 negative score: no temporary file is left - []
+  runtime log lines about the leaderboard: ['[WARN] E_LEADERBOARD_READ: invalid or unreadable board; empty table shown', '[WARN] Score saved: rank 1; Warning: the previous leaderboard JSON was malformed or schema-invalid. A fresh leaderboard was saved.']
+PASS TC-LB-04 bad enum: no crash and an empty leaderboard is shown - SnakeXtreme | Leaderboard | 0 entries | E_LEADERBOARD_READ: invalid or unreadable board; empty table shown | Esc: back
+PASS TC-LB-04 bad enum: a warning is shown on the Leaderboard screen - 0 entries | E_LEADERBOARD_READ: invalid or unreadable board; empty table shown | Esc: back
+PASS TC-LB-04 bad enum: the next real game's score (10) is saved - Score saved: rank 1; Warning: the previous leaderboard JSON was malformed or schema-invalid. A fresh leaderboard was saved.
+PASS TC-LB-04 bad enum: the app exits normally - exit code 0
+PASS TC-LB-04 bad enum: the bad file is replaced by a valid board holding only that score - file now 1 entries
+PASS TC-LB-04 bad enum: no temporary file is left - []
+  runtime log lines about the leaderboard: ['[WARN] E_LEADERBOARD_READ: invalid or unreadable board; empty table shown', '[WARN] Score saved: rank 1; Warning: the previous leaderboard JSON was malformed or schema-invalid. A fresh leaderboard was saved.']
+PASS TC-LB-04 11 entries: no crash and an empty leaderboard is shown - SnakeXtreme | Leaderboard | 0 entries | E_LEADERBOARD_READ: invalid or unreadable board; empty table shown | Esc: back
+PASS TC-LB-04 11 entries: a warning is shown on the Leaderboard screen - 0 entries | E_LEADERBOARD_READ: invalid or unreadable board; empty table shown | Esc: back
+PASS TC-LB-04 11 entries: the next real game's score (10) is saved - Score saved: rank 1; Warning: the previous leaderboard JSON was malformed or schema-invalid. A fresh leaderboard was saved.
+PASS TC-LB-04 11 entries: the app exits normally - exit code 0
+PASS TC-LB-04 11 entries: the bad file is replaced by a valid board holding only that score - file now 1 entries
+PASS TC-LB-04 11 entries: no temporary file is left - []
+  runtime log lines about the leaderboard: ['[WARN] E_LEADERBOARD_READ: invalid or unreadable board; empty table shown', '[WARN] Score saved: rank 1; Warning: the previous leaderboard JSON was malformed or schema-invalid. A fresh leaderboard was saved.']
+SUMMARY 65/66 passed
+rc=1
+== TC-SEC-04 app level: a refused save keeps the old board
+PASS TC-SEC-04 app level: the game over screen reports that the score was not saved - E_LEADERBOARD_SAVE: score not saved
+PASS TC-SEC-04 app level: the Leaderboard still shows the old board - SnakeXtreme | Leaderboard | 3 entries | 1. Old300 300 | 2. Old200 200 | 3. Old100 100 |  | Esc: back
+PASS TC-SEC-04 app level: the app exits normally - exit code 0
+PASS TC-SEC-04 app level: leaderboard.json is unchanged, byte for byte
+PASS TC-SEC-04 app level: no temporary file is left - []
+PASS TC-SEC-04 app level: the failure is logged - [WARN] E_LEADERBOARD_SAVE: score not saved
+SUMMARY 6/6 passed
+rc=0
+
+## 11. PR #52 itself: merge 5915e58 (base #50 6e28118, which contains 31602b5 and 0d516f3) + promotion 15892ba
+### GCC 13.3 Release, tests only
+uid=30033(tester) gid=30033(tester) groups=30033(tester)
+ 1/12 Test  #1: app_state_flow ...................   Passed    0.00 sec
+ 2/12 Test  #2: score_service ....................   Passed    0.00 sec
+ 3/12 Test  #3: input_validator_tests ............   Passed    0.00 sec
+ 4/12 Test  #5: leaderboard_repository_tests .....   Passed    0.16 sec
+ 5/12 Test  #4: secure_file_store_tests ..........   Passed    0.27 sec
+ 6/12 Test  #6: security_corpus_tests ............   Passed    0.23 sec
+ 7/12 Test  #8: game_session .....................   Passed    0.00 sec
+ 8/12 Test  #7: secure_write_fault_tests .........   Passed    0.12 sec
+ 9/12 Test  #9: game_engine_tests ................   Passed    0.03 sec
+10/12 Test #11: gameplay_tests ...................   Passed    0.02 sec
+11/12 Test #12: layering_core_is_sfml_free .......   Passed    0.01 sec
+12/12 Test #10: game_mode_tests ..................   Passed    0.15 sec
+100% tests passed, 0 tests failed out of 12
+Total Test time (real) =   0.56 sec
+Catch2 totals per suite:
+  game_engine_tests: All tests passed (10213 assertions in 22 test cases)
+  game_mode_tests: All tests passed (84891 assertions in 37 test cases)
+  gameplay_tests: All tests passed (443 assertions in 22 test cases)
+  input_validator_tests: All tests passed (34 assertions in 9 test cases)
+  leaderboard_repository_tests: All tests passed (192 assertions in 13 test cases)
+  secure_file_store_tests: All tests passed (387 assertions in 20 test cases)
+  secure_write_fault_tests: All tests passed (155 assertions in 7 test cases)
+  security_corpus_tests: assertions: 732 | 730 passed | 2 failed as expected
+  security_corpus_tests: test cases:  21 |  20 passed | 1 failed as expected
+### Clang 18 ASan+UBSan, tests only
+uid=30033(tester) gid=30033(tester) groups=30033(tester)
+ 1/12 Test  #1: app_state_flow ...................   Passed    0.01 sec
+ 2/12 Test  #2: score_service ....................   Passed    0.01 sec
+ 3/12 Test  #3: input_validator_tests ............   Passed    0.02 sec
+ 4/12 Test  #5: leaderboard_repository_tests .....   Passed    0.22 sec
+ 5/12 Test  #4: secure_file_store_tests ..........   Passed    0.39 sec
+ 6/12 Test  #6: security_corpus_tests ............   Passed    0.41 sec
+ 7/12 Test  #8: game_session .....................   Passed    0.01 sec
+ 8/12 Test  #7: secure_write_fault_tests .........   Passed    0.32 sec
+ 9/12 Test  #9: game_engine_tests ................   Passed    0.38 sec
+10/12 Test #11: gameplay_tests ...................   Passed    0.31 sec
+11/12 Test #12: layering_core_is_sfml_free .......   Passed    0.01 sec
+12/12 Test #10: game_mode_tests ..................   Passed    7.20 sec
+100% tests passed, 0 tests failed out of 12
+Total Test time (real) =   7.92 sec
+Catch2 totals per suite:
+  game_engine_tests: All tests passed (10213 assertions in 22 test cases)
+  game_mode_tests: All tests passed (84891 assertions in 37 test cases)
+  gameplay_tests: All tests passed (443 assertions in 22 test cases)
+  input_validator_tests: All tests passed (34 assertions in 9 test cases)
+  leaderboard_repository_tests: All tests passed (192 assertions in 13 test cases)
+  secure_file_store_tests: All tests passed (387 assertions in 20 test cases)
+  secure_write_fault_tests: All tests passed (155 assertions in 7 test cases)
+  security_corpus_tests: assertions: 732 | 730 passed | 2 failed as expected
+  security_corpus_tests: test cases:  21 |  20 passed | 1 failed as expected
+Sanitizer reports: 0
+# The one expected failure is 'Known defect D6'. secure_write_fault_tests has 7 cases here: the settings variant needs the settings module (#53).

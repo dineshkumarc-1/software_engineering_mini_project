@@ -107,7 +107,11 @@ Linux desktop scripts require Xvfb/xdotool and refuse occupied displays :97,
 :99 and :98 respectively. They clean up only their own processes and use
 isolated temporary settings with null audio/software rendering. Null audio is
 not a human listening check. The probe smoke sends 100 synthetic seeded-random
-requests and collects three launch traces; **tooling smoke, not STP acceptance**.
+requests in a short Classic/Easy burst and verifies their exact recorded order,
+then collects three launch traces. This avoids mistaking keys sent during a
+Game Over transition for missing gameplay samples. It is **tooling smoke, not
+STP acceptance**: it does not replace the sustained Hard/Obstacle campaign,
+randomized target-hardware latency study or verified cold-launch measurements.
 See `evidence/owner-followup-results.md` for this follow-up's executed results.
 
 See `evidence/owner-tooling-fix-results.md` for the subsequent PR #46 collector

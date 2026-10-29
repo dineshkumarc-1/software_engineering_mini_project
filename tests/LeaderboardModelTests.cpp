@@ -1,4 +1,6 @@
 #include "snakextreme/LeaderboardModel.hpp"
+#include "snakextreme/LeaderboardTable.hpp"
+#include <limits>
 #include <catch2/catch_test_macros.hpp>
 #include <chrono>
 #include <filesystem>
@@ -48,4 +50,51 @@ TEST_CASE("Leaderboard adapter safely handles missing corrupt and unsafe files",
     model.finish("Dinesh", 120, snake::GameMode::Classic, snake::Difficulty::Easy);
     REQUIRE(model.message() == "E_LEADERBOARD_SAVE: score not saved");
     REQUIRE(std::filesystem::is_directory(path));
+}
+
+TEST_CASE("Leaderboard rows expose all six STP fields for every mode and difficulty",
+          "[leaderboard][TC-LB-02][D7]") {
+    std::size_t rank = 1U;
+    for (const auto mode : snake::AllGameModes) {
+        for (const auto difficulty : snake::AllDifficulties) {
+            const snake::LeaderboardEntry entry{"WWWWWWWWWWWWWWW",
+                std::numeric_limits<int>::max(), mode, difficulty, "2024-02-29"};
+            const auto row = snake::leaderboardRow(rank, entry);
+            REQUIRE(row.size() == 6U);
+            CHECK(row[0] == std::to_string(rank));
+            CHECK(row[1] == entry.playerName);
+            CHECK(row[2] == "2147483647");
+            CHECK(row[3] == snake::toString(mode));
+            CHECK(row[4] == snake::toString(difficulty));
+            CHECK(row[5] == "2024-02-29");
+            ++rank;
+        }
+    }
+}
+TEST_CASE("Leaderboard table column bounds are disjoint inside the navigation view",
+          "[leaderboard][TC-LB-02][D7]") {
+    const auto& columns = snake::LeaderboardColumns;
+    REQUIRE(columns.size() == 6U);
+    CHECK(columns[0].heading == "Rank");
+    CHECK(columns[1].heading == "Player name");
+    CHECK(columns[2].heading == "Score");
+    CHECK(columns[3].heading == "Mode");
+    CHECK(columns[4].heading == "Difficulty");
+    CHECK(columns[5].heading == "Date");
+    for (std::size_t i = 0; i < columns.size(); ++i) {
+        CHECK(columns[i].left >= 0.f);
+        CHECK(columns[i].width > 0.f);
+        CHECK(columns[i].left + columns[i].width <= 900.f);
+        if (i + 1U < columns.size()) {
+            CHECK(columns[i].left + columns[i].width < columns[i + 1U].left);
+        }
+    }
+}
+
+TEST_CASE("Leaderboard fallback keeps the existing QA rank-name-score delimiter",
+          "[leaderboard][TC-LB-02][D7]") {
+    const snake::LeaderboardEntry entry{"Low 10", 10, snake::GameMode::Timed,
+        snake::Difficulty::Medium, "2024-02-29"};
+    CHECK(snake::leaderboardRowTitle(3U, entry) ==
+          " | 3. Low 10 10 | Timed / Medium / 2024-02-29");
 }

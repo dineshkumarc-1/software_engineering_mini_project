@@ -1,0 +1,90 @@
+# Issue #18 run 2 - the candidate's own desktop smoke tests (tools/desktop_*_smoke.py from #53), Linux, Xvfb
+# Build: candidate #53 dbf08b5 plus the #52 test update at 12441e5
+
+## GCC 13.3 Release game
+=== desktop_leaderboard_smoke
+PASS: Top-10 table exposes rank name and descending score for every row
+PASS: Escape returns to menu
+PASS: mouse Back returns to menu
+PASS: clean app exit
+PASS: completed session saves normalized player name
+PASS: Game Over frames do not resubmit score
+PASS: new score appears in the real UI table
+PASS: clean app exit
+PASS: saved leaderboard survives process restart
+PASS: clean app exit
+PASS: corrupt board displays empty table and warning without crashing
+PASS: clean app exit
+12 leaderboard integration checks passed; Windows/manual acceptance pending
+rc=0
+=== desktop_navigation_smoke
+PASS: blank name cannot advance by mouse
+PASS: whitespace-only name cannot advance
+PASS: 16th character is rejected at runtime
+PASS: invalid character rejected without inserting it
+PASS: mouse Back returns from name entry
+PASS: three confirmation-click launch, mouse Resume and Main menu
+PASS: leaderboard table has working mouse Back
+PASS: mouse launch/pause/menu: Classic/Easy
+PASS: mouse launch/pause/menu: Classic/Medium
+PASS: mouse launch/pause/menu: Classic/Hard
+PASS: mouse launch/pause/menu: Timed/Easy
+PASS: mouse launch/pause/menu: Timed/Medium
+PASS: mouse launch/pause/menu: Timed/Hard
+PASS: mouse launch/pause/menu: Obstacle/Easy
+PASS: mouse launch/pause/menu: Obstacle/Medium
+PASS: mouse launch/pause/menu: Obstacle/Hard
+PASS: mouse restart after actual wall collision
+PASS: gap click does not activate key capture
+PASS: duplicate movement binding rejected in real UI
+PASS: drag beyond slider track clamps without changing other channel
+PASS: mouse Save persists clamped independent volumes
+PASS: clean default-mode exit
+PASS: default mode produces no probe files
+23 desktop navigation/settings checks passed; target Windows/manual acceptance pending
+rc=0
+=== desktop_settings_smoke
+PASS: missing config generates 70/70 defaults
+PASS: Settings opens without changing a row
+PASS: desktop independent music 0 / SFX 100 preview
+PASS: Save persists independent channel volumes
+PASS: desktop independent music 100 / SFX 0 preview
+PASS: Cancel does not overwrite saved configuration
+PASS: reopen restores saved volume draft after Cancel
+PASS: theme selection persists
+PASS: desktop remap to I/K/J/L persists SFML key codes
+PASS: failed Save stays on Settings with visible error
+PASS: failed Save preserves existing target directory
+PASS: failed Save removes only its owned temporary file
+PASS: Cancel after failed Save restores previously active values
+PASS: recovered fixture retains all saved settings
+PASS: normal menu exit returns 0
+PASS: real application relaunch restores settings
+PASS: normal menu exit returns 0
+PASS: real startup regenerates corrupt config defaults
+PASS: corrupt-file warning emitted
+PASS: normal menu exit returns 0
+PASS: no audio backend leaves Settings usable (silent fallback)
+PASS: normal menu exit returns 0
+22 Linux/Xvfb desktop Settings checks passed; null output, no audible or Windows acceptance.
+rc=0
+
+## Clang 18 ASan+UBSan game (last lines of each script; a script prints its total only when every check passed)
+=== desktop_leaderboard_smoke
+PASS: clean app exit
+PASS: corrupt board displays empty table and warning without crashing
+PASS: clean app exit
+12 leaderboard integration checks passed; Windows/manual acceptance pending
+rc=0
+=== desktop_navigation_smoke
+PASS: mouse Save persists clamped independent volumes
+PASS: clean default-mode exit
+PASS: default mode produces no probe files
+23 desktop navigation/settings checks passed; target Windows/manual acceptance pending
+rc=0
+=== desktop_settings_smoke
+PASS: normal menu exit returns 0
+PASS: no audio backend leaves Settings usable (silent fallback)
+PASS: normal menu exit returns 0
+22 Linux/Xvfb desktop Settings checks passed; null output, no audible or Windows acceptance.
+rc=0

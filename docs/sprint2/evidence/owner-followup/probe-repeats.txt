@@ -1,0 +1,14 @@
+=== Final repeat 1 ===
+PASS: all 100 synthetic burst requests recorded in order; accepted/rejected/consumed/displayed separated; no display-name leakage
+PASS: 3 isolated external launch-marker traces; cache condition and target hardware unverified
+All instrumentation smoke checks pass; target performance acceptance NOT ASSESSED
+
+=== Final repeat 2 ===
+PASS: all 100 synthetic burst requests recorded in order; accepted/rejected/consumed/displayed separated; no display-name leakage
+PASS: 3 isolated external launch-marker traces; cache condition and target hardware unverified
+All instrumentation smoke checks pass; target performance acceptance NOT ASSESSED
+
+=== Final repeat 3 ===
+PASS: all 100 synthetic burst requests recorded in order; accepted/rejected/consumed/displayed separated; no display-name leakage
+PASS: 3 isolated external launch-marker traces; cache condition and target hardware unverified
+All instrumentation smoke checks pass; target performance acceptance NOT ASSESSED

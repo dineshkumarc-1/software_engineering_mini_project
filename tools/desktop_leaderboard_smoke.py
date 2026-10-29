@@ -2,6 +2,7 @@
 """Isolated Linux/Xvfb #21 integration checks; not Windows/manual acceptance."""
 import json
 import os
+import re
 from pathlib import Path
 import subprocess
 import sys
@@ -9,6 +10,10 @@ import tempfile
 import time
 
 exe = Path(sys.argv[1]).resolve()
+# Optional local evidence capture; normal CI needs only the standard library.
+evidence = Path(sys.argv[2]).resolve() if len(sys.argv) > 2 else None
+if evidence is not None:
+    evidence.mkdir(parents=True, exist_ok=False)
 env = dict(os.environ, DISPLAY=":95", ALSOFT_DRIVERS="null", LIBGL_ALWAYS_SOFTWARE="1")
 checks = 0
 process = xvfb = None
@@ -42,13 +47,15 @@ try:
     assert not Path("/tmp/.X11-unix/X95").exists(), "Display :95 occupied"
     xvfb = subprocess.Popen(["Xvfb", ":95", "-screen", "0", "1024x768x24", "-nolisten", "tcp"],
                             stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-    wait(lambda: Path("/tmp/.X11-unix/X95").exists(), "Xvfb startup")
+    wait(lambda: bool(xdo("getdisplaygeometry")), "Xvfb startup")
     with tempfile.TemporaryDirectory(prefix="snake-leaderboard-") as work:
         board = Path(work) / "leaderboard.json"
         def entries(count):
             return {"version": 1, "entries": [
                 {"player_name": f"Player{i}", "score": 1000 - i * 10,
-                 "game_mode": "Classic", "difficulty": "Medium", "date_achieved": "2026-10-28"}
+                 "game_mode": ("Classic", "Timed", "Obstacle")[i % 3],
+                 "difficulty": ("Easy", "Medium", "Hard")[(i // 3) % 3],
+                 "date_achieved": f"2024-02-{i + 1:02d}"}
                 for i in range(count)]}
         with (Path(work) / "runtime.txt").open("w") as log:
             def launch():
@@ -56,9 +63,13 @@ try:
                 process = subprocess.Popen([str(exe)], cwd=work, env=env, stdout=log, stderr=log)
                 ids = []
                 def found():
+                    if process.poll() is not None:
+                        raise AssertionError(f"app exited {process.returncode}: " +
+                                             (Path(work) / "runtime.txt").read_text()[-4000:])
                     ids[:] = xdo("search", "--name", "^SnakeXtreme").splitlines()
                     return bool(ids) and process.poll() is None
                 wait(found, "app window missing")
+                xdo("windowmove", ids[0], 50, 50)
                 return ids[0]
             def stop(window):
                 # Close through the app's menu, not X server forced destruction.
@@ -71,7 +82,10 @@ try:
                     pass
                 process.wait(timeout=10)
                 check(process.returncode == 0, "clean app exit")
-            board.write_text(json.dumps(entries(10)), encoding="utf-8")
+            ten = entries(10)
+            ten["entries"][0].update(player_name="WWWWWWWWWWWWWWW", score=2147483647,
+                                      date_achieved="2024-02-29")
+            board.write_text(json.dumps(ten), encoding="utf-8")
             window = launch()
             title = lambda: xdo("getwindowname", window)
             key = lambda *keys: xdo("key", "--window", window, "--clearmodifiers", "--delay", "30", *keys)
@@ -80,8 +94,21 @@ try:
             def open_board():
                 key("Down", "Return"); screen("| Leaderboard |")
             screen("Main menu"); open_board(); screen("| 10 entries")
-            check(all(f"| {i+1}. Player{i} {1000-i*10}" in title() for i in range(10)),
+            check(all(f"| {i+1}. {entry['player_name']} {entry['score']}" in title()
+                      for i, entry in enumerate(ten["entries"])),
                   "Top-10 table exposes rank name and descending score for every row")
+            check(all(f"{entry['game_mode']} / {entry['difficulty']} / {entry['date_achieved']}" in title()
+                      for entry in ten["entries"]),
+                  "all ten rows expose mode difficulty and ISO date, covering all nine combinations")
+            check("WWWWWWWWWWWWWWW 2147483647 | Classic / Easy / 2024-02-29" in title(),
+                  "maximum-width name and score plus leap-day date survive presentation")
+            check(json.loads(board.read_text()) == ten,
+                  "viewing the six-column table does not rewrite persisted entries")
+            if evidence is not None:
+                from PIL import ImageGrab
+                ImageGrab.grab(xdisplay=env["DISPLAY"]).crop((50, 50, 950, 650)).save(
+                    evidence / "leaderboard-six-columns.png")
+                (evidence / "leaderboard-title.txt").write_text(title(), encoding="utf-8")
             key("Escape"); screen("Main menu")
             check(True, "Escape returns to menu")
             key("Return"); screen("| Leaderboard |")
@@ -101,6 +128,11 @@ try:
             wait(lambda: len(json.loads(board.read_text())["entries"]) == 3, "score not persisted")
             saved = json.loads(board.read_text())
             check(saved["entries"][2]["player_name"] == "Dinesh", "completed session saves normalized player name")
+            check(re.fullmatch(r"\d{4}-\d{2}-\d{2}", saved["entries"][2]["date_achieved"]) is not None,
+                  "completed session persists an ISO date without a timestamp")
+            check(saved["entries"][2]["game_mode"] == "Classic" and
+                  saved["entries"][2]["difficulty"] == "Medium",
+                  "completed session persists the active mode and difficulty")
             time.sleep(0.2)  # Observe several render frames after the one-shot save.
             check(json.loads(board.read_text()) == saved, "Game Over frames do not resubmit score")
             key("m"); screen("Main menu"); open_board(); screen("| 3 entries")

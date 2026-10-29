@@ -1,0 +1,18 @@
+PASS: Top-10 table exposes rank name and descending score for every row
+PASS: all ten rows expose mode difficulty and ISO date, covering all nine combinations
+PASS: maximum-width name and score plus leap-day date survive presentation
+PASS: viewing the six-column table does not rewrite persisted entries
+PASS: Escape returns to menu
+PASS: mouse Back returns to menu
+PASS: clean app exit
+PASS: completed session saves normalized player name
+PASS: completed session persists an ISO date without a timestamp
+PASS: completed session persists the active mode and difficulty
+PASS: Game Over frames do not resubmit score
+PASS: new score appears in the real UI table
+PASS: clean app exit
+PASS: saved leaderboard survives process restart
+PASS: clean app exit
+PASS: corrupt board displays empty table and warning without crashing
+PASS: clean app exit
+17 leaderboard integration checks passed; Windows/manual acceptance pending

@@ -1,3 +1,4 @@
+#include "snakextreme/LeaderboardTable.hpp"
 
 #include "snakextreme/AppManager.hpp"
 #include "snakextreme/UiHitTest.hpp"
@@ -408,8 +409,7 @@ std::string AppManager::titleText() const {
     case Screen::Leaderboard:
         title += " | Leaderboard | " + std::to_string(leaderboard_.entries().size()) + " entries";
         for (std::size_t i = 0; i < leaderboard_.entries().size(); ++i) {
-            const auto& entry = leaderboard_.entries()[i];
-            title += " | " + std::to_string(i + 1) + ". " + entry.playerName + " " + std::to_string(entry.score);
+            title += leaderboardRowTitle(i + 1U, leaderboard_.entries()[i]);
         }
         title += " | " + leaderboard_.message() + " | Esc: back";
         break;

@@ -235,6 +235,42 @@ snake_add_catch2_test(input_validator_tests
             SNAKE_JSON_CORPUS_DIR="${PROJECT_SOURCE_DIR}/tests/fixtures/json-corpus")
     endif()
 
+    # TC-SEC-04 with real fault injection (Linux): an LD_PRELOAD library aborts
+    # or fails the save at each step of write-temp-then-rename, in a child
+    # process that performs one save.
+    if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
+        add_library(snake_fault_inject SHARED tests/fault/FaultInjection.cpp)
+        target_link_libraries(snake_fault_inject PRIVATE ${CMAKE_DL_LIBS})
+        # It replaces libc functions: no fortified wrappers, no sanitizers.
+        target_compile_options(snake_fault_inject PRIVATE
+            -U_FORTIFY_SOURCE -D_FORTIFY_SOURCE=0 -fno-sanitize=all)
+        target_link_options(snake_fault_inject PRIVATE -fno-sanitize=all)
+        snake_warnings(snake_fault_inject)
+
+        add_executable(secure_write_fault_writer tests/fault/FaultWriter.cpp)
+        target_link_libraries(secure_write_fault_writer PRIVATE snake_persistence)
+        snake_warnings(secure_write_fault_writer)
+
+        snake_add_catch2_test(secure_write_fault_tests
+            SOURCES tests/SecureWriteFaultTests.cpp
+            LIBS snake_persistence)
+        target_compile_definitions(secure_write_fault_tests PRIVATE
+            SNAKE_FAULT_LIBRARY="$<TARGET_FILE:snake_fault_inject>"
+            SNAKE_FAULT_WRITER="$<TARGET_FILE:secure_write_fault_writer>")
+        add_dependencies(secure_write_fault_tests snake_fault_inject secure_write_fault_writer)
+
+        # Settings too, once they save through SecureFileStore.
+        if(TARGET snake_settings)
+            get_target_property(snake_settings_links snake_settings LINK_LIBRARIES)
+            if(snake_settings_links AND "snake_persistence" IN_LIST snake_settings_links)
+                foreach(target secure_write_fault_writer secure_write_fault_tests)
+                    target_link_libraries(${target} PRIVATE snake_settings)
+                    target_compile_definitions(${target} PRIVATE SNAKE_HAVE_SETTINGS)
+                endforeach()
+            endif()
+        endif()
+    endif()
+
     add_executable(game_session_tests tests/GameSessionTests.cpp)
     target_link_libraries(game_session_tests PRIVATE snake_scoring snake_engine)
     snake_warnings(game_session_tests)
