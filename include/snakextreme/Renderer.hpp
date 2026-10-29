@@ -2,8 +2,11 @@
 #pragma once
 
 #include "snakextreme/AppState.hpp"
+#include "snakextreme/Settings.hpp"
+#include "snakextreme/LeaderboardRepository.hpp"
 #include "snakextreme/GameEngine.hpp"
 #include "snakextreme/ModeManager.hpp"
+#include "snakextreme/PowerUp.hpp"
 #include <SFML/Graphics.hpp>
 
 #include <chrono>
@@ -15,15 +18,27 @@ namespace snake {
 // Everything one frame shows, gathered by AppManager. The renderer only
 // draws it; no game rules live here.
 struct FrameView {
+    bool audioAvailable{false};
+    Settings settings{};
+    std::size_t settingsRow{0};
+    bool capturingKey{false};
+    std::string settingsMessage;
     Screen screen{Screen::MainMenu};
     const GameEngine* engine{nullptr};
     SessionConfig selected{};  // main-menu choice
     SessionConfig active{};    // settings of the current game
     std::optional<std::chrono::milliseconds> remainingTime; // Timed only
+    std::optional<PowerUp> powerUp;           // waiting on the grid
+    std::optional<ActiveEffect> activeEffect; // running on the snake
     GameOverReason gameOverReason{GameOverReason::None};
     int score{0};
     int highScore{0};
     std::string menuError;
+    std::vector<LeaderboardEntry> leaderboard;
+    std::string leaderboardMessage;
+    std::string playerName;
+    std::string nameError;
+    std::size_t menuIndex{0};
 };
 
 class Renderer {
@@ -33,15 +48,20 @@ public:
     static constexpr unsigned CellSize = 30;
 
     Renderer();
+    static sf::Color background(Theme theme);
 
     void draw(sf::RenderTarget& target, const FrameView& frame) const;
 
 private:
+    void drawFooter(sf::RenderTarget& target, Screen screen) const;
+    void drawNavigation(sf::RenderTarget& target, const FrameView& frame) const;
+    void drawSettings(sf::RenderTarget& target, const FrameView& frame) const;
     void drawMenu(sf::RenderTarget& target, const FrameView& frame) const;
-    void drawBoard(sf::RenderTarget& target, const GameEngine& engine) const;
+    void drawBoard(sf::RenderTarget& target, const GameEngine& engine, Theme theme) const;
     void drawHud(sf::RenderTarget& target, const FrameView& frame) const;
     void drawPaused(sf::RenderTarget& target) const;
     void drawGameOver(sf::RenderTarget& target, const FrameView& frame) const;
+    void drawPowerUp(sf::RenderTarget& target, const PowerUp& item) const;
     sf::Text text(const std::string& utf8, unsigned size, sf::Color color) const;
 
     sf::Font font_;

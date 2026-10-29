@@ -1,0 +1,32 @@
+{
+  "acceptance": "not_assessed",
+  "clock": "steady_clock_us_since_main",
+  "display_scope": "first_display_return_after_engine_consumed_input",
+  "dropped_inputs": 0,
+  "dropped_windows": 0,
+  "first_frame_us": 55281,
+  "fps_windows": [
+    {
+      "difficulty": "Medium",
+      "duration_us": 1000000,
+      "frames": 60,
+      "mode": "Classic",
+      "screen": "MainMenu",
+      "session": 0,
+      "start_us": 55281,
+      "uniform_context": true
+    }
+  ],
+  "input_scope": "SFML_dequeue_to_engine_queue_registration_lower_bound",
+  "inputs": [],
+  "invalid_samples": 0,
+  "partial_window": {
+    "duration_us": 4793,
+    "frames": 1,
+    "screen": "MainMenu",
+    "start_us": 1055281,
+    "uniform_context": true
+  },
+  "powerups_implemented": false,
+  "schema_version": 1
+}

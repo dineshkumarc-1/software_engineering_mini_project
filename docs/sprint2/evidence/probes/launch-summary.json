@@ -1,0 +1,40 @@
+{
+  "acceptance": "not_assessed",
+  "source_snapshot_operator_supplied": "uncommitted probe smoke working-tree; not a release build",
+  "platform": "Linux",
+  "audio_null_output": true,
+  "cache_condition": "unverified; no OS cache was cleared",
+  "target_hardware_verified": false,
+  "measurement_scope": "process creation request to observed stdout marker after first display; IPC/scheduling adds delay",
+  "warnings": [
+    "Not proof of cold-cache launch or the specified Windows hardware.",
+    "Use the full executable/DLL/assets package. First-run config regeneration is included.",
+    "No personal player input is recorded; inspect local stderr logs before sharing."
+  ],
+  "runs": [
+    {
+      "run": 1,
+      "process_exit": 0,
+      "timed_out": false,
+      "launch_to_observed_first_frame_marker_us": 61061.964,
+      "report": "launch-1.json",
+      "config_fixture": "missing_temporary_config"
+    },
+    {
+      "run": 2,
+      "process_exit": 0,
+      "timed_out": false,
+      "launch_to_observed_first_frame_marker_us": 60438.134,
+      "report": "launch-2.json",
+      "config_fixture": "missing_temporary_config"
+    },
+    {
+      "run": 3,
+      "process_exit": 0,
+      "timed_out": false,
+      "launch_to_observed_first_frame_marker_us": 60490.166,
+      "report": "launch-3.json",
+      "config_fixture": "missing_temporary_config"
+    }
+  ]
+}

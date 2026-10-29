@@ -1,0 +1,46 @@
+{
+  "report": "gameplay.json",
+  "acceptance": "not_assessed",
+  "main_to_first_frame_us": 57686,
+  "all_complete_window_fps": {
+    "count": 12,
+    "min": 59,
+    "median": 60.0,
+    "mean": 59.833333333333336,
+    "max": 60
+  },
+  "hard_obstacle_uniform_gameplay_fps": {
+    "count": 3,
+    "min": 60,
+    "median": 60,
+    "mean": 60,
+    "max": 60
+  },
+  "longest_same_session_eligible_seconds": 3,
+  "fps_below_30_windows": 0,
+  "accepted_input_registration_lower_bound_us": {
+    "count": 51,
+    "min": 0,
+    "median": 1,
+    "mean": 1.0392156862745099,
+    "max": 2
+  },
+  "accepted_input_registration_at_least_100ms": 0,
+  "first_display_after_application_us": {
+    "count": 51,
+    "min": 16696,
+    "median": 83711,
+    "mean": 89516.19607843137,
+    "max": 150519
+  },
+  "rejected_inputs": 49,
+  "accepted_without_display": 0,
+  "required_campaign": "3 x 300 consecutive seconds, Hard/Obstacle with power-ups; 100 randomized inputs on target Windows hardware",
+  "warnings": [
+    "Diagnostic tooling only; target-hardware acceptance is not assessed.",
+    "Registration latency excludes OS/SFML queue wait; it is a lower bound, not end-to-end input latency.",
+    "First-frame time starts at main entry; use collect_launch.py for an external process-launch readiness upper bound.",
+    "Display timestamps mean display() returned, not measured photons or GPU scan-out.",
+    "No measured power-up activity or independent volunteer usability evidence is provided."
+  ]
+}

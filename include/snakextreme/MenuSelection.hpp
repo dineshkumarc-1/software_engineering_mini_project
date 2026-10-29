@@ -50,7 +50,7 @@ constexpr Difficulty stepDifficulty(Difficulty difficulty, int step) noexcept {
 constexpr SessionConfig applyMenuInput(SessionConfig selection,
                                        MenuInput input,
                                        Screen screen) noexcept {
-    if (screen != Screen::MainMenu) {
+    if (screen != Screen::MainMenu && screen != Screen::ModeSelection) {
         return selection;
     }
 

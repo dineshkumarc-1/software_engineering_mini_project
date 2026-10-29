@@ -1,0 +1,5 @@
+Traceback (most recent call last):
+  File "/data/dinesh-owner-followup/tools/desktop_probe_smoke.py", line 72, in <module>
+    assert len(parsed["inputs"]) == 100, "not all 100 requested keys were recorded"
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: not all 100 requested keys were recorded

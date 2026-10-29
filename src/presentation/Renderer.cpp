@@ -1,4 +1,6 @@
 #include "snakextreme/Renderer.hpp"
+#include "snakextreme/LeaderboardTable.hpp"
+#include "snakextreme/UiHitTest.hpp"
 #include <cstdint>
 #include <filesystem>
 #include <string>
@@ -15,6 +17,7 @@
 #include "snakextreme/GameConfig.hpp"
 #include "snakextreme/GameplayController.hpp"
 
+#include <algorithm>
 #include <array>
 #include <chrono>
 
@@ -86,6 +89,28 @@ const sf::Color Danger(255, 110, 110);
 const sf::Color Warning(255, 170, 60);
 const sf::Color ObstacleFill(190, 135, 70);
 const sf::Color ObstacleEdge(110, 72, 34);
+// Power-ups: one colour per type, all drawn as diamonds (SAD 4.5).
+const sf::Color SpeedColour(70, 170, 255);
+const sf::Color MultiplierColour(255, 205, 60);
+const sf::Color ShrinkColour(200, 120, 255);
+const sf::Color IconColour(15, 23, 32);
+
+sf::Color powerUpColour(PowerUpType type) {
+    switch (type) {
+    case PowerUpType::Speed:
+        return SpeedColour;
+    case PowerUpType::Multiplier:
+        return MultiplierColour;
+    case PowerUpType::Shrink:
+        return ShrinkColour;
+    }
+    return SpeedColour;
+}
+
+sf::Color withAlpha(sf::Color colour, sf::Uint8 alpha) {
+    colour.a = alpha;
+    return colour;
+}
 
 // UTF-8 for the symbols the bundled DejaVu Sans font provides.
 const char* const ArrowLeft = "\xE2\x86\x90";
@@ -120,20 +145,17 @@ void centreOn(sf::Text& label, float x, float y) {
     label.setPosition(x, y);
 }
 
-// True when a snake segment, the food or an obstacle lies under `area`, so
-// the HUD can fade there instead of hiding the board.
-bool coversGameplay(const sf::FloatRect& area, const GameEngine& engine) {
-    for (const GridPosition& segment : engine.snake()) {
-        if (area.intersects(cellRect(segment))) {
-            return true;
-        }
-    }
-    for (const GridPosition& obstacle : engine.obstacles()) {
-        if (area.intersects(cellRect(obstacle))) {
-            return true;
-        }
-    }
-    return engine.hasFood() && area.intersects(cellRect(engine.food()));
+// True when a snake segment, the food, an obstacle or a power-up lies under
+// `area`, so the HUD can fade there instead of hiding the board.
+bool coversGameplay(const sf::FloatRect& area, const GameEngine& engine,
+                    const std::optional<PowerUp>& powerUp) {
+    const auto under = [&area](GridPosition cell) { return area.intersects(cellRect(cell)); };
+    const auto& body = engine.snake();
+    const auto& obstacles = engine.obstacles();
+    return (powerUp && under(powerUp->cell)) ||
+           std::any_of(body.begin(), body.end(), under) ||
+           std::any_of(obstacles.begin(), obstacles.end(), under) ||
+           (engine.hasFood() && under(engine.food()));
 }
 
 std::string modeDescription(GameMode mode) {
@@ -166,18 +188,43 @@ sf::Text Renderer::text(const std::string& utf8, unsigned size, sf::Color color)
     return label;
 }
 
+sf::Color Renderer::background(Theme theme) {
+    if (theme == Theme::Neon) return sf::Color(14, 8, 32);
+    if (theme == Theme::Retro) return sf::Color(29, 40, 24);
+    return sf::Color(15, 23, 32);
+}
+
 void Renderer::draw(sf::RenderTarget& target, const FrameView& frame) const {
     if (frame.screen == Screen::Exiting) {
         return;
     }
 
-    if (frame.screen == Screen::MainMenu) {
+    if (frame.screen == Screen::Settings) {
+        drawSettings(target, frame);
+        return;
+    }
+    if (frame.screen == Screen::MainMenu || frame.screen == Screen::NameEntry ||
+        frame.screen == Screen::Leaderboard) {
+        drawNavigation(target, frame);
+        drawFooter(target, frame.screen);
+        return;
+    }
+    if (frame.screen == Screen::ModeSelection) {
         drawMenu(target, frame);
+        drawFooter(target, frame.screen);
         return;
     }
 
     if (frame.engine != nullptr) {
-        drawBoard(target, *frame.engine);
+        drawBoard(target, *frame.engine, frame.settings.theme);
+    }
+
+    if (frame.engine != nullptr && frame.powerUp) {
+        drawPowerUp(target, *frame.powerUp);
+    }
+
+    if (frame.engine != nullptr && frame.powerUp) {
+        drawPowerUp(target, *frame.powerUp);
     }
 
     if (frame.screen == Screen::Paused) {
@@ -188,6 +235,115 @@ void Renderer::draw(sf::RenderTarget& target, const FrameView& frame) const {
 
     // The HUD is drawn last so it stays readable over every overlay.
     drawHud(target, frame);
+    drawFooter(target, frame.screen);
+}
+
+void Renderer::drawFooter(sf::RenderTarget& target, Screen screen) const {
+    for (const auto& button : footerButtons(screen)) {
+        const auto& area = button.area;
+        sf::RectangleShape box({static_cast<float>(area.width), static_cast<float>(area.height)});
+        box.setPosition(static_cast<float>(area.left), static_cast<float>(area.top));
+        box.setFillColor(PanelFill); box.setOutlineColor(Accent); box.setOutlineThickness(1.f);
+        target.draw(box);
+        if (fontLoaded_) {
+            auto label = text(button.label, 20, TextMain);
+            centreOn(label, static_cast<float>(area.left) + static_cast<float>(area.width) / 2.f,
+                     static_cast<float>(area.top) + static_cast<float>(area.height) / 2.f);
+            target.draw(label);
+        }
+    }
+}
+
+void Renderer::drawNavigation(sf::RenderTarget& target, const FrameView& frame) const {
+    if (!fontLoaded_) return; // Window title remains the text fallback.
+    const auto label = [&](const std::string& value, unsigned size, float y, sf::Color color) {
+        auto item = text(value, size, color);
+        centreOn(item, 450.f, y);
+        target.draw(item);
+    };
+    label("SnakeXtreme", 46, 78.f, Accent);
+    if (frame.screen == Screen::MainMenu) {
+        const char* entries[] = {"New Game", "Leaderboard", "Settings", "Exit"};
+        for (std::size_t i = 0; i < 4; ++i) {
+            const float top = 190.f + 60.f * static_cast<float>(i);
+            sf::RectangleShape box({380.f, 48.f});
+            box.setPosition(260.f, top);
+            box.setFillColor(i == frame.menuIndex ? Accent : PanelFill);
+            target.draw(box);
+            label(entries[i], 24, top + 24.f, i == frame.menuIndex ? sf::Color(15, 23, 32) : TextMain);
+        }
+        label("Up/Down or W/S: select   Enter / click: confirm   Esc: exit", 17, 500.f, TextDim);
+    } else if (frame.screen == Screen::NameEntry) {
+        label("Enter your display name", 28, 190.f, TextMain);
+        label(frame.playerName + "_", 32, 275.f, Accent);
+        label(std::to_string(frame.playerName.size()) + "/15", 18, 320.f, TextDim);
+        label(frame.nameError, 18, 380.f, Danger);
+        label("Type name   Backspace: delete   Enter: continue   Esc: back", 17, 500.f, TextDim);
+    } else {
+        label("Leaderboard - Top 10", 28, 138.f, TextMain);
+        const auto cell = [&](const std::string& value, const LeaderboardColumn& column,
+                              float y, sf::Color color) {
+            auto item = text(value, 17, color);
+            // A legal 15-character name (including wide W glyphs) and a maximum
+            // integer score must fit without overlapping the adjacent column.
+            while (item.getLocalBounds().width > column.width &&
+                   item.getCharacterSize() > 12U) {
+                item.setCharacterSize(item.getCharacterSize() - 1U);
+            }
+            item.setPosition(column.left - item.getLocalBounds().left, y);
+            target.draw(item);
+        };
+        for (const auto& column : LeaderboardColumns) {
+            cell(std::string(column.heading), column, 165.f, Accent);
+        }
+        for (std::size_t i = 0; i < frame.leaderboard.size(); ++i) {
+            const float y = 194.f + static_cast<float>(i) * 22.f;
+            const auto row = leaderboardRow(i + 1U, frame.leaderboard[i]);
+            for (std::size_t j = 0; j < row.size(); ++j) {
+                cell(row[j], LeaderboardColumns[j], y, j == 0U ? TextDim : TextMain);
+            }
+        }
+        if (frame.leaderboard.empty()) label("No scores yet", 22, 280.f, TextDim);
+        // Constant warning text is deliberately bounded to the available row.
+        if (!frame.leaderboardMessage.empty()) label("Leaderboard unavailable: empty table shown", 17, 420.f, Warning);
+        label("Esc / Back: main menu", 18, 500.f, TextDim);
+    }
+}
+
+void Renderer::drawSettings(sf::RenderTarget& target, const FrameView& frame) const {
+    if (!fontLoaded_) return;
+    auto heading = text("Settings", 34, Accent); centreOn(heading, 450.f, 65.f); target.draw(heading);
+    const char* names[] = {"Move Up", "Move Down", "Move Left", "Move Right", "Music", "SFX",
+                           "Theme", "Restore defaults", "Save & back", "Cancel"};
+    for (std::size_t i = 0; i < 10; ++i) {
+        const float top = 120.f + 35.f * static_cast<float>(i);
+        sf::RectangleShape row({580.f, 32.f}); row.setPosition(160.f, top);
+        row.setFillColor(i == frame.settingsRow ? sf::Color(45, 65, 75) : PanelFill); target.draw(row);
+        auto name = text(names[i], 19, i == frame.settingsRow ? Accent : TextMain);
+        name.setPosition(175.f, top + 3.f); target.draw(name);
+        std::string value;
+        if (i < 4) value = frame.capturingKey && frame.settingsRow == i ? "Press key..." : keyName(frame.settings.keys[i]);
+        if (i == 6) value = std::string(themeName(frame.settings.theme)) + "  < >";
+        if (i == 4 || i == 5) {
+            const int volume = i == 4 ? frame.settings.musicVolume : frame.settings.sfxVolume;
+            sf::RectangleShape track({300.f, 5.f}); track.setPosition(400.f, top + 16.f);
+            track.setFillColor(PanelEdge); target.draw(track);
+            sf::RectangleShape fill({static_cast<float>(volume) * 3.f, 5.f}); fill.setPosition(track.getPosition());
+            fill.setFillColor(Accent); target.draw(fill);
+            sf::CircleShape knob(6.f); knob.setPosition(394.f + static_cast<float>(volume) * 3.f, top + 12.f);
+            knob.setFillColor(TextMain); target.draw(knob);
+            auto number = text(std::to_string(volume), 16, TextMain); number.setPosition(345.f, top + 4.f); target.draw(number);
+        } else {
+            auto item = text(value, 18, TextMain); item.setPosition(400.f, top + 3.f); target.draw(item);
+        }
+    }
+    auto message = text(frame.settingsMessage, 15, Warning); centreOn(message, 450.f, 490.f); target.draw(message);
+    auto help = text("Up/Down: row   Left/Right: adjust   Enter / click: edit   Esc: cancel", 16, TextDim);
+    centreOn(help, 450.f, 525.f); target.draw(help);
+    auto note = text(frame.audioAvailable
+        ? "Live audio preview. F5: test SFX. Save applies; Cancel restores. WASD always enabled."
+        : "Audio unavailable: silent fallback. Values still save. WASD always enabled.", 15, TextDim);
+    centreOn(note, 450.f, 555.f); target.draw(note);
 }
 
 void Renderer::drawMenu(sf::RenderTarget& target, const FrameView& frame) const {
@@ -245,7 +401,7 @@ void Renderer::drawMenu(sf::RenderTarget& target, const FrameView& frame) const 
     centreOn(title, 450.f, 78.f);
     target.draw(title);
 
-    sf::Text subtitle = text("Choose a mode and a difficulty, then press Enter", 18, TextDim);
+    sf::Text subtitle = text("Choose a mode and difficulty; click Start or press Enter", 18, TextDim);
     centreOn(subtitle, 450.f, 126.f);
     target.draw(subtitle);
 
@@ -297,28 +453,33 @@ void Renderer::drawMenu(sf::RenderTarget& target, const FrameView& frame) const 
 
     const std::string controls =
         std::string(ArrowLeft) + " " + ArrowRight + "  mode       " +
-        ArrowUp + " " + ArrowDown + "  difficulty       Enter  start       Esc  quit";
+        ArrowUp + " " + ArrowDown + "  difficulty       Enter  start       Esc  back";
     sf::Text hint = text(controls, 18, TextMain);
-    centreOn(hint, 450.f, 468.f);
+    centreOn(hint, 450.f, 510.f);
     target.draw(hint);
 
     if (frame.highScore > 0) {
         sf::Text best = text("Best score this session: " + std::to_string(frame.highScore),
                              16, TextDim);
-        centreOn(best, 450.f, 508.f);
+        centreOn(best, 450.f, 548.f);
         target.draw(best);
     }
 
     if (!frame.menuError.empty()) {
         sf::Text error = text(frame.menuError, 17, Danger);
-        centreOn(error, 450.f, 548.f);
+        centreOn(error, 450.f, 580.f);
         target.draw(error);
     }
 }
 
-void Renderer::drawBoard(sf::RenderTarget& target, const GameEngine& engine) const {
+void Renderer::drawBoard(sf::RenderTarget& target, const GameEngine& engine, Theme theme) const {
     sf::VertexArray grid(sf::Lines);
-    const sf::Color gridColor(43, 61, 72);
+    const sf::Color gridColor = theme == Theme::Neon ? sf::Color(85, 40, 115) :
+        theme == Theme::Retro ? sf::Color(63, 82, 47) : sf::Color(43, 61, 72);
+    const sf::Color headColor = theme == Theme::Neon ? sf::Color(30, 255, 245) :
+        theme == Theme::Retro ? sf::Color(190, 210, 100) : Accent;
+    const sf::Color bodyColor = theme == Theme::Neon ? sf::Color(220, 45, 230) :
+        theme == Theme::Retro ? sf::Color(125, 155, 65) : sf::Color(35, 160, 115);
 
     for (unsigned x = 0; x <= Width; x += CellSize) {
         grid.append(sf::Vertex({static_cast<float>(x), 0.f}, gridColor));
@@ -360,7 +521,7 @@ void Renderer::drawBoard(sf::RenderTarget& target, const GameEngine& engine) con
         sf::RectangleShape segment({Cell - 2.f, Cell - 2.f});
         segment.setPosition(static_cast<float>(body[i].x) * Cell + 1.f,
                             static_cast<float>(body[i].y) * Cell + 1.f);
-        segment.setFillColor(i == 0 ? Accent : sf::Color(35, 160, 115));
+        segment.setFillColor(i == 0 ? headColor : bodyColor);
         target.draw(segment);
     }
 }
@@ -373,7 +534,7 @@ void Renderer::drawHud(sf::RenderTarget& target, const FrameView& frame) const {
     // Compact panels in the top corners. Each one fades when part of the
     // board is underneath, so the HUD never fully hides the game.
     const auto drawPanel = [&](const sf::FloatRect& area) {
-        const bool faded = coversGameplay(area, *frame.engine);
+        const bool faded = coversGameplay(area, *frame.engine, frame.powerUp);
         sf::RectangleShape panel({area.width, area.height});
         panel.setPosition(area.left, area.top);
         panel.setFillColor(sf::Color(8, 14, 20, faded ? 110 : 215));
@@ -421,6 +582,43 @@ void Renderer::drawHud(sf::RenderTarget& target, const FrameView& frame) const {
         countdown.setPosition(settingsArea.left + settingsArea.width - 12.f,
                               settingsArea.top + 17.f);
         target.draw(countdown);
+    }
+
+    // Top centre: the running power-up effect with its seconds left and a
+    // bar that empties (SAD 4.5). Hidden once the game is over.
+    if (frame.activeEffect && frame.gameOverReason == GameOverReason::None) {
+        const ActiveEffect& effect = *frame.activeEffect;
+        const sf::Color colour = powerUpColour(effect.type);
+
+        sf::Text label = text(describeEffect(effect), 20, TextMain);
+        const float labelWidth = label.getLocalBounds().width;
+        const float effectWidth = labelWidth + 50.f;
+        const sf::FloatRect effectArea(static_cast<float>(Width) / 2.f - effectWidth / 2.f, 8.f,
+                                       effectWidth, 34.f);
+        drawPanel(effectArea);
+
+        sf::CircleShape icon(8.f, 4);
+        icon.setOrigin(8.f, 8.f);
+        icon.setPosition(effectArea.left + 18.f, effectArea.top + 17.f);
+        icon.setFillColor(colour);
+        target.draw(icon);
+
+        const sf::FloatRect labelBounds = label.getLocalBounds();
+        label.setOrigin(labelBounds.left, capMiddle(label));
+        label.setPosition(effectArea.left + 34.f, effectArea.top + 17.f);
+        target.draw(label);
+
+        const auto total = std::chrono::duration_cast<std::chrono::microseconds>(
+            effectFor(effect.type).duration());
+        if (total.count() > 0) {
+            float fraction = static_cast<float>(effect.remaining.count()) /
+                             static_cast<float>(total.count());
+            fraction = fraction < 0.f ? 0.f : (fraction > 1.f ? 1.f : fraction);
+            sf::RectangleShape bar({(effectArea.width - 8.f) * fraction, 3.f});
+            bar.setPosition(effectArea.left + 4.f, effectArea.top + effectArea.height - 6.f);
+            bar.setFillColor(colour);
+            target.draw(bar);
+        }
     }
 }
 
@@ -483,6 +681,10 @@ void Renderer::drawGameOver(sf::RenderTarget& target, const FrameView& frame) co
     centreOn(heading, 450.f, top + 38.f);
     target.draw(heading);
 
+    if (!frame.leaderboardMessage.empty()) {
+        auto saved = text(frame.leaderboardMessage, 16, Warning);
+        centreOn(saved, 450.f, 505.f); target.draw(saved);
+    }
     sf::Text reason = text(std::string(describeGameOver(frame.gameOverReason)), 22, TextMain);
     centreOn(reason, 450.f, top + 84.f);
     target.draw(reason);
@@ -494,6 +696,65 @@ void Renderer::drawGameOver(sf::RenderTarget& target, const FrameView& frame) co
     sf::Text hint = text("Enter  play again       M  menu", 17, TextDim);
     centreOn(hint, 450.f, top + 164.f);
     target.draw(hint);
+}
+
+void Renderer::drawPowerUp(sf::RenderTarget& target, const PowerUp& item) const {
+    // Blinks during its last 1.5 s, so the player sees it is about to go.
+    const bool dimmed = item.remaining < std::chrono::milliseconds{1500} &&
+                        (item.remaining.count() / 125000) % 2 == 0;
+    const sf::Uint8 alpha = static_cast<sf::Uint8>(dimmed ? 90 : 255);
+
+    const float centreX = static_cast<float>(item.cell.x) * Cell + Cell / 2.f;
+    const float centreY = static_cast<float>(item.cell.y) * Cell + Cell / 2.f;
+
+    // A diamond, so power-ups differ by shape from the round food and the
+    // square obstacles and snake, not only by colour (SAD 4.5).
+    const float radius = Cell / 2.f - 2.f;
+    sf::CircleShape diamond(radius, 4);
+    diamond.setOrigin(radius, radius);
+    diamond.setPosition(centreX, centreY);
+    diamond.setFillColor(withAlpha(powerUpColour(item.type), alpha));
+    diamond.setOutlineColor(sf::Color(255, 255, 255, alpha));
+    diamond.setOutlineThickness(1.5f);
+    target.draw(diamond);
+
+    // A small dark sign on top: >> for Speed, x2 for Multiplier, - for Shrink.
+    const sf::Color sign = withAlpha(IconColour, alpha);
+    switch (item.type) {
+    case PowerUpType::Speed: {
+        sf::CircleShape arrow(4.f, 3);
+        arrow.setOrigin(4.f, 4.f);
+        arrow.setRotation(90.f);
+        arrow.setFillColor(sign);
+        arrow.setPosition(centreX - 3.f, centreY);
+        target.draw(arrow);
+        arrow.setPosition(centreX + 4.f, centreY);
+        target.draw(arrow);
+        break;
+    }
+    case PowerUpType::Multiplier:
+        if (fontLoaded_) {
+            sf::Text times = text("x2", 12, sign);
+            times.setStyle(sf::Text::Bold);
+            centreOn(times, centreX, centreY);
+            target.draw(times);
+        } else {
+            sf::CircleShape dot(3.5f);
+            dot.setOrigin(3.5f, 3.5f);
+            dot.setPosition(centreX, centreY);
+            dot.setFillColor(sign);
+            target.draw(dot);
+        }
+        break;
+    case PowerUpType::Shrink: {
+        sf::RectangleShape minus({12.f, 3.f});
+        minus.setOrigin(6.f, 1.5f);
+        minus.setPosition(centreX, centreY);
+        minus.setFillColor(sign);
+        target.draw(minus);
+        break;
+    }
+    }
 }
 
 } // namespace snake

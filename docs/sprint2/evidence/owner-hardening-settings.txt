@@ -1,0 +1,23 @@
+PASS: missing config generates 70/70 defaults
+PASS: Settings opens without changing a row
+PASS: desktop independent music 0 / SFX 100 preview
+PASS: Save persists independent channel volumes
+PASS: desktop independent music 100 / SFX 0 preview
+PASS: Cancel does not overwrite saved configuration
+PASS: reopen restores saved volume draft after Cancel
+PASS: theme selection persists
+PASS: desktop remap to I/K/J/L persists SFML key codes
+PASS: failed Save stays on Settings with visible error
+PASS: failed Save preserves existing target directory
+PASS: failed Save removes only its owned temporary file
+PASS: Cancel after failed Save restores previously active values
+PASS: recovered fixture retains all saved settings
+PASS: normal menu exit returns 0
+PASS: real application relaunch restores settings
+PASS: normal menu exit returns 0
+PASS: real startup regenerates corrupt config defaults
+PASS: corrupt-file warning emitted
+PASS: normal menu exit returns 0
+PASS: no audio backend leaves Settings usable (silent fallback)
+PASS: normal menu exit returns 0
+22 Linux/Xvfb desktop Settings checks passed; null output, no audible or Windows acceptance.

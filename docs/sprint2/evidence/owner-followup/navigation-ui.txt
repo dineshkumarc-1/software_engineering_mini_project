@@ -1,0 +1,24 @@
+PASS: blank name cannot advance by mouse
+PASS: whitespace-only name cannot advance
+PASS: 16th character is rejected at runtime
+PASS: invalid character rejected without inserting it
+PASS: mouse Back returns from name entry
+PASS: three confirmation-click launch, mouse Resume and Main menu
+PASS: leaderboard table has working mouse Back
+PASS: mouse launch/pause/menu: Classic/Easy
+PASS: mouse launch/pause/menu: Classic/Medium
+PASS: mouse launch/pause/menu: Classic/Hard
+PASS: mouse launch/pause/menu: Timed/Easy
+PASS: mouse launch/pause/menu: Timed/Medium
+PASS: mouse launch/pause/menu: Timed/Hard
+PASS: mouse launch/pause/menu: Obstacle/Easy
+PASS: mouse launch/pause/menu: Obstacle/Medium
+PASS: mouse launch/pause/menu: Obstacle/Hard
+PASS: mouse restart after actual wall collision
+PASS: gap click does not activate key capture
+PASS: duplicate movement binding rejected in real UI
+PASS: drag beyond slider track clamps without changing other channel
+PASS: mouse Save persists clamped independent volumes
+PASS: clean default-mode exit
+PASS: default mode produces no probe files
+23 desktop navigation/settings checks passed; target Windows/manual acceptance pending

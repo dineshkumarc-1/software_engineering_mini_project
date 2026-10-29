@@ -1,0 +1,2 @@
+RNG seed: 781117003
+All tests passed (147 assertions in 4 test cases)

@@ -1,0 +1,17 @@
+Execution date:
+Tue Oct 27 17:08:35 IST 2026
+Tested commit:
+aa1cc1e22319f018f7dd515e77f70d45d5a3712d
+CMake:
+cmake version 4.4.4
+
+CMake suite maintained and supported by Kitware (kitware.com/cmake).
+CTest:
+ctest version 4.4.4
+
+CMake suite maintained and supported by Kitware (kitware.com/cmake).
+Compiler:
+Apple clang version 21.0.0 (clang-2100.1.1.101)
+Target: arm64-apple-darwin27.0.0
+Thread model: posix
+InstalledDir: /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin

@@ -30,11 +30,11 @@ ctest --test-dir build -C Release --output-on-failure
 .\build\Release\SnakeXtreme.exe
 ```
 
-The first configure downloads SFML **2.5.1** and needs internet access. Audio/network modules are deliberately disabled for this window-only story. Alternatively install a compatible **SFML 2.x** development package and configure without `SNAKE_FETCH_SFML`, setting `SFML_DIR` to its CMake configuration directory if needed. Prebuilt SFML must match compiler, architecture and runtime.
+The first configure downloads SFML **2.5.1** and needs internet access. Graphics, window, system and audio are enabled; network remains disabled. Alternatively install a compatible **SFML 2.x** development package and configure without `SNAKE_FETCH_SFML`, setting `SFML_DIR` to its CMake configuration directory if needed. Prebuilt SFML must match compiler, architecture and runtime.
 
 ## Linux build (development/testing only)
 
-With a compiler, CMake and the X11/OpenGL/FreeType/udev development dependencies installed:
+With a compiler, CMake and the X11/OpenGL/FreeType/udev plus OpenAL/FLAC/Ogg/Vorbis development dependencies installed:
 
 ```sh
 cmake -S . -B build -DSNAKE_FETCH_SFML=ON -DBUILD_SHARED_LIBS=OFF -DCMAKE_BUILD_TYPE=Release
@@ -64,6 +64,13 @@ cmake --preset app      && cmake --build --preset app      && ctest --preset app
 
 CI runs these checks on every pull request and push to `main` (Linux GCC, macOS Clang, Windows MSVC and MinGW-w64, plus full app builds on Windows and Linux). See [docs/modes-build-ci.md](docs/modes-build-ci.md).
 
+Quality gates (issue #23):
+- Every test also runs under Clang AddressSanitizer + UndefinedBehaviorSanitizer.
+- cppcheck must report nothing in `src/`, `include/` or `tests/`.
+- The CTest `security_banned_api_scan` fails on any command-running, code-loading, unbounded-string or printf-family call (SEC-005).
+
+See [docs/quality-gates.md](docs/quality-gates.md), which also has the Windows 10/11 run checklist (TC-PORT-01).
+
 ## Game modes and difficulty (issues #11, #12)
 
 `snake_modes` (SAD C7, SFML-free) provides the three mode strategies and the difficulty speeds. Values come from `GameConfig.hpp` (SRS Addendum §4).
@@ -82,22 +89,60 @@ CI runs these checks on every pull request and push to `main` (Linux GCC, macOS 
 
 The main menu selects the mode and difficulty before a game starts, and the HUD shows them next to the score, the high score and the Timed countdown. See [docs/modes-integration.md](docs/modes-integration.md).
 
+## Power-ups (issue #14)
+
+`snake_powerups` (SAD C8, SFML-free) places power-ups and runs their timed effects. Values come from `GameConfig.hpp` (SRS Addendum §4).
+
+| Power-up | On the board | Effect |
+| --- | --- | --- |
+| Speed | Blue diamond with » | The snake moves every 0.6 × interval for 5 s (Easy 120 ms, Medium 72 ms, Hard 42 ms) |
+| Multiplier | Gold diamond with x2 | Food is worth twice its points for 10 s |
+| Shrink | Violet diamond with − | The tail loses one segment at once, never below 3 segments |
+
+A power-up appears on a random free cell 8–15 s after the previous one and disappears after 5 s if it is not collected. There is at most one on the board. Only one effect runs at a time: collecting a power-up ends the current effect first. The HUD and the window title show the running effect with its seconds left, and pausing freezes every power-up timer. See [docs/powerups.md](docs/powerups.md).
+
 ## Controls
 
 | Screen | Key | Action |
 | --- | --- | --- |
-| Main menu | Left / Right (or A / D) | Change mode: Classic, Timed, Obstacle |
-| Main menu | Up / Down (or W / S) | Change difficulty: Easy, Medium, Hard |
-| Main menu | Enter | Start a game with the selected settings |
-| Main menu | Esc | Exit |
-| Gameplay | Arrow keys / WASD | Steer the snake |
-| Gameplay | Esc | Pause |
+| Main menu | Up / Down (or W / S), Enter / click | Select New Game, Leaderboard, Settings or Exit |
+| Name Entry | Type / Backspace, Enter, Esc | Edit (max 15), validate / continue, cancel |
+| Mode selection | Left / Right (or A / D) | Change mode: Classic, Timed, Obstacle |
+| Mode selection | Up / Down (or W / S), Enter | Change difficulty; start |
+| Settings | Up / Down, Left / Right, Enter / click | Select row, adjust value, capture key / activate |
+| Settings | Drag Music / SFX slider | Preview that channel live (0–100) |
+| Settings | F5 | Play SFX test tone at the current SFX volume |
+| Settings | Save & back / Cancel (Esc) | Persist and apply / discard edits and restore audio |
+| Gameplay | Remapped primary keys plus WASD | Steer the snake |
+| Gameplay | Esc | Pause game and audio |
 | Game over | Enter | Play again with the same settings |
-| Paused | Esc / Enter | Resume |
-| Gameplay / Paused / Game over | M | Return to the menu (the selection is kept) |
+| Paused | Esc / Enter | Resume game and audio |
+| Gameplay / Paused / Game over | M | Return to the menu |
 | Any screen | Window close button | Exit |
 
-Mode and difficulty can only change on the main menu. The window title also shows the screen, settings, score and countdown, so the state stays visible even if the bundled font cannot be loaded.
+Mode and difficulty can only change before a session starts. The window title
+mirrors the current state and settings as a text fallback. Leaderboard persistence
+is still pending integration (#15/#17/#21); the menu explicitly labels it pending.
+
+### Audio and Settings (#20 / C5)
+
+A short original, code-generated musical loop and preview/food/game-over tones
+play through SFML Audio. No external audio assets are downloaded. Music and SFX
+have separate gains; slider edits preview immediately. Save persists the values;
+Cancel restores the previously saved levels. The background loop pauses with the
+game. No-device or buffer failure uses silent fallback and a visible Settings
+notice; preferences still work. Human listening on Windows is still required for
+TC-SET-02 acceptance. A null-output test checks routing, not what a user hears.
+
+On Linux with OpenAL Soft: `ALSOFT_DRIVERS=null ./build/audio_backend_smoke`
+checks the real SFML backend without a speaker or display. It is an optional app
+build executable, not part of display/audio-independent CTest. Normal playback
+must not use the `null` driver.
+
+Windows packages require `openal32.dll` next to `SnakeXtreme.exe`; CMake copies
+the matching SFML 2.5.1 bundled DLL. Keep the entire CI artifact together,
+including `assets/` and `THIRD_PARTY_NOTICES.md`. See the OpenAL notice for source
+and licence information. The Linux/macOS system OpenAL runtime is not bundled.
 
 ## Structure
 
@@ -126,6 +171,12 @@ include/snakextreme/GameplayController.hpp  One game: engine + ModeManager + sco
 src/gameplay/                         Game wiring used by AppManager (SFML-free)
 tests/GameplayControllerTests.cpp     Menu and game-wiring integration tests (Catch2)
 docs/modes-integration.md             Modes and difficulty in the running game
+include/snakextreme/PowerUp.hpp        Power-up types, effects (Speed, Multiplier, Shrink), schedule
+include/snakextreme/PowerUpManager.hpp Spawn schedule, pick-up, one active effect
+src/powerups/                         Power-up effects and manager (SFML-free)
+tests/PowerUpTests.cpp                TC-PWR-01..05 unit tests (Catch2)
+tests/PowerUpGameplayTests.cpp        Power-ups in the running game (Catch2)
+docs/powerups.md                      Power-ups: rules, design, tests, validation
 ```
 
 Future engine integration should expose plain C++ game state; `Renderer` translates that state into SFML drawing. No SFML headers or types should be added to engine or persistence modules. Application's 60 Hz update seam is **not** the snake's movement interval (Easy 200 ms / Medium 120 ms / Hard 70 ms).
@@ -157,3 +208,15 @@ ctest --test-dir build-headless --output-on-failure
 - Verify actual movement intervals using a fake clock and 50 system timestamps per required difficulty, applying the specified +/-10% tolerance.
 - Verify arrow-key and WASD input through the running application.
 - Record integration-test results separately from headless unit-test results.
+
+
+## Owner UI/Settings follow-up and performance diagnostics
+
+The stacked owner follow-up adds mouse navigation, Settings row-gap safety and
+opt-in diagnostics. See [probe usage and measurement limits](docs/sprint2/performance-probes.md)
+and [executed follow-up evidence](docs/sprint2/evidence/owner-followup-results.md).
+Normal launches remain uninstrumented; use `--help` for optional flags. Draft
+work and Linux synthetic smoke are not final Windows/performance acceptance.
+
+For the fixed-capacity name field, failed-Save regression and unexecuted
+exact-build acceptance bundle, see the [owner acceptance workflow](docs/sprint2/owner-acceptance-workflow.md).
