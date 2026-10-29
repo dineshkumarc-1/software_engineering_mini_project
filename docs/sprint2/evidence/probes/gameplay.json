@@ -1,0 +1,1143 @@
+{
+  "acceptance": "not_assessed",
+  "clock": "steady_clock_us_since_main",
+  "display_scope": "first_display_return_after_engine_consumed_input",
+  "dropped_inputs": 0,
+  "dropped_windows": 0,
+  "first_frame_us": 57686,
+  "fps_windows": [
+    {
+      "difficulty": "Hard",
+      "duration_us": 1000000,
+      "frames": 60,
+      "mode": "Obstacle",
+      "screen": "Gameplay",
+      "session": 1,
+      "start_us": 57686,
+      "uniform_context": false
+    },
+    {
+      "difficulty": "Hard",
+      "duration_us": 1000000,
+      "frames": 60,
+      "mode": "Obstacle",
+      "screen": "Gameplay",
+      "session": 1,
+      "start_us": 1057686,
+      "uniform_context": true
+    },
+    {
+      "difficulty": "Hard",
+      "duration_us": 1000000,
+      "frames": 60,
+      "mode": "Obstacle",
+      "screen": "Gameplay",
+      "session": 1,
+      "start_us": 2057686,
+      "uniform_context": true
+    },
+    {
+      "difficulty": "Hard",
+      "duration_us": 1000000,
+      "frames": 60,
+      "mode": "Obstacle",
+      "screen": "Gameplay",
+      "session": 1,
+      "start_us": 3057686,
+      "uniform_context": true
+    },
+    {
+      "difficulty": "Hard",
+      "duration_us": 1000000,
+      "frames": 59,
+      "mode": "Obstacle",
+      "screen": "GameOver",
+      "session": 1,
+      "start_us": 4057686,
+      "uniform_context": false
+    },
+    {
+      "difficulty": "Hard",
+      "duration_us": 1000000,
+      "frames": 60,
+      "mode": "Obstacle",
+      "screen": "GameOver",
+      "session": 1,
+      "start_us": 5057686,
+      "uniform_context": true
+    },
+    {
+      "difficulty": "Hard",
+      "duration_us": 1000000,
+      "frames": 60,
+      "mode": "Obstacle",
+      "screen": "GameOver",
+      "session": 1,
+      "start_us": 6057686,
+      "uniform_context": true
+    },
+    {
+      "difficulty": "Hard",
+      "duration_us": 1000000,
+      "frames": 60,
+      "mode": "Obstacle",
+      "screen": "GameOver",
+      "session": 1,
+      "start_us": 7057686,
+      "uniform_context": true
+    },
+    {
+      "difficulty": "Hard",
+      "duration_us": 1000000,
+      "frames": 60,
+      "mode": "Obstacle",
+      "screen": "GameOver",
+      "session": 1,
+      "start_us": 8057686,
+      "uniform_context": true
+    },
+    {
+      "difficulty": "Hard",
+      "duration_us": 1000000,
+      "frames": 59,
+      "mode": "Obstacle",
+      "screen": "GameOver",
+      "session": 1,
+      "start_us": 9057686,
+      "uniform_context": true
+    },
+    {
+      "difficulty": "Hard",
+      "duration_us": 1000000,
+      "frames": 60,
+      "mode": "Obstacle",
+      "screen": "GameOver",
+      "session": 1,
+      "start_us": 10057686,
+      "uniform_context": true
+    },
+    {
+      "difficulty": "Hard",
+      "duration_us": 1000000,
+      "frames": 60,
+      "mode": "Obstacle",
+      "screen": "GameOver",
+      "session": 1,
+      "start_us": 11057686,
+      "uniform_context": true
+    }
+  ],
+  "input_scope": "SFML_dequeue_to_engine_queue_registration_lower_bound",
+  "inputs": [
+    {
+      "accepted": true,
+      "applied_us": 375632,
+      "dequeued_us": 325435,
+      "direction": "Down",
+      "displayed_us": 392321,
+      "ordinal": 1,
+      "registered_us": 325436,
+      "session": 1
+    },
+    {
+      "accepted": true,
+      "applied_us": 442556,
+      "dequeued_us": 358897,
+      "direction": "Right",
+      "displayed_us": 459255,
+      "ordinal": 2,
+      "registered_us": 358898,
+      "session": 1
+    },
+    {
+      "accepted": true,
+      "applied_us": 509479,
+      "dequeued_us": 392356,
+      "direction": "Up",
+      "displayed_us": 526162,
+      "ordinal": 3,
+      "registered_us": 392357,
+      "session": 1
+    },
+    {
+      "accepted": false,
+      "applied_us": null,
+      "dequeued_us": 442543,
+      "direction": "Left",
+      "displayed_us": null,
+      "ordinal": 0,
+      "registered_us": 442544,
+      "session": 1
+    },
+    {
+      "accepted": false,
+      "applied_us": null,
+      "dequeued_us": 476014,
+      "direction": "Up",
+      "displayed_us": null,
+      "ordinal": 0,
+      "registered_us": 476015,
+      "session": 1
+    },
+    {
+      "accepted": false,
+      "applied_us": null,
+      "dequeued_us": 509469,
+      "direction": "Up",
+      "displayed_us": null,
+      "ordinal": 0,
+      "registered_us": 509470,
+      "session": 1
+    },
+    {
+      "accepted": false,
+      "applied_us": null,
+      "dequeued_us": 559659,
+      "direction": "Down",
+      "displayed_us": null,
+      "ordinal": 0,
+      "registered_us": 559660,
+      "session": 1
+    },
+    {
+      "accepted": true,
+      "applied_us": 643321,
+      "dequeued_us": 593110,
+      "direction": "Right",
+      "displayed_us": 660102,
+      "ordinal": 4,
+      "registered_us": 593111,
+      "session": 1
+    },
+    {
+      "accepted": true,
+      "applied_us": 710318,
+      "dequeued_us": 643306,
+      "direction": "Up",
+      "displayed_us": 727017,
+      "ordinal": 5,
+      "registered_us": 643307,
+      "session": 1
+    },
+    {
+      "accepted": false,
+      "applied_us": null,
+      "dequeued_us": 676858,
+      "direction": "Up",
+      "displayed_us": null,
+      "ordinal": 0,
+      "registered_us": 676859,
+      "session": 1
+    },
+    {
+      "accepted": true,
+      "applied_us": 777243,
+      "dequeued_us": 727046,
+      "direction": "Left",
+      "displayed_us": 793937,
+      "ordinal": 6,
+      "registered_us": 727047,
+      "session": 1
+    },
+    {
+      "accepted": true,
+      "applied_us": 844149,
+      "dequeued_us": 760516,
+      "direction": "Down",
+      "displayed_us": 860829,
+      "ordinal": 7,
+      "registered_us": 760517,
+      "session": 1
+    },
+    {
+      "accepted": false,
+      "applied_us": null,
+      "dequeued_us": 810693,
+      "direction": "Up",
+      "displayed_us": null,
+      "ordinal": 0,
+      "registered_us": 810694,
+      "session": 1
+    },
+    {
+      "accepted": true,
+      "applied_us": 911034,
+      "dequeued_us": 844137,
+      "direction": "Left",
+      "displayed_us": 927745,
+      "ordinal": 8,
+      "registered_us": 844138,
+      "session": 1
+    },
+    {
+      "accepted": false,
+      "applied_us": null,
+      "dequeued_us": 877584,
+      "direction": "Right",
+      "displayed_us": null,
+      "ordinal": 0,
+      "registered_us": 877585,
+      "session": 1
+    },
+    {
+      "accepted": true,
+      "applied_us": 994723,
+      "dequeued_us": 927778,
+      "direction": "Down",
+      "displayed_us": 1011405,
+      "ordinal": 9,
+      "registered_us": 927779,
+      "session": 1
+    },
+    {
+      "accepted": true,
+      "applied_us": 1061602,
+      "dequeued_us": 961254,
+      "direction": "Left",
+      "displayed_us": 1078309,
+      "ordinal": 10,
+      "registered_us": 961255,
+      "session": 1
+    },
+    {
+      "accepted": false,
+      "applied_us": null,
+      "dequeued_us": 994711,
+      "direction": "Down",
+      "displayed_us": null,
+      "ordinal": 0,
+      "registered_us": 994712,
+      "session": 1
+    },
+    {
+      "accepted": false,
+      "applied_us": null,
+      "dequeued_us": 1044887,
+      "direction": "Left",
+      "displayed_us": null,
+      "ordinal": 0,
+      "registered_us": 1044889,
+      "session": 1
+    },
+    {
+      "accepted": true,
+      "applied_us": 1128524,
+      "dequeued_us": 1078340,
+      "direction": "Up",
+      "displayed_us": 1145227,
+      "ordinal": 11,
+      "registered_us": 1078341,
+      "session": 1
+    },
+    {
+      "accepted": true,
+      "applied_us": 1195457,
+      "dequeued_us": 1111790,
+      "direction": "Left",
+      "displayed_us": 1212137,
+      "ordinal": 12,
+      "registered_us": 1111791,
+      "session": 1
+    },
+    {
+      "accepted": false,
+      "applied_us": null,
+      "dequeued_us": 1161990,
+      "direction": "Right",
+      "displayed_us": null,
+      "ordinal": 0,
+      "registered_us": 1161992,
+      "session": 1
+    },
+    {
+      "accepted": true,
+      "applied_us": 1262365,
+      "dequeued_us": 1195446,
+      "direction": "Down",
+      "displayed_us": 1279051,
+      "ordinal": 13,
+      "registered_us": 1195447,
+      "session": 1
+    },
+    {
+      "accepted": true,
+      "applied_us": 1345986,
+      "dequeued_us": 1228907,
+      "direction": "Left",
+      "displayed_us": 1362676,
+      "ordinal": 14,
+      "registered_us": 1228908,
+      "session": 1
+    },
+    {
+      "accepted": false,
+      "applied_us": null,
+      "dequeued_us": 1262355,
+      "direction": "Up",
+      "displayed_us": null,
+      "ordinal": 0,
+      "registered_us": 1262356,
+      "session": 1
+    },
+    {
+      "accepted": false,
+      "applied_us": null,
+      "dequeued_us": 1295809,
+      "direction": "Right",
+      "displayed_us": null,
+      "ordinal": 0,
+      "registered_us": 1295810,
+      "session": 1
+    },
+    {
+      "accepted": false,
+      "applied_us": null,
+      "dequeued_us": 1345976,
+      "direction": "Right",
+      "displayed_us": null,
+      "ordinal": 0,
+      "registered_us": 1345976,
+      "session": 1
+    },
+    {
+      "accepted": false,
+      "applied_us": null,
+      "dequeued_us": 1379436,
+      "direction": "Right",
+      "displayed_us": null,
+      "ordinal": 0,
+      "registered_us": 1379436,
+      "session": 1
+    },
+    {
+      "accepted": false,
+      "applied_us": null,
+      "dequeued_us": 1412882,
+      "direction": "Right",
+      "displayed_us": null,
+      "ordinal": 0,
+      "registered_us": 1412883,
+      "session": 1
+    },
+    {
+      "accepted": true,
+      "applied_us": 1479785,
+      "dequeued_us": 1463065,
+      "direction": "Up",
+      "displayed_us": 1496490,
+      "ordinal": 15,
+      "registered_us": 1463067,
+      "session": 1
+    },
+    {
+      "accepted": false,
+      "applied_us": null,
+      "dequeued_us": 1496519,
+      "direction": "Down",
+      "displayed_us": null,
+      "ordinal": 0,
+      "registered_us": 1496520,
+      "session": 1
+    },
+    {
+      "accepted": true,
+      "applied_us": 1546699,
+      "dequeued_us": 1546689,
+      "direction": "Right",
+      "displayed_us": 1563385,
+      "ordinal": 16,
+      "registered_us": 1546690,
+      "session": 1
+    },
+    {
+      "accepted": false,
+      "applied_us": null,
+      "dequeued_us": 1563410,
+      "direction": "Right",
+      "displayed_us": null,
+      "ordinal": 0,
+      "registered_us": 1563411,
+      "session": 1
+    },
+    {
+      "accepted": true,
+      "applied_us": 1613601,
+      "dequeued_us": 1613589,
+      "direction": "Down",
+      "displayed_us": 1630296,
+      "ordinal": 17,
+      "registered_us": 1613590,
+      "session": 1
+    },
+    {
+      "accepted": true,
+      "applied_us": 1697230,
+      "dequeued_us": 1647047,
+      "direction": "Right",
+      "displayed_us": 1713934,
+      "ordinal": 18,
+      "registered_us": 1647048,
+      "session": 1
+    },
+    {
+      "accepted": false,
+      "applied_us": null,
+      "dequeued_us": 1680498,
+      "direction": "Left",
+      "displayed_us": null,
+      "ordinal": 0,
+      "registered_us": 1680499,
+      "session": 1
+    },
+    {
+      "accepted": true,
+      "applied_us": 1764182,
+      "dequeued_us": 1730704,
+      "direction": "Down",
+      "displayed_us": 1780862,
+      "ordinal": 19,
+      "registered_us": 1730705,
+      "session": 1
+    },
+    {
+      "accepted": false,
+      "applied_us": null,
+      "dequeued_us": 1764171,
+      "direction": "Up",
+      "displayed_us": null,
+      "ordinal": 0,
+      "registered_us": 1764172,
+      "session": 1
+    },
+    {
+      "accepted": false,
+      "applied_us": null,
+      "dequeued_us": 1814362,
+      "direction": "Down",
+      "displayed_us": null,
+      "ordinal": 0,
+      "registered_us": 1814363,
+      "session": 1
+    },
+    {
+      "accepted": false,
+      "applied_us": null,
+      "dequeued_us": 1847831,
+      "direction": "Up",
+      "displayed_us": null,
+      "ordinal": 0,
+      "registered_us": 1847832,
+      "session": 1
+    },
+    {
+      "accepted": true,
+      "applied_us": 1898027,
+      "dequeued_us": 1881278,
+      "direction": "Right",
+      "displayed_us": 1914706,
+      "ordinal": 20,
+      "registered_us": 1881279,
+      "session": 1
+    },
+    {
+      "accepted": true,
+      "applied_us": 1964923,
+      "dequeued_us": 1914733,
+      "direction": "Down",
+      "displayed_us": 1981609,
+      "ordinal": 21,
+      "registered_us": 1914734,
+      "session": 1
+    },
+    {
+      "accepted": true,
+      "applied_us": 2048541,
+      "dequeued_us": 1964912,
+      "direction": "Right",
+      "displayed_us": 2065251,
+      "ordinal": 22,
+      "registered_us": 1964913,
+      "session": 1
+    },
+    {
+      "accepted": true,
+      "applied_us": 2115450,
+      "dequeued_us": 1981636,
+      "direction": "Up",
+      "displayed_us": 2132148,
+      "ordinal": 23,
+      "registered_us": 1981637,
+      "session": 1
+    },
+    {
+      "accepted": false,
+      "applied_us": null,
+      "dequeued_us": 2031831,
+      "direction": "Down",
+      "displayed_us": null,
+      "ordinal": 0,
+      "registered_us": 2031832,
+      "session": 1
+    },
+    {
+      "accepted": true,
+      "applied_us": 2182336,
+      "dequeued_us": 2065278,
+      "direction": "Right",
+      "displayed_us": 2199047,
+      "ordinal": 24,
+      "registered_us": 2065279,
+      "session": 1
+    },
+    {
+      "accepted": false,
+      "applied_us": null,
+      "dequeued_us": 2098727,
+      "direction": "Up",
+      "displayed_us": null,
+      "ordinal": 0,
+      "registered_us": 2098728,
+      "session": 1
+    },
+    {
+      "accepted": false,
+      "applied_us": null,
+      "dequeued_us": 2148900,
+      "direction": "Left",
+      "displayed_us": null,
+      "ordinal": 0,
+      "registered_us": 2148901,
+      "session": 1
+    },
+    {
+      "accepted": true,
+      "applied_us": 2249261,
+      "dequeued_us": 2199071,
+      "direction": "Up",
+      "displayed_us": 2265950,
+      "ordinal": 25,
+      "registered_us": 2199073,
+      "session": 1
+    },
+    {
+      "accepted": true,
+      "applied_us": 2316138,
+      "dequeued_us": 2249251,
+      "direction": "Left",
+      "displayed_us": 2332831,
+      "ordinal": 26,
+      "registered_us": 2249252,
+      "session": 1
+    },
+    {
+      "accepted": true,
+      "applied_us": 2399770,
+      "dequeued_us": 2282682,
+      "direction": "Up",
+      "displayed_us": 2416456,
+      "ordinal": 27,
+      "registered_us": 2282683,
+      "session": 1
+    },
+    {
+      "accepted": false,
+      "applied_us": null,
+      "dequeued_us": 2316129,
+      "direction": "Left",
+      "displayed_us": null,
+      "ordinal": 0,
+      "registered_us": 2316130,
+      "session": 1
+    },
+    {
+      "accepted": true,
+      "applied_us": 2466655,
+      "dequeued_us": 2366302,
+      "direction": "Left",
+      "displayed_us": 2483349,
+      "ordinal": 28,
+      "registered_us": 2366303,
+      "session": 1
+    },
+    {
+      "accepted": false,
+      "applied_us": null,
+      "dequeued_us": 2399759,
+      "direction": "Right",
+      "displayed_us": null,
+      "ordinal": 0,
+      "registered_us": 2399760,
+      "session": 1
+    },
+    {
+      "accepted": true,
+      "applied_us": 2533524,
+      "dequeued_us": 2433199,
+      "direction": "Down",
+      "displayed_us": 2550237,
+      "ordinal": 29,
+      "registered_us": 2433200,
+      "session": 1
+    },
+    {
+      "accepted": false,
+      "applied_us": null,
+      "dequeued_us": 2466647,
+      "direction": "Down",
+      "displayed_us": null,
+      "ordinal": 0,
+      "registered_us": 2466647,
+      "session": 1
+    },
+    {
+      "accepted": false,
+      "applied_us": null,
+      "dequeued_us": 2500092,
+      "direction": "Up",
+      "displayed_us": null,
+      "ordinal": 0,
+      "registered_us": 2500093,
+      "session": 1
+    },
+    {
+      "accepted": true,
+      "applied_us": 2600436,
+      "dequeued_us": 2550259,
+      "direction": "Left",
+      "displayed_us": 2617136,
+      "ordinal": 30,
+      "registered_us": 2550259,
+      "session": 1
+    },
+    {
+      "accepted": true,
+      "applied_us": 2667355,
+      "dequeued_us": 2583712,
+      "direction": "Up",
+      "displayed_us": 2684034,
+      "ordinal": 31,
+      "registered_us": 2583712,
+      "session": 1
+    },
+    {
+      "accepted": true,
+      "applied_us": 2750989,
+      "dequeued_us": 2617160,
+      "direction": "Left",
+      "displayed_us": 2767679,
+      "ordinal": 32,
+      "registered_us": 2617160,
+      "session": 1
+    },
+    {
+      "accepted": false,
+      "applied_us": null,
+      "dequeued_us": 2667343,
+      "direction": "Right",
+      "displayed_us": null,
+      "ordinal": 0,
+      "registered_us": 2667345,
+      "session": 1
+    },
+    {
+      "accepted": false,
+      "applied_us": null,
+      "dequeued_us": 2700785,
+      "direction": "Right",
+      "displayed_us": null,
+      "ordinal": 0,
+      "registered_us": 2700786,
+      "session": 1
+    },
+    {
+      "accepted": true,
+      "applied_us": 2817900,
+      "dequeued_us": 2750978,
+      "direction": "Down",
+      "displayed_us": 2834589,
+      "ordinal": 33,
+      "registered_us": 2750979,
+      "session": 1
+    },
+    {
+      "accepted": true,
+      "applied_us": 2884789,
+      "dequeued_us": 2767703,
+      "direction": "Right",
+      "displayed_us": 2901500,
+      "ordinal": 34,
+      "registered_us": 2767704,
+      "session": 1
+    },
+    {
+      "accepted": false,
+      "applied_us": null,
+      "dequeued_us": 2817886,
+      "direction": "Up",
+      "displayed_us": null,
+      "ordinal": 0,
+      "registered_us": 2817887,
+      "session": 1
+    },
+    {
+      "accepted": false,
+      "applied_us": null,
+      "dequeued_us": 2851342,
+      "direction": "Right",
+      "displayed_us": null,
+      "ordinal": 0,
+      "registered_us": 2851343,
+      "session": 1
+    },
+    {
+      "accepted": true,
+      "applied_us": 2951704,
+      "dequeued_us": 2901528,
+      "direction": "Up",
+      "displayed_us": 2968401,
+      "ordinal": 35,
+      "registered_us": 2901529,
+      "session": 1
+    },
+    {
+      "accepted": true,
+      "applied_us": 3018637,
+      "dequeued_us": 2934980,
+      "direction": "Right",
+      "displayed_us": 3035320,
+      "ordinal": 36,
+      "registered_us": 2934982,
+      "session": 1
+    },
+    {
+      "accepted": true,
+      "applied_us": 3102267,
+      "dequeued_us": 2985161,
+      "direction": "Down",
+      "displayed_us": 3118955,
+      "ordinal": 37,
+      "registered_us": 2985162,
+      "session": 1
+    },
+    {
+      "accepted": false,
+      "applied_us": null,
+      "dequeued_us": 3018625,
+      "direction": "Up",
+      "displayed_us": null,
+      "ordinal": 0,
+      "registered_us": 3018626,
+      "session": 1
+    },
+    {
+      "accepted": false,
+      "applied_us": null,
+      "dequeued_us": 3052107,
+      "direction": "Up",
+      "displayed_us": null,
+      "ordinal": 0,
+      "registered_us": 3052108,
+      "session": 1
+    },
+    {
+      "accepted": false,
+      "applied_us": null,
+      "dequeued_us": 3102256,
+      "direction": "Down",
+      "displayed_us": null,
+      "ordinal": 0,
+      "registered_us": 3102257,
+      "session": 1
+    },
+    {
+      "accepted": true,
+      "applied_us": 3169168,
+      "dequeued_us": 3135705,
+      "direction": "Left",
+      "displayed_us": 3185856,
+      "ordinal": 38,
+      "registered_us": 3135706,
+      "session": 1
+    },
+    {
+      "accepted": false,
+      "applied_us": null,
+      "dequeued_us": 3169157,
+      "direction": "Right",
+      "displayed_us": null,
+      "ordinal": 0,
+      "registered_us": 3169158,
+      "session": 1
+    },
+    {
+      "accepted": false,
+      "applied_us": null,
+      "dequeued_us": 3202615,
+      "direction": "Left",
+      "displayed_us": null,
+      "ordinal": 0,
+      "registered_us": 3202616,
+      "session": 1
+    },
+    {
+      "accepted": false,
+      "applied_us": null,
+      "dequeued_us": 3236069,
+      "direction": "Right",
+      "displayed_us": null,
+      "ordinal": 0,
+      "registered_us": 3236070,
+      "session": 1
+    },
+    {
+      "accepted": false,
+      "applied_us": null,
+      "dequeued_us": 3269518,
+      "direction": "Left",
+      "displayed_us": null,
+      "ordinal": 0,
+      "registered_us": 3269520,
+      "session": 1
+    },
+    {
+      "accepted": true,
+      "applied_us": 3369892,
+      "dequeued_us": 3319710,
+      "direction": "Up",
+      "displayed_us": 3386585,
+      "ordinal": 39,
+      "registered_us": 3319712,
+      "session": 1
+    },
+    {
+      "accepted": true,
+      "applied_us": 3453526,
+      "dequeued_us": 3353165,
+      "direction": "Right",
+      "displayed_us": 3470214,
+      "ordinal": 40,
+      "registered_us": 3353166,
+      "session": 1
+    },
+    {
+      "accepted": true,
+      "applied_us": 3520448,
+      "dequeued_us": 3403345,
+      "direction": "Down",
+      "displayed_us": 3537135,
+      "ordinal": 41,
+      "registered_us": 3403346,
+      "session": 1
+    },
+    {
+      "accepted": false,
+      "applied_us": null,
+      "dequeued_us": 3436793,
+      "direction": "Right",
+      "displayed_us": null,
+      "ordinal": 0,
+      "registered_us": 3436794,
+      "session": 1
+    },
+    {
+      "accepted": true,
+      "applied_us": 3587375,
+      "dequeued_us": 3470249,
+      "direction": "Left",
+      "displayed_us": 3604060,
+      "ordinal": 42,
+      "registered_us": 3470250,
+      "session": 1
+    },
+    {
+      "accepted": false,
+      "applied_us": null,
+      "dequeued_us": 3503719,
+      "direction": "Up",
+      "displayed_us": null,
+      "ordinal": 0,
+      "registered_us": 3503720,
+      "session": 1
+    },
+    {
+      "accepted": true,
+      "applied_us": 3654294,
+      "dequeued_us": 3553903,
+      "direction": "Up",
+      "displayed_us": 3670977,
+      "ordinal": 43,
+      "registered_us": 3553904,
+      "session": 1
+    },
+    {
+      "accepted": false,
+      "applied_us": null,
+      "dequeued_us": 3587363,
+      "direction": "Left",
+      "displayed_us": null,
+      "ordinal": 0,
+      "registered_us": 3587364,
+      "session": 1
+    },
+    {
+      "accepted": true,
+      "applied_us": 3721172,
+      "dequeued_us": 3620825,
+      "direction": "Left",
+      "displayed_us": 3737882,
+      "ordinal": 44,
+      "registered_us": 3620826,
+      "session": 1
+    },
+    {
+      "accepted": false,
+      "applied_us": null,
+      "dequeued_us": 3654283,
+      "direction": "Left",
+      "displayed_us": null,
+      "ordinal": 0,
+      "registered_us": 3654284,
+      "session": 1
+    },
+    {
+      "accepted": false,
+      "applied_us": null,
+      "dequeued_us": 3687737,
+      "direction": "Left",
+      "displayed_us": null,
+      "ordinal": 0,
+      "registered_us": 3687738,
+      "session": 1
+    },
+    {
+      "accepted": false,
+      "applied_us": null,
+      "dequeued_us": 3737910,
+      "direction": "Right",
+      "displayed_us": null,
+      "ordinal": 0,
+      "registered_us": 3737911,
+      "session": 1
+    },
+    {
+      "accepted": true,
+      "applied_us": 3804866,
+      "dequeued_us": 3771409,
+      "direction": "Down",
+      "displayed_us": 3821565,
+      "ordinal": 45,
+      "registered_us": 3771410,
+      "session": 1
+    },
+    {
+      "accepted": false,
+      "applied_us": null,
+      "dequeued_us": 3821596,
+      "direction": "Down",
+      "displayed_us": null,
+      "ordinal": 0,
+      "registered_us": 3821597,
+      "session": 1
+    },
+    {
+      "accepted": true,
+      "applied_us": 3871800,
+      "dequeued_us": 3871789,
+      "direction": "Left",
+      "displayed_us": 3888485,
+      "ordinal": 46,
+      "registered_us": 3871790,
+      "session": 1
+    },
+    {
+      "accepted": true,
+      "applied_us": 3938695,
+      "dequeued_us": 3921974,
+      "direction": "Up",
+      "displayed_us": 3955394,
+      "ordinal": 47,
+      "registered_us": 3921976,
+      "session": 1
+    },
+    {
+      "accepted": false,
+      "applied_us": null,
+      "dequeued_us": 3955424,
+      "direction": "Down",
+      "displayed_us": null,
+      "ordinal": 0,
+      "registered_us": 3955425,
+      "session": 1
+    },
+    {
+      "accepted": false,
+      "applied_us": null,
+      "dequeued_us": 3988872,
+      "direction": "Up",
+      "displayed_us": null,
+      "ordinal": 0,
+      "registered_us": 3988873,
+      "session": 1
+    },
+    {
+      "accepted": true,
+      "applied_us": 4072518,
+      "dequeued_us": 4022325,
+      "direction": "Right",
+      "displayed_us": 4089226,
+      "ordinal": 48,
+      "registered_us": 4022326,
+      "session": 1
+    },
+    {
+      "accepted": true,
+      "applied_us": 4156141,
+      "dequeued_us": 4055790,
+      "direction": "Up",
+      "displayed_us": 4172852,
+      "ordinal": 49,
+      "registered_us": 4055791,
+      "session": 1
+    },
+    {
+      "accepted": false,
+      "applied_us": null,
+      "dequeued_us": 4105986,
+      "direction": "Down",
+      "displayed_us": null,
+      "ordinal": 0,
+      "registered_us": 4105987,
+      "session": 1
+    },
+    {
+      "accepted": true,
+      "applied_us": 4223067,
+      "dequeued_us": 4139428,
+      "direction": "Left",
+      "displayed_us": 4239782,
+      "ordinal": 50,
+      "registered_us": 4139429,
+      "session": 1
+    },
+    {
+      "accepted": true,
+      "applied_us": 4290005,
+      "dequeued_us": 4172882,
+      "direction": "Up",
+      "displayed_us": 4306709,
+      "ordinal": 51,
+      "registered_us": 4172883,
+      "session": 1
+    }
+  ],
+  "invalid_samples": 0,
+  "partial_window": {
+    "duration_us": 11037,
+    "frames": 1,
+    "screen": "GameOver",
+    "start_us": 12057686,
+    "uniform_context": true
+  },
+  "powerups_implemented": false,
+  "schema_version": 1
+}

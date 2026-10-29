@@ -1,0 +1,10 @@
+{
+  "version": 1,
+  "key_up": 8,
+  "key_down": 10,
+  "key_left": 9,
+  "key_right": 11,
+  "music_volume": 0,
+  "sfx_volume": 0,
+  "theme": "Neon"
+}

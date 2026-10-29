@@ -1,0 +1,2 @@
+-- Running Cppcheck 2.13.0
+-- cppcheck: no findings in src/, include/ and tests/

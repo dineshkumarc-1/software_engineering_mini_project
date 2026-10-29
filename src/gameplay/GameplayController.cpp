@@ -124,9 +124,11 @@ void GameplayController::update(std::chrono::microseconds step, Screen screen) {
 }
 
 void GameplayController::changeDirection(Direction direction) {
-    if (hasGame_) {
-        engine_.changeDirection(direction);
-    }
+    (void)requestDirection(direction);
+}
+
+bool GameplayController::requestDirection(Direction direction) {
+    return hasGame_ && engine_.tryQueueDirection(direction);
 }
 
 bool GameplayController::hasGame() const noexcept {

@@ -1,0 +1,26 @@
+{
+  "version": 1,
+  "entries": [
+    {
+      "player_name": "Easy",
+      "score": 30,
+      "game_mode": "Classic",
+      "difficulty": "Easy",
+      "date_achieved": "2026-10-28"
+    },
+    {
+      "player_name": "Medium",
+      "score": 20,
+      "game_mode": "Classic",
+      "difficulty": "Medium",
+      "date_achieved": "2026-10-28"
+    },
+    {
+      "player_name": "Hard",
+      "score": 10,
+      "game_mode": "Classic",
+      "difficulty": "Hard",
+      "date_achieved": "2026-10-28"
+    }
+  ]
+}

@@ -74,6 +74,9 @@ public:
     std::size_t foodEatenCount() const noexcept;
 
     void changeDirection(Direction next);
+    // Nonbreaking diagnostic hook: same queue rules, explicit registration result.
+    bool tryQueueDirection(Direction next);
+    std::size_t appliedDirectionCount() const noexcept { return appliedDirectionCount_; }
     void tick();
 
     bool isGameOver() const noexcept;
@@ -110,6 +113,7 @@ private:
 
     std::deque<GridPosition> snake_;
     std::deque<Direction> directionQueue_;
+    std::size_t appliedDirectionCount_{0};
     Direction direction_{Direction::Right};
 
     bool gameOver_{false};

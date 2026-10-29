@@ -56,6 +56,9 @@ jobs:
       - name: Test
         run: ctest --test-dir build -C Release --output-on-failure
 
+      - name: Performance and acceptance tooling tests
+        run: python -m unittest discover -s tests -p "test_*.py"
+
   mingw:
     name: Tests (Windows MinGW-w64)
     runs-on: windows-latest
@@ -162,7 +165,8 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y --no-install-recommends \
-            libx11-dev libxrandr-dev libudev-dev libgl1-mesa-dev libfreetype-dev
+            libx11-dev libxrandr-dev libudev-dev libgl1-mesa-dev libfreetype-dev \
+            libopenal-dev libflac-dev libogg-dev libvorbis-dev xvfb xdotool
 
       - name: Configure
         run: >
@@ -177,11 +181,28 @@ jobs:
       - name: Test
         run: ctest --test-dir build -C Release --output-on-failure
 
+      - name: Audio backend smoke (null output, not audible acceptance)
+        if: runner.os == 'Linux'
+        env:
+          ALSOFT_DRIVERS: 'null'
+        run: ./build/audio_backend_smoke
+
+      - name: Desktop navigation and Settings regression (Linux only)
+        if: runner.os == 'Linux'
+        run: |
+          python tools/desktop_navigation_smoke.py "$PWD/build/SnakeXtreme"
+          python tools/desktop_settings_smoke.py "$PWD/build/SnakeXtreme"
+          python tools/desktop_leaderboard_smoke.py "$PWD/build/SnakeXtreme"
+
       - name: Upload Windows executable
         if: runner.os == 'Windows'
         uses: actions/upload-artifact@v4
         with:
           name: SnakeXtreme-windows-x64
-          path: build/Release/SnakeXtreme.exe
+          path: |
+            build/Release/SnakeXtreme.exe
+            build/Release/openal32.dll
+            build/Release/assets/
+            build/Release/THIRD_PARTY_NOTICES.md
           if-no-files-found: error
           retention-days: 14

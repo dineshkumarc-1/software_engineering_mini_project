@@ -1,0 +1,119 @@
+{
+  "acceptance": "not_assessed",
+  "platform": "Linux/Xvfb/software GL/null audio",
+  "hardware_verified": false,
+  "cache_condition": "unverified",
+  "runs": [
+    {
+      "acceptance": "not_assessed",
+      "main_to_first_frame_us": 246200,
+      "all_complete_window_fps": {
+        "count": 12,
+        "min": 53,
+        "median": 58.0,
+        "mean": 57.833333333333336,
+        "max": 60
+      },
+      "hard_obstacle_uniform_gameplay_fps": null,
+      "longest_same_session_eligible_seconds": 0,
+      "fps_below_30_windows": 0,
+      "accepted_input_registration_lower_bound_us": {
+        "count": 5,
+        "min": 0,
+        "median": 1,
+        "mean": 1,
+        "max": 2
+      },
+      "accepted_input_registration_at_least_100ms": 0,
+      "first_display_after_application_us": {
+        "count": 5,
+        "min": 184399,
+        "median": 401873,
+        "mean": 354053.2,
+        "max": 407741
+      },
+      "rejected_inputs": 95,
+      "accepted_without_display": 0,
+      "run": 1,
+      "external_launch_marker_us": [
+        272427.947,
+        179792.868,
+        178668.177
+      ]
+    },
+    {
+      "acceptance": "not_assessed",
+      "main_to_first_frame_us": 208736,
+      "all_complete_window_fps": {
+        "count": 12,
+        "min": 55,
+        "median": 59.0,
+        "mean": 58.583333333333336,
+        "max": 60
+      },
+      "hard_obstacle_uniform_gameplay_fps": null,
+      "longest_same_session_eligible_seconds": 0,
+      "fps_below_30_windows": 0,
+      "accepted_input_registration_lower_bound_us": {
+        "count": 5,
+        "min": 0,
+        "median": 1,
+        "mean": 1,
+        "max": 2
+      },
+      "accepted_input_registration_at_least_100ms": 0,
+      "first_display_after_application_us": {
+        "count": 5,
+        "min": 185155,
+        "median": 392066,
+        "mean": 350383.6,
+        "max": 410457
+      },
+      "rejected_inputs": 95,
+      "accepted_without_display": 0,
+      "run": 2,
+      "external_launch_marker_us": [
+        160677.131,
+        194788.759,
+        173119.61
+      ]
+    },
+    {
+      "acceptance": "not_assessed",
+      "main_to_first_frame_us": 222879,
+      "all_complete_window_fps": {
+        "count": 12,
+        "min": 58,
+        "median": 59.5,
+        "mean": 59.333333333333336,
+        "max": 60
+      },
+      "hard_obstacle_uniform_gameplay_fps": null,
+      "longest_same_session_eligible_seconds": 0,
+      "fps_below_30_windows": 0,
+      "accepted_input_registration_lower_bound_us": {
+        "count": 5,
+        "min": 0,
+        "median": 1,
+        "mean": 0.8,
+        "max": 2
+      },
+      "accepted_input_registration_at_least_100ms": 0,
+      "first_display_after_application_us": {
+        "count": 5,
+        "min": 184095,
+        "median": 402760,
+        "mean": 352717.2,
+        "max": 404304
+      },
+      "rejected_inputs": 95,
+      "accepted_without_display": 0,
+      "run": 3,
+      "external_launch_marker_us": [
+        152923.013,
+        127352.612,
+        156527.827
+      ]
+    }
+  ]
+}

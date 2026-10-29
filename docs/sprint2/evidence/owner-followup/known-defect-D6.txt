@@ -1,0 +1,8 @@
+Filters: [known-defect]
+RNG seed: 102985409
+/data/dinesh-owner-followup/tests/SecurityCorpusTests.cpp:539: failed: !(warning.empty()) for: !true with 1 message: 'name := "01-empty-file.json"'
+/data/dinesh-owner-followup/tests/SecurityCorpusTests.cpp:539: failed: !(warning.empty()) for: !true with 1 message: 'name := "02-whitespace-only.json"'
+test cases: 1 | 1 failed as expected
+assertions: 4 | 2 passed | 2 failed as expected
+
+

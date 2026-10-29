@@ -1,0 +1,192 @@
+# Issue #18 run 2 - tools/leaderboard_ui_check.py on the real game (Linux, Xvfb, XTEST keys and mouse)
+# Build: candidate #53 dbf08b5 plus the #52 test update at 12441e5. 'FAIL (Dn)' marks a check broken by a known defect.
+
+## GCC 13.3 Release game, sections TC-LB-01, TC-LB-02, TC-LB-04 (root; TC-SEC-04 part below)
+== TC-LB-01 persist Top 10 with all fields
+  attempt 1, game Ann: Classic / Easy, score 30 - You hit the wall | Classic / Easy | Score 30 | High 30 | Score saved: rank 1 | Enter: play
+  attempt 1, game Ben: Timed / Medium, score 10 - You hit the wall | Timed / Medium | Score 10 | High 30 | Time 0:58 | Score saved: rank 2 |
+  attempt 1, game Cara: Obstacle / Hard, score 15 - You hit an obstacle | Obstacle / Hard | Score 15 | High 30 | Score saved: rank 2 | Enter: 
+  attempt 1, game Dev: Classic / Hard, score 0 - You hit the wall | Classic / Hard | Score 0 | High 30 | Score saved: rank 4 | Enter: play 
+  attempt 1, game Eli: Obstacle / Easy, score 45 - You hit the wall | Obstacle / Easy | Score 45 | High 45 | Score saved: rank 1 | Enter: pla
+PASS TC-LB-01: Ann's game over screen reports the save - c / Easy | Score 30 | High 30 | Score saved: rank 1 | Enter: play again, M: menu
+PASS TC-LB-01: Ben's game over screen reports the save - core 10 | High 30 | Time 0:58 | Score saved: rank 2 | Enter: play again, M: menu
+PASS TC-LB-01: Cara's game over screen reports the save - e / Hard | Score 15 | High 30 | Score saved: rank 2 | Enter: play again, M: menu
+PASS TC-LB-01: Dev's game over screen reports the save - ic / Hard | Score 0 | High 30 | Score saved: rank 4 | Enter: play again, M: menu
+PASS TC-LB-01: Eli's game over screen reports the save - e / Easy | Score 45 | High 45 | Score saved: rank 1 | Enter: play again, M: menu
+PASS TC-LB-01: the 5 games have different scores - {'Ann': 30, 'Ben': 10, 'Cara': 15, 'Dev': 0, 'Eli': 45}
+PASS TC-LB-01: the app exits normally - exit code 0
+PASS TC-LB-01: leaderboard.json is valid JSON - 859 bytes
+PASS TC-LB-01: version 1 and all 5 games stored - 5 entries
+PASS TC-LB-01: sorted by score, descending - [45, 30, 15, 10, 0]
+PASS TC-LB-01: every entry has exactly the 5 Appendix B fields - ['date_achieved', 'difficulty', 'game_mode', 'player_name', 'score']
+PASS TC-LB-01: name, score, mode and difficulty match each game played - Eli 45 Obstacle/Easy; Ann 30 Classic/Easy; Cara 15 Obstacle/Hard; Ben 10 Timed/Medium; Dev 0 Classic/Hard
+FAIL (D4) TC-LB-01: date_achieved is today's date as YYYY-MM-DD - ['2026-10-29T09:09:14Z', '2026-10-29T09:09:17Z', '2026-10-29T09:09:19Z', '2026-10-29T09:09:21Z', '2026-10-29T09:09:31Z']
+PASS TC-LB-01: no temporary file is left - []
+PASS TC-LB-01: after a restart the Leaderboard shows the 5 saved games in order - SnakeXtreme | Leaderboard | 5 entries | 1. Eli 45 | 2. Ann 30 | 3. Cara 15 | 4. Ben 10 | 5. Dev 0 |  | Esc: back
+PASS TC-LB-01: the app exits normally after the restart
+PASS TC-LB-01: viewing the board does not rewrite the file
+== TC-LB-02 view leaderboard
+PASS TC-LB-02: Leaderboard opens from the main menu - SnakeXtreme | Leaderboard | 10 entries | 1. Top-9999999 9999999 | 2. Nine00 900 | 3. FifteenCharsXYZ 750 | 4. Mid_500 50
+PASS TC-LB-02: 10 rows with rank, name and score in descending order - SnakeXtreme | Leaderboard | 10 entries | 1. Top-9999999 9999999 | 2. Nine00 900 | 3. FifteenCharsXYZ 750 | 4. Mid_500 500 | 5. B 300 | 6. Tie_A 200 | 7. Tie_B 200 | 8. Hundred 100 | 9. Low 10 10 | 10. Zero 0 |  | Esc: back
+PASS TC-LB-02: equal scores keep their stored order (Tie_A before Tie_B)
+PASS TC-LB-02: Esc returns to the main menu - SnakeXtreme | Main menu | Up/Down: select, Enter: confirm, Esc: exit
+PASS TC-LB-02: the app exits normally
+PASS TC-LB-02: the empty board shows no rows and no warning - SnakeXtreme | Leaderboard | 0 entries |  | Esc: back
+PASS TC-LB-02: Esc returns to the main menu from the empty board
+PASS TC-LB-02: the app exits normally
+  The screenshots lb02-*.png are inspected by eye for the columns and "No scores yet".
+== TC-LB-04 missing/corrupt leaderboard fallback
+PASS TC-LB-04 missing: no crash and an empty leaderboard is shown - SnakeXtreme | Leaderboard | 0 entries |  | Esc: back
+PASS TC-LB-04 missing: the next real game's score (10) is saved - Score saved: rank 1
+PASS TC-LB-04 missing: the app exits normally - exit code 0
+PASS TC-LB-04 missing: the bad file is replaced by a valid board holding only that score - file now 1 entries
+PASS TC-LB-04 missing: no temporary file is left - []
+  runtime log lines about the leaderboard: none
+PASS TC-LB-04 empty: no crash and an empty leaderboard is shown - SnakeXtreme | Leaderboard | 0 entries |  | Esc: back
+FAIL TC-LB-04 empty: a warning is shown on the Leaderboard screen - SnakeXtreme | Leaderboard | 0 entries |  | Esc: back
+PASS TC-LB-04 empty: the next real game's score (10) is saved - Score saved: rank 1
+PASS TC-LB-04 empty: the app exits normally - exit code 0
+PASS TC-LB-04 empty: the bad file is replaced by a valid board holding only that score - file now 1 entries
+PASS TC-LB-04 empty: no temporary file is left - []
+  runtime log lines about the leaderboard: none
+PASS TC-LB-04 truncated: no crash and an empty leaderboard is shown - SnakeXtreme | Leaderboard | 0 entries | E_LEADERBOARD_READ: invalid or unreadable board; empty table shown | Esc: back
+PASS TC-LB-04 truncated: a warning is shown on the Leaderboard screen - 0 entries | E_LEADERBOARD_READ: invalid or unreadable board; empty table shown | Esc: back
+PASS TC-LB-04 truncated: the next real game's score (10) is saved - Score saved: rank 1; Warning: the previous leaderboard JSON was malformed. A new leaderboard was saved.
+PASS TC-LB-04 truncated: the app exits normally - exit code 0
+PASS TC-LB-04 truncated: the bad file is replaced by a valid board holding only that score - file now 1 entries
+PASS TC-LB-04 truncated: no temporary file is left - []
+  runtime log lines about the leaderboard: ['[WARN] E_LEADERBOARD_READ: invalid or unreadable board; empty table shown', '[WARN] Score saved: rank 1; Warning: the previous leaderboard JSON was malformed. A new leaderboard was saved.']
+PASS TC-LB-04 wrong type: no crash and an empty leaderboard is shown - SnakeXtreme | Leaderboard | 0 entries | E_LEADERBOARD_READ: invalid or unreadable board; empty table shown | Esc: back
+PASS TC-LB-04 wrong type: a warning is shown on the Leaderboard screen - 0 entries | E_LEADERBOARD_READ: invalid or unreadable board; empty table shown | Esc: back
+FAIL (D3) TC-LB-04 wrong type: the next real game's score (10) is saved - E_LEADERBOARD_SAVE: score not saved
+PASS TC-LB-04 wrong type: the app exits normally - exit code 0
+FAIL (D3) TC-LB-04 wrong type: the bad file is replaced by a valid board holding only that score - file unchanged
+PASS TC-LB-04 wrong type: no temporary file is left - []
+  runtime log lines about the leaderboard: ['[WARN] E_LEADERBOARD_READ: invalid or unreadable board; empty table shown', '[WARN] E_LEADERBOARD_SAVE: score not saved']
+PASS TC-LB-04 negative score: no crash and an empty leaderboard is shown - SnakeXtreme | Leaderboard | 0 entries | E_LEADERBOARD_READ: invalid or unreadable board; empty table shown | Esc: back
+PASS TC-LB-04 negative score: a warning is shown on the Leaderboard screen - 0 entries | E_LEADERBOARD_READ: invalid or unreadable board; empty table shown | Esc: back
+FAIL (D3) TC-LB-04 negative score: the next real game's score (10) is saved - E_LEADERBOARD_SAVE: score not saved
+PASS TC-LB-04 negative score: the app exits normally - exit code 0
+FAIL (D3) TC-LB-04 negative score: the bad file is replaced by a valid board holding only that score - file unchanged
+PASS TC-LB-04 negative score: no temporary file is left - []
+  runtime log lines about the leaderboard: ['[WARN] E_LEADERBOARD_READ: invalid or unreadable board; empty table shown', '[WARN] E_LEADERBOARD_SAVE: score not saved']
+PASS TC-LB-04 bad enum: no crash and an empty leaderboard is shown - SnakeXtreme | Leaderboard | 0 entries | E_LEADERBOARD_READ: invalid or unreadable board; empty table shown | Esc: back
+PASS TC-LB-04 bad enum: a warning is shown on the Leaderboard screen - 0 entries | E_LEADERBOARD_READ: invalid or unreadable board; empty table shown | Esc: back
+FAIL (D3) TC-LB-04 bad enum: the next real game's score (10) is saved - E_LEADERBOARD_SAVE: score not saved
+PASS TC-LB-04 bad enum: the app exits normally - exit code 0
+FAIL (D3) TC-LB-04 bad enum: the bad file is replaced by a valid board holding only that score - file unchanged
+PASS TC-LB-04 bad enum: no temporary file is left - []
+  runtime log lines about the leaderboard: ['[WARN] E_LEADERBOARD_READ: invalid or unreadable board; empty table shown', '[WARN] E_LEADERBOARD_SAVE: score not saved']
+FAIL (D2) TC-LB-04 11 entries: no crash and an empty leaderboard is shown - SnakeXtreme | Leaderboard | 10 entries | 1. Eleven0 1100 | 2. Eleven1 1000 | 3. Eleven2 900 | 4. Eleven3 800 | 5. Eleven
+FAIL (D2) TC-LB-04 11 entries: a warning is shown on the Leaderboard screen - n5 600 | 7. Eleven6 500 | 8. Eleven7 400 | 9. Eleven8 300 | 10. Eleven9 200 |  | Esc: back
+FAIL (D2) TC-LB-04 11 entries: the next real game's score (10) is saved - Score did not reach the Top 10
+PASS TC-LB-04 11 entries: the app exits normally - exit code 0
+FAIL (D2) TC-LB-04 11 entries: the bad file is replaced by a valid board holding only that score - file unchanged
+PASS TC-LB-04 11 entries: no temporary file is left - []
+  runtime log lines about the leaderboard: none
+SUMMARY 54/66 passed
+
+## GCC 13.3 Release game, TC-SEC-04 app level, normal user
+== TC-SEC-04 app level: a refused save keeps the old board
+PASS TC-SEC-04 app level: the game over screen reports that the score was not saved - E_LEADERBOARD_SAVE: score not saved
+PASS TC-SEC-04 app level: the Leaderboard still shows the old board - SnakeXtreme | Leaderboard | 3 entries | 1. Old300 300 | 2. Old200 200 | 3. Old100 100 |  | Esc: back
+PASS TC-SEC-04 app level: the app exits normally - exit code 0
+PASS TC-SEC-04 app level: leaderboard.json is unchanged, byte for byte
+PASS TC-SEC-04 app level: no temporary file is left - []
+PASS TC-SEC-04 app level: the failure is logged - [WARN] E_LEADERBOARD_SAVE: score not saved
+SUMMARY 6/6 passed
+
+## Clang 18 ASan+UBSan game, sections TC-LB-01, TC-LB-02, TC-LB-04
+== TC-LB-01 persist Top 10 with all fields
+  attempt 1, game Ann: Classic / Easy, score 30 - You hit the wall | Classic / Easy | Score 30 | High 30 | Score saved: rank 1 | Enter: play
+  attempt 1, game Ben: Timed / Medium, score 10 - You hit the wall | Timed / Medium | Score 10 | High 30 | Time 0:58 | Score saved: rank 2 |
+  attempt 1, game Cara: Obstacle / Hard, score 15 - You hit the wall | Obstacle / Hard | Score 15 | High 30 | Score saved: rank 2 | Enter: pla
+  attempt 1, game Dev: Classic / Hard, score 0 - You hit the wall | Classic / Hard | Score 0 | High 30 | Score saved: rank 4 | Enter: play 
+  attempt 1, game Eli: Obstacle / Easy, score 45 - You hit the wall | Obstacle / Easy | Score 45 | High 45 | Score saved: rank 1 | Enter: pla
+PASS TC-LB-01: Ann's game over screen reports the save - c / Easy | Score 30 | High 30 | Score saved: rank 1 | Enter: play again, M: menu
+PASS TC-LB-01: Ben's game over screen reports the save - core 10 | High 30 | Time 0:58 | Score saved: rank 2 | Enter: play again, M: menu
+PASS TC-LB-01: Cara's game over screen reports the save - e / Hard | Score 15 | High 30 | Score saved: rank 2 | Enter: play again, M: menu
+PASS TC-LB-01: Dev's game over screen reports the save - ic / Hard | Score 0 | High 30 | Score saved: rank 4 | Enter: play again, M: menu
+PASS TC-LB-01: Eli's game over screen reports the save - e / Easy | Score 45 | High 45 | Score saved: rank 1 | Enter: play again, M: menu
+PASS TC-LB-01: the 5 games have different scores - {'Ann': 30, 'Ben': 10, 'Cara': 15, 'Dev': 0, 'Eli': 45}
+PASS TC-LB-01: the app exits normally - exit code 0
+PASS TC-LB-01: leaderboard.json is valid JSON - 859 bytes
+PASS TC-LB-01: version 1 and all 5 games stored - 5 entries
+PASS TC-LB-01: sorted by score, descending - [45, 30, 15, 10, 0]
+PASS TC-LB-01: every entry has exactly the 5 Appendix B fields - ['date_achieved', 'difficulty', 'game_mode', 'player_name', 'score']
+PASS TC-LB-01: name, score, mode and difficulty match each game played - Eli 45 Obstacle/Easy; Ann 30 Classic/Easy; Cara 15 Obstacle/Hard; Ben 10 Timed/Medium; Dev 0 Classic/Hard
+FAIL (D4) TC-LB-01: date_achieved is today's date as YYYY-MM-DD - ['2026-10-29T09:10:40Z', '2026-10-29T09:10:43Z', '2026-10-29T09:10:45Z', '2026-10-29T09:10:47Z', '2026-10-29T09:10:56Z']
+PASS TC-LB-01: no temporary file is left - []
+PASS TC-LB-01: after a restart the Leaderboard shows the 5 saved games in order - SnakeXtreme | Leaderboard | 5 entries | 1. Eli 45 | 2. Ann 30 | 3. Cara 15 | 4. Ben 10 | 5. Dev 0 |  | Esc: back
+PASS TC-LB-01: the app exits normally after the restart
+PASS TC-LB-01: viewing the board does not rewrite the file
+== TC-LB-02 view leaderboard
+PASS TC-LB-02: Leaderboard opens from the main menu - SnakeXtreme | Leaderboard | 10 entries | 1. Top-9999999 9999999 | 2. Nine00 900 | 3. FifteenCharsXYZ 750 | 4. Mid_500 50
+PASS TC-LB-02: 10 rows with rank, name and score in descending order - SnakeXtreme | Leaderboard | 10 entries | 1. Top-9999999 9999999 | 2. Nine00 900 | 3. FifteenCharsXYZ 750 | 4. Mid_500 500 | 5. B 300 | 6. Tie_A 200 | 7. Tie_B 200 | 8. Hundred 100 | 9. Low 10 10 | 10. Zero 0 |  | Esc: back
+PASS TC-LB-02: equal scores keep their stored order (Tie_A before Tie_B)
+PASS TC-LB-02: Esc returns to the main menu - SnakeXtreme | Main menu | Up/Down: select, Enter: confirm, Esc: exit
+PASS TC-LB-02: the app exits normally
+PASS TC-LB-02: the empty board shows no rows and no warning - SnakeXtreme | Leaderboard | 0 entries |  | Esc: back
+PASS TC-LB-02: Esc returns to the main menu from the empty board
+PASS TC-LB-02: the app exits normally
+  The screenshots lb02-*.png are inspected by eye for the columns and "No scores yet".
+== TC-LB-04 missing/corrupt leaderboard fallback
+PASS TC-LB-04 missing: no crash and an empty leaderboard is shown - SnakeXtreme | Leaderboard | 0 entries |  | Esc: back
+PASS TC-LB-04 missing: the next real game's score (10) is saved - Score saved: rank 1
+PASS TC-LB-04 missing: the app exits normally - exit code 0
+PASS TC-LB-04 missing: the bad file is replaced by a valid board holding only that score - file now 1 entries
+PASS TC-LB-04 missing: no temporary file is left - []
+  runtime log lines about the leaderboard: none
+PASS TC-LB-04 empty: no crash and an empty leaderboard is shown - SnakeXtreme | Leaderboard | 0 entries |  | Esc: back
+FAIL TC-LB-04 empty: a warning is shown on the Leaderboard screen - SnakeXtreme | Leaderboard | 0 entries |  | Esc: back
+PASS TC-LB-04 empty: the next real game's score (10) is saved - Score saved: rank 1
+PASS TC-LB-04 empty: the app exits normally - exit code 0
+PASS TC-LB-04 empty: the bad file is replaced by a valid board holding only that score - file now 1 entries
+PASS TC-LB-04 empty: no temporary file is left - []
+  runtime log lines about the leaderboard: none
+PASS TC-LB-04 truncated: no crash and an empty leaderboard is shown - SnakeXtreme | Leaderboard | 0 entries | E_LEADERBOARD_READ: invalid or unreadable board; empty table shown | Esc: back
+PASS TC-LB-04 truncated: a warning is shown on the Leaderboard screen - 0 entries | E_LEADERBOARD_READ: invalid or unreadable board; empty table shown | Esc: back
+PASS TC-LB-04 truncated: the next real game's score (10) is saved - Score saved: rank 1; Warning: the previous leaderboard JSON was malformed. A new leaderboard was saved.
+PASS TC-LB-04 truncated: the app exits normally - exit code 0
+PASS TC-LB-04 truncated: the bad file is replaced by a valid board holding only that score - file now 1 entries
+PASS TC-LB-04 truncated: no temporary file is left - []
+  runtime log lines about the leaderboard: ['[WARN] E_LEADERBOARD_READ: invalid or unreadable board; empty table shown', '[WARN] Score saved: rank 1; Warning: the previous leaderboard JSON was malformed. A new leaderboard was saved.']
+PASS TC-LB-04 wrong type: no crash and an empty leaderboard is shown - SnakeXtreme | Leaderboard | 0 entries | E_LEADERBOARD_READ: invalid or unreadable board; empty table shown | Esc: back
+PASS TC-LB-04 wrong type: a warning is shown on the Leaderboard screen - 0 entries | E_LEADERBOARD_READ: invalid or unreadable board; empty table shown | Esc: back
+FAIL (D3) TC-LB-04 wrong type: the next real game's score (10) is saved - E_LEADERBOARD_SAVE: score not saved
+PASS TC-LB-04 wrong type: the app exits normally - exit code 0
+FAIL (D3) TC-LB-04 wrong type: the bad file is replaced by a valid board holding only that score - file unchanged
+PASS TC-LB-04 wrong type: no temporary file is left - []
+  runtime log lines about the leaderboard: ['[WARN] E_LEADERBOARD_READ: invalid or unreadable board; empty table shown', '[WARN] E_LEADERBOARD_SAVE: score not saved']
+PASS TC-LB-04 negative score: no crash and an empty leaderboard is shown - SnakeXtreme | Leaderboard | 0 entries | E_LEADERBOARD_READ: invalid or unreadable board; empty table shown | Esc: back
+PASS TC-LB-04 negative score: a warning is shown on the Leaderboard screen - 0 entries | E_LEADERBOARD_READ: invalid or unreadable board; empty table shown | Esc: back
+FAIL (D3) TC-LB-04 negative score: the next real game's score (10) is saved - E_LEADERBOARD_SAVE: score not saved
+PASS TC-LB-04 negative score: the app exits normally - exit code 0
+FAIL (D3) TC-LB-04 negative score: the bad file is replaced by a valid board holding only that score - file unchanged
+PASS TC-LB-04 negative score: no temporary file is left - []
+  runtime log lines about the leaderboard: ['[WARN] E_LEADERBOARD_READ: invalid or unreadable board; empty table shown', '[WARN] E_LEADERBOARD_SAVE: score not saved']
+PASS TC-LB-04 bad enum: no crash and an empty leaderboard is shown - SnakeXtreme | Leaderboard | 0 entries | E_LEADERBOARD_READ: invalid or unreadable board; empty table shown | Esc: back
+PASS TC-LB-04 bad enum: a warning is shown on the Leaderboard screen - 0 entries | E_LEADERBOARD_READ: invalid or unreadable board; empty table shown | Esc: back
+FAIL (D3) TC-LB-04 bad enum: the next real game's score (10) is saved - E_LEADERBOARD_SAVE: score not saved
+PASS TC-LB-04 bad enum: the app exits normally - exit code 0
+FAIL (D3) TC-LB-04 bad enum: the bad file is replaced by a valid board holding only that score - file unchanged
+PASS TC-LB-04 bad enum: no temporary file is left - []
+  runtime log lines about the leaderboard: ['[WARN] E_LEADERBOARD_READ: invalid or unreadable board; empty table shown', '[WARN] E_LEADERBOARD_SAVE: score not saved']
+FAIL (D2) TC-LB-04 11 entries: no crash and an empty leaderboard is shown - SnakeXtreme | Leaderboard | 10 entries | 1. Eleven0 1100 | 2. Eleven1 1000 | 3. Eleven2 900 | 4. Eleven3 800 | 5. Eleven
+FAIL (D2) TC-LB-04 11 entries: a warning is shown on the Leaderboard screen - n5 600 | 7. Eleven6 500 | 8. Eleven7 400 | 9. Eleven8 300 | 10. Eleven9 200 |  | Esc: back
+FAIL (D2) TC-LB-04 11 entries: the next real game's score (10) is saved - Score did not reach the Top 10
+PASS TC-LB-04 11 entries: the app exits normally - exit code 0
+FAIL (D2) TC-LB-04 11 entries: the bad file is replaced by a valid board holding only that score - file unchanged
+PASS TC-LB-04 11 entries: no temporary file is left - []
+  runtime log lines about the leaderboard: none
+SUMMARY 54/66 passed
+
+## Clang 18 ASan+UBSan game, TC-SEC-04 app level, normal user
+== TC-SEC-04 app level: a refused save keeps the old board
+PASS TC-SEC-04 app level: the game over screen reports that the score was not saved - E_LEADERBOARD_SAVE: score not saved
+PASS TC-SEC-04 app level: the Leaderboard still shows the old board - SnakeXtreme | Leaderboard | 3 entries | 1. Old300 300 | 2. Old200 200 | 3. Old100 100 |  | Esc: back
+PASS TC-SEC-04 app level: the app exits normally - exit code 0
+PASS TC-SEC-04 app level: leaderboard.json is unchanged, byte for byte
+PASS TC-SEC-04 app level: no temporary file is left - []
+PASS TC-SEC-04 app level: the failure is logged - [WARN] E_LEADERBOARD_SAVE: score not saved
+SUMMARY 6/6 passed

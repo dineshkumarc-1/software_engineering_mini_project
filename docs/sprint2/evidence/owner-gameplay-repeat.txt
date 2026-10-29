@@ -1,0 +1,45 @@
+Test project /vercel/sandbox/data/snakextreme/build/headless
+    Start 7: gameplay_tests
+    Test #7: gameplay_tests ...................   Passed    0.01 sec
+    Start 7: gameplay_tests
+    Test #7: gameplay_tests ...................   Passed    0.01 sec
+    Start 7: gameplay_tests
+    Test #7: gameplay_tests ...................   Passed    0.01 sec
+    Start 7: gameplay_tests
+    Test #7: gameplay_tests ...................   Passed    0.01 sec
+    Start 7: gameplay_tests
+    Test #7: gameplay_tests ...................   Passed    0.01 sec
+    Start 7: gameplay_tests
+    Test #7: gameplay_tests ...................   Passed    0.01 sec
+    Start 7: gameplay_tests
+    Test #7: gameplay_tests ...................   Passed    0.01 sec
+    Start 7: gameplay_tests
+    Test #7: gameplay_tests ...................   Passed    0.01 sec
+    Start 7: gameplay_tests
+    Test #7: gameplay_tests ...................   Passed    0.01 sec
+    Start 7: gameplay_tests
+    Test #7: gameplay_tests ...................   Passed    0.01 sec
+    Start 7: gameplay_tests
+    Test #7: gameplay_tests ...................   Passed    0.01 sec
+    Start 7: gameplay_tests
+    Test #7: gameplay_tests ...................   Passed    0.01 sec
+    Start 7: gameplay_tests
+    Test #7: gameplay_tests ...................   Passed    0.01 sec
+    Start 7: gameplay_tests
+    Test #7: gameplay_tests ...................   Passed    0.01 sec
+    Start 7: gameplay_tests
+    Test #7: gameplay_tests ...................   Passed    0.01 sec
+    Start 7: gameplay_tests
+    Test #7: gameplay_tests ...................   Passed    0.01 sec
+    Start 7: gameplay_tests
+    Test #7: gameplay_tests ...................   Passed    0.01 sec
+    Start 7: gameplay_tests
+    Test #7: gameplay_tests ...................   Passed    0.01 sec
+    Start 7: gameplay_tests
+    Test #7: gameplay_tests ...................   Passed    0.01 sec
+    Start 7: gameplay_tests
+1/1 Test #7: gameplay_tests ...................   Passed    0.01 sec
+
+100% tests passed out of 1
+
+Total Test time (real) =   0.21 sec

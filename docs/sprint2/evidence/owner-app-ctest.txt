@@ -1,0 +1,27 @@
+Test project /vercel/sandbox/data/snakextreme/build/app
+      Start  1: app_state_flow
+ 1/11 Test  #1: app_state_flow ...................   Passed    0.00 sec
+      Start  2: score_service
+ 2/11 Test  #2: score_service ....................   Passed    0.00 sec
+      Start  3: input_validator_tests
+ 3/11 Test  #3: input_validator_tests ............   Passed    0.00 sec
+      Start  4: game_session
+ 4/11 Test  #4: game_session .....................   Passed    0.00 sec
+      Start  5: game_engine_tests
+ 5/11 Test  #5: game_engine_tests ................   Passed    0.01 sec
+      Start  6: game_mode_tests
+ 6/11 Test  #6: game_mode_tests ..................   Passed    0.20 sec
+      Start  7: gameplay_tests
+ 7/11 Test  #7: gameplay_tests ...................   Passed    0.01 sec
+      Start  8: settings_tests
+ 8/11 Test  #8: settings_tests ...................   Passed    0.01 sec
+      Start  9: audio_model_tests
+ 9/11 Test  #9: audio_model_tests ................   Passed    0.00 sec
+      Start 10: performance_probe_tests
+10/11 Test #10: performance_probe_tests ..........   Passed    0.00 sec
+      Start 11: layering_core_is_sfml_free
+11/11 Test #11: layering_core_is_sfml_free .......   Passed    0.01 sec
+
+100% tests passed out of 11
+
+Total Test time (real) =   0.25 sec

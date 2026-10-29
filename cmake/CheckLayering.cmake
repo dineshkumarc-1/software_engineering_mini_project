@@ -13,7 +13,7 @@ if(NOT SNAKE_SOURCE_DIR)
     message(FATAL_ERROR "Pass -DSNAKE_SOURCE_DIR=<repository root>")
 endif()
 
-set(core_dirs app engine modes scoring gameplay persistence)
+set(core_dirs app engine modes scoring gameplay persistence audio diagnostics)
 set(pending "")
 # C8 power-ups (issue #14).
 list(APPEND core_dirs powerups)

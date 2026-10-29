@@ -1,0 +1,9 @@
+Traceback (most recent call last):
+  File "/data/dinesh-owner-followup/tools/desktop_leaderboard_smoke.py", line 86, in <module>
+    window = launch()
+  File "/data/dinesh-owner-followup/tools/desktop_leaderboard_smoke.py", line 68, in launch
+    wait(found, "app window missing")
+    ~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/dinesh-owner-followup/tools/desktop_leaderboard_smoke.py", line 36, in wait
+    raise AssertionError(message)
+AssertionError: app window missing

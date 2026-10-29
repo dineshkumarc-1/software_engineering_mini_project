@@ -1,0 +1,51 @@
+# Issue #18 run 2 - TC-SEC-04 injected faults (tests/SecureWriteFaultTests.cpp + tests/fault/, Linux LD_PRELOAD)
+# Build: candidate #53 dbf08b5 plus the #52 test update at 12441e5
+
+## Every injection on the real writer (GCC Release; secure_write_fault_writer with libsnake_fault_inject.so)
+# Each line: one child process saving Crash/400 into a fresh copy of a 3-entry board
+# fault | how the child ended | leaderboard.json afterwards | temporary files left (size)
+none                | exit 0            | new: 4 entries, top 400      | none
+crash-after-open    | killed by SIGABRT | old, byte for byte           | leaderboard.json.tmp.15969279173231122992 (0 B)
+crash-after-write   | killed by SIGABRT | old, byte for byte           | leaderboard.json.tmp.3088482535234525990 (678 B)
+crash-after-flush   | killed by SIGABRT | old, byte for byte           | leaderboard.json.tmp.4688852560215249215 (678 B)
+crash-after-rename  | killed by SIGABRT | new: 4 entries, top 400      | none
+fail-write          | exit 3            | old, byte for byte           | none
+fail-flush          | exit 3            | old, byte for byte           | none
+fail-rename         | exit 3            | old, byte for byte           | none
+
+## secure_write_fault_tests -d yes, Clang 18 ASan+UBSan, normal user
+tester
+0.067 s: TC-SEC-04 injected crash: a save aborted at each step leaves the old or the new board
+0.076 s: TC-SEC-04 injected crash: the next save after a crash works and keeps every score
+0.049 s: TC-SEC-04 injected failure: a failed write, flush or rename keeps the old board
+0.049 s: TC-SEC-04 injected failure: a failed first save creates no file
+0.023 s: TC-SEC-04 without a fault the writer saves normally (control)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+secure_write_fault_tests is a Catch2 v3.8.1 host application.
+Run with -? for options
+-------------------------------------------------------------------------------
+Known defect D5 (injected crash): a crashed save's temporary file is never
+removed
+-------------------------------------------------------------------------------
+tests/SecureWriteFaultTests.cpp:296
+...............................................................................
+tests/SecureWriteFaultTests.cpp:311: FAILED:
+  REQUIRE( temporaries(dir.path()).empty() )
+with expansion:
+  false
+0.000 s: Known defect D5 (injected crash): a crashed save's temporary file is never removed
+0.120 s: TC-SEC-04 injected crash and failure: config.json keeps old or new settings
+===============================================================================
+test cases:   7 |   6 passed | 1 failed as expected
+assertions: 182 | 181 passed | 1 failed as expected
+
+## secure_write_fault_tests -d yes, GCC 13.3 Release, normal user
+0.015 s: TC-SEC-04 injected crash: a save aborted at each step leaves the old or the new board
+0.025 s: TC-SEC-04 injected crash: the next save after a crash works and keeps every score
+0.010 s: TC-SEC-04 injected failure: a failed write, flush or rename keeps the old board
+0.009 s: TC-SEC-04 injected failure: a failed first save creates no file
+0.005 s: TC-SEC-04 without a fault the writer saves normally (control)
+0.000 s: Known defect D5 (injected crash): a crashed save's temporary file is never removed
+0.040 s: TC-SEC-04 injected crash and failure: config.json keeps old or new settings
+test cases:   7 |   6 passed | 1 failed as expected
+assertions: 182 | 181 passed | 1 failed as expected
