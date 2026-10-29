@@ -64,6 +64,13 @@ cmake --preset app      && cmake --build --preset app      && ctest --preset app
 
 CI runs these checks on every pull request and push to `main` (Linux GCC, macOS Clang, Windows MSVC and MinGW-w64, plus full app builds on Windows and Linux). See [docs/modes-build-ci.md](docs/modes-build-ci.md).
 
+Quality gates (issue #23):
+- Every test also runs under Clang AddressSanitizer + UndefinedBehaviorSanitizer.
+- cppcheck must report nothing in `src/`, `include/` or `tests/`.
+- The CTest `security_banned_api_scan` fails on any command-running, code-loading, unbounded-string or printf-family call (SEC-005).
+
+See [docs/quality-gates.md](docs/quality-gates.md), which also has the Windows 10/11 run checklist (TC-PORT-01).
+
 ## Game modes and difficulty (issues #11, #12)
 
 `snake_modes` (SAD C7, SFML-free) provides the three mode strategies and the difficulty speeds. Values come from `GameConfig.hpp` (SRS Addendum §4).
