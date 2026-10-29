@@ -3,6 +3,7 @@
 #include "snakextreme/GameConfig.hpp"
 
 #include <algorithm>
+#include <iterator>
 #include <stdexcept>
 #include <utility>
 #include <vector>
@@ -165,6 +166,21 @@ bool GameEngine::spawnFood() {
         return false;
     }
 
+    // Keep new food off excluded cells (a power-up) while another cell is
+    // free; with no other choice, an excluded cell is still used.
+    if (!foodExclusions_.empty()) {
+        std::vector<GridPosition> preferred;
+        preferred.reserve(freeCells.size());
+        std::copy_if(freeCells.begin(), freeCells.end(), std::back_inserter(preferred),
+                     [this](const GridPosition& cell) {
+                         return std::find(foodExclusions_.begin(), foodExclusions_.end(),
+                                          cell) == foodExclusions_.end();
+                     });
+        if (!preferred.empty()) {
+            freeCells = std::move(preferred);
+        }
+    }
+
     if (foodSelector_) {
         const GridPosition selected = foodSelector_(freeCells);
 
@@ -321,6 +337,29 @@ void GameEngine::endGame(GameOverReason reason) noexcept {
 bool GameEngine::isObstacle(GridPosition cell) const noexcept {
     return std::find(obstacles_.begin(), obstacles_.end(), cell) !=
            obstacles_.end();
+}
+
+void GameEngine::setFoodExclusions(std::vector<GridPosition> cells) {
+    foodExclusions_ = std::move(cells);
+}
+
+const std::vector<GridPosition>& GameEngine::foodExclusions() const noexcept {
+    return foodExclusions_;
+}
+
+std::size_t GameEngine::shrink(std::size_t segments,
+                               std::size_t minimumLength) noexcept {
+    if (gameOver_) {
+        return 0;
+    }
+
+    const std::size_t keep = minimumLength > 0 ? minimumLength : 1;
+    std::size_t removed = 0;
+    while (removed < segments && snake_.size() > keep) {
+        snake_.pop_back();
+        ++removed;
+    }
+    return removed;
 }
 
 } // namespace snake

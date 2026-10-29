@@ -28,6 +28,10 @@ snake_add_module(snake_engine SOURCES src/engine/GameEngine.cpp)
 # C7 game modes and difficulty profiles. Uses engine grid types only.
 snake_add_module(snake_modes
     SOURCES src/modes/ModeStrategy.cpp src/modes/ModeManager.cpp)
+# C8 power-ups: spawn schedule, pick-up and timed effects (issue #14).
+snake_add_module(snake_powerups
+    SOURCES src/powerups/PowerUpEffects.cpp src/powerups/PowerUpManager.cpp
+    DEPS snake_engine)
 # One game as the app runs it: engine + ModeManager + score session.
 snake_add_module(snake_gameplay
     SOURCES src/gameplay/GameplayController.cpp
@@ -37,6 +41,9 @@ snake_add_module(snake_gameplay
 snake_add_module(snake_persistence)
 
 snake_assert_core_is_sfml_free()
+
+# The running game (GameplayController) owns the power-ups of its session.
+target_link_libraries(snake_gameplay PUBLIC snake_powerups)
 
 # ---------------------------------------------------------------------------
 # Presentation layer (C1-C5) and the desktop executable.
@@ -143,6 +150,11 @@ if(BUILD_TESTING)
     snake_add_catch2_test(game_mode_tests
         SOURCES tests/GameModeTests.cpp tests/ModeEngineIntegrationTests.cpp
         LIBS snake_modes snake_engine)
+
+    # C8 power-ups: schedule, effects, one active effect (TC-PWR-01..05).
+    snake_add_catch2_test(powerup_tests
+        SOURCES tests/PowerUpTests.cpp tests/PowerUpGameplayTests.cpp
+        LIBS snake_gameplay)
 
     # Menu selection and the app's game wiring (modes, speed, timer, score).
     snake_add_catch2_test(gameplay_tests
