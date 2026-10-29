@@ -379,10 +379,24 @@ TEST_CASE("Time up ends the game and stops all movement",
 
 TEST_CASE("Restarting resets the countdown, score and movement but keeps the high score",
           "[gameplay][timed][TC-MODE-03]") {
-    GameplayController game;
+    
+GameplayController game;
 
-    // Food straight ahead: the first move eats it.
-    REQUIRE(game.start({GameMode::Timed, Difficulty::Medium}, leftStart({3, 10}), 1u));
+// Food starts directly ahead. Place subsequent food at the
+// last free cell so the snake does not score again along its
+// straight path before hitting the wall.
+const GameEngine initialEngine(
+    {{2, 10}, {1, 10}, {0, 10}},
+    Direction::Right,
+    {3, 10},
+    [](const std::vector<GridPosition>& freeCells) {
+        return freeCells.back();
+    });
+
+REQUIRE(game.start(
+    {GameMode::Timed, Difficulty::Medium},
+    initialEngine,
+    1u));
 
     game.update(120ms, Screen::Gameplay);
     REQUIRE(game.score() == 10);
