@@ -166,6 +166,24 @@ if(BUILD_TESTING)
         COMMAND ${CMAKE_COMMAND} -DSNAKE_SOURCE_DIR=${PROJECT_SOURCE_DIR}
                 -P ${PROJECT_SOURCE_DIR}/cmake/CheckLayering.cmake)
 
+    # SEC-005 / TC-SEC-05: no running commands, loading code, unbounded C
+    # strings or printf-family calls in product code (issue #23).
+    add_test(NAME security_banned_api_scan
+        COMMAND ${CMAKE_COMMAND} -DSNAKE_SOURCE_DIR=${PROJECT_SOURCE_DIR}
+                -P ${PROJECT_SOURCE_DIR}/cmake/CheckBannedApis.cmake)
+    # The scan itself: it reports all 12 planted calls and nothing in
+    # look-alike code (comments, strings, fgets, std::filesystem, ...).
+    add_test(NAME security_banned_api_scan_finds_planted_calls
+        COMMAND ${CMAKE_COMMAND}
+                -DSNAKE_SOURCE_DIR=${PROJECT_SOURCE_DIR}/tests/fixtures/banned-api/bad
+                -P ${PROJECT_SOURCE_DIR}/cmake/CheckBannedApis.cmake)
+    set_tests_properties(security_banned_api_scan_finds_planted_calls PROPERTIES
+        PASS_REGULAR_EXPRESSION "12 banned API call\\(s\\)")
+    add_test(NAME security_banned_api_scan_ignores_lookalikes
+        COMMAND ${CMAKE_COMMAND}
+                -DSNAKE_SOURCE_DIR=${PROJECT_SOURCE_DIR}/tests/fixtures/banned-api/clean
+                -P ${PROJECT_SOURCE_DIR}/cmake/CheckBannedApis.cmake)
+
     # Test runner: builds every test executable, then runs the whole suite.
     get_property(snake_test_targets GLOBAL PROPERTY SNAKE_TEST_TARGETS)
     add_custom_target(check

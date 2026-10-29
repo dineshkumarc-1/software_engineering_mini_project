@@ -57,8 +57,10 @@ constexpr std::string_view toString(Difficulty difficulty) noexcept {
 
 // Exact, case-sensitive match of the stored enum strings; anything else is
 // rejected so persistence code can treat it as a schema error (SEC-003).
+// A loop, not std::find_if: std::find_if is not constexpr before C++20.
 constexpr std::optional<GameMode> parseGameMode(std::string_view text) noexcept {
     for (const GameMode mode : AllGameModes) {
+        // cppcheck-suppress useStlAlgorithm
         if (toString(mode) == text) {
             return mode;
         }
@@ -68,6 +70,7 @@ constexpr std::optional<GameMode> parseGameMode(std::string_view text) noexcept 
 
 constexpr std::optional<Difficulty> parseDifficulty(std::string_view text) noexcept {
     for (const Difficulty difficulty : AllDifficulties) {
+        // cppcheck-suppress useStlAlgorithm
         if (toString(difficulty) == text) {
             return difficulty;
         }

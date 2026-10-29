@@ -286,7 +286,7 @@ GameOverReason GameEngine::gameOverReason() const noexcept {
     return gameOverReason_;
 }
 
-void GameEngine::setObstacles(std::vector<GridPosition> obstacles) {
+void GameEngine::setObstacles(const std::vector<GridPosition>& obstacles) {
     std::vector<GridPosition> unique;
     unique.reserve(obstacles.size());
 

@@ -86,7 +86,7 @@ public:
     // Static cells that end the game on contact and never hold food. Food
     // already on one of them is moved to a free cell. Throws
     // std::invalid_argument for a cell outside the grid or on the snake.
-    void setObstacles(std::vector<GridPosition> obstacles);
+    void setObstacles(const std::vector<GridPosition>& obstacles);
     const std::vector<GridPosition>& obstacles() const noexcept;
 
     // Ends a running session for a reason decided outside the engine, such
