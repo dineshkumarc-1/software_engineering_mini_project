@@ -12,7 +12,9 @@
 // Behaviour that the SRS/SAD/STP require but the code does not do yet is
 // kept as "[!shouldfail]" tests named "Known defect ...": they pass while
 // the defect exists and start failing once it is fixed, as a reminder to
-// drop the tag. See docs/qa/TC-PWR-LB-SEC-EXECUTION.md.
+// drop the tag. Tests marked (D1)...(D5) started that way and became
+// ordinary regression tests with the persistence fix in #48.
+// See docs/qa/TC-PWR-LB-SEC-EXECUTION.md.
 
 #include "snakextreme/GameMode.hpp"
 #include "snakextreme/InputValidator.hpp"
@@ -219,10 +221,6 @@ bool isIsoDate(std::string_view text) {
     return true;
 }
 
-// Fixtures the current code accepts although SAD 4.3.5 rejects them; the
-// "Known defect" tests below cover them.
-const std::set<std::string> KnownAccepted{"23-bad-date-format.json", "24-eleven-entries.json"};
-
 } // namespace
 
 // ---------------------------------------------------------------------------
@@ -294,13 +292,10 @@ TEST_CASE("Corpus: the 25 malformed leaderboard files fall back to an empty boar
         // Loading never changes the file.
         REQUIRE(holds(dir.board(), before));
 
-        if (KnownAccepted.count(name) != 0) {
-            continue; // see the "Known defect" tests
-        }
         REQUIRE(loaded.entries.empty());
         ++checked;
     }
-    REQUIRE(checked == 23);
+    REQUIRE(checked == 25);
 }
 
 TEST_CASE("Corpus: each malformed leaderboard file is rejected for the right reason",
@@ -345,16 +340,16 @@ TEST_CASE("Corpus: each malformed leaderboard file is rejected for the right rea
     }
 }
 
-TEST_CASE("Known defect D1: a date_achieved that is not YYYY-MM-DD is accepted",
-          "[corpus][TC-SEC-03][known-defect][!shouldfail]") {
+TEST_CASE("TC-SEC-03: a date_achieved that is not a valid YYYY-MM-DD date is rejected (D1)",
+          "[corpus][TC-SEC-03]") {
     // SAD 4.3.5: "date_achieved": valid YYYY-MM-DD; any violation -> defaults.
     TempDir dir;
     install(CorpusDir / "leaderboard" / "malformed" / "23-bad-date-format.json", dir.board());
     REQUIRE(LeaderboardRepository(dir.board()).top10().empty());
 }
 
-TEST_CASE("Known defect D2: a board with more than 10 entries is accepted",
-          "[corpus][TC-SEC-03][TC-LB-04][known-defect][!shouldfail]") {
+TEST_CASE("TC-LB-04: a board with more than 10 entries is rejected (D2)",
+          "[corpus][TC-SEC-03][TC-LB-04]") {
     // SAD 4.3.5: at most 10 entries; STP TC-LB-04 lists "11 entries" as a
     // corrupt fixture that must show an empty leaderboard.
     TempDir dir;
@@ -455,8 +450,8 @@ TEST_CASE("TC-LB-01: five games persist sorted, with every field, across a resta
     REQUIRE(board[4].playerName == "Guest_1");
 }
 
-TEST_CASE("Known defect D4: date_achieved is written as a timestamp, not YYYY-MM-DD",
-          "[leaderboard][TC-LB-01][known-defect][!shouldfail]") {
+TEST_CASE("TC-LB-01: date_achieved is written as YYYY-MM-DD (D4)",
+          "[leaderboard][TC-LB-01]") {
     // SRS Appendix B and SAD 4.3.5: date_achieved is a 10-character date.
     TempDir dir;
     REQUIRE(LeaderboardRepository(dir.board())
@@ -530,11 +525,25 @@ TEST_CASE("TC-LB-04: missing, empty and truncated files show an empty board and 
     }
 }
 
-TEST_CASE("Known defect D3: a schema-invalid board is not replaced by the next valid score",
+TEST_CASE("Known defect D6: an empty or whitespace-only board shows no warning",
           "[leaderboard][TC-LB-04][known-defect][!shouldfail]") {
+    // STP TC-LB-04 lists "empty" with the other corrupt fixtures: "empty
+    // leaderboard shown; warning logged". Today an empty or blank file is
+    // read as a new board, with no warning (truncated files do warn).
+    for (const char* name : {"01-empty-file.json", "02-whitespace-only.json"}) {
+        CAPTURE(name);
+        TempDir dir;
+        install(CorpusDir / "leaderboard" / "malformed" / name, dir.board());
+        std::string warning;
+        REQUIRE(LeaderboardRepository(dir.board()).top10(&warning).empty());
+        CHECK_FALSE(warning.empty());
+    }
+}
+
+TEST_CASE("TC-LB-04: a schema-invalid board is replaced by the next valid score (D3)",
+          "[leaderboard][TC-LB-04]") {
     // STP TC-LB-04 step 2: "valid result then stored (bad file replaced
-    // atomically)" for wrong type, negative score and bad enum. Today
-    // addScore() refuses to save over them.
+    // atomically)" for wrong type, negative score and bad enum.
     const char* const fixturesToReplace[] = {"14-score-as-string.json", "15-negative-score.json",
                                              "18-unknown-game-mode.json"};
     for (const char* name : fixturesToReplace) {
@@ -663,8 +672,8 @@ TEST_CASE("TC-SEC-04 (simulated leftovers): the files a crash leaves still load 
     }
 }
 
-TEST_CASE("Known defect D5 (simulated leftover): a stale temporary file is never removed",
-          "[security][TC-SEC-04][known-defect][!shouldfail]") {
+TEST_CASE("TC-SEC-04 (simulated leftover): a temporary file older than 24 hours is removed (D5)",
+          "[security][TC-SEC-04]") {
     // STP TC-SEC-04: "stale .tmp removed" (SAD 4.3.4 removeStaleTemp). The
     // agreed policy (#48) only removes leftovers older than 24 hours, so the
     // leftover is made 48 hours old. A fresh one is kept on purpose: see the
@@ -681,8 +690,8 @@ TEST_CASE("Known defect D5 (simulated leftover): a stale temporary file is never
     REQUIRE_FALSE(fs::exists(stale));
 }
 
-TEST_CASE("Known defect D5 (simulated orphan lock): a stale lock sidecar without its temporary file is never removed",
-          "[security][TC-SEC-04][known-defect][!shouldfail]") {
+TEST_CASE("TC-SEC-04 (simulated orphan lock): a lock sidecar older than 24 hours without its temporary file is removed (D5)",
+          "[security][TC-SEC-04]") {
     // A crash before the temporary file is created, or after the rename,
     // leaves only "<board>.tmp.<nonce>.lock" (#48 review). Under the agreed
     // policy, the next load removes it once it is older than 24 hours.

@@ -353,8 +353,8 @@ TEST_CASE("TC-SEC-04 injected crash: a fresh crash leftover is kept, so cleanup 
     REQUIRE(holds(left.front(), leftBytes));
 }
 
-TEST_CASE("Known defect D5 (injected crash): a crashed save's temporary file is never removed",
-          "[security][TC-SEC-04][fault-injection][known-defect][!shouldfail]") {
+TEST_CASE("TC-SEC-04 injected crash: what a crashed save leaves is removed once it is older than 24 hours (D5)",
+          "[security][TC-SEC-04][fault-injection]") {
     // STP TC-SEC-04 "stale .tmp removed" (SAD 4.3.4 removeStaleTemp). The
     // agreed policy (#48) removes leftovers older than 24 hours, so what the
     // crash left is made 48 hours old first. Both crash points that leave
