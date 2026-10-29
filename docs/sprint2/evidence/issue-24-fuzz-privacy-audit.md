@@ -38,3 +38,21 @@ During the capture, interact with the game and separately note whether normal me
 Evidence artifact SHA-256: `8e64b38706d1dbbbd549f71f73325998edfbcdcff2b2b89841a47c7fdf50e34e`. The raw JSON was kept out of this repository because it includes the local computer name and full executable path; the digest identifies the reviewed upload without publishing those details.
 
 **Timing limitation:** although `DurationSeconds` was set to 60, the capture loop took approximately 104.70 seconds from `CaptureStartedAt` to `CapturedAt`; sample timestamps span 98.35 seconds. Endpoint queries and the one-second sleep per iteration caused actual intervals to average 1.667 seconds (range 1.521–1.999 seconds). These are point-in-time process-owned connection/endpoint snapshots, not packet capture. No TCP connection or UDP endpoint was observed at the samples, but brief connections or activity between samples are not ruled out, and the results do not prove that no possible network attempt can occur.
+
+## 5. Tested build identity and final-candidate follow-up
+
+The reviewed JSON artifact has SHA-256
+\`8e64b38706d1dbbbd549f71f73325998edfbcdcff2b2b89841a47c7fdf50e34e\`.
+This digest identifies the **JSON evidence artifact**, not \`SnakeXtreme.exe\`.
+
+The retained JSON records the OS caption as Windows 11 Home Single Language, the 60 observations, process-running state, endpoint results, and ActiveStore verification. It does **not** record the repository commit SHA, compiler/build configuration, executable size, or executable SHA-256. The earlier review notes do not preserve those values either. Therefore the exact source revision and binary used for this historical capture cannot be identified from the retained evidence, and the observations must not be attributed to commit \`3032c5a\` or a newer candidate.
+
+A final-candidate privacy capture is **Pending** coordination with Dinesh after the D6 fix from PR #48 is incorporated into the selected candidate. For that run, record, alongside the evidence artifact:
+
+- \`git rev-parse HEAD\` from the exact source checkout used to build.
+- Compiler/toolchain and build configuration.
+- Executable byte size and \`Get-FileHash .\\build\\Release\\SnakeXtreme.exe -Algorithm SHA256\` output from the exact binary launched by the collector.
+- The JSON evidence artifact SHA-256 separately from the executable SHA-256.
+- Whether the menu/gameplay remained usable with the executable-scoped outbound block active.
+
+Keep the raw JSON out of the repository: it includes a local computer name and executable path. Commit only the source/build identifiers, hashes, reviewed observations, and limitations. The existing 60-sample observation remains historical evidence, not an exhaustive test of possible network activity and not yet proof about the final candidate.
