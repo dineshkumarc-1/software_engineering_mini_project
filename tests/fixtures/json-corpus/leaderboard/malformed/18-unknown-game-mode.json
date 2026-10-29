@@ -1,0 +1,12 @@
+{
+  "version": 1,
+  "entries": [
+    {
+      "player_name": "Arcade",
+      "score": 10,
+      "game_mode": "Arcade",
+      "difficulty": "Medium",
+      "date_achieved": "2026-10-28"
+    }
+  ]
+}

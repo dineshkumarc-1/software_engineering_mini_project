@@ -1,0 +1,26 @@
+{
+  "version": 1,
+  "entries": [
+    {
+      "player_name": "Dinesh",
+      "score": 300,
+      "game_mode": "Classic",
+      "difficulty": "Medium",
+      "date_achieved": "2026-10-28"
+    },
+    {
+      "player_name": "Bharath",
+      "score": 200,
+      "game_mode": "Classic",
+      "difficulty": "Medium",
+      "date_achieved": "2026-10-28"
+    },
+    {
+      "player_name": "Tejas",
+      "score": 100,
+      "game_mode": "Classic",
+      "difficulty": "Medium",
+      "date_achieved": "2026-10-28"
+    }
+  ]
+}

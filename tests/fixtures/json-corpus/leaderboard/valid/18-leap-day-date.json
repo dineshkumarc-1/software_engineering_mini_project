@@ -1,0 +1,12 @@
+{
+  "version": 1,
+  "entries": [
+    {
+      "player_name": "Leap",
+      "score": 40,
+      "game_mode": "Classic",
+      "difficulty": "Medium",
+      "date_achieved": "2028-02-29"
+    }
+  ]
+}

@@ -82,9 +82,9 @@ try:
             click(550, 566); screen("Playing")
             key("Escape"); screen("Paused"); click(350, 566); screen("Main menu")
             check(True, "three confirmation-click launch, mouse Resume and Main menu")
-            click(450, 274); screen("Leaderboard integration pending")
+            click(450, 274); screen("| Leaderboard |")
             click(350, 456); screen("Main menu")
-            check(True, "leaderboard placeholder has working mouse Back")
+            check(True, "leaderboard table has working mouse Back")
             for mode_index, mode in enumerate(("Classic", "Timed", "Obstacle")):
                 for difficulty_index, difficulty in enumerate(("Easy", "Medium", "Hard")):
                     click(450, 214); screen("| Name:"); type_name("Dinesh")

@@ -1,0 +1,26 @@
+{
+  "version": 1,
+  "entries": [
+    {
+      "player_name": "Alpha",
+      "score": 500,
+      "game_mode": "Classic",
+      "difficulty": "Medium",
+      "date_achieved": "2026-10-28"
+    },
+    {
+      "player_name": "Bravo",
+      "score": 500,
+      "game_mode": "Classic",
+      "difficulty": "Medium",
+      "date_achieved": "2026-10-28"
+    },
+    {
+      "player_name": "Charlie",
+      "score": 400,
+      "game_mode": "Classic",
+      "difficulty": "Medium",
+      "date_achieved": "2026-10-28"
+    }
+  ]
+}
