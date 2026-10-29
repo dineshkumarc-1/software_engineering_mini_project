@@ -380,26 +380,39 @@ TEST_CASE("Time up ends the game and stops all movement",
 TEST_CASE("Restarting resets the countdown, score and movement but keeps the high score",
           "[gameplay][timed][TC-MODE-03]") {
     GameplayController game;
+
     // Food straight ahead: the first move eats it.
     REQUIRE(game.start({GameMode::Timed, Difficulty::Medium}, leftStart({3, 10}), 1u));
+
     game.update(120ms, Screen::Gameplay);
     REQUIRE(game.score() == 10);
+
     for (int i = 0; i < 100; ++i) {
         game.update(100ms, Screen::Gameplay); // 10 s; the snake hits the wall on the way
     }
+
     REQUIRE(game.remainingTime() < Millis{60s});
 
+    // Capture the high score before restarting. The score may increase
+    // if the snake eats additional food during the updates above.
+    const int highScoreBeforeRestart = game.highScore();
+    REQUIRE(highScoreBeforeRestart >= 10);
+
+    // Restart the game.
     REQUIRE(game.start({GameMode::Timed, Difficulty::Medium}));
 
+    // The countdown and current score reset, but the high score is preserved.
     REQUIRE(game.remainingTime() == Millis{60s});
     REQUIRE(game.score() == 0);
-    REQUIRE(game.highScore() == 10);
+    REQUIRE(game.highScore() == highScoreBeforeRestart);
     REQUIRE_FALSE(game.isGameOver());
 
     // The movement accumulator starts empty: no move before a full interval.
     const GridPosition head = game.engine().snake().front();
+
     game.update(119ms, Screen::Gameplay);
     REQUIRE(game.engine().snake().front() == head);
+
     game.update(1ms, Screen::Gameplay);
     REQUIRE(game.engine().snake().front() != head);
 }
