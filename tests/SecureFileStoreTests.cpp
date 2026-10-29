@@ -3,6 +3,20 @@
 #include <catch2/catch_test_macros.hpp>
 
 #include <atomic>
+#include <chrono>
+#include <system_error>
+
+#ifdef _WIN32
+#ifndef NOMINMAX
+#define NOMINMAX
+#endif
+#include <windows.h>
+#else
+#include <fcntl.h>
+#include <sys/file.h>
+#include <sys/stat.h>
+#include <unistd.h>
+#endif
 #include <filesystem>
 #include <fstream>
 #include <string>
@@ -386,4 +400,174 @@ TEST_CASE(
 
     REQUIRE(result.status == snake::StoreReadStatus::Ok);
     CHECK(result.value == original);
+}
+
+TEST_CASE(
+    "SecureFileStore removes only stale matching temp files and leaves unrelated files and symlinks",
+    "[persistence][store][security]") {
+
+    TemporaryDirectory directory;
+    const auto destination = directory.path() / "data.json";
+    const snake::SecureFileStore store(destination);
+    REQUIRE(store.writeJson(nlohmann::json{{"value", 42}}));
+
+    const auto stale = directory.path() / "data.json.tmp.12345";
+    const auto unrelated = directory.path() / "other.json.tmp.12345";
+
+    {
+        std::ofstream output(stale, std::ios::binary);
+        REQUIRE(output.good());
+        output << R"({"partial":)";
+    }
+    {
+        std::ofstream output(unrelated, std::ios::binary);
+        REQUIRE(output.good());
+        output << "unrelated";
+    }
+
+    const auto oldTime =
+        std::filesystem::file_time_type::clock::now() -
+        std::chrono::hours(48);
+    std::error_code timeError;
+    std::filesystem::last_write_time(stale, oldTime, timeError);
+    REQUIRE_FALSE(timeError);
+    std::filesystem::last_write_time(unrelated, oldTime, timeError);
+    REQUIRE_FALSE(timeError);
+
+    const auto target = directory.path() / "link-target.json";
+    const auto link = directory.path() / "data.json.tmp.54321";
+    {
+        std::ofstream output(target, std::ios::binary);
+        REQUIRE(output.good());
+        output << R"({"value":7})";
+    }
+
+    std::error_code symlinkError;
+    std::filesystem::create_symlink(target, link, symlinkError);
+
+    const auto result = store.readJson();
+    REQUIRE(result.status == snake::StoreReadStatus::Ok);
+    CHECK_FALSE(std::filesystem::exists(stale));
+    CHECK(std::filesystem::exists(unrelated));
+
+    if (!symlinkError) {
+        CHECK(std::filesystem::is_symlink(
+            std::filesystem::symlink_status(link)));
+    } else {
+        WARN("Symbolic links unavailable in this environment: "
+             << symlinkError.message());
+    }
+}
+
+TEST_CASE(
+    "SecureFileStore preserves a stale temp file while another writer holds its lock",
+    "[persistence][store][security]") {
+
+    TemporaryDirectory directory;
+    const auto destination = directory.path() / "data.json";
+    const snake::SecureFileStore store(destination);
+    REQUIRE(store.writeJson(nlohmann::json{{"value", 42}}));
+
+    const auto stale = directory.path() / "data.json.tmp.67890";
+    const auto lockPath = directory.path() / "data.json.tmp.67890.lock";
+
+    {
+        std::ofstream output(stale, std::ios::binary);
+        REQUIRE(output.good());
+        output << "partial write";
+    }
+
+    std::error_code timeError;
+    std::filesystem::last_write_time(
+        stale,
+        std::filesystem::file_time_type::clock::now() -
+            std::chrono::hours(48),
+        timeError);
+    REQUIRE_FALSE(timeError);
+
+#ifdef _WIN32
+    HANDLE activeLock = ::CreateFileW(
+        lockPath.c_str(),
+        GENERIC_READ | GENERIC_WRITE,
+        0,
+        nullptr,
+        CREATE_NEW,
+        FILE_ATTRIBUTE_NORMAL,
+        nullptr);
+    REQUIRE(activeLock != INVALID_HANDLE_VALUE);
+#else
+    const int activeLock = ::open(
+        lockPath.c_str(),
+        O_RDWR | O_CREAT | O_EXCL,
+        S_IRUSR | S_IWUSR);
+    REQUIRE(activeLock >= 0);
+    REQUIRE(::flock(activeLock, LOCK_EX | LOCK_NB) == 0);
+#endif
+
+    const auto firstRead = store.readJson();
+    REQUIRE(firstRead.status == snake::StoreReadStatus::Ok);
+    CHECK(std::filesystem::exists(stale));
+
+#ifdef _WIN32
+    REQUIRE(::CloseHandle(activeLock));
+#else
+    REQUIRE(::flock(activeLock, LOCK_UN) == 0);
+    REQUIRE(::close(activeLock) == 0);
+#endif
+
+    const auto secondRead = store.readJson();
+    REQUIRE(secondRead.status == snake::StoreReadStatus::Ok);
+    CHECK_FALSE(std::filesystem::exists(stale));
+    CHECK_FALSE(std::filesystem::exists(lockPath));
+}
+
+TEST_CASE(
+    "SecureFileStore failed replacement preserves the destination and cleans its temp files",
+    "[persistence][store][security]") {
+
+    TemporaryDirectory directory;
+    const auto destination = directory.path() / "locked.json";
+    const snake::SecureFileStore store(destination);
+    const nlohmann::json original = {{"value", 42}};
+    REQUIRE(store.writeJson(original));
+
+#ifdef _WIN32
+    HANDLE targetLock = ::CreateFileW(
+        destination.c_str(),
+        GENERIC_READ,
+        0,
+        nullptr,
+        OPEN_EXISTING,
+        FILE_ATTRIBUTE_NORMAL,
+        nullptr);
+    REQUIRE(targetLock != INVALID_HANDLE_VALUE);
+
+    CHECK_FALSE(store.writeJson(nlohmann::json{{"value", 99}}));
+    REQUIRE(::CloseHandle(targetLock));
+#else
+    // On POSIX, the portable fault injection is a non-writable parent.
+    // The existing destination remains readable; no temp is staged.
+    if (::geteuid() == 0) {
+        SKIP("Root ignores directory permissions; CI should run this as an unprivileged user");
+    }
+    std::filesystem::permissions(
+        directory.path(),
+        std::filesystem::perms::owner_read |
+            std::filesystem::perms::owner_exec,
+        std::filesystem::perm_options::replace);
+    CHECK_FALSE(store.writeJson(nlohmann::json{{"value", 99}}));
+    std::filesystem::permissions(
+        directory.path(),
+        std::filesystem::perms::owner_all,
+        std::filesystem::perm_options::add);
+#endif
+
+    const auto result = store.readJson();
+    REQUIRE(result.status == snake::StoreReadStatus::Ok);
+    CHECK(result.value == original);
+
+    for (const auto& item : std::filesystem::directory_iterator(directory.path())) {
+        const auto name = item.path().filename().string();
+        CHECK(name.find("locked.json.tmp.") != 0U);
+    }
 }

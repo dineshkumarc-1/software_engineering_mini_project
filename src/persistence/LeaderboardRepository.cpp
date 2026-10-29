@@ -10,12 +10,14 @@
 #include <limits>
 #include <sstream>
 #include <string>
+#include <string_view>
 #include <utility>
+#include <vector>
 
 namespace snake {
 namespace {
 
-std::string currentUtcTimestamp() {
+std::string currentUtcDate() {
     const auto now = std::chrono::system_clock::now();
     const std::time_t timeValue =
         std::chrono::system_clock::to_time_t(now);
@@ -33,10 +35,51 @@ std::string currentUtcTimestamp() {
 #endif
 
     std::ostringstream output;
-    output << std::put_time(
-        &utcTime, "%Y-%m-%dT%H:%M:%SZ");
-
+    output << std::put_time(&utcTime, "%Y-%m-%d");
     return output.str();
+}
+
+bool isValidCalendarDate(std::string_view date) noexcept {
+    if (date.size() != 10U || date[4] != '-' || date[7] != '-') {
+        return false;
+    }
+
+    for (std::size_t index = 0; index < date.size(); ++index) {
+        if (index == 4U || index == 7U) {
+            continue;
+        }
+
+        if (date[index] < '0' || date[index] > '9') {
+            return false;
+        }
+    }
+
+    const int year =
+        (date[0] - '0') * 1000 +
+        (date[1] - '0') * 100 +
+        (date[2] - '0') * 10 +
+        (date[3] - '0');
+    const int month = (date[5] - '0') * 10 + (date[6] - '0');
+    const int day = (date[8] - '0') * 10 + (date[9] - '0');
+
+    // The schema uses the proleptic Gregorian calendar, years 0001-9999.
+    if (year == 0 || month < 1 || month > 12 || day < 1) {
+        return false;
+    }
+
+    static constexpr int daysInMonth[] = {
+        31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31
+    };
+
+    int maximumDay = daysInMonth[month - 1];
+    const bool leapYear =
+        (year % 4 == 0) && ((year % 100 != 0) || (year % 400 == 0));
+
+    if (month == 2 && leapYear) {
+        maximumDay = 29;
+    }
+
+    return day <= maximumDay;
 }
 
 nlohmann::json serializeEntries(
@@ -80,108 +123,119 @@ LeaderboardRepository::LeaderboardRepository(
     : store_(std::move(filePath)) {}
 
 std::optional<std::vector<LeaderboardEntry>>
-LeaderboardRepository::loadValidatedEntries(
-    bool* corruptJson) const {
-      if (corruptJson != nullptr) {
-    *corruptJson = false;
-}
+LeaderboardRepository::loadValidatedEntries(bool* corruptJson) const {
+    if (corruptJson != nullptr) {
+        *corruptJson = false;
+    }
+
     const StoreReadResult result = store_.readJson();
 
-    // A missing or empty file represents a new leaderboard.
+    // Missing or empty files represent a new leaderboard.
     if (result.status == StoreReadStatus::NotFound ||
         result.status == StoreReadStatus::EmptyFile) {
         return std::vector<LeaderboardEntry>{};
     }
 
-    // Do not silently overwrite malformed JSON.
+    // Syntactically malformed JSON can be recovered by addScore().
+    // Unsafe JSON, unsafe paths, oversized files and I/O failures are
+    // deliberately kept distinct and are never overwritten as recovery.
     if (result.status == StoreReadStatus::InvalidJson) {
-    // Only addScore() opts into recovery from malformed JSON.
-    if (corruptJson != nullptr) {
-        *corruptJson = true;
-        return std::vector<LeaderboardEntry>{};
+        if (corruptJson != nullptr) {
+            *corruptJson = true;
+            return std::vector<LeaderboardEntry>{};
+        }
+
+        return std::nullopt;
     }
 
-    return std::nullopt;
-}
-
-    // Do not silently replace oversized files or ignore I/O errors.
     if (result.status != StoreReadStatus::Ok) {
         return std::nullopt;
     }
 
+    const auto invalidSchema =
+        [corruptJson]() -> std::optional<std::vector<LeaderboardEntry>> {
+            if (corruptJson != nullptr) {
+                *corruptJson = true;
+                return std::vector<LeaderboardEntry>{};
+            }
+
+            return std::nullopt;
+        };
+
     const auto& document = result.value;
 
-    // Validate the document and schema version.
     if (!document.is_object() ||
         !document.contains("version") ||
         !isValidVersion(document.at("version")) ||
         !document.contains("entries") ||
         !document.at("entries").is_array()) {
-        return std::nullopt;
+        return invalidSchema();
+    }
+
+    const auto& serializedEntries = document.at("entries");
+
+    // An on-disk schema may contain at most ten entries. Do not silently
+    // accept a larger document and display a truncated Top 10.
+    if (serializedEntries.size() > 10U) {
+        return invalidSchema();
     }
 
     std::vector<LeaderboardEntry> entries;
-    entries.reserve(document.at("entries").size());
+    entries.reserve(serializedEntries.size());
 
-    for (const auto& item : document.at("entries")) {
+    for (const auto& item : serializedEntries) {
         if (!item.is_object() ||
             !item.contains("player_name") ||
             !item.contains("score") ||
             !item.contains("game_mode") ||
             !item.contains("difficulty") ||
             !item.contains("date_achieved")) {
-            return std::nullopt;
+            return invalidSchema();
         }
 
         if (!item.at("player_name").is_string() ||
             !item.at("game_mode").is_string() ||
             !item.at("difficulty").is_string() ||
             !item.at("date_achieved").is_string()) {
-            return std::nullopt;
+            return invalidSchema();
         }
 
         const auto& scoreValue = item.at("score");
-
         if (!scoreValue.is_number_integer() &&
             !scoreValue.is_number_unsigned()) {
-            return std::nullopt;
+            return invalidSchema();
         }
 
         std::int64_t score64 = 0;
-
         try {
             score64 = scoreValue.get<std::int64_t>();
         } catch (const nlohmann::json::exception&) {
-            return std::nullopt;
+            return invalidSchema();
         }
 
         if (score64 < 0 ||
             score64 > std::numeric_limits<int>::max()) {
-            return std::nullopt;
+            return invalidSchema();
         }
 
         const std::string name =
             item.at("player_name").get<std::string>();
-
         const std::string modeText =
             item.at("game_mode").get<std::string>();
-
         const std::string difficultyText =
             item.at("difficulty").get<std::string>();
-
         const std::string date =
             item.at("date_achieved").get<std::string>();
 
         const auto mode = parseGameMode(modeText);
         const auto difficulty = parseDifficulty(difficultyText);
 
-        // Stored player names must already be valid and normalized.
         if (!isValidPlayerName(name) ||
             sanitizePlayerName(name) != name ||
             !mode.has_value() ||
             !difficulty.has_value() ||
-            date.empty()) {
-            return std::nullopt;
+            !isValidCalendarDate(date)) {
+            return invalidSchema();
         }
 
         entries.push_back(LeaderboardEntry{
@@ -226,7 +280,6 @@ LeaderboardRepository::top10() const {
     return rankedTop10(std::move(*entries));
 }
 
-
 ScoreSubmissionResult LeaderboardRepository::addScore(
     std::string_view playerName,
     int score,
@@ -236,16 +289,15 @@ ScoreSubmissionResult LeaderboardRepository::addScore(
     const auto errorResult = [] {
         return ScoreSubmissionResult{
             ScoreSubmissionStatus::Error,
-            std::nullopt
+            std::nullopt,
+            {}
         };
     };
 
-    // Validate the supplied name and score.
     if (!isValidPlayerName(playerName) || score < 0) {
         return errorResult();
     }
 
-    // Reject invalid enum values.
     switch (gameMode) {
     case GameMode::Classic:
     case GameMode::Timed:
@@ -264,76 +316,68 @@ ScoreSubmissionResult LeaderboardRepository::addScore(
         return errorResult();
     }
 
-    std::string normalizedName =
-        sanitizePlayerName(playerName);
-
+    std::string normalizedName = sanitizePlayerName(playerName);
     if (normalizedName.empty() ||
         !isValidPlayerName(normalizedName)) {
         return errorResult();
     }
 
     bool recoveredCorruptJson = false;
+    auto entries = loadValidatedEntries(&recoveredCorruptJson);
 
-auto entries = loadValidatedEntries(&recoveredCorruptJson);
+    // Only malformed JSON and schema-invalid JSON opt into recovery.
+    // Unsafe paths, UnsafeJson, TooLarge, and I/O failures return Error
+    // without replacing the existing file.
+    if (!entries) {
+        return errorResult();
+    }
 
-// Do not overwrite unreadable data or invalid schemas.
-if (!entries) {
-    return errorResult();
-}
-
-    // Rank the existing leaderboard before evaluating
-    // whether the new score qualifies.
     auto ranked = rankedTop10(std::move(*entries));
 
-    // On a full board, a score must be strictly greater
-    // than tenth place. A tie at tenth place is rejected.
+    // A full leaderboard requires a score strictly above tenth place.
     if (ranked.size() == 10U &&
         score <= ranked.back().score) {
         return ScoreSubmissionResult{
             ScoreSubmissionStatus::NotQualified,
-            std::nullopt
+            std::nullopt,
+            {}
         };
     }
 
-    // Equal scores rank after existing entries with that score.
-    std::size_t rank = 1U;
+    const std::size_t rank = 1U + static_cast<std::size_t>(
+        std::count_if(
+            ranked.begin(),
+            ranked.end(),
+            [score](const auto& entry) {
+                return entry.score >= score;
+            }));
 
-    for (const auto& entry : ranked) {
-        if (entry.score >= score) {
-            ++rank;
-        }
+    const std::string achievedAt = currentUtcDate();
+    if (!isValidCalendarDate(achievedAt)) {
+        return errorResult();
     }
 
-    const std::string achievedAt = currentUtcTimestamp();
-
-if (achievedAt.empty()) {
-    return errorResult();
-}
-
-LeaderboardEntry newEntry{
-    std::move(normalizedName),
-    score,
-    gameMode,
-    difficulty,
-    achievedAt
-};
-
-    ranked.push_back(std::move(newEntry));
+    ranked.push_back(LeaderboardEntry{
+        std::move(normalizedName),
+        score,
+        gameMode,
+        difficulty,
+        achievedAt
+    });
     ranked = rankedTop10(std::move(ranked));
 
-    // SecureFileStore writes the updated JSON atomically.
     if (!store_.writeJson(serializeEntries(ranked))) {
         return errorResult();
     }
 
     return ScoreSubmissionResult{
-    ScoreSubmissionStatus::Submitted,
-    rank,
-    recoveredCorruptJson
-        ? "Warning: the previous leaderboard JSON was malformed. "
-          "A new leaderboard was saved."
-        : std::string{}
-};
+        ScoreSubmissionStatus::Submitted,
+        rank,
+        recoveredCorruptJson
+            ? "Warning: the previous leaderboard JSON was malformed or "
+              "schema-invalid. A fresh leaderboard was saved."
+            : std::string{}
+    };
 }
 
 } // namespace snake
