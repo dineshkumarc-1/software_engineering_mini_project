@@ -409,7 +409,9 @@ std::string AppManager::titleText() const {
         title += " | Leaderboard | " + std::to_string(leaderboard_.entries().size()) + " entries";
         for (std::size_t i = 0; i < leaderboard_.entries().size(); ++i) {
             const auto& entry = leaderboard_.entries()[i];
-            title += " | " + std::to_string(i + 1) + ". " + entry.playerName + " " + std::to_string(entry.score);
+            title += " | " + std::to_string(i + 1) + ". " + entry.playerName + " " +
+                     std::to_string(entry.score) + " " + std::string(toString(entry.gameMode)) + " " +
+                     std::string(toString(entry.difficulty)) + " " + entry.dateAchieved;
         }
         title += " | " + leaderboard_.message() + " | Esc: back";
         break;
