@@ -9,10 +9,9 @@
 //  - TC-LB-01, TC-LB-03, TC-LB-04, TC-SEC-01, TC-SEC-04, TC-SEC-05 and
 //    TC-SEC-06 at the repository level.
 //
-// Behaviour that the SRS/SAD/STP require but the code does not do yet is
-// kept as "[!shouldfail]" tests named "Known defect ...": they pass while
-// the defect exists and start failing once it is fixed, as a reminder to
-// drop the tag. See docs/qa/TC-PWR-LB-SEC-EXECUTION.md.
+// Regression cases below assert the approved behavior directly. Keep their
+// expectations enabled so the corpus fails if a fixed defect returns. See
+// docs/qa/TC-PWR-LB-SEC-EXECUTION.md.
 
 #include "snakextreme/GameMode.hpp"
 #include "snakextreme/InputValidator.hpp"
@@ -42,6 +41,9 @@
 #include <fcntl.h>
 #include <sys/stat.h>
 #else
+#include <fcntl.h>
+#include <sys/file.h>
+#include <sys/stat.h>
 #include <unistd.h>
 #endif
 
@@ -148,6 +150,62 @@ Timed timedTop10(const fs::path& board) {
     return result;
 }
 
+// Makes `path` look `age` old (its last write time).
+void age(const fs::path& path, std::chrono::hours hours) {
+    fs::last_write_time(path, fs::file_time_type::clock::now() - hours);
+}
+
+#if !defined(_WIN32)
+// Ages a symbolic link itself, not the file it points to.
+bool ageLink(const fs::path& link, std::chrono::hours hours) {
+    const auto when = std::chrono::system_clock::now() - hours;
+    const auto seconds =
+        std::chrono::duration_cast<std::chrono::seconds>(when.time_since_epoch()).count();
+    const timespec times[2] = {{static_cast<time_t>(seconds), 0},
+                               {static_cast<time_t>(seconds), 0}};
+    return ::utimensat(AT_FDCWD, link.c_str(), times, AT_SYMLINK_NOFOLLOW) == 0;
+}
+#endif
+
+// Holds `path` the way a live save holds its lock sidecar: an exclusive
+// flock on POSIX, an open handle that shares nothing on Windows.
+class HeldLock {
+public:
+    explicit HeldLock(const fs::path& path) {
+#if defined(_WIN32)
+        if (_wsopen_s(&descriptor_, path.c_str(), _O_RDWR | _O_BINARY, _SH_DENYRW,
+                      _S_IREAD | _S_IWRITE) != 0) {
+            descriptor_ = -1;
+        }
+#else
+        descriptor_ = ::open(path.c_str(), O_RDWR);
+        if (descriptor_ >= 0 && ::flock(descriptor_, LOCK_EX | LOCK_NB) != 0) {
+            ::close(descriptor_);
+            descriptor_ = -1;
+        }
+#endif
+    }
+    ~HeldLock() {
+        if (descriptor_ >= 0) {
+#if defined(_WIN32)
+            _close(descriptor_);
+#else
+            ::flock(descriptor_, LOCK_UN);
+            ::close(descriptor_);
+#endif
+        }
+    }
+    HeldLock(const HeldLock&) = delete;
+    HeldLock& operator=(const HeldLock&) = delete;
+
+    bool held() const noexcept {
+        return descriptor_ >= 0;
+    }
+
+private:
+    int descriptor_{-1};
+};
+
 bool isIsoDate(std::string_view text) {
     if (text.size() != 10 || text[4] != '-' || text[7] != '-') {
         return false;
@@ -159,10 +217,6 @@ bool isIsoDate(std::string_view text) {
     }
     return true;
 }
-
-// Fixtures the current code accepts although SAD 4.3.5 rejects them; the
-// "Known defect" tests below cover them.
-const std::set<std::string> KnownAccepted{"23-bad-date-format.json", "24-eleven-entries.json"};
 
 } // namespace
 
@@ -235,13 +289,10 @@ TEST_CASE("Corpus: the 25 malformed leaderboard files fall back to an empty boar
         // Loading never changes the file.
         REQUIRE(holds(dir.board(), before));
 
-        if (KnownAccepted.count(name) != 0) {
-            continue; // see the "Known defect" tests
-        }
         REQUIRE(loaded.entries.empty());
         ++checked;
     }
-    REQUIRE(checked == 23);
+    REQUIRE(checked == 25);
 }
 
 TEST_CASE("Corpus: each malformed leaderboard file is rejected for the right reason",
@@ -286,16 +337,16 @@ TEST_CASE("Corpus: each malformed leaderboard file is rejected for the right rea
     }
 }
 
-TEST_CASE("Known defect D1: a date_achieved that is not YYYY-MM-DD is accepted",
-          "[corpus][TC-SEC-03][known-defect][!shouldfail]") {
+TEST_CASE("D1: a date_achieved that is not YYYY-MM-DD is rejected",
+          "[corpus][TC-SEC-03]") {
     // SAD 4.3.5: "date_achieved": valid YYYY-MM-DD; any violation -> defaults.
     TempDir dir;
     install(CorpusDir / "leaderboard" / "malformed" / "23-bad-date-format.json", dir.board());
     REQUIRE(LeaderboardRepository(dir.board()).top10().empty());
 }
 
-TEST_CASE("Known defect D2: a board with more than 10 entries is accepted",
-          "[corpus][TC-SEC-03][TC-LB-04][known-defect][!shouldfail]") {
+TEST_CASE("D2: a board with more than 10 entries is rejected",
+          "[corpus][TC-SEC-03][TC-LB-04]") {
     // SAD 4.3.5: at most 10 entries; STP TC-LB-04 lists "11 entries" as a
     // corrupt fixture that must show an empty leaderboard.
     TempDir dir;
@@ -396,8 +447,8 @@ TEST_CASE("TC-LB-01: five games persist sorted, with every field, across a resta
     REQUIRE(board[4].playerName == "Guest_1");
 }
 
-TEST_CASE("Known defect D4: date_achieved is written as a timestamp, not YYYY-MM-DD",
-          "[leaderboard][TC-LB-01][known-defect][!shouldfail]") {
+TEST_CASE("D4: date_achieved is serialized as YYYY-MM-DD",
+          "[leaderboard][TC-LB-01]") {
     // SRS Appendix B and SAD 4.3.5: date_achieved is a 10-character date.
     TempDir dir;
     REQUIRE(LeaderboardRepository(dir.board())
@@ -471,11 +522,10 @@ TEST_CASE("TC-LB-04: missing, empty and truncated files show an empty board and 
     }
 }
 
-TEST_CASE("Known defect D3: a schema-invalid board is not replaced by the next valid score",
-          "[leaderboard][TC-LB-04][known-defect][!shouldfail]") {
-    // STP TC-LB-04 step 2: "valid result then stored (bad file replaced
-    // atomically)" for wrong type, negative score and bad enum. Today
-    // addScore() refuses to save over them.
+TEST_CASE("D3: a valid score atomically replaces a schema-invalid board",
+          "[leaderboard][TC-LB-04]") {
+    // STP TC-LB-04 step 2: a valid result is stored and the bad file is
+    // replaced atomically for wrong type, negative score and bad enum.
     const char* const fixturesToReplace[] = {"14-score-as-string.json", "15-negative-score.json",
                                              "18-unknown-game-mode.json"};
     for (const char* name : fixturesToReplace) {
@@ -565,11 +615,13 @@ TEST_CASE("TC-SEC-06: a 10,000-character name never gets past 15 characters",
 // TC-SEC-04: what a crash at each step of the safe write leaves behind
 // ---------------------------------------------------------------------------
 
-TEST_CASE("TC-SEC-04: a save interrupted at any step leaves the old or the new board",
+TEST_CASE("TC-SEC-04 (simulated leftovers): the files a crash leaves still load the old or new board",
           "[security][TC-SEC-04]") {
     const std::string oldBoard = boardJson({300, 200, 100});
     const std::string newBoard = boardJson({400, 300, 200, 100});
 
+    // Simulated: these files are written by the test, no save is crashed.
+    // tests/SecureWriteFaultTests.cpp crashes the real save (Linux).
     // What a crash leaves on disk at each point (a)-(c): the old file plus a
     // temporary sibling, as SecureFileStore::writeJson names it.
     const std::string leftovers[] = {
@@ -602,13 +654,17 @@ TEST_CASE("TC-SEC-04: a save interrupted at any step leaves the old or the new b
     }
 }
 
-TEST_CASE("Known defect D5: a stale temporary file from a crash is never removed",
-          "[security][TC-SEC-04][known-defect][!shouldfail]") {
-    // STP TC-SEC-04: "stale .tmp removed" (SAD 4.3.4 removeStaleTemp).
+TEST_CASE("D5: a stale temporary file is removed after the safety threshold",
+          "[security][TC-SEC-04]") {
+    // STP TC-SEC-04: "stale .tmp removed" (SAD 4.3.4 removeStaleTemp). The
+    // agreed policy (#48) only removes leftovers older than 24 hours, so the
+    // leftover is made 48 hours old. A fresh one is kept on purpose: see the
+    // "stale temp safety" test below.
     TempDir dir;
     writeBytes(dir.board(), boardJson({300}));
     const fs::path stale = dir.path() / "leaderboard.json.tmp.12345";
     writeBytes(stale, "{\"version\": 1, \"ent");
+    age(stale, 48h);
     LeaderboardRepository repository(dir.board());
     (void)repository.top10();
     REQUIRE(repository.addScore("New", 400, GameMode::Classic, Difficulty::Easy).status ==
@@ -616,7 +672,103 @@ TEST_CASE("Known defect D5: a stale temporary file from a crash is never removed
     REQUIRE_FALSE(fs::exists(stale));
 }
 
-TEST_CASE("TC-SEC-04: a save that cannot replace the file keeps the old board",
+TEST_CASE("D5: a stale orphan lock sidecar is removed after the safety threshold",
+          "[security][TC-SEC-04]") {
+    // A crash before the temporary file is created, or after the rename,
+    // leaves only "<board>.tmp.<nonce>.lock" (#48 review). Under the agreed
+    // policy, the next load removes it once it is older than 24 hours.
+    TempDir dir;
+    writeBytes(dir.board(), boardJson({300}));
+    const fs::path orphan = dir.path() / "leaderboard.json.tmp.991.lock";
+    writeBytes(orphan, "");
+    age(orphan, 48h);
+    REQUIRE(LeaderboardRepository(dir.board()).top10().size() == 1);
+    REQUIRE_FALSE(fs::exists(orphan));
+}
+
+TEST_CASE("TC-SEC-04 (stale temp safety): loads and saves remove nothing but stale, unlocked leftovers of this board",
+          "[security][TC-SEC-04]") {
+    // Guards the D5 fix and the agreed policy (#48): only regular files named
+    // exactly "<board>.tmp.<decimal nonce>", or that name plus ".lock" once
+    // its temporary file is gone, older than 24 hours and not locked by a live
+    // save, may be removed. Everything below must survive a load and a save.
+    TempDir dir;
+    writeBytes(dir.board(), boardJson({300}));
+    const std::string keep = "keep me";
+
+    struct Kept {
+        fs::path path;
+        bool aged;
+    };
+    const Kept files[] = {
+        {dir.path() / "leaderboard.json.bak", true},
+        {dir.path() / "leaderboard.json.tmp", true},             // no nonce
+        {dir.path() / "leaderboard.json.tmp.12ab", true},        // not a decimal nonce
+        {dir.path() / "config.json.tmp.12345", true},            // the settings store's
+        {dir.path() / "leaderboard.jsonx.tmp.12345", true},      // another file's
+        {dir.path() / "notes.txt", true},
+        {dir.path() / "leaderboard.json.tmp.4242", false},       // fresh: a save may be running
+        {dir.path() / "leaderboard.json.tmp.4343.lock", false},  // fresh sidecar
+    };
+    for (const Kept& file : files) {
+        writeBytes(file.path, keep);
+        if (file.aged) {
+            age(file.path, 48h);
+        }
+    }
+
+    // A stale-looking temporary file whose save still holds its lock.
+    const fs::path busy = dir.path() / "leaderboard.json.tmp.5151";
+    const fs::path busyLock = dir.path() / "leaderboard.json.tmp.5151.lock";
+    writeBytes(busy, keep);
+    writeBytes(busyLock, "");
+    age(busy, 48h);
+    age(busyLock, 48h);
+    const HeldLock lock(busyLock);
+    REQUIRE(lock.held());
+
+    // A directory with a temporary file's name.
+    const fs::path folder = dir.path() / "leaderboard.json.tmp.777";
+    fs::create_directory(folder);
+    writeBytes(folder / "inside.txt", keep);
+    std::error_code ignored; // directory times cannot be set everywhere
+    fs::last_write_time(folder, fs::file_time_type::clock::now() - 48h, ignored);
+
+    const fs::path outside = dir.path() / "outside.json";
+    writeBytes(outside, keep);
+#if !defined(_WIN32)
+    // Old symbolic links with a temporary file's or a sidecar's name.
+    const fs::path link = dir.path() / "leaderboard.json.tmp.888";
+    const fs::path lockLink = dir.path() / "leaderboard.json.tmp.889.lock";
+    fs::create_symlink(outside, link);
+    fs::create_symlink(outside, lockLink);
+    REQUIRE(ageLink(link, 48h));
+    REQUIRE(ageLink(lockLink, 48h));
+#endif
+
+    LeaderboardRepository repository(dir.board());
+    (void)repository.top10();
+    REQUIRE(repository.addScore("New", 400, GameMode::Classic, Difficulty::Easy).status ==
+            ScoreSubmissionStatus::Submitted);
+    (void)LeaderboardRepository(dir.board()).top10();
+
+    for (const Kept& file : files) {
+        CAPTURE(file.path.filename().string());
+        REQUIRE(holds(file.path, keep));
+    }
+    REQUIRE(holds(busy, keep));
+    REQUIRE(fs::exists(busyLock));
+    REQUIRE(fs::is_directory(folder));
+    REQUIRE(holds(folder / "inside.txt", keep));
+    REQUIRE(holds(outside, keep));
+#if !defined(_WIN32)
+    REQUIRE(fs::is_symlink(fs::symlink_status(link)));
+    REQUIRE(fs::is_symlink(fs::symlink_status(lockLink)));
+#endif
+    REQUIRE(LeaderboardRepository(dir.board()).top10().size() == 2);
+}
+
+TEST_CASE("TC-SEC-04 (real refusal): a save into a read-only folder or locked file keeps the old board",
           "[security][TC-SEC-04]") {
     TempDir dir;
     const std::string oldBoard = boardJson({300, 200, 100});
