@@ -1,0 +1,172 @@
+# Quality gates: sanitizers, static analysis, banned APIs, portability (issue #23)
+
+Covers SEC-005 (TC-SEC-05, step 2), NFR-005 (TC-MNT-01) and NFR-006 (TC-PORT-01), plus the STP exit criterion "no sanitiser or cppcheck findings". Owner: B V Tejas.
+
+## Gates
+
+| Gate | What fails it | Where it runs | Run it yourself |
+| --- | --- | --- | --- |
+| Clang ASan + UBSan | Any AddressSanitizer or UndefinedBehaviorSanitizer report in any test. Leak detection is on, and errors abort (`-fno-sanitize-recover=all`, `halt_on_error=1`) | CI job **Sanitizers (Clang ASan + UBSan)**, Ubuntu 24.04, Clang 18, Debug | See below |
+| cppcheck | Any finding of severity warning, style, performance or portability in `src/`, `include/` or `tests/` | CI job **Static analysis (cppcheck)**, Ubuntu 24.04, cppcheck 2.13 | `cmake -P cmake/RunCppcheck.cmake` |
+| Banned APIs (SEC-005) | Any call in `src/` or `include/` to:<br>• commands or code loading: `system`, `popen`, `exec*`, `spawn*`, `dlopen`, `LoadLibrary*`, `ShellExecute*`, `CreateProcess*`, `WinExec`<br>• unbounded C strings: `strcpy`, `strcat`, `wcscpy`, `wcscat`, `gets`<br>• any printf-family function, so no format string can ever come from a file | CTest `security_banned_api_scan`, in every CI job | `cmake -DSNAKE_SOURCE_DIR=. -P cmake/CheckBannedApis.cmake` |
+| Scanner self-test | The scan misses one of the 12 planted calls in `tests/fixtures/banned-api/bad`, or reports anything in the look-alike code in `tests/fixtures/banned-api/clean` (comments, strings, `fgets`, `std::filesystem`, `ecosystem()`, …) | CTest `security_banned_api_scan_finds_planted_calls`, `security_banned_api_scan_ignores_lookalikes` | `ctest -R banned_api` |
+| Layering (TC-MNT-01) | An SFML include in engine, modes, power-up, scoring, gameplay, persistence or app-state code. Since every presentation header includes SFML, this also catches a core file that includes presentation code | CTest `layering_core_is_sfml_free`, in every CI job | `ctest -R layering` |
+| Warnings as errors | Any compiler warning in project code | Linux GCC and macOS Clang test jobs | `-DSNAKE_WARNINGS_AS_ERRORS=ON` |
+
+Sanitizer build, as in CI:
+
+```sh
+cmake -S . -B build-san -DSNAKE_BUILD_APP=OFF -DCMAKE_BUILD_TYPE=Debug \
+  -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ -DSNAKE_WARNINGS_AS_ERRORS=ON \
+  "-DCMAKE_CXX_FLAGS=-fsanitize=address,undefined -fno-sanitize-recover=all -fno-omit-frame-pointer" \
+  "-DCMAKE_EXE_LINKER_FLAGS=-fsanitize=address,undefined"
+cmake --build build-san --parallel
+ASAN_OPTIONS=detect_leaks=1:abort_on_error=1:strict_string_checks=1:detect_stack_use_after_return=1:check_initialization_order=1 \
+UBSAN_OPTIONS=print_stacktrace=1:halt_on_error=1 ctest --test-dir build-san --output-on-failure
+```
+
+On Ubuntu, the Clang sanitizer runtime comes from the `libclang-rt-18-dev` package.
+
+**Exceptions** must be justified on the line itself:
+- cppcheck: `// cppcheck-suppress <id>` on the line before, with a comment saying why. The only ones today are in the two `constexpr` parse functions in `GameMode.hpp`, because `std::find_if` is not `constexpr` before C++20.
+- Banned APIs: `banned-api-ok: <reason>` on the same line. There are none today.
+
+## Findings fixed for this issue
+
+cppcheck 2.13 found 6 issues, all fixed:
+- `GameEngine::setObstacles` now takes its cells by const reference.
+- The constexpr loops in `GameMode.hpp` are suppressed, with the reason above.
+- Three test findings: a by-value parameter, a constant `REQUIRE` turned into `static_assert`, and a reference made const.
+
+The power-up code in #49, on which this branch is stacked, was already clean.
+
+On 28 Oct, the open pull requests would have added these findings when merged. In the integrated candidate #53 (`dbf08b5`), all of them are fixed or justified, and cppcheck reports 0 findings:
+
+| PR | Finding | In candidate #53 |
+| --- | --- | --- |
+| #42 / #44 / #45 / #46 / #48 / #50 | `src/validation/InputValidator.cpp:21` and `:49`: useStlAlgorithm (use `std::all_of` / `std::none_of` and `std::copy_if`) | Resolved |
+| #46 | `include/snakextreme/UiHitTest.hpp:43`: useStlAlgorithm (`std::find_if`); `src/diagnostics/PerformanceProbe.cpp:53` and `:80`: local variable `input` shadows a function | Resolved |
+| #48 / #50 | `src/persistence/LeaderboardRepository.cpp:303`: useStlAlgorithm (`std::count_if`) | Resolved |
+
+No open pull request has a banned-API hit, and neither has the candidate.
+
+## Results after integration (29 Oct 2026)
+
+Rerun on the integrated candidate **#53 at `dbf08b5`**, which contains this branch together with every other Sprint 2 branch. #52's test update (test, tool and report files only, no product code) was added on top. Ubuntu 24.04. Evidence: [docs/qa/evidence/issue-18-candidate-ctest-sanitizers.txt](qa/evidence/issue-18-candidate-ctest-sanitizers.txt) in #52.
+
+| Check | Result |
+| --- | --- |
+| Clang 18 ASan + UBSan, CI settings, game and all tests, run as a normal user | **21/21 CTest tests pass, 0 sanitizer reports.** Six known-defect tests (D1–D5, #52) are tagged `[!shouldfail]` and still fail as expected; they are acceptance blockers, not passes |
+| GCC 13.3 Release, `-Werror`, game and all tests, normal user | 21/21 pass |
+| The real game built with Clang ASan + UBSan (SFML included) on Xvfb | **0 sanitizer reports and no leak at exit** in every run: power-ups 120 s (16/16 checks), 5 games plus corrupt boards and a refused save (`tools/leaderboard_ui_check.py`), the name-entry and privacy checks, and #53's leaderboard, navigation and settings smoke tests |
+| cppcheck 2.13 on `src/`, `include/` and `tests/` | **0 findings** |
+| Banned-API scan | **0 hits in 46 files.** The self-test finds 12/12 planted calls and reports nothing in the look-alike code |
+| Layering | Pass |
+
+### With the persistence fix (#48 at `31602b5`, then `0d516f3`)
+
+The same checks were run again with Bharath's persistence fix merged into the candidate, plus #52's promoted tests. Evidence: `docs/qa/evidence/issue-18-run3-fix-verification.txt` in #52.
+
+| Check | Result |
+| --- | --- |
+| Clang 18 ASan + UBSan and GCC 13.3, game and all tests, normal user | 21/21 pass, 0 sanitizer reports. The real ASan game also reports nothing in every runtime check |
+| cppcheck 2.13 | **0 findings with `0d516f3`.** `31602b5` had one (`src/persistence/SecureFileStore.cpp:445`, knownConditionTrueFalse); Bharath's `0d516f3` removed it. All 21 suites were re-run on `0d516f3` with the same results |
+| Banned-API scan | 0 hits in 46 files |
+
+## Results on this branch (28 Oct 2026)
+
+All checks below were run on this branch, which is main plus #49 plus this change.
+
+| Check | Result |
+| --- | --- |
+| Clang 18 ASan + UBSan, CI settings, all 11 CTest tests | 11/11 pass, 0 sanitizer reports. The instrumentation is active: a planted heap overflow is reported |
+| GCC 13.3 ASan + UBSan | 11/11 pass, 0 reports |
+| The real game built with Clang ASan + UBSan (SFML included), played for 150 s on Xvfb by the power-up autopilot | 0 reports, including leaks at exit. See [Real game under sanitizers](#real-game-under-sanitizers) |
+| cppcheck 2.13 on `src/`, `include/` and `tests/` | 0 findings |
+| Banned-API scan | 0 hits in 26 files. The self-test finds 12/12 planted calls and reports nothing in the look-alike code |
+| Layering | Pass |
+
+### Real game under sanitizers
+
+The real `SnakeXtreme` binary was built with Clang 18 and `-fsanitize=address,undefined -fno-sanitize-recover=all`, with SFML 2.5.1 compiled with the same flags. It ran on Linux on an Xvfb display with:
+
+```text
+ASAN_OPTIONS=detect_leaks=1:abort_on_error=1:log_path=<dir>/asan
+UBSAN_OPTIONS=print_stacktrace=1:halt_on_error=1:log_path=<dir>/ubsan
+```
+
+The power-up autopilot played Classic / Medium for 150.8 s: 1,393 moves, 13 power-ups seen, and Speed, Multiplier and Shrink collected. Along the way it paused and resumed, then left through the menu (M, then Esc).
+
+**Result:** the process exited normally with code 0, with **no AddressSanitizer, UndefinedBehaviorSanitizer or LeakSanitizer report** and no sanitizer log file written. All 13 gameplay checks of the run passed.
+
+## TC-MNT-01 Module separation (NFR-005)
+
+Step 1, the dependency check: `layering_core_is_sfml_free` follows every include of the SFML-free modules and finds 0 SFML includes. In CMake, `snake_assert_core_is_sfml_free()` stops the configure step if a core module links SFML. Dependencies only point down:
+
+```text
+snake_presentation (SFML) ──► snake_gameplay ──► snake_modes, snake_powerups ──► snake_engine
+                          ──► snake_app_state     snake_scoring
+```
+
+Nothing below the presentation layer links SFML or includes a presentation header. In #53 the layering check also covers `persistence`, `audio` and `diagnostics`. `src/validation` is not on its list yet, though it has no SFML include today; adding it is a one-word change.
+
+Step 2, the review of modules against unit-test targets:
+
+| Module | Test suite(s) | Status |
+| --- | --- | --- |
+| Engine (`snake_engine`, C6) | `game_engine_tests`, `game_mode_tests` (integration), `powerup_tests` (shrink and food hooks) | Pass |
+| Modes (`snake_modes`, C7) | `game_mode_tests` | Pass |
+| Power-ups (`snake_powerups`, C8) | `powerup_tests` | Pass (#49) |
+| Scoring (`snake_scoring`, C9) | `score_service`, `game_session`, `powerup_tests` (multiplier) | Pass |
+| UI logic (`snake_app_state` C1 navigation, `MenuSelection`, `snake_gameplay`) | `app_state_flow`, `gameplay_tests`, `powerup_tests` | Pass |
+| Persistence (`snake_persistence`, C11–C13) | Placeholder on main. In candidate #53: `secure_file_store_tests`, `leaderboard_repository_tests`, `leaderboard_model_tests`, `security_corpus_tests`, `secure_write_fault_tests` | Pass in #53, except the six known-defect tests (D1–D5), which fail as expected |
+| Settings (`snake_settings`) and name validation (`snake_validation`) | In candidate #53: `settings_tests`, `settings_corpus_tests`, `input_validator_tests` | Pass in #53 |
+| Audio model and performance probe (`snake_audio_model`, `snake_probe`) | In candidate #53: `audio_model_tests`, `performance_probe_tests` | Pass in #53 |
+
+## TC-PORT-01 Windows 10 / 11 build and run (NFR-006)
+
+CI already builds the full app with MSVC on Windows Server (`windows-latest`) on every pull request and runs the headless tests with MSVC and MinGW-w64. TC-PORT-01 still needs one clean build and one real game on a **Windows 10** PC and on a **Windows 11** PC.
+
+**Needs:**
+- Visual Studio 2022 with the "Desktop development with C++" workload
+- Git
+- CMake 3.20 or newer (included with Visual Studio)
+
+Steps, in a "Developer PowerShell for VS 2022":
+
+```powershell
+git clone https://github.com/dineshkumarc-1/software_engineering_mini_project.git
+cd software_engineering_mini_project
+cmake -S . -B build -DSNAKE_FETCH_SFML=ON -DBUILD_SHARED_LIBS=OFF
+cmake --build build --config Release --parallel
+ctest --test-dir build -C Release --output-on-failure
+.\build\Release\SnakeXtreme.exe
+```
+
+Checklist (record each result in the table below). Build the commit Dinesh names for acceptance. Today that is the integrated candidate #53, `dbf08b5`; it will move once the persistence fixes land.
+
+1. Configure and build finish with **0 errors**.
+2. `ctest` passes **every** test.
+3. The game window opens with the menu text visible, so the bundled font loaded.
+4. Play one game in each mode:
+   - Classic: eat food, +10.
+   - Timed: the countdown runs down from 1:00.
+   - Obstacle: hitting a brown block shows "You hit an obstacle".
+5. Collect at least one power-up. The HUD shows its name and seconds left.
+6. Esc pauses and resumes. M returns to the menu. Esc on the menu exits.
+7. Closing the window with its X also exits cleanly.
+8. Leaderboard and settings: after a game, the main menu's Leaderboard lists the score. Changing a setting survives a restart.
+
+Record for each machine:
+- **Tested SHA:** the full commit (`git rev-parse HEAD`).
+- **Build artifact:** `build\Release\SnakeXtreme.exe`, its size and its SHA-256 (`Get-FileHash .\build\Release\SnakeXtreme.exe`).
+- **OS version:** edition, version and OS build from `winver`, for example "Windows 11 Pro 23H2, build 22631.4317".
+- **Build and run results:** errors and warnings of the build, the CTest summary line, and steps 3–8.
+- **Evidence:** the configure, build and CTest output as text, a `winver` screenshot, and screenshots of the menu, one game and the leaderboard. Attach them to issue #23 or add them under `docs/qa/evidence/`.
+
+| Machine | Status | Tested SHA | Build artifact (size, SHA-256) | OS version (`winver`) | Build | CTest | Steps 3–8 | Evidence | Tester | Date |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| Windows 10 PC | **Pending**: no Windows 10 machine yet | – | – | – | – | – | – | – | – | – |
+| Windows 11 PC | **Pending**: no Windows 11 machine yet | – | – | – | – | – | – | – | – | – |
+
+A row stays **Pending** until someone runs the checklist on a real PC with that Windows version. The CI jobs on Windows Server (`windows-latest`, MSVC and MinGW-w64) are **not** a substitute: they prove the code compiles and the headless tests pass, not that the game runs on Windows 10 or 11. Issue #23 can be closed once both rows are filled in and pass. The Linux build is informational only.

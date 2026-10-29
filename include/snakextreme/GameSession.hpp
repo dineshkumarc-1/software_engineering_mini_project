@@ -15,6 +15,15 @@ public:
         scoreService_.foodEaten(mode);
     }
 
+    // FR-014: Multiplier power-up (see ScoreService::setMultiplier).
+    void setMultiplier(int multiplier) noexcept {
+        scoreService_.setMultiplier(multiplier);
+    }
+
+    [[nodiscard]] int multiplier() const noexcept {
+        return scoreService_.multiplier();
+    }
+
     // Advance the engine and apply score changes for any food consumed
     // during this tick. Kept here so the integration can be tested headlessly.
     void tick(GameEngine& gameEngine, GameMode mode) {

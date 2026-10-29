@@ -31,6 +31,10 @@ snake_add_module(snake_engine SOURCES src/engine/GameEngine.cpp)
 # C7 game modes and difficulty profiles. Uses engine grid types only.
 snake_add_module(snake_modes
     SOURCES src/modes/ModeStrategy.cpp src/modes/ModeManager.cpp)
+# C8 power-ups: spawn schedule, pick-up and timed effects (issue #14).
+snake_add_module(snake_powerups
+    SOURCES src/powerups/PowerUpEffects.cpp src/powerups/PowerUpManager.cpp
+    DEPS snake_engine)
 # One game as the app runs it: engine + ModeManager + score session.
 snake_add_module(snake_gameplay
     SOURCES src/gameplay/GameplayController.cpp
@@ -40,6 +44,9 @@ snake_add_module(snake_gameplay
 snake_add_module(snake_persistence DEPS snake_validation)
 
 snake_assert_core_is_sfml_free()
+
+# The running game (GameplayController) owns the power-ups of its session.
+target_link_libraries(snake_gameplay PUBLIC snake_powerups)
 
 # ---------------------------------------------------------------------------
 # Presentation layer (C1-C5) and the desktop executable.
@@ -153,6 +160,11 @@ snake_add_catch2_test(input_validator_tests
         SOURCES tests/GameModeTests.cpp tests/ModeEngineIntegrationTests.cpp
         LIBS snake_modes snake_engine)
 
+    # C8 power-ups: schedule, effects, one active effect (TC-PWR-01..05).
+    snake_add_catch2_test(powerup_tests
+        SOURCES tests/PowerUpTests.cpp tests/PowerUpGameplayTests.cpp
+        LIBS snake_gameplay)
+
     # Menu selection and the app's game wiring (modes, speed, timer, score).
     snake_add_catch2_test(gameplay_tests
         SOURCES tests/GameplayControllerTests.cpp
@@ -162,6 +174,24 @@ snake_add_catch2_test(input_validator_tests
     add_test(NAME layering_core_is_sfml_free
         COMMAND ${CMAKE_COMMAND} -DSNAKE_SOURCE_DIR=${PROJECT_SOURCE_DIR}
                 -P ${PROJECT_SOURCE_DIR}/cmake/CheckLayering.cmake)
+
+    # SEC-005 / TC-SEC-05: no running commands, loading code, unbounded C
+    # strings or printf-family calls in product code (issue #23).
+    add_test(NAME security_banned_api_scan
+        COMMAND ${CMAKE_COMMAND} -DSNAKE_SOURCE_DIR=${PROJECT_SOURCE_DIR}
+                -P ${PROJECT_SOURCE_DIR}/cmake/CheckBannedApis.cmake)
+    # The scan itself: it reports all 12 planted calls and nothing in
+    # look-alike code (comments, strings, fgets, std::filesystem, ...).
+    add_test(NAME security_banned_api_scan_finds_planted_calls
+        COMMAND ${CMAKE_COMMAND}
+                -DSNAKE_SOURCE_DIR=${PROJECT_SOURCE_DIR}/tests/fixtures/banned-api/bad
+                -P ${PROJECT_SOURCE_DIR}/cmake/CheckBannedApis.cmake)
+    set_tests_properties(security_banned_api_scan_finds_planted_calls PROPERTIES
+        PASS_REGULAR_EXPRESSION "12 banned API call\\(s\\)")
+    add_test(NAME security_banned_api_scan_ignores_lookalikes
+        COMMAND ${CMAKE_COMMAND}
+                -DSNAKE_SOURCE_DIR=${PROJECT_SOURCE_DIR}/tests/fixtures/banned-api/clean
+                -P ${PROJECT_SOURCE_DIR}/cmake/CheckBannedApis.cmake)
 
     # Test runner: builds every test executable, then runs the whole suite.
     get_property(snake_test_targets GLOBAL PROPERTY SNAKE_TEST_TARGETS)
