@@ -429,9 +429,6 @@ void removeStaleTemporaryFiles(
                 }
 
                 const auto temporary = parent / (prefix + nonce);
-                if (!pathIsAbsentWithoutFollowing(temporary)) {
-                    continue;
-                }
 
                 // acquireExisting uses O_NOFOLLOW / OPEN_REPARSE_POINT and a
                 // non-blocking lock; active lock holders are skipped.
