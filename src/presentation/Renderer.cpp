@@ -223,10 +223,6 @@ void Renderer::draw(sf::RenderTarget& target, const FrameView& frame) const {
         drawPowerUp(target, *frame.powerUp);
     }
 
-    if (frame.engine != nullptr && frame.powerUp) {
-        drawPowerUp(target, *frame.powerUp);
-    }
-
     if (frame.screen == Screen::Paused) {
         drawPaused(target);
     } else if (frame.gameOverReason != GameOverReason::None) {

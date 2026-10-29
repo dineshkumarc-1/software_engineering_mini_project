@@ -58,7 +58,9 @@ public:
 
 private:
     [[nodiscard]] std::optional<std::vector<LeaderboardEntry>>
-    loadValidatedEntries(bool* corruptJson = nullptr) const;
+    loadValidatedEntries(
+        bool* corruptJson = nullptr,
+        bool* emptyFile = nullptr) const;
     [[nodiscard]]
     static std::vector<LeaderboardEntry> rankedTop10(
         std::vector<LeaderboardEntry> entries);

@@ -1,8 +1,9 @@
 # Owner-only acceptance preparation (#19 / #20 / #22)
 
-This workflow adds no QA sign-off and does not edit `docs/qa` or a teammate's
-branch. It addresses build-identification gaps without pretending that a
-manual test has occurred. Existing owner work stays on draft PR #46.
+This workflow adds no QA sign-off. It addresses build-identification gaps without
+pretending that manual testing occurred. The original #46 work is now consolidated
+in owner #53 through #56; see SPRINT2-INTEGRATION-STATUS.md for current history.
+Historical scope descriptions below do not override that reconciliation status.
 
 ## Fixed-capacity name entry (#19)
 
@@ -67,13 +68,14 @@ with the QA owner; owner merge approval and QA execution have separate roles.
 
 **Performance:** use `performance-probes.md` and its explicit limitations. Three
 continuous 300-s Hard/Obstacle runs with power-ups, actual target cold launch,
-end-to-end latency accounting and three independent volunteers are still real
+acknowledgement timing with OS/SFML queue limitations documented, and three
+independent volunteers are still real
 acceptance work. The generated template is not a substitute.
 
 ## Scope boundaries
 
-PR #48's storage/schema/outcome/recovery review findings must be resolved and
-integration-tested before replacing the current Settings adapter or treating
-the leaderboard as working. This follow-up neither modifies Bharath's PR nor
-adds a competing persistence API. It does not merge the stack, close issues,
-change QA documents, approve a release, or invent manual evidence.
+The current reconciliation imports reviewed #48 through 4793a7a, including D6,
+and preserves the owner Settings adapter and six-column leaderboard. The separate
+source/test evidence covers that integration; this preparation tool itself never
+merges PRs, verifies source provenance, executes tests, closes issues or grants
+release acceptance. Final Windows/privacy/performance/manual evidence is Pending.

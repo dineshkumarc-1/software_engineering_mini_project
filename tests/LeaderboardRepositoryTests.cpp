@@ -570,6 +570,7 @@ TEST_CASE(
 REQUIRE(result.status == snake::ScoreSubmissionStatus::Submitted);
 REQUIRE(result.rank.has_value());
 CHECK(*result.rank == 1U);
+CHECK(result.warning.empty()); // Empty-file submission retains existing behavior.
     const auto entries = repository.top10();
 
     REQUIRE(entries.size() == 1U);
@@ -613,4 +614,111 @@ TEST_CASE(
 
     // Existing callers that omit the optional argument remain source-compatible.
     CHECK(repository.top10().size() == 1U);
+}
+
+
+TEST_CASE(
+    "A zero-byte leaderboard returns a warning without rewriting the file",
+    "[persistence][leaderboard][warning]") {
+
+    TemporaryDirectory directory;
+    const auto file = directory.path() / "leaderboard.json";
+    {
+        std::ofstream output(file, std::ios::binary | std::ios::trunc);
+        REQUIRE(output.good());
+    }
+
+    std::ifstream beforeInput(file, std::ios::binary);
+    REQUIRE(beforeInput.good());
+    const std::string contentsBefore(
+        (std::istreambuf_iterator<char>(beforeInput)),
+        std::istreambuf_iterator<char>());
+    CHECK(contentsBefore.empty());
+
+    const snake::LeaderboardRepository repository(file);
+    std::string warning = "stale warning";
+    CHECK(repository.top10(&warning).empty());
+    CHECK(
+        warning ==
+        "E_LEADERBOARD_READ: invalid or unreadable board; empty table shown");
+
+    CHECK(std::filesystem::exists(file));
+    std::ifstream afterInput(file, std::ios::binary);
+    REQUIRE(afterInput.good());
+    const std::string contentsAfter(
+        (std::istreambuf_iterator<char>(afterInput)),
+        std::istreambuf_iterator<char>());
+    CHECK(contentsAfter == contentsBefore);
+}
+
+TEST_CASE(
+    "A whitespace-only leaderboard returns a warning without rewriting the file",
+    "[persistence][leaderboard][warning]") {
+
+    TemporaryDirectory directory;
+    const auto file = directory.path() / "leaderboard.json";
+    const std::string original = " \t\r\n  \n";
+    {
+        std::ofstream output(file, std::ios::binary | std::ios::trunc);
+        REQUIRE(output.good());
+        output << original;
+        REQUIRE(output.good());
+    }
+
+    std::ifstream beforeInput(file, std::ios::binary);
+    REQUIRE(beforeInput.good());
+    const std::string contentsBefore(
+        (std::istreambuf_iterator<char>(beforeInput)),
+        std::istreambuf_iterator<char>());
+    CHECK(contentsBefore == original);
+
+    const snake::LeaderboardRepository repository(file);
+    std::string warning = "stale warning";
+    CHECK(repository.top10(&warning).empty());
+    CHECK(
+        warning ==
+        "E_LEADERBOARD_READ: invalid or unreadable board; empty table shown");
+
+    CHECK(std::filesystem::exists(file));
+    std::ifstream afterInput(file, std::ios::binary);
+    REQUIRE(afterInput.good());
+    const std::string contentsAfter(
+        (std::istreambuf_iterator<char>(afterInput)),
+        std::istreambuf_iterator<char>());
+    CHECK(contentsAfter == contentsBefore);
+}
+
+TEST_CASE(
+    "A valid empty leaderboard does not warn or rewrite the file",
+    "[persistence][leaderboard][warning]") {
+
+    TemporaryDirectory directory;
+    const auto file = directory.path() / "leaderboard.json";
+    const std::string original =
+        "{\n  \"version\": 1,\n  \"entries\": []\n}\n";
+    {
+        std::ofstream output(file, std::ios::binary | std::ios::trunc);
+        REQUIRE(output.good());
+        output << original;
+        REQUIRE(output.good());
+    }
+
+    std::ifstream beforeInput(file, std::ios::binary);
+    REQUIRE(beforeInput.good());
+    const std::string contentsBefore(
+        (std::istreambuf_iterator<char>(beforeInput)),
+        std::istreambuf_iterator<char>());
+    CHECK(contentsBefore == original);
+
+    const snake::LeaderboardRepository repository(file);
+    std::string warning = "stale warning";
+    CHECK(repository.top10(&warning).empty());
+    CHECK(warning.empty());
+
+    std::ifstream afterInput(file, std::ios::binary);
+    REQUIRE(afterInput.good());
+    const std::string contentsAfter(
+        (std::istreambuf_iterator<char>(afterInput)),
+        std::istreambuf_iterator<char>());
+    CHECK(contentsAfter == contentsBefore);
 }

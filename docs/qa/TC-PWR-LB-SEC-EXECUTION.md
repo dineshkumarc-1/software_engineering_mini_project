@@ -124,7 +124,7 @@ Real refusals and safety:
 
 All D1–D5 still reproduce on candidate `dbf08b5`. D6 and D7 are new in run 2.
 
-Status after run 3: **D1–D5 are fixed in #48 (`31602b5`, `0d516f3`) and verified** (see Run 3). D6 and D7 are open.
+Status after run 3: **D1–D5 are fixed in #48 (`31602b5`, `0d516f3`; `2402449` adds only a cppcheck comment) and verified** (see Run 3). D6 (#55) and D7 are open.
 
 | ID | Component (owner) | Requirement | Observed (run 2, before the fix) | Expected | Reproduce |
 | --- | --- | --- | --- | --- | --- |
@@ -133,7 +133,7 @@ Status after run 3: **D1–D5 are fixed in #48 (`31602b5`, `0d516f3`) and verifi
 | D3 | C11 (Bharath) | TC-LB-04 step 2 | After a schema-invalid file (wrong type, negative score, bad enum), `addScore` returns `Error` ("E_LEADERBOARD_SAVE: score not saved" in the game) and keeps the bad file | The valid score is stored and the bad file replaced atomically, as already happens for malformed JSON | `malformed/14`, `15`, `18`; test "Known defect D3"; `leaderboard_ui_check.py` |
 | D4 | C11 (Bharath) | SRS Appendix B "Date (YYYY-MM-DD)", TC-LB-01 | New entries get `date_achieved` like `2026-10-29T09:09:14Z` | `2026-10-29` | Test "Known defect D4"; `leaderboard_ui_check.py` |
 | D5 | C13 secure file store (Bharath) | SAD 4.3.4 `removeStaleTemp`, TC-SEC-04 | `leaderboard.json.tmp.*` left by a crashed save stays forever | Removed on a later load or save, without touching anything else | Tests "Known defect D5 (simulated leftover)" and "Known defect D5 (injected crash)" |
-| D6 | C11 (to triage) | TC-LB-04 "warning logged" | An empty (0-byte) or whitespace-only `leaderboard.json` is read as a new board: nothing on screen and nothing in the log. Truncated or invalid files do show and log `E_LEADERBOARD_READ` | The same warning as for other corrupt files | `leaderboard_ui_check.py`, "TC-LB-04 empty"; `malformed/01`, `02`. No known-defect unit test yet: the warning API (`top10(std::string*)`) exists only in #53, not in this pull request's base |
+| D6 | C11, logged as #55 for triage | TC-LB-04 "warning logged" | An empty (0-byte) or whitespace-only `leaderboard.json` is read as a new board: nothing on screen and nothing in the log. Truncated or invalid files do show and log `E_LEADERBOARD_READ` | The same warning as for other corrupt files | `leaderboard_ui_check.py`, "TC-LB-04 empty"; `malformed/01`, `02`. No known-defect unit test yet: the warning API (`top10(std::string*)`) exists only in #53, not in this pull request's base |
 | D7 | Leaderboard screen, #21 (to triage) | STP TC-LB-02 | The table has Rank, Player name and Score only | Rank, name, score, mode, difficulty and date | [lb02-ten-entries.png](evidence/screenshots/lb02-ten-entries.png) |
 
 ### Known-defect tests

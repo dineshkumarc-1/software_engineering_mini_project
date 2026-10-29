@@ -9,11 +9,10 @@
 //  - TC-LB-01, TC-LB-03, TC-LB-04, TC-SEC-01, TC-SEC-04, TC-SEC-05 and
 //    TC-SEC-06 at the repository level.
 //
-// Behaviour that the SRS/SAD/STP require but the code does not do yet is
-// kept as "[!shouldfail]" tests named "Known defect ...": they pass while
-// the defect exists and start failing once it is fixed, as a reminder to
-// drop the tag. Tests marked (D1)...(D5) started that way and became
-// ordinary regression tests with the persistence fix in #48.
+// Historical defects D1-D6 now run as ordinary regressions. Their original
+// assertions remain intact; expected-failure tags are removed only after
+// verification of the corresponding persistence fix. D6 is verified against
+// Bharath's f898f8c blank-file warning fix in the owner integration candidate.
 // See docs/qa/TC-PWR-LB-SEC-EXECUTION.md.
 
 #include "snakextreme/GameMode.hpp"
@@ -525,8 +524,8 @@ TEST_CASE("TC-LB-04: missing, empty and truncated files show an empty board and 
     }
 }
 
-TEST_CASE("Known defect D6: an empty or whitespace-only board shows no warning",
-          "[leaderboard][TC-LB-04][known-defect][!shouldfail]") {
+TEST_CASE("TC-LB-04: an empty or whitespace-only board returns a warning (D6)",
+          "[leaderboard][TC-LB-04][D6]") {
     // STP TC-LB-04 lists "empty" with the other corrupt fixtures: "empty
     // leaderboard shown; warning logged". Today an empty or blank file is
     // read as a new board, with no warning (truncated files do warn).
