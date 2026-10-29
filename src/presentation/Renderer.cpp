@@ -277,17 +277,27 @@ void Renderer::drawNavigation(sf::RenderTarget& target, const FrameView& frame) 
     } else {
         label("Leaderboard - Top 10", 28, 138.f, TextMain);
         const auto cell = [&](const std::string& value, float x, float y, sf::Color color) {
-            auto item = text(value, 19, color); item.setPosition(x, y); target.draw(item);
+            auto item = text(value, 16, color);
+            item.setPosition(x, y);
+            target.draw(item);
         };
-        cell("Rank", 190.f, 165.f, Accent);
-        cell("Player name", 285.f, 165.f, Accent);
-        cell("Score", 610.f, 165.f, Accent);
+        // The six columns fit the 900px reference window, including a full
+        // 15-character player name and the YYYY-MM-DD date.
+        cell("Rank", 90.f, 165.f, Accent);
+        cell("Player name", 130.f, 165.f, Accent);
+        cell("Score", 285.f, 165.f, Accent);
+        cell("Mode", 390.f, 165.f, Accent);
+        cell("Difficulty", 480.f, 165.f, Accent);
+        cell("Date", 590.f, 165.f, Accent);
         for (std::size_t i = 0; i < frame.leaderboard.size(); ++i) {
             const float y = 194.f + static_cast<float>(i) * 22.f;
             const auto& entry = frame.leaderboard[i];
-            cell(std::to_string(i + 1), 205.f, y, TextDim);
-            cell(entry.playerName, 285.f, y, TextMain);
-            cell(std::to_string(entry.score), 610.f, y, TextMain);
+            cell(std::to_string(i + 1), 95.f, y, TextDim);
+            cell(entry.playerName, 130.f, y, TextMain);
+            cell(std::to_string(entry.score), 285.f, y, TextMain);
+            cell(toString(entry.gameMode), 390.f, y, TextMain);
+            cell(toString(entry.difficulty), 480.f, y, TextMain);
+            cell(entry.dateAchieved, 590.f, y, TextMain);
         }
         if (frame.leaderboard.empty()) label("No scores yet", 22, 280.f, TextDim);
         // Constant warning text is deliberately bounded to the available row.
