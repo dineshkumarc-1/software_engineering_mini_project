@@ -157,3 +157,18 @@ Relevant headless evidence files include:
 Update this matrix when additional tests, source reviews, integration checks, or defect investigations produce new evidence.
 
 For every confirmed deviation, record the specific requirement or design reference, observed behavior, evidence, impact, reason if known, and the associated defect or approved change. Where no deviation is found, state **“No deviation identified”** and specify the scope actually verified.
+
+## 12. Windows 11 Offline Network Collector Evidence
+
+| Scope | Evidence reviewed | Finding and limitations | Status |
+|---|---|---|---|
+| Windows 11 process monitoring | Collaborator-reported collector result; JSON reviewed according to the PR #50 evidence note. The SnakeXtreme process remained running in 60 of 60 samples. | The observation covers the recorded collection only; it does not establish complete platform or application conformance. | Limited evidence recorded |
+| Process-owned TCP and UDP endpoints | Zero process-owned TCP connection records and zero process-owned UDP endpoint records were reported across the snapshots. | No endpoint records were observed in this collection. This does not prove that all possible network activity is absent or blocked. | Limited evidence recorded |
+| Scoped outbound firewall rule | ActiveStore checks reported the enabled outbound block rule for the game executable as present at the beginning and end of collection. The collaborator reported that gameplay remained usable while the rule was enabled. | The evidence is limited to the reported rule state and observed gameplay during this collection. Broader network-security conformance remains unverified. | Limited evidence recorded |
+| Sampling duration | The configured duration was 60 seconds; timestamps spanned approximately 98.35 seconds because of per-loop query overhead. | The actual collection interval exceeded the configured duration and must be considered when interpreting the results. | Limitation documented |
+| Evidence provenance | The collaborator reported reviewing the collector JSON. The raw JSON was kept outside Git due to local machine and path details; the PR #50 evidence note is the reference. | The raw JSON is not available in this repository for independent reinspection. The final integrated candidate SHA has not been established by this evidence. | Further verification pending |
+| Windows 10 and final-candidate acceptance | No corresponding Windows 10 result or verified final-candidate relationship is established by this Windows 11 collection. | Windows 10 testing, final integrated candidate verification, and complete mapping to approved requirements and STP test cases remain outstanding. | Pending verification |
+
+**Assessment:** The Windows 11 collector result is limited supporting evidence, not a complete network-security acceptance result. It must not be used to infer Windows 10 conformance, final-candidate acceptance, or completion of the full test plan.
+
+**Overall QA decision remains: Final QA sign-off pending.**
