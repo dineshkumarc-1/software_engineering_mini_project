@@ -130,9 +130,16 @@ LeaderboardRepository::loadValidatedEntries(bool* corruptJson) const {
 
     const StoreReadResult result = store_.readJson();
 
-    // Missing or empty files represent a new leaderboard.
-    if (result.status == StoreReadStatus::NotFound ||
-        result.status == StoreReadStatus::EmptyFile) {
+    // A missing file represents a new leaderboard. An existing zero-byte
+    // file is corrupt input: show the read warning but allow a later valid
+    // score submission to replace it atomically.
+    if (result.status == StoreReadStatus::NotFound) {
+        return std::vector<LeaderboardEntry>{};
+    }
+    if (result.status == StoreReadStatus::EmptyFile) {
+        if (corruptJson != nullptr) {
+            *corruptJson = true;
+        }
         return std::vector<LeaderboardEntry>{};
     }
 
@@ -275,7 +282,13 @@ LeaderboardRepository::top10(std::string* warning) const {
         warning->clear();
     }
 
-    auto entries = loadValidatedEntries();
+    bool corruptBoard = false;
+    auto entries = loadValidatedEntries(&corruptBoard);
+
+    if (warning != nullptr && corruptBoard) {
+        *warning =
+            "E_LEADERBOARD_READ: invalid or unreadable board; empty table shown";
+    }
 
     if (!entries) {
         if (warning != nullptr) {
@@ -382,7 +395,7 @@ ScoreSubmissionResult LeaderboardRepository::addScore(
         ScoreSubmissionStatus::Submitted,
         rank,
         recoveredCorruptJson
-            ? "Warning: the previous leaderboard JSON was malformed or "
+            ? "Warning: the previous leaderboard file was empty, malformed or "
               "schema-invalid. A fresh leaderboard was saved."
             : std::string{}
     };
