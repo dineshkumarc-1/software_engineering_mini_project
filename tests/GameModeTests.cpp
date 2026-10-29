@@ -46,7 +46,7 @@ std::chrono::milliseconds expectedInterval(Difficulty difficulty) {
     return 0ms;
 }
 
-bool hasDuplicates(Obstacles cells) {
+bool hasDuplicates(const Obstacles& cells) {
     for (std::size_t i = 0; i < cells.size(); ++i) {
         for (std::size_t j = i + 1; j < cells.size(); ++j) {
             if (cells[i] == cells[j]) {
@@ -314,7 +314,7 @@ TEST_CASE("Obstacle mode places 8 valid obstacles for 500 seeds",
     const auto snakeBody = startingSnake();
     const GridPosition food{20, 4};
 
-    REQUIRE(snake::config::ObstacleCount == 8);
+    static_assert(snake::config::ObstacleCount == 8, "SRS Addendum: 8 obstacles");
 
     for (std::uint32_t seed = 0; seed < 500; ++seed) {
         INFO("seed " << seed);

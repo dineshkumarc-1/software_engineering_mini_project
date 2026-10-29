@@ -31,25 +31,45 @@ snake_add_module(snake_engine SOURCES src/engine/GameEngine.cpp)
 # C7 game modes and difficulty profiles. Uses engine grid types only.
 snake_add_module(snake_modes
     SOURCES src/modes/ModeStrategy.cpp src/modes/ModeManager.cpp)
+# C8 power-ups: spawn schedule, pick-up and timed effects (issue #14).
+snake_add_module(snake_powerups
+    SOURCES src/powerups/PowerUpEffects.cpp src/powerups/PowerUpManager.cpp
+    DEPS snake_engine)
 # One game as the app runs it: engine + ModeManager + score session.
 snake_add_module(snake_gameplay
     SOURCES src/gameplay/GameplayController.cpp
     DEPS snake_app_state snake_engine snake_modes snake_scoring)
-# C11-C13 persistence. Placeholder until issue #15 adds sources, e.g.
-#   snake_add_module(snake_persistence SOURCES src/persistence/SecureFileStore.cpp)
-snake_add_module(snake_persistence DEPS snake_validation)
+# JSON dependency required by persistence.
+find_package(nlohmann_json 3.11 QUIET)
 
-# C12 settings schema/editor and interim atomic file adapter (#20).
-include(FetchContent)
-set(JSON_BuildTests OFF CACHE BOOL "" FORCE)
-FetchContent_Declare(nlohmann_json
-    GIT_REPOSITORY https://github.com/nlohmann/json.git
-    GIT_TAG v3.11.3
-    GIT_SHALLOW TRUE)
-FetchContent_MakeAvailable(nlohmann_json)
+if(NOT TARGET nlohmann_json::nlohmann_json)
+    include(FetchContent)
+
+    FetchContent_Declare(
+        nlohmann_json
+        GIT_REPOSITORY https://github.com/nlohmann/json.git
+        GIT_TAG v3.11.3
+        GIT_SHALLOW TRUE
+    )
+
+    FetchContent_MakeAvailable(nlohmann_json)
+endif()
+
+# C11-C13 persistence.
+snake_add_module(snake_persistence
+    SOURCES
+        src/persistence/SecureFileStore.cpp
+        src/persistence/LeaderboardRepository.cpp
+        src/persistence/LeaderboardModel.cpp
+    DEPS
+        snake_validation
+        nlohmann_json::nlohmann_json
+)
+
+# C12 schema/editor over shared C13 storage.
 snake_add_module(snake_settings
     SOURCES src/persistence/Settings.cpp src/persistence/SettingsRepository.cpp)
-target_link_libraries(snake_settings PRIVATE nlohmann_json::nlohmann_json)
+target_link_libraries(snake_settings PRIVATE snake_persistence nlohmann_json::nlohmann_json)
 
 # Optional C1 performance diagnostics; no SFML or player data in reports.
 snake_add_module(snake_probe SOURCES src/diagnostics/PerformanceProbe.cpp)
@@ -58,6 +78,9 @@ target_link_libraries(snake_probe PRIVATE nlohmann_json::nlohmann_json)
 # C5 waveform generation and volume policy remain SFML-free.
 snake_add_module(snake_audio_model SOURCES src/audio/AudioModel.cpp)
 snake_assert_core_is_sfml_free()
+
+# The running game (GameplayController) owns the power-ups of its session.
+target_link_libraries(snake_gameplay PUBLIC snake_powerups)
 
 # ---------------------------------------------------------------------------
 # Presentation layer (C1-C5) and the desktop executable.
@@ -182,6 +205,35 @@ if(BUILD_TESTING)
 snake_add_catch2_test(input_validator_tests
     SOURCES tests/InputValidatorTests.cpp
     LIBS snake_validation)
+        snake_add_catch2_test(secure_file_store_tests
+        SOURCES tests/SecureFileStoreTests.cpp
+        LIBS snake_persistence
+    )
+
+    snake_add_catch2_test(leaderboard_repository_tests
+        SOURCES tests/LeaderboardRepositoryTests.cpp
+        LIBS snake_persistence
+    )
+
+    # Issue #18: leaderboard and security test execution with the JSON
+    # corpus (25 valid + 25 malformed files per file type, 64 KiB boundary).
+    snake_add_catch2_test(leaderboard_model_tests
+        SOURCES tests/LeaderboardModelTests.cpp
+        LIBS snake_persistence)
+
+    snake_add_catch2_test(security_corpus_tests
+        SOURCES tests/SecurityCorpusTests.cpp
+        LIBS snake_persistence)
+    target_compile_definitions(security_corpus_tests PRIVATE
+        SNAKE_JSON_CORPUS_DIR="${PROJECT_SOURCE_DIR}/tests/fixtures/json-corpus")
+    # The config.json half, built once the settings module (C12, #20) exists.
+    if(TARGET snake_settings)
+        snake_add_catch2_test(settings_corpus_tests
+            SOURCES tests/SettingsCorpusTests.cpp
+            LIBS snake_settings nlohmann_json::nlohmann_json)
+        target_compile_definitions(settings_corpus_tests PRIVATE
+            SNAKE_JSON_CORPUS_DIR="${PROJECT_SOURCE_DIR}/tests/fixtures/json-corpus")
+    endif()
 
     add_executable(game_session_tests tests/GameSessionTests.cpp)
     target_link_libraries(game_session_tests PRIVATE snake_scoring snake_engine)
@@ -194,6 +246,11 @@ snake_add_catch2_test(input_validator_tests
     snake_add_catch2_test(game_mode_tests
         SOURCES tests/GameModeTests.cpp tests/ModeEngineIntegrationTests.cpp
         LIBS snake_modes snake_engine)
+
+    # C8 power-ups: schedule, effects, one active effect (TC-PWR-01..05).
+    snake_add_catch2_test(powerup_tests
+        SOURCES tests/PowerUpTests.cpp tests/PowerUpGameplayTests.cpp
+        LIBS snake_gameplay)
 
     # Menu selection and the app's game wiring (modes, speed, timer, score).
     snake_add_catch2_test(gameplay_tests
@@ -223,6 +280,24 @@ snake_add_catch2_test(input_validator_tests
     add_test(NAME layering_core_is_sfml_free
         COMMAND ${CMAKE_COMMAND} -DSNAKE_SOURCE_DIR=${PROJECT_SOURCE_DIR}
                 -P ${PROJECT_SOURCE_DIR}/cmake/CheckLayering.cmake)
+
+    # SEC-005 / TC-SEC-05: no running commands, loading code, unbounded C
+    # strings or printf-family calls in product code (issue #23).
+    add_test(NAME security_banned_api_scan
+        COMMAND ${CMAKE_COMMAND} -DSNAKE_SOURCE_DIR=${PROJECT_SOURCE_DIR}
+                -P ${PROJECT_SOURCE_DIR}/cmake/CheckBannedApis.cmake)
+    # The scan itself: it reports all 12 planted calls and nothing in
+    # look-alike code (comments, strings, fgets, std::filesystem, ...).
+    add_test(NAME security_banned_api_scan_finds_planted_calls
+        COMMAND ${CMAKE_COMMAND}
+                -DSNAKE_SOURCE_DIR=${PROJECT_SOURCE_DIR}/tests/fixtures/banned-api/bad
+                -P ${PROJECT_SOURCE_DIR}/cmake/CheckBannedApis.cmake)
+    set_tests_properties(security_banned_api_scan_finds_planted_calls PROPERTIES
+        PASS_REGULAR_EXPRESSION "12 banned API call\\(s\\)")
+    add_test(NAME security_banned_api_scan_ignores_lookalikes
+        COMMAND ${CMAKE_COMMAND}
+                -DSNAKE_SOURCE_DIR=${PROJECT_SOURCE_DIR}/tests/fixtures/banned-api/clean
+                -P ${PROJECT_SOURCE_DIR}/cmake/CheckBannedApis.cmake)
 
     # Test runner: builds every test executable, then runs the whole suite.
     get_property(snake_test_targets GLOBAL PROPERTY SNAKE_TEST_TARGETS)

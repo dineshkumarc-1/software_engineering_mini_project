@@ -9,9 +9,8 @@ struct SettingsLoadResult {
     bool usedDefaults{false};
     std::string warning;
 };
-// C12 interim file adapter; coordinate with C13 (#15) before final integration.
-// Bounded read, validated schema, exclusive sibling temp + atomic replacement.
-// No claim of disk-fsync durability or final C13 security acceptance.
+// C12 schema/validation adapter over C13 SecureFileStore.
+// Uses a stricter JSON nesting limit of 8 and retains stable fallback warnings.
 class SettingsRepository {
 public:
     explicit SettingsRepository(std::filesystem::path path = "config.json") : path_(std::move(path)) {}

@@ -163,3 +163,21 @@ TEST_CASE("Symbolic-link config is rejected without reading it", "[settings]") {
     if (ec) { SUCCEED("Symlink privileges unavailable; platform check deferred"); return; }
     CHECK(SettingsRepository(f.path).load().usedDefaults);
 }
+
+TEST_CASE("Shared storage keeps Settings depth eight and stable fallback codes", "[settings][integration]") {
+    Fixture f;
+    auto document = validJson();
+    nlohmann::json value = 0;
+    for (int i = 0; i < 7; ++i) value = nlohmann::json::array({value});
+    document["future"] = value;
+    f.write(document.dump());
+    CHECK_FALSE(SettingsRepository(f.path).load().usedDefaults);
+    document["future"] = nlohmann::json::array({value});
+    f.write(document.dump());
+    CHECK(SettingsRepository(f.path).load().warning == "E_PARSE: defaults loaded");
+    auto bytes = validJson().dump(); bytes.pop_back();
+    f.write(bytes + ",\"future\":{\"x\":1,\"x\":2}}");
+    CHECK(SettingsRepository(f.path).load().warning == "E_PARSE: defaults loaded");
+    f.write(std::string(65537, ' '));
+    CHECK(SettingsRepository(f.path).load().warning == "E_FILE_TOO_LARGE: defaults loaded");
+}

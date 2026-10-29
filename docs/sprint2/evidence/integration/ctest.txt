@@ -1,0 +1,45 @@
+Test project /data/sprint2-integration/build/headless
+      Start  1: app_state_flow
+ 1/20 Test  #1: app_state_flow .................................   Passed    0.01 sec
+      Start  2: score_service
+ 2/20 Test  #2: score_service ..................................   Passed    0.00 sec
+      Start  3: input_validator_tests
+ 3/20 Test  #3: input_validator_tests ..........................   Passed    0.00 sec
+      Start  4: secure_file_store_tests
+ 4/20 Test  #4: secure_file_store_tests ........................   Passed    0.05 sec
+      Start  5: leaderboard_repository_tests
+ 5/20 Test  #5: leaderboard_repository_tests ...................   Passed    0.01 sec
+      Start  6: leaderboard_model_tests
+ 6/20 Test  #6: leaderboard_model_tests ........................   Passed    0.00 sec
+      Start  7: security_corpus_tests
+ 7/20 Test  #7: security_corpus_tests ..........................   Passed    0.04 sec
+      Start  8: settings_corpus_tests
+ 8/20 Test  #8: settings_corpus_tests ..........................   Passed    0.01 sec
+      Start  9: game_session
+ 9/20 Test  #9: game_session ...................................   Passed    0.00 sec
+      Start 10: game_engine_tests
+10/20 Test #10: game_engine_tests ..............................   Passed    0.01 sec
+      Start 11: game_mode_tests
+11/20 Test #11: game_mode_tests ................................   Passed    0.27 sec
+      Start 12: powerup_tests
+12/20 Test #12: powerup_tests ..................................   Passed    0.03 sec
+      Start 13: gameplay_tests
+13/20 Test #13: gameplay_tests .................................   Passed    0.02 sec
+      Start 14: settings_tests
+14/20 Test #14: settings_tests .................................   Passed    0.02 sec
+      Start 15: audio_model_tests
+15/20 Test #15: audio_model_tests ..............................   Passed    0.01 sec
+      Start 16: performance_probe_tests
+16/20 Test #16: performance_probe_tests ........................   Passed    0.00 sec
+      Start 17: layering_core_is_sfml_free
+17/20 Test #17: layering_core_is_sfml_free .....................   Passed    0.01 sec
+      Start 18: security_banned_api_scan
+18/20 Test #18: security_banned_api_scan .......................   Passed    0.23 sec
+      Start 19: security_banned_api_scan_finds_planted_calls
+19/20 Test #19: security_banned_api_scan_finds_planted_calls ...   Passed    0.01 sec
+      Start 20: security_banned_api_scan_ignores_lookalikes
+20/20 Test #20: security_banned_api_scan_ignores_lookalikes ....   Passed    0.01 sec
+
+100% tests passed out of 20
+
+Total Test time (real) =   0.75 sec

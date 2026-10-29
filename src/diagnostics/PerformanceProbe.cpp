@@ -50,10 +50,10 @@ void PerformanceProbe::input(std::int64_t dequeued, std::int64_t registered, boo
 void PerformanceProbe::engineApplied(std::size_t ordinal, std::int64_t now) {
     if (!validTime(now)) { ++invalidSamples_; return; }
     for (auto index : pending_) {
-        auto& input = inputs_[index];
-        if (!input.appliedUs && input.ordinal <= ordinal) {
-            if (now < input.registeredUs) { ++invalidSamples_; continue; }
-            input.appliedUs = now;
+        auto& sample = inputs_[index];
+        if (!sample.appliedUs && sample.ordinal <= ordinal) {
+            if (now < sample.registeredUs) { ++invalidSamples_; continue; }
+            sample.appliedUs = now;
         }
     }
 }
@@ -77,8 +77,8 @@ void PerformanceProbe::frame(std::int64_t now, const ProbeContext& context) {
     currentContext_ = context; windowSession_ = session_;
     ++frames_; lastFrameUs_ = now;
     for (auto index : pending_) {
-        auto& input = inputs_[index];
-        if (input.appliedUs && *input.appliedUs <= now) input.displayedUs = now;
+        auto& sample = inputs_[index];
+        if (sample.appliedUs && *sample.appliedUs <= now) sample.displayedUs = now;
     }
     pending_.erase(std::remove_if(pending_.begin(), pending_.end(), [this](auto i) { return inputs_[i].displayedUs.has_value(); }), pending_.end());
 }

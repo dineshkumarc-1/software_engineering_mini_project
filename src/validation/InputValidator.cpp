@@ -1,5 +1,7 @@
 
 #include "snakextreme/InputValidator.hpp"
+#include <algorithm>
+#include <iterator>
 
 namespace snake {
 
@@ -18,11 +20,9 @@ bool isValidPlayerName(std::string_view name) noexcept {
     }
 
     // Reject characters outside the whitelist.
-    for (const char ch : name) {
-        if (!isAllowedPlayerNameCharacter(ch)) {
-            return false;
-        }
-    }
+    if (std::any_of(name.begin(), name.end(), [](char ch) {
+            return !isAllowedPlayerNameCharacter(ch);
+        })) return false;
 
     // Ignore outer spaces when checking the effective name.
     const std::size_t first = name.find_first_not_of(' ');
@@ -44,11 +44,8 @@ std::string sanitizePlayerName(std::string_view name) {
             : MaxPlayerNameLength);
 
     // Keep only permitted characters.
-    for (const char ch : name) {
-        if (isAllowedPlayerNameCharacter(ch)) {
-            sanitized.push_back(ch);
-        }
-    }
+    std::copy_if(name.begin(), name.end(), std::back_inserter(sanitized),
+                 isAllowedPlayerNameCharacter);
 
     // Trim leading spaces.
     const std::size_t first = sanitized.find_first_not_of(' ');

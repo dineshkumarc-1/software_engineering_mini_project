@@ -2,6 +2,7 @@
 // Pixel-space controls shared by rendering and input; no SFML dependency.
 #include "snakextreme/AppState.hpp"
 #include <cstddef>
+#include <algorithm>
 #include <optional>
 #include <vector>
 namespace snake {
@@ -40,7 +41,11 @@ inline std::optional<UiButton> navigationHit(Screen screen, int x, int y) {
                 return UiButton{{}, UiCommand::Difficulty, i, ""};
         }
     }
-    for (const auto& button : footerButtons(screen)) if (button.area.contains(x, y)) return button;
+    const auto buttons = footerButtons(screen);
+    const auto hit = std::find_if(buttons.begin(), buttons.end(), [x, y](const auto& button) {
+        return button.area.contains(x, y);
+    });
+    if (hit != buttons.end()) return *hit;
     return std::nullopt;
 }
 inline std::optional<std::size_t> settingsRowAt(int x, int y) {

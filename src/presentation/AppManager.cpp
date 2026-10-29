@@ -329,6 +329,7 @@ void AppManager::select(MenuInput input) {
 
 void AppManager::startGame() {
     if (gameplay_.start(selectedConfig_)) {
+        leaderboard_.beginSession();
         if (probe_ != nullptr) probe_->beginSession();
         menuError_.clear();
         if (state_.screen() == Screen::ModeSelection) dispatch(Action::BeginGame);
@@ -352,6 +353,10 @@ void AppManager::dispatch(Action action) {
         settingsEditor_.error(settingsNotice_);
     }
 
+    if (state_.screen() == Screen::Leaderboard && previous != Screen::Leaderboard) {
+        leaderboard_.refresh();
+        if (!leaderboard_.message().empty()) std::cerr << "[WARN] " << leaderboard_.message() << '\n';
+    }
     syncAudio();
     if (state_.screen() == Screen::Exiting) {
         window_.close();
@@ -370,6 +375,11 @@ void AppManager::update(sf::Time step) {
     if (state_.screen() == Screen::Gameplay && gameplay_.score() > previousScore)
         audio_.playSfx(SoundCue::Food);
     if (state_.screen() == Screen::Gameplay && gameplay_.isGameOver()) {
+        leaderboard_.finish(nameEntry_.value(), gameplay_.score(),
+                            gameplay_.config().mode, gameplay_.config().difficulty);
+        if (leaderboard_.message().find("E_") != std::string::npos ||
+            leaderboard_.message().find("Warning:") != std::string::npos)
+            std::cerr << "[WARN] " << leaderboard_.message() << '\n';
         dispatch(Action::EndGame);
         audio_.playSfx(SoundCue::GameOver);
     }
@@ -396,7 +406,12 @@ std::string AppManager::titleText() const {
         title += " | Name: " + nameEntry_.value() + " | " + nameEntry_.error();
         break;
     case Screen::Leaderboard:
-        title += " | Leaderboard integration pending (#21) | Esc: back";
+        title += " | Leaderboard | " + std::to_string(leaderboard_.entries().size()) + " entries";
+        for (std::size_t i = 0; i < leaderboard_.entries().size(); ++i) {
+            const auto& entry = leaderboard_.entries()[i];
+            title += " | " + std::to_string(i + 1) + ". " + entry.playerName + " " + std::to_string(entry.score);
+        }
+        title += " | " + leaderboard_.message() + " | Esc: back";
         break;
     case Screen::Settings:
         title += " | Settings | row " + std::to_string(settingsEditor_.row() + 1) +
@@ -430,10 +445,13 @@ std::string AppManager::titleText() const {
         if (const auto remaining = gameplay_.remainingTime()) {
             title += " | Time " + formatCountdown(*remaining);
         }
+        if (const auto effect = gameplay_.activeEffect(); effect && !gameplay_.isGameOver()) {
+            title += " | " + describeEffect(*effect);
+        }
         if (state_.screen() == Screen::Paused) {
             title += " | Esc/Enter: resume, M: menu";
         } else if (gameplay_.isGameOver()) {
-            title += " | Enter: play again, M: menu";
+            title += " | " + leaderboard_.message() + " | Enter: play again, M: menu";
         } else {
             title += " | Esc: pause, M: menu";
         }
@@ -459,10 +477,14 @@ FrameView AppManager::frame() const {
     view.selected = selectedConfig_;
     view.active = gameplay_.config();
     view.remainingTime = gameplay_.remainingTime();
+    view.powerUp = gameplay_.powerUpOnGrid();
+    view.activeEffect = gameplay_.activeEffect();
     view.gameOverReason = gameplay_.gameOverReason();
     view.score = gameplay_.score();
     view.highScore = gameplay_.highScore();
     view.menuError = menuError_;
+    view.leaderboard = leaderboard_.entries();
+    view.leaderboardMessage = leaderboard_.message();
     view.playerName = nameEntry_.value();
     view.nameError = nameEntry_.error();
     view.menuIndex = menuIndex_;

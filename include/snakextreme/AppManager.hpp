@@ -6,6 +6,7 @@
 #include "snakextreme/PerformanceProbe.hpp"
 #include "snakextreme/NameEntry.hpp"
 #include "snakextreme/SettingsRepository.hpp"
+#include "snakextreme/LeaderboardModel.hpp"
 #include "snakextreme/GameplayController.hpp"
 #include "snakextreme/MenuSelection.hpp"
 #include "snakextreme/ModeManager.hpp"
@@ -51,6 +52,7 @@ private:
     std::int64_t inputDequeuedUs_{0};
     AudioService audio_;
     SettingsRepository settingsRepository_;
+    LeaderboardModel leaderboard_;
     Settings settings_;
     SettingsEditor settingsEditor_;
     std::string settingsNotice_;

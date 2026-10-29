@@ -1,30 +1,12 @@
-#if defined(_WIN32)
-#define NOMINMAX
-#define WIN32_LEAN_AND_MEAN
-#include <windows.h>
-#endif
 #include "snakextreme/SettingsRepository.hpp"
+#include "snakextreme/SecureFileStore.hpp"
 #include <nlohmann/json.hpp>
 #include <array>
-#include <cstdio>
-#include <fstream>
-#include <memory>
-#include <random>
-#include <set>
-#include <stdexcept>
-#include <system_error>
+#include <exception>
 
 namespace snake {
 namespace {
 using Json = nlohmann::json;
-// A concrete deleter avoids GCC's ignored-attributes warning when glibc marks
-// fclose with attributes that do not survive a function-pointer template type.
-struct FileCloser {
-    void operator()(std::FILE* file) const noexcept {
-        if (file != nullptr) (void)std::fclose(file);
-    }
-};
-constexpr std::size_t MaxBytes = 65536;
 SettingsLoadResult defaults(const char* code) { return {Settings{}, true, code}; }
 bool integerInRange(const Json& j, int low, int high) {
     return j.is_number_integer() && j >= low && j <= high;
@@ -32,25 +14,19 @@ bool integerInRange(const Json& j, int low, int high) {
 }
 SettingsLoadResult SettingsRepository::load() const {
     try {
-        std::error_code ec;
-        const auto status = std::filesystem::symlink_status(path_, ec);
-        if (status.type() == std::filesystem::file_type::not_found) return defaults("E_FILE_MISSING: defaults loaded");
-        if (ec || !std::filesystem::is_regular_file(status)) return defaults("E_READ_FAILED: defaults loaded");
-        std::ifstream input(path_, std::ios::binary);
-        if (!input) return defaults("E_READ_FAILED: defaults loaded");
-        std::array<char, MaxBytes + 1> buffer{};
-        input.read(buffer.data(), static_cast<std::streamsize>(buffer.size()));
-        if (input.bad()) return defaults("E_READ_FAILED: defaults loaded");
-        const auto length = static_cast<std::size_t>(input.gcount());
-        if (length > MaxBytes) return defaults("E_FILE_TOO_LARGE: defaults loaded");
-        std::set<std::string> keys;
-        const auto callback = [&keys](int depth, Json::parse_event_t event, Json& value) {
-            if (depth > 8) throw std::runtime_error("depth limit");
-            if (event == Json::parse_event_t::key && depth == 1 &&
-                !keys.insert(value.get<std::string>()).second) throw std::runtime_error("duplicate key");
-            return true;
-        };
-        const auto json = Json::parse(buffer.data(), buffer.data() + length, callback);
+        // C13 owns bounded reads, duplicate-key/depth checks and safe paths.
+        const auto loaded = SecureFileStore(path_).readJson(8);
+        switch (loaded.status) {
+        case StoreReadStatus::Ok: break;
+        case StoreReadStatus::NotFound: return defaults("E_FILE_MISSING: defaults loaded");
+        case StoreReadStatus::TooLarge: return defaults("E_FILE_TOO_LARGE: defaults loaded");
+        case StoreReadStatus::EmptyFile:
+        case StoreReadStatus::InvalidJson:
+        case StoreReadStatus::UnsafeJson: return defaults("E_PARSE: defaults loaded");
+        case StoreReadStatus::UnsafeFile:
+        case StoreReadStatus::IoError: return defaults("E_READ_FAILED: defaults loaded");
+        }
+        const auto& json = loaded.value;
         if (!json.is_object() || !json.contains("version") || !integerInRange(json["version"], 1, 1))
             return defaults("E_SCHEMA: defaults loaded");
         Settings settings;
@@ -75,46 +51,23 @@ SettingsLoadResult SettingsRepository::load() const {
 bool SettingsRepository::save(const Settings& settings, std::string& error) const {
     error.clear();
     if (!validSettings(settings)) { error = "E_SCHEMA: settings not saved"; return false; }
-    std::filesystem::path temporary;
-    bool ownsTemporary = false;
     try {
+        // Preserve the existing Settings save contract: never create parents.
+        const auto parent = path_.has_parent_path() ? path_.parent_path() : std::filesystem::path{"."};
+        std::error_code ec;
+        if (!std::filesystem::is_directory(parent, ec) || ec) {
+            error = "E_WRITE_FAILED: existing config retained";
+            return false;
+        }
         const Json json{{"version", 1}, {"key_up", settings.keys[0]}, {"key_down", settings.keys[1]},
             {"key_left", settings.keys[2]}, {"key_right", settings.keys[3]},
             {"music_volume", settings.musicVolume}, {"sfx_volume", settings.sfxVolume},
             {"theme", themeName(settings.theme)}};
-        const std::string bytes = json.dump(2) + "\n";
-        std::random_device random;
-        std::unique_ptr<std::FILE, FileCloser> file;
-        for (int attempt = 0; attempt < 8 && !file; ++attempt) {
-            temporary = path_; temporary += ".tmp-" + std::to_string(random());
-#if defined(_WIN32)
-            std::FILE* handle = nullptr;
-            if (_wfopen_s(&handle, temporary.c_str(), L"wbx") == 0) file.reset(handle);
-#else
-            file.reset(std::fopen(temporary.c_str(), "wbx"));
-#endif
-        }
-        // Never remove a path unless this process successfully created it.
-        if (!file) { error = "E_WRITE_FAILED: could not create temporary file"; return false; }
-        ownsTemporary = true;
-        const bool written = std::fwrite(bytes.data(), 1, bytes.size(), file.get()) == bytes.size();
-        const bool flushed = std::fflush(file.get()) == 0;
-        const bool closed = std::fclose(file.release()) == 0;
-        if (!written || !flushed || !closed) throw std::runtime_error("write failed");
-#if defined(_WIN32)
-        if (!MoveFileExW(temporary.c_str(), path_.c_str(), MOVEFILE_REPLACE_EXISTING | MOVEFILE_WRITE_THROUGH))
-            throw std::runtime_error("replace failed");
-#else
-        std::filesystem::rename(temporary, path_);
-#endif
-        return true;
+        if (SecureFileStore(path_).writeJson(json)) return true;
     } catch (const std::exception&) {
-        if (ownsTemporary) {
-            std::error_code ignored;
-            std::filesystem::remove(temporary, ignored);
-        }
-        error = "E_WRITE_FAILED: existing config retained";
-        return false;
+        // Preserve C12's stable error contract; do not expose player paths.
     }
+    error = "E_WRITE_FAILED: existing config retained";
+    return false;
 }
 } // namespace snake

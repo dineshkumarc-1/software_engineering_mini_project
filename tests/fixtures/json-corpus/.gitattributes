@@ -1,0 +1,2 @@
+# Test data: keep every byte exactly as committed (no line-ending conversion).
+* -text
