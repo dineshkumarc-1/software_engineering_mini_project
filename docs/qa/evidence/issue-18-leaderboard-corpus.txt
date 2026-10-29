@@ -1,8 +1,9 @@
-# Issue #18 - leaderboard.json corpus, per file (Clang 18 ASan+UBSan build, run as a normal user)
+# Issue #18 - leaderboard.json corpus, per file (run 2: Clang 18 ASan+UBSan build, run as a normal user)
+# Build: candidate #53 dbf08b5 plus the #52 test update at 12441e5 (no product code changed)
 # set | file | size | SecureFileStore::readJson status | entries from LeaderboardRepository::top10() | load time
 valid | 01-empty-board.json | 36 B | Ok | 0 entries | 0 ms
 valid | 02-one-entry.json | 196 B | Ok | 1 entries | 0 ms
-valid | 03-full-board.json | 1650 B | Ok | 10 entries | 2 ms
+valid | 03-full-board.json | 1650 B | Ok | 10 entries | 1 ms
 valid | 04-three-entries.json | 518 B | Ok | 3 entries | 0 ms
 valid | 05-tied-scores.json | 517 B | Ok | 3 entries | 0 ms
 valid | 06-zero-score.json | 194 B | Ok | 1 entries | 0 ms
@@ -22,7 +23,7 @@ valid | 19-surrounding-whitespace.json | 206 B | Ok | 1 entries | 0 ms
 valid | 20-digit-only-name.json | 196 B | Ok | 1 entries | 0 ms
 valid | 21-name-with-inner-space.json | 199 B | Ok | 1 entries | 0 ms
 valid | 22-unicode-in-unknown-field.json | 218 B | Ok | 1 entries | 0 ms
-valid | 23-ten-equal-scores.json | 1628 B | Ok | 10 entries | 1 ms
+valid | 23-ten-equal-scores.json | 1628 B | Ok | 10 entries | 0 ms
 valid | 24-year-boundaries.json | 358 B | Ok | 2 entries | 0 ms
 valid | 25-nested-unknown-object.json | 204 B | Ok | 1 entries | 0 ms
 malformed | 01-empty-file.json | 0 B | EmptyFile | 0 entries | 0 ms
@@ -48,12 +49,10 @@ malformed | 20-name-sixteen-chars.json | 207 B | Ok | 0 entries | 0 ms
 malformed | 21-name-with-delimiters.json | 202 B | Ok | 0 entries | 0 ms
 malformed | 22-empty-name.json | 191 B | Ok | 0 entries | 0 ms
 malformed | 23-bad-date-format.json | 195 B | Ok | 1 entries | 0 ms
-malformed | 24-eleven-entries.json | 1812 B | Ok | 10 entries | 1 ms
+malformed | 24-eleven-entries.json | 1812 B | Ok | 10 entries | 0 ms
 malformed | 25-deep-nesting-10000.json | 20029 B | UnsafeJson | 0 entries | 0 ms
-test cases:  18 |  13 passed | 5 failed as expected
-assertions: 704 | 697 passed | 7 failed as expected
 
-# Whole suite:
-test cases:  18 |  13 passed | 5 failed as expected
-assertions: 704 | 697 passed | 7 failed as expected
-All tests passed (362 assertions in 3 test cases)
+# Whole suite (security_corpus_tests, same build and user):
+test cases:  19 |  14 passed | 5 failed as expected
+assertions: 714 | 707 passed | 7 failed as expected
+# The 5 expected failures are the known-defect tests D1-D5; the corpus test lists 23-bad-date-format.json (D1) and 24-eleven-entries.json (D2) as known exceptions.

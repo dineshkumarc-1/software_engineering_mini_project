@@ -1,0 +1,81 @@
+# Issue #18 run 2 - tools/powerup_runtime_check.py on the real game (Classic / Medium, Linux, Xvfb, XTEST keys)
+# Build: candidate #53 dbf08b5 plus the #52 test update at 12441e5
+
+## GCC 13.3 Release game, 150 s
+PASS main menu ready - SnakeXtreme | Main menu | Up/Down: select, Enter: confirm, Esc: exit
+PASS name entered - SnakeXtreme | Name: Tejas |
+PASS mode menu ready - SnakeXtreme | Menu | Classic / Medium | Left/Right: mode, Up/Down: difficulty, Enter: start, Esc: exit
+PASS Classic / Medium game started - SnakeXtreme | Playing | Classic / Medium | Score 0 | High 0 | Esc: pause, M: menu
+process exit code: 0
+PASS clean exit - exit code 0
+files written: ['config.json']
+played 150.7 s, 1337 moves, state Playing
+appearances: [('10.5', (20, 1), 'Speed'), ('19.2', (16, 7), 'Multiplier'), ('36.5', (19, 17), 'Speed'), ('46.8', (15, 9), 'Multiplier'), ('58.6', (2, 17), 'Multiplier'), ('69.9', (18, 18), 'Multiplier'), ('80.2', (22, 18), 'Speed'), ('90.1', (12, 1), 'Multiplier'), ('103.8', (15, 8), 'Shrink'), ('111.8', (23, 3), 'Shrink'), ('120.1', (8, 15), 'Shrink'), ('129.9', (5, 11), 'Speed')]
+collected: {'type': 'Speed', 'time': 12.952500343322754, 'length_before': 12, 'length_after': 12, 'move_index': 109, 'effect_title': ('Speed', 5.0), 'boost_ms': 71.83144010346511, 'end': 18.01785969734192, 'end_index': 179, 'after_ms': 120.5294132232666}
+collected: {'type': 'Multiplier', 'time': 21.135082960128784, 'length_before': 15, 'length_after': 15, 'move_index': 205, 'effect_title': ('Multiplier', 10.0), 'pause': (10.0, 'Paused', 10.0)}
+collected: {'type': 'Speed', 'time': 37.55297136306763, 'length_before': 25, 'length_after': 25, 'move_index': 317, 'effect_title': ('Speed', 5.0), 'boost_ms': 72.3758237115268, 'end': 42.6416130065918, 'end_index': 387, 'after_ms': 118.97339820861816}
+collected: {'type': 'Multiplier', 'time': 49.1147677898407, 'length_before': 28, 'length_after': 28, 'move_index': 441, 'effect_title': ('Multiplier', 10.0)}
+collected: {'type': 'Multiplier', 'time': 70.95770239830017, 'length_before': 37, 'length_after': 37, 'move_index': 623, 'effect_title': ('Multiplier', 10.0)}
+collected: {'type': 'Speed', 'time': 81.75308728218079, 'length_before': 39, 'length_after': 39, 'move_index': 713, 'effect_title': ('Speed', 5.0), 'boost_ms': 71.62224013229897, 'end': 86.84014391899109, 'end_index': 783, 'after_ms': 119.06516551971436}
+collected: {'type': 'Multiplier', 'time': 90.79509854316711, 'length_before': 39, 'length_after': 39, 'move_index': 816, 'effect_title': ('Multiplier', 10.0)}
+collected: {'type': 'Shrink', 'time': 104.49413752555847, 'length_before': 39, 'length_after': 38, 'move_index': 930}
+collected: {'type': 'Shrink', 'time': 112.03223490715027, 'length_before': 41, 'length_after': 40, 'move_index': 993}
+collected: {'type': 'Shrink', 'time': 122.4889268875122, 'length_before': 40, 'length_after': 39, 'move_index': 1080}
+collected: {'type': 'Speed', 'time': 132.2063546180725, 'length_before': 39, 'length_after': 39, 'move_index': 1161, 'effect_title': ('Speed', 5.0), 'boost_ms': 71.87388683187551, 'end': 137.29706859588623, 'end_index': 1231, 'after_ms': 118.84491443634033}
+food with x2: [20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20] food without: [10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10]
+log: Multiplier at (2, 17) gone without pick-up at 62.8 s
+log: Multiplier at (2, 17) gone without pick-up at 63.0 s
+log: Multiplier at (2, 17) gone without pick-up at 63.3 s
+log: Multiplier at (2, 17) gone without pick-up at 63.5 s
+PASS power-ups keep appearing during play - 12 seen in 151 s (0 restarts)
+gaps between seen appearances (s): 8.7, 17.2, 10.4, 11.8, 11.3, 10.3, 9.9, 13.7, 8.0, 8.3, 9.8
+PASS Speed: title shows "Speed boost" with seconds left - ('Speed', 5.0)
+PASS Speed: moves every ~72 ms during the boost - 71.8 ms over 29 moves
+PASS Speed: boost ends after ~5 s - 5.07 s
+PASS Speed: back to ~120 ms afterwards - 120.5 ms
+PASS Multiplier: title shows "Score x2" with seconds left - ('Multiplier', 10.0)
+PASS Multiplier: pause freezes the effect time - before 10.0, paused Paused 10.0
+PASS food during x2 scores +20 - [20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20]
+PASS food without x2 scores +10 - [10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10]
+PASS Shrink: length 39 -> 38 - measured 38
+PASS Shrink: length 41 -> 40 - measured 40
+PASS Shrink: length 40 -> 39 - measured 39
+collected types: ['Multiplier', 'Shrink', 'Speed']
+SUMMARY 17/17 passed
+
+## Clang 18 ASan+UBSan game, 120 s
+PASS main menu ready - SnakeXtreme | Main menu | Up/Down: select, Enter: confirm, Esc: exit
+PASS name entered - SnakeXtreme | Name: Tejas |
+PASS mode menu ready - SnakeXtreme | Menu | Classic / Medium | Left/Right: mode, Up/Down: difficulty, Enter: start, Esc: exit
+PASS Classic / Medium game started - SnakeXtreme | Playing | Classic / Medium | Score 0 | High 0 | Esc: pause, M: menu
+process exit code: 0
+PASS clean exit - exit code 0
+files written: ['config.json']
+played 120.9 s, 1060 moves, state Playing
+appearances: [('9.7', (26, 15), 'Multiplier'), ('20.8', (12, 15), 'Speed'), ('31.4', (19, 9), 'Multiplier'), ('42.6', (4, 10), 'Multiplier'), ('53.9', (26, 2), 'Multiplier'), ('62.1', (21, 7), 'Speed'), ('70.1', (10, 3), 'Multiplier'), ('83.1', (24, 16), 'Speed'), ('92.0', (13, 6), 'Multiplier'), ('102.1', (29, 9), 'Shrink'), ('112.8', (21, 4), 'Shrink')]
+collected: {'type': 'Multiplier', 'time': 11.494477033615112, 'length_before': 8, 'length_after': 8, 'move_index': 97, 'effect_title': ('Multiplier', 10.0), 'pause': (10.0, 'Paused', 10.0)}
+collected: {'type': 'Speed', 'time': 22.483153343200684, 'length_before': 8, 'length_after': 8, 'move_index': 164, 'effect_title': ('Speed', 4.9), 'boost_ms': 71.7683167293154, 'end': 27.58355164527893, 'end_index': 234, 'after_ms': 119.68955993652344}
+collected: {'type': 'Multiplier', 'time': 33.692018270492554, 'length_before': 9, 'length_after': 9, 'move_index': 285, 'effect_title': ('Multiplier', 10.0)}
+collected: {'type': 'Multiplier', 'time': 44.49989056587219, 'length_before': 12, 'length_after': 12, 'move_index': 375, 'effect_title': ('Multiplier', 10.0)}
+collected: {'type': 'Multiplier', 'time': 54.57808017730713, 'length_before': 15, 'length_after': 15, 'move_index': 459, 'effect_title': ('Multiplier', 10.0)}
+collected: {'type': 'Speed', 'time': 65.61789846420288, 'length_before': 19, 'length_after': 19, 'move_index': 551, 'effect_title': ('Speed', 5.0), 'boost_ms': 71.86779482611294, 'end': 70.70230102539062, 'end_index': 621}
+collected: {'type': 'Multiplier', 'time': 70.84144043922424, 'length_before': 22, 'length_after': 22, 'move_index': 622, 'effect_title': ('Multiplier', 10.0)}
+collected: {'type': 'Speed', 'time': 86.78267097473145, 'length_before': 29, 'length_after': 29, 'move_index': 755, 'effect_title': ('Speed', 5.0), 'boost_ms': 71.74320056520659, 'end': 91.87775039672852, 'end_index': 825, 'after_ms': 120.67101001739502}
+collected: {'type': 'Multiplier', 'time': 94.62308621406555, 'length_before': 32, 'length_after': 32, 'move_index': 848, 'effect_title': ('Multiplier', 10.0)}
+collected: {'type': 'Shrink', 'time': 104.10414028167725, 'length_before': 37, 'length_after': 36, 'move_index': 927}
+collected: {'type': 'Shrink', 'time': 114.31273937225342, 'length_before': 40, 'length_after': 39, 'move_index': 1012}
+food with x2: [20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20] food without: [10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10]
+PASS power-ups keep appearing during play - 11 seen in 121 s (0 restarts)
+gaps between seen appearances (s): 11.1, 10.6, 11.2, 11.3, 8.3, 8.0, 12.9, 8.9, 10.1, 10.7
+PASS Speed: title shows "Speed boost" with seconds left - ('Speed', 4.9)
+PASS Speed: moves every ~72 ms during the boost - 71.8 ms over 29 moves
+PASS Speed: boost ends after ~5 s - 5.10 s
+PASS Speed: back to ~120 ms afterwards - 119.7 ms
+PASS Multiplier: title shows "Score x2" with seconds left - ('Multiplier', 10.0)
+PASS Multiplier: pause freezes the effect time - before 10.0, paused Paused 10.0
+PASS food during x2 scores +20 - [20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20]
+PASS food without x2 scores +10 - [10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10]
+PASS Shrink: length 37 -> 36 - measured 36
+PASS Shrink: length 40 -> 39 - measured 39
+collected types: ['Multiplier', 'Shrink', 'Speed']
+SUMMARY 16/16 passed

@@ -1,4 +1,5 @@
-# Issue #18 - config.json corpus, per file (SettingsRepository::load, integration build)
+# Issue #18 - config.json corpus, per file (run 2: SettingsRepository::load of the candidate, GCC 13.3 Release)
+# Build: candidate #53 dbf08b5 plus the #52 test update at 12441e5 (no product code changed)
 # set | file | size | result | warning | load time
 valid | 01-defaults.json | 154 B | loaded | - | 0 ms
 valid | 02-wasd.json | 152 B | loaded | - | 0 ms
@@ -51,4 +52,4 @@ malformed | 23-missing-theme.json | 132 B | defaults | E_SCHEMA: defaults loaded
 malformed | 24-duplicate-json-key.json | 150 B | defaults | E_PARSE: defaults loaded | 0 ms
 malformed | 25-deep-nesting-10000.json | 20024 B | defaults | E_PARSE: defaults loaded | 0 ms
 
-# settings_corpus_tests (Clang 18 ASan+UBSan): All tests passed (362 assertions in 3 test cases)
+# settings_corpus_tests (Clang 18 ASan+UBSan, normal user): All tests passed (362 assertions in 3 test cases)
