@@ -125,9 +125,9 @@ The two runs have different registered test inventories. In particular, `input_v
 - The headless configuration and build succeeded for Run B.
 - All seven CTest tests registered for Run B passed.
 - All eight tests in the earlier Run A were reported as passing.
-- The earlier validator unit tests covered allowed characters, invalid characters, length limits, sanitization, and maximum sanitized output length.
-- Searches of the inspected source and header directories on the earlier review branch did not identify calls to `isValidPlayerName()` or `sanitizePlayerName()` outside the validator component itself.
-- UI input integration and pre-persistence sanitization remain pending verification.
+- The earlier validator unit tests covered allowed characters, invalid characters, length limits, sanitization, and maximum sanitized output length. This is historical evidence for the validator component on `review/issue-16-validator`, not a test result for the current QA branch.
+- Historical commit `d2a8a36` on `review/issue-16-validator` contains the validator source, header, tests, and CMake registration. These files and registration are absent from the current QA branch's tracked source. Searches of tracked C++ source on the current QA branch found no matches for the historical validator APIs or the searched player-name validation terms. This does not rule out equivalent validation under different names or in unsearched locations.
+- The existing local `build/headless/input_validator_tests` executable is a build artifact. Its individual passing result does not establish that the current QA branch can build or reproduce the validator tests from source. UI input integration and pre-persistence sanitization remain pending verification. Confirm whether equivalent validation exists in the current implementation and meets the approved requirements before drawing a conformance conclusion.
 - The automated results cover only the registered headless CTest tests for their respective runs.
 
 ## 5.1 Windows Manual Tests — Reported Results
