@@ -108,15 +108,44 @@ std::string boardJson(const std::vector<int>& scores) {
     return document.dump(2);
 }
 
-// Temporary files SecureFileStore left in `dir`.
+bool endsWithLock(const std::string& name) {
+    const std::string suffix = ".lock";
+    return name.size() > suffix.size() &&
+           name.compare(name.size() - suffix.size(), suffix.size(), suffix) == 0;
+}
+
+// Temporary files "<file>.tmp.<nonce>" SecureFileStore left in `dir`.
 std::vector<fs::path> temporaries(const fs::path& dir) {
     std::vector<fs::path> found;
     for (const auto& item : fs::directory_iterator(dir)) {
-        if (item.path().filename().string().find(".tmp.") != std::string::npos) {
+        const std::string name = item.path().filename().string();
+        if (name.find(".tmp.") != std::string::npos && !endsWithLock(name)) {
             found.push_back(item.path());
         }
     }
     return found;
+}
+
+// Lock sidecars "<file>.tmp.<nonce>.lock", if the store uses them.
+std::vector<fs::path> lockSidecars(const fs::path& dir) {
+    std::vector<fs::path> found;
+    for (const auto& item : fs::directory_iterator(dir)) {
+        const std::string name = item.path().filename().string();
+        if (name.find(".tmp.") != std::string::npos && endsWithLock(name)) {
+            found.push_back(item.path());
+        }
+    }
+    return found;
+}
+
+// Makes everything a crash left in `dir` look `age` old.
+void ageLeftovers(const fs::path& dir, std::chrono::hours age) {
+    for (const fs::path& path : temporaries(dir)) {
+        fs::last_write_time(path, fs::file_time_type::clock::now() - age);
+    }
+    for (const fs::path& path : lockSidecars(dir)) {
+        fs::last_write_time(path, fs::file_time_type::clock::now() - age);
+    }
 }
 
 struct ChildResult {
@@ -225,6 +254,11 @@ TEST_CASE("TC-SEC-04 injected crash: a save aborted at each step leaves the old 
             } else {
                 REQUIRE(nlohmann::json::parse(readBytes(left.front())).at("entries").size() == 4);
             }
+            // A lock sidecar, if the store uses one, belongs to that file.
+            for (const fs::path& sidecar : lockSidecars(dir.path())) {
+                CAPTURE(sidecar.filename().string());
+                REQUIRE(sidecar.string() == left.front().string() + ".lock");
+            }
         }
     }
 }
@@ -264,6 +298,7 @@ TEST_CASE("TC-SEC-04 injected failure: a failed write, flush or rename keeps the
         REQUIRE(holds(board, oldBoard));
         REQUIRE(LeaderboardRepository(board).top10().size() == 3);
         REQUIRE(temporaries(dir.path()).empty()); // the failed save cleans up
+        REQUIRE(lockSidecars(dir.path()).empty());
     }
 }
 
@@ -278,6 +313,7 @@ TEST_CASE("TC-SEC-04 injected failure: a failed first save creates no file",
         REQUIRE(child.exitCode == 3);
         REQUIRE_FALSE(fs::exists(board));
         REQUIRE(temporaries(dir.path()).empty());
+        REQUIRE(lockSidecars(dir.path()).empty());
     }
 }
 
@@ -290,25 +326,59 @@ TEST_CASE("TC-SEC-04 without a fault the writer saves normally (control)",
     REQUIRE_FALSE(child.aborted);
     REQUIRE(child.exitCode == 0);
     REQUIRE(LeaderboardRepository(board).top10().size() == 2);
+    REQUIRE(temporaries(dir.path()).empty());
+    REQUIRE(lockSidecars(dir.path()).empty());
 }
 
-TEST_CASE("Known defect D5 (injected crash): a crashed save's temporary file is never removed",
-          "[security][TC-SEC-04][fault-injection][known-defect][!shouldfail]") {
-    // STP TC-SEC-04 "stale .tmp removed" (SAD 4.3.4 removeStaleTemp). The
-    // file is made an hour old, so an age-based cleanup policy also applies.
+TEST_CASE("TC-SEC-04 injected crash: a fresh crash leftover is kept, so cleanup never races a live save",
+          "[security][TC-SEC-04][fault-injection]") {
+    // Agreed cleanup policy (#48): only leftovers older than 24 hours are
+    // removed. A crash moments ago is indistinguishable from a save still in
+    // progress, so the next load and save keep its files. This is why a
+    // crash leftover is not removed on the very next start.
     TempDir dir;
     const fs::path board = dir.file("leaderboard.json");
     writeBytes(board, boardJson({300, 200, 100}));
     REQUIRE(runWriter("leaderboard", board, "crash-after-flush").aborted);
     const auto left = temporaries(dir.path());
     REQUIRE(left.size() == 1);
-    fs::last_write_time(left.front(), fs::file_time_type::clock::now() - 1h);
+    const std::string leftBytes = readBytes(left.front());
 
     LeaderboardRepository repository(board);
-    (void)repository.top10();
+    REQUIRE(repository.top10().size() == 3);
     REQUIRE(repository.addScore("Next", 500, GameMode::Timed, Difficulty::Hard).status ==
             ScoreSubmissionStatus::Submitted);
-    REQUIRE(temporaries(dir.path()).empty());
+    REQUIRE(repository.top10().size() == 4);
+    REQUIRE(fs::exists(left.front()));
+    REQUIRE(holds(left.front(), leftBytes));
+}
+
+TEST_CASE("Known defect D5 (injected crash): a crashed save's temporary file is never removed",
+          "[security][TC-SEC-04][fault-injection][known-defect][!shouldfail]") {
+    // STP TC-SEC-04 "stale .tmp removed" (SAD 4.3.4 removeStaleTemp). The
+    // agreed policy (#48) removes leftovers older than 24 hours, so what the
+    // crash left is made 48 hours old first. Both crash points that leave
+    // something behind are covered: before the rename (a temporary file and
+    // its lock sidecar) and after it (only a lock sidecar, if the store uses
+    // one).
+    for (const char* fault : {"crash-after-flush", "crash-after-rename"}) {
+        CAPTURE(fault);
+        TempDir dir;
+        const fs::path board = dir.file("leaderboard.json");
+        writeBytes(board, boardJson({300, 200, 100}));
+        REQUIRE(runWriter("leaderboard", board, fault).aborted);
+        if (std::string(fault) == "crash-after-flush") {
+            REQUIRE(temporaries(dir.path()).size() == 1);
+        }
+        ageLeftovers(dir.path(), 48h);
+
+        LeaderboardRepository repository(board);
+        (void)repository.top10();
+        REQUIRE(repository.addScore("Next", 500, GameMode::Timed, Difficulty::Hard).status ==
+                ScoreSubmissionStatus::Submitted);
+        REQUIRE(temporaries(dir.path()).empty());
+        REQUIRE(lockSidecars(dir.path()).empty());
+    }
 }
 
 // ---------------------------------------------------------------------------
@@ -356,6 +426,7 @@ TEST_CASE("TC-SEC-04 injected crash and failure: config.json keeps old or new se
         REQUIRE(holds(config, oldBytes));
         REQUIRE(snake::SettingsRepository(config).load().settings == old);
         REQUIRE(temporaries(dir.path()).empty());
+        REQUIRE(lockSidecars(dir.path()).empty());
     }
 }
 
