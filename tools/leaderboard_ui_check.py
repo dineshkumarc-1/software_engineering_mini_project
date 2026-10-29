@@ -85,9 +85,10 @@ def read_board(img):
         for x in range(COLS):
             cx, cy = x * CELL + CELL // 2, y * CELL + CELL // 2
             p = px[cx, cy]
-            # A cell counts only if a 13 x 13 area around its centre has the
-            # colour, so thin HUD outlines and text are never taken for it.
-            solid = lambda c: all(near(px[cx + dx, cy + dy], c) for dx in (-6, 0, 6) for dy in (-6, 0, 6))
+            # A cell counts only if its centre and points 6 px to the side and
+            # below have the colour, so thin HUD outlines and text are never
+            # taken for it, and a cell just under a HUD panel is still read.
+            solid = lambda c: all(near(px[cx + dx, cy + dy], c) for dx in (-6, 0, 6) for dy in (0, 6))
             if solid(HEAD):
                 board["head"].append((x, y))
             elif solid(BODY) or solid(OBSTACLE):

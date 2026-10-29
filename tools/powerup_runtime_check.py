@@ -82,6 +82,7 @@ class Game:
 
 BIN = sys.argv[1]
 OUT = sys.argv[2] if len(sys.argv) > 2 else '.'
+os.makedirs(OUT, exist_ok=True)
 PLAY_SECONDS = float(sys.argv[3]) if len(sys.argv) > 3 else 150
 COLS, ROWS, CELL = 30, 20, 30
 HEAD, BODY, FOOD, OBST = (63, 215, 155), (35, 160, 115), (255, 90, 90), (190, 135, 70)
@@ -98,8 +99,9 @@ def near(p, c, tol=14):
 
 def board(img):
     """Snake, food and power-up cells. Row 0 counts only where no HUD panel
-    covers it. A cell needs its colour on a 13 x 13 area around its centre,
-    so HUD outlines and text are never taken for the snake or food."""
+    covers it. A cell needs its colour at its centre and at points 6 px to the
+    side and below, so HUD outlines and text are never taken for the snake or
+    food, and a cell just under a HUD panel is still read."""
     px = img.load()
     b = {'head': [], 'body': [], 'food': [], 'obst': [], 'item': [], 'open_top': set()}
     for y in range(0, ROWS):
@@ -109,7 +111,7 @@ def board(img):
             if y == 0 and near(p, (15, 23, 32), 2):
                 b['open_top'].add((x, y))
             for k, c in (('head', HEAD), ('body', BODY), ('food', FOOD), ('obst', OBST)):
-                if all(near(px[cx + dx, cy + dy], c) for dx in (-6, 0, 6) for dy in (-6, 0, 6)):
+                if all(near(px[cx + dx, cy + dy], c) for dx in (-6, 0, 6) for dy in (0, 6)):
                     b[k].append((x, y))
             q = px[cx - 9, cy]
             for name, c in ITEM.items():
@@ -266,7 +268,15 @@ try:
     while time.time() - start < PLAY_SECONDS:
         b = pilot.wait_move()
         if b is None:
-            break
+            # The head is hidden (under a HUD panel) or the game stopped.
+            state = parse_title(g.title()).get('state')
+            if state == 'Playing':
+                log.append('head not visible at %.1f s' % (time.time() - start))
+                pilot.head = None
+                continue
+            if state != 'GameOver':
+                break
+            b = pilot.last[1] if pilot.last else board(g.grab())
         now = time.time()
         title = parse_title(g.title())
         if title.get('state') == 'GameOver':
