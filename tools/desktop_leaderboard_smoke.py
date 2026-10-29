@@ -142,6 +142,27 @@ try:
             check("| 3. Dinesh " in title(), "saved leaderboard survives process restart")
             key("Escape"); screen("Main menu"); stop(window)
 
+            # D6: distinguish invalid existing blank files from normal first-run
+            # absence and an explicitly valid empty board. Reading never saves.
+            for label, payload in (("zero-byte", ""), ("whitespace-only", " \t\r\n  ")):
+                board.write_bytes(payload.encode("utf-8"))
+                window = launch(); screen("Main menu"); open_board(); screen("| 0 entries")
+                check("E_LEADERBOARD_READ" in title(), label + " board surfaces D6 warning")
+                check(board.read_bytes() == payload.encode("utf-8"),
+                      label + " board is not rewritten merely by viewing")
+                key("Escape"); screen("Main menu"); stop(window)
+            for label, payload in (("missing", None), ("valid empty", json.dumps(entries(0)))):
+                if payload is None:
+                    board.unlink(missing_ok=True)
+                else:
+                    board.write_bytes(payload.encode("utf-8"))
+                window = launch(); screen("Main menu"); open_board(); screen("| 0 entries")
+                check("E_LEADERBOARD_READ" not in title(), label + " board has no false warning")
+                check(not board.exists() if payload is None else
+                      board.read_bytes() == payload.encode("utf-8"),
+                      label + " board remains unchanged on viewing")
+                key("Escape"); screen("Main menu"); stop(window)
+
             board.write_text("{broken", encoding="utf-8")
             window = launch(); screen("Main menu"); open_board(); screen("| 0 entries")
             check("E_LEADERBOARD_READ" in title() and process.poll() is None,

@@ -1,108 +1,91 @@
-# Sprint 2 owner integration candidate — NOT final acceptance
+# Sprint 2 owner reconciliation — code integration, NOT final acceptance
 
-AI-assisted implementation/review for C Dinesh Kumar. This is a content-integration
-candidate for Draft PR #53, not a merge into main, QA sign-off, release freeze,
-or final demo. The original staged workspace and teammate branches are untouched.
+AI-assisted implementation/review for C Dinesh Kumar. This candidate reconciles
+PR histories and retains #53's tested fixes. Integration does not mean final QA,
+release freeze/tag, sprint closure or demo approval. The user's original staged
+workspace is untouched. Owner-requested conflict fixes were published to #42/#44;
+Bharath/Tejas implementation branches were not rewritten or force-pushed.
 
-## Refreshed inputs
+## Reviewed inputs and history
 
-| Input | Exact revision |
+| Input | Exact revision / result |
 | --- | --- |
-| Main, including merged #49, #51 and preliminary #47 | d9bd416dbeb6ae6976168127c3b376330dcdde2d |
-| Published #53 before this follow-up | dbf08b51b9465e7ceac66e5200b8bcad874db408 |
-| #48 persistence fixes | 2402449795c862b309383eb7edff6e5d7f8c2649 |
-| #50 combined store tests / privacy documentation | 6e281183a8d8a022c80a9f1f1dced2383a0a0bfc |
-| #52 promoted corpus / fault tests / UI tooling | 810769cc3fde14245c600474ed2b15b76445c06e |
+| #42 validator conflict resolution | 4790254ff22aa43f1740b3be6ff2158880ff1e40; 12/12 local CTest, zero cppcheck, 8/8 CI; merged into main |
+| #44 UI conflict resolution | c0827f476cb8eef5bd5d7a434ff566f959e12096; 12/12 local CTest, zero cppcheck, 8/8 CI; merged into main |
+| Main after #42/#44, already including #49/#51/preliminary #47 | 374ab7482e082f07380c21510d5de520c6575f22 |
+| Tested owner #53 baseline | 8432828849e281caf649ca884a1aa6577bfb5492 |
+| Latest #48 persistence | 4793a7ad79937ea6598ffa84639594cae33afdff; includes f898f8c D6 warning fix |
+| Latest #50 / merged #52 history | 4c0d1e0bba6327a123698181ba5f09ec5dd62164 |
+| Owner reconciliation | #57 imports #48 into isolated integration/sprint2-reconciled; #56 targets #53, then #53 targets main |
 
-Latest persistence sources, combined SecureFileStore tests, promoted corpus,
-fault-injection tests, teammate evidence and current main QA documentation were
-imported without editing their contents. CMake combines the new fault target
-with the existing owner targets. Historical teammate observations are not new
-owner executions. The source hash manifest identifies this tested content.
+Conflict resolutions preserve the owner's fixed name buffer and stress tests,
+Settings storage depth 8 and validation, deterministic restart, combined store
+fuzz/cleanup tests, canonical D1–D7 assertions/fixtures and fault-injection target.
+A duplicate power-up drawing block introduced by a clean automatic main merge is
+removed: the tested renderer draws each active power-up once. No sanitizer/static
+or assertion gate was weakened. Published heads and hosted checks must be verified
+after each history merge; a clean merge alone is not acceptance.
 
-This branch is still based on #46, not main. Reconcile original PR histories and
-final heads before any main merge; do not merge overlapping work twice blindly.
-The deterministic gameplay restart test and owner static-analysis corrections
-remain. The integration does not weaken any sanitizer or static-analysis gate.
+## Dinesh's work
 
-## Dinesh's implementation
-
-| Issue | Implemented / checked | Remaining acceptance |
+| Issue | Implemented and locally verified | Remaining acceptance |
 | --- | --- | --- |
-| #19 | Navigation, name entry, nine mode/difficulty choices, keyboard/mouse transitions; real-window regression | Final candidate Windows/manual QA |
-| #20 | SettingsRepository uses SecureFileStore; depth limit 8, existing schema/validation, warning codes, Save/Cancel and failure preservation retained | Final Windows audio/persistence/remapping evidence |
-| #21 | D7 fixed: Rank, Player name, Score, Mode, Difficulty, Date; glyph-width-aware fitting, all ten rows and Back. One-shot game-over submission, actual mode/difficulty, ISO date and reload on entry retained | D6 warning defect and final candidate QA |
-| #22 | Instrumentation wiring and strict 100-input smoke; accepted/rejected/consumed/displayed remain distinct, no dropped samples or name leakage | Target-device cold launch, FPS and true end-to-end input latency; smoke is NOT acceptance |
-| #26 | Not started prematurely | Joint UAT, release exit criteria, tag/freeze |
-| #28 | Not started | LAST: only after integration, executable and acceptance are ready |
+| #19 | Navigation/name entry, nine choices, keyboard/mouse transitions, bounded input/stress handling | Exact final Windows candidate manual QA |
+| #20 | SecureFileStore integration; Settings schema/validation, depth 8, warning codes, Save/Cancel and failed-save preservation | Final Windows audible/audio, persistence and key-remapping evidence |
+| #21 | Six columns; 10 rows, wide-name/integer boundaries, one-shot save, mode/difficulty/date; D6 existing blank/whitespace warning without rewrite | Final candidate Windows/manual QA |
+| #22 | Instrumentation, strict request accounting, Linux smoke measurements and raw evidence | Reference Windows campaign and volunteer usability; NOT accepted from Linux smoke |
+| #26 | Release checklist/preparation only | Joint UAT, traceability/coverage/exit criteria, final tag/freeze |
+| #28 | Not started prematurely | LAST, after integration, executable and acceptance |
 
-The leaderboard formatter is SFML-free and preserves the existing QA title
-protocol (`| rank. name score | mode / difficulty / date`). Three new ordinary
-regressions cover all nine combinations, a 15-wide-W name, maximum integer score,
-a valid leap-day date, nonoverlapping column geometry and the parser delimiter.
-The six-column screenshot is from the final tested desktop binary.
+## Actual verification
 
-The probe driver previously issued a key across a Hard/Obstacle Game Over
-transition (99 of 100 recorded, zero dropped). For this wiring-only smoke it now
-uses Classic/Easy and a bounded seeded burst, requires the game remain Playing,
-and requires ALL 100 records in exact order. This is not a substitute for the
-separate Hard/Obstacle/reference-hardware performance campaign.
-
-## Executed verification
-
-Amazon Linux 2023 x64, GCC 11.5, Clang 15.0.7, cppcheck 2.13.0, SFML 2.5.1,
-Python 3.13. Desktop uses software GL and null OpenAL: no audible acceptance.
-Headless and sanitizer tests run unprivileged so permission tests are meaningful.
+Linux x64, GCC 11.5, Clang 15.0.7, cppcheck 2.13, SFML 2.5.1, Python 3.13.
+Desktop uses Xvfb/software GL and null audio. Permission-sensitive headless and
+sanitizer tests run unprivileged. These results are not Windows/audio sign-off.
 
 | Executed check | Result |
 | --- | --- |
 | Headless CTest | 21/21 suites pass |
-| Clang ASan + UBSan with leak detection | 21/21 suites pass, no sanitizer reports |
-| Leaderboard model/format regressions | 5 cases, 106 assertions pass |
-| Leaderboard model + gameplay repeats | Each passes 20 consecutive executions |
-| cppcheck 2.13, unchanged gate | Zero findings |
+| Clang ASan + UBSan + leaks | 21/21 suites pass, no sanitizer reports |
+| Latest unchanged cppcheck 2.13 gate | Zero findings |
+| D6 ordinary regression | All 4 assertions pass, no [!shouldfail] tag |
 | Python tooling unit suite | 33 pass |
-| Final six-column real-window smoke | 17 checks pass; all ten rows, all nine combinations, max-width boundary, one-shot save, restart, corrupt file and Back |
-| Final real-window navigation | 23 checks pass |
-| Final real-window Settings | 22 checks pass |
-| Final security UI | 23/23 checks pass |
-| Unchanged Tejas TC-LB-02 tool | 8/8 checks pass; final screenshots reviewed |
-| Strict probe wiring, three consecutive repeats | Each records all 100 requests in order plus 3 valid launch traces; acceptance NOT ASSESSED |
+| Real-window leaderboard, including D6 and false-warning controls | 29 checks pass |
+| Real-window navigation | 23 checks pass |
+| Real-window Settings | 22 checks pass |
+| Security UI | 23/23 checks pass |
+| Unchanged Tejas TC-LB-02 tool | 8/8 checks pass |
+| Probe wiring, three runs | All 100 requests recorded in order each; 9 launch traces |
 
-**Critical qualification:** one D6 test still has `[!shouldfail]`. Empty and
-whitespace-only on-disk leaderboard files return no warning; its two warning
-assertions still fail as expected. The latest #52 D1–D5/D7 tag promotions are
-imported unchanged; they were not reverted. Green CTest is NOT final acceptance.
-D6 is tracked in issue #55 and must remain visible.
+D6 is no longer hidden as an expected failure. The integration-only promotion
+removes only known-defect/expected-failure metadata and preserves all assertions
+and fixtures. Existing missing-file and valid-empty-board reads remain warning-free.
+No C++ testcase retains [!shouldfail] in this candidate.
 
-Evidence: `evidence/owner-followup/`. Earlier `evidence/integration/` files and
-teammate run reports are historical. Fresh published-head GitHub CI must be
-checked separately; local success is not a claim that hosted CI passed.
+Evidence: evidence/final-integration/, including source SHA-256 manifest, actual
+path-sanitized logs, screenshots, whitelisted aggregate probes and LINUX-MEASUREMENTS.md.
+Raw process/runtime reports remain private in the local build workspace. Older owner evidence and
+teammate execution reports remain historical; they are not silently relabelled.
+The earlier probe 99/100 failure, X display/tool setup issues and incorrect batch
+preset/script attempts remain historical harness failures, not passing executions.
 
-### Harness failures retained, not hidden
+## Exact candidate handoff and open work
 
-- Earlier leaderboard smoke startup saw no window. The owner harness now waits
-  for an actual X display query, rather than socket creation alone, and reports
-  an early child exit with its runtime log. Final rerun passes; assertions remain.
-- Independent teammate tooling required xdpyinfo and xwininfo in this environment.
-  Its parser exposed the initial owner title delimiter incompatibility, fixed
-  in product formatting with an ordinary regression, not by editing their tool.
-- Initial probe smoke recorded 99/100 as described above. Failure logs are kept;
-  no missing-input assertion or sample requirement was relaxed.
-- An intermediate batch used an incorrect security-script filename and stopped.
-  The correct unchanged `security_ui_smoke.py` is used for the actual result.
+Pin one published SHA plus its matching Actions run and Windows artifact after
+final hosted checks pass. Record EXE SHA-256 and carry DLL/assets/notices with it.
+Do not use a previous artifact while claiming the new candidate was tested.
 
-## Open acceptance / coordination
-
-| Work | Required follow-up |
+| Owner | Remaining exact-candidate work |
 | --- | --- |
-| D6 / #55 | Bharath persistence warning fix; coordinate Tejas's regression promotion only after confirmed correction |
-| #24 | Latest imported report records reviewed Windows TCP/UDP samples and enabled executable-scoped firewall at start/end. This is sampled evidence, not exhaustive zero-network proof; retain timing/build limitations and revalidate final build as required |
-| #23 | Real Windows 10 AND Windows 11 clean build/run checklist; CI Windows Server is not a substitute |
-| #22 | Reference-device cold start <2s and true input-to-display <100ms, FPS and specified campaign; Xvfb/internal lower bounds do not establish these |
-| #25 | Ayushi: exact final candidate SHA/run/artifact, pending remapping/manual tests, traceability, audible/visual checks and final QA sign-off |
-| #26 | Joint UAT and volunteer evidence, final release exit criteria, tag/freeze only after blockers clear |
-| #28 | Final two-minute demo LAST, after all required merges and executable readiness |
+| Dinesh / #22 | Target hardware/cold launch; three continuous 300s Hard/Obstacle runs with power-ups and every 1s FPS window; 100 randomized inputs with valid acknowledgement timing; coordinate 3 outside-team first-time volunteers |
+| Bharath / #24 | Repeat TCP/UDP and enforced executable-scoped firewall/offline checks on the pinned EXE; record source SHA, compiler, binary size/hash, rule state and limitations. The older capture lacks runtime build identity and cannot be attributed to this candidate |
+| Tejas / #18/#23 | Confirm final corpus/defect disposition and acceptance mapping, coverage evidence; collect real Windows 10 AND 11 build/run checklist evidence. CI Windows Server is not client-OS acceptance |
+| Ayushi / #25 | Preserve earlier results; test pinned artifact, pending remapping/audio/manual cases; record expected/actual/date/evidence; final QA sign-off only after required results exist |
+| Owner + team / #26 | Confirm all required test/coverage/traceability/UAT and severity gates, then tag/freeze |
+| Dinesh / #28 | Final demo LAST |
 
-No final release tag, sprint closure, development freeze or final QA sign-off is
-claimed by this follow-up. Keep PR #53 Draft and unmerged while blockers remain.
+The #22 Linux data is diagnostic: 5 accepted/95 rejected requests per seeded
+Classic/Easy run, short sessions, no verified target hardware/cold cache. Internal
+registration excludes OS/SFML queue delay. Display-return timing is informational,
+not photons and not a substitute for acknowledgement acceptance. Keep all Pending
+requirements visible; no final QA, release tag, sprint completion or demo is claimed.

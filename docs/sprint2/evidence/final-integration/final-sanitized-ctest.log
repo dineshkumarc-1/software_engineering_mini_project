@@ -1,0 +1,47 @@
+Test project <private-workspace-path>
+      Start  1: app_state_flow
+ 1/21 Test  #1: app_state_flow .................................   Passed    0.12 sec
+      Start  2: score_service
+ 2/21 Test  #2: score_service ..................................   Passed    0.02 sec
+      Start  3: input_validator_tests
+ 3/21 Test  #3: input_validator_tests ..........................   Passed    0.06 sec
+      Start  4: secure_file_store_tests
+ 4/21 Test  #4: secure_file_store_tests ........................   Passed    0.54 sec
+      Start  5: leaderboard_repository_tests
+ 5/21 Test  #5: leaderboard_repository_tests ...................   Passed    0.34 sec
+      Start  6: leaderboard_model_tests
+ 6/21 Test  #6: leaderboard_model_tests ........................   Passed    0.06 sec
+      Start  7: security_corpus_tests
+ 7/21 Test  #7: security_corpus_tests ..........................   Passed    0.96 sec
+      Start  8: settings_corpus_tests
+ 8/21 Test  #8: settings_corpus_tests ..........................   Passed    0.20 sec
+      Start  9: secure_write_fault_tests
+ 9/21 Test  #9: secure_write_fault_tests .......................   Passed    1.06 sec
+      Start 10: game_session
+10/21 Test #10: game_session ...................................   Passed    0.02 sec
+      Start 11: game_engine_tests
+11/21 Test #11: game_engine_tests ..............................   Passed    1.89 sec
+      Start 12: game_mode_tests
+12/21 Test #12: game_mode_tests ................................   Passed   36.89 sec
+      Start 13: powerup_tests
+13/21 Test #13: powerup_tests ..................................   Passed    3.43 sec
+      Start 14: gameplay_tests
+14/21 Test #14: gameplay_tests .................................   Passed    1.50 sec
+      Start 15: settings_tests
+15/21 Test #15: settings_tests .................................   Passed    0.16 sec
+      Start 16: audio_model_tests
+16/21 Test #16: audio_model_tests ..............................   Passed    0.12 sec
+      Start 17: performance_probe_tests
+17/21 Test #17: performance_probe_tests ........................   Passed    0.08 sec
+      Start 18: layering_core_is_sfml_free
+18/21 Test #18: layering_core_is_sfml_free .....................   Passed    0.05 sec
+      Start 19: security_banned_api_scan
+19/21 Test #19: security_banned_api_scan .......................   Passed    0.54 sec
+      Start 20: security_banned_api_scan_finds_planted_calls
+20/21 Test #20: security_banned_api_scan_finds_planted_calls ...   Passed    0.01 sec
+      Start 21: security_banned_api_scan_ignores_lookalikes
+21/21 Test #21: security_banned_api_scan_ignores_lookalikes ....   Passed    0.01 sec
+
+100% tests passed out of 21
+
+Total Test time (real) =  48.05 sec
