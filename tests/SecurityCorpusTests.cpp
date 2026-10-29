@@ -565,11 +565,13 @@ TEST_CASE("TC-SEC-06: a 10,000-character name never gets past 15 characters",
 // TC-SEC-04: what a crash at each step of the safe write leaves behind
 // ---------------------------------------------------------------------------
 
-TEST_CASE("TC-SEC-04: a save interrupted at any step leaves the old or the new board",
+TEST_CASE("TC-SEC-04 (simulated leftovers): the files a crash leaves still load the old or new board",
           "[security][TC-SEC-04]") {
     const std::string oldBoard = boardJson({300, 200, 100});
     const std::string newBoard = boardJson({400, 300, 200, 100});
 
+    // Simulated: these files are written by the test, no save is crashed.
+    // tests/SecureWriteFaultTests.cpp crashes the real save (Linux).
     // What a crash leaves on disk at each point (a)-(c): the old file plus a
     // temporary sibling, as SecureFileStore::writeJson names it.
     const std::string leftovers[] = {
@@ -602,7 +604,7 @@ TEST_CASE("TC-SEC-04: a save interrupted at any step leaves the old or the new b
     }
 }
 
-TEST_CASE("Known defect D5: a stale temporary file from a crash is never removed",
+TEST_CASE("Known defect D5 (simulated leftover): a stale temporary file is never removed",
           "[security][TC-SEC-04][known-defect][!shouldfail]") {
     // STP TC-SEC-04: "stale .tmp removed" (SAD 4.3.4 removeStaleTemp).
     TempDir dir;
@@ -616,7 +618,50 @@ TEST_CASE("Known defect D5: a stale temporary file from a crash is never removed
     REQUIRE_FALSE(fs::exists(stale));
 }
 
-TEST_CASE("TC-SEC-04: a save that cannot replace the file keeps the old board",
+TEST_CASE("TC-SEC-04 (stale temp safety): loads and saves never remove files that are not their own temporaries",
+          "[security][TC-SEC-04]") {
+    // Guards the D5 fix: removing stale temporary files must never touch
+    // other files next to the board, another store's temporary file, a
+    // directory, or what a symbolic link points to.
+    TempDir dir;
+    writeBytes(dir.board(), boardJson({300}));
+    const std::string keep = "keep me";
+    const fs::path others[] = {
+        dir.path() / "leaderboard.json.bak",
+        dir.path() / "leaderboard.json.tmp",          // no nonce
+        dir.path() / "config.json.tmp.12345",         // the settings store's
+        dir.path() / "leaderboard.jsonx.tmp.12345",   // another file's
+        dir.path() / "notes.txt",
+    };
+    for (const fs::path& other : others) {
+        writeBytes(other, keep);
+    }
+    const fs::path folder = dir.path() / "leaderboard.json.tmp.777";
+    fs::create_directory(folder);
+    writeBytes(folder / "inside.txt", keep);
+    const fs::path outside = dir.path() / "outside.json";
+    writeBytes(outside, keep);
+#if !defined(_WIN32)
+    fs::create_symlink(outside, dir.path() / "leaderboard.json.tmp.888");
+#endif
+
+    LeaderboardRepository repository(dir.board());
+    (void)repository.top10();
+    REQUIRE(repository.addScore("New", 400, GameMode::Classic, Difficulty::Easy).status ==
+            ScoreSubmissionStatus::Submitted);
+    (void)LeaderboardRepository(dir.board()).top10();
+
+    for (const fs::path& other : others) {
+        CAPTURE(other.filename().string());
+        REQUIRE(holds(other, keep));
+    }
+    REQUIRE(fs::is_directory(folder));
+    REQUIRE(holds(folder / "inside.txt", keep));
+    REQUIRE(holds(outside, keep));
+    REQUIRE(LeaderboardRepository(dir.board()).top10().size() == 2);
+}
+
+TEST_CASE("TC-SEC-04 (real refusal): a save into a read-only folder or locked file keeps the old board",
           "[security][TC-SEC-04]") {
     TempDir dir;
     const std::string oldBoard = boardJson({300, 200, 100});
