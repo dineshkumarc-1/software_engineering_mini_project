@@ -3,8 +3,10 @@
 // tests/SecureWriteFaultTests.cpp, never into the game.
 //
 // SNAKE_FAULT picks one injection. It only touches the temporary file that
-// SecureFileStore::writeJson creates (a path containing ".tmp."), so every
-// other file operation of the process runs normally.
+// SecureFileStore::writeJson creates ("<file>.tmp.<nonce>"), so every other
+// file operation of the process runs normally. That includes the lock
+// sidecar "<file>.tmp.<nonce>.lock" that the store may create before the
+// temporary file: it is never treated as the temporary file.
 //
 //   crash-after-open    abort() as soon as the temporary file is created  (STP point a)
 //   crash-after-write   abort() when its written bytes are about to be
@@ -38,7 +40,12 @@ bool faultIs(const char* name) {
 }
 
 bool isTemporary(const char* path) {
-    return path != nullptr && std::strstr(path, ".tmp.") != nullptr;
+    if (path == nullptr || std::strstr(path, ".tmp.") == nullptr) {
+        return false;
+    }
+    const std::size_t length = std::strlen(path);
+    const std::size_t suffix = std::strlen(".lock");
+    return length < suffix || std::strcmp(path + length - suffix, ".lock") != 0;
 }
 
 // The next definition of `name` after this library (normally libc's).
