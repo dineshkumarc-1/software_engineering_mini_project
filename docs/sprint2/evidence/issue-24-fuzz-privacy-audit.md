@@ -31,4 +31,4 @@ Run from an elevated PowerShell session, using the actual local executable path:
 
 During the capture, interact with the game and separately note whether normal menu navigation/gameplay remains functional while the rule is active. Keep the generated JSON with the test artifact and record the exact executable build/commit SHA.
 
-**Status: pending local execution and review of the generated JSON.** No claim is made here that the UDP/firewall evidence is complete. The collector's endpoint samples are not a packet capture and do not prove that all possible network activity is absent.
+**Execution update (2026-10-29):** Bharath reports that the collector command now runs successfully. The JSON output has not been provided with this repository update, so its specific sample count, observed TCP connections/UDP endpoints, and ActiveStore verification values have not been independently reviewed or transcribed here. Attach `issue-24-offline-evidence.json` to the PR or QA record before marking the evidence packet fully reviewed. The collector's endpoint samples are not a packet capture and do not prove that all possible network activity is absent.
