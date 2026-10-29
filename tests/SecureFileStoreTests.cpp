@@ -707,3 +707,103 @@ TEST_CASE(
     CHECK_FALSE(std::filesystem::exists(orphan));
 }
 
+TEST_CASE(
+    "SecureFileStore safely handles fuzzed and truncated JSON",
+    "[persistence][store][fuzz]") {
+
+    TemporaryDirectory directory;
+
+    const auto file = directory.path() / "fuzz-input.json";
+    const snake::SecureFileStore store(file);
+
+    const std::string validJson =
+        R"({"version":1,"entries":[{"player_name":"Alice","score":10,"game_mode":"Classic","difficulty":"Medium","date_achieved":"2026-10-28T12:00:00Z"}]})";
+
+    // Write each input and parse it. Report file setup errors
+    // through the normal result so the test fails visibly.
+    const auto parsePayload = [&](const std::string& payload)
+        -> snake::StoreReadResult {
+
+        std::ofstream output(
+            file,
+            std::ios::binary | std::ios::trunc);
+
+        if (!output) {
+            return {
+                snake::StoreReadStatus::IoError,
+                {},
+                "Could not create fuzz-test input."
+            };
+        }
+
+        output.write(
+            payload.data(),
+            static_cast<std::streamsize>(payload.size()));
+        output.close();
+
+        if (output.fail()) {
+            return {
+                snake::StoreReadStatus::IoError,
+                {},
+                "Could not write fuzz-test input."
+            };
+        }
+
+        return store.readJson();
+    };
+
+    SECTION("Every strict prefix of valid JSON is rejected") {
+        for (std::size_t length = 0;
+             length < validJson.size();
+             ++length) {
+
+            const auto result =
+                parsePayload(validJson.substr(0, length));
+
+            if (length == 0U) {
+                CHECK(
+                    result.status ==
+                    snake::StoreReadStatus::EmptyFile);
+            } else {
+                CHECK(
+                    result.status ==
+                    snake::StoreReadStatus::InvalidJson);
+            }
+        }
+    }
+
+    SECTION("A control-character mutation at every byte is rejected") {
+        for (std::size_t index = 0;
+             index < validJson.size();
+             ++index) {
+
+            std::string mutated = validJson;
+            mutated[index] = '\x01';
+
+            const auto result = parsePayload(mutated);
+
+            CHECK(
+                result.status ==
+                snake::StoreReadStatus::InvalidJson);
+        }
+    }
+
+    SECTION("Malformed payload corpus is handled safely") {
+        const std::string malformedPayloads[] = {
+            "{",
+            "{\"entries\":",
+            "{\"entries\":[}",
+            "{\"value\":tru}",
+            "[1,2,",
+            "{\"name\":\"unterminated"
+        };
+
+        for (const auto& payload : malformedPayloads) {
+            const auto result = parsePayload(payload);
+
+            CHECK(
+                result.status ==
+                snake::StoreReadStatus::InvalidJson);
+        }
+    }
+}
