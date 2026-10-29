@@ -86,12 +86,24 @@ public:
     // Static cells that end the game on contact and never hold food. Food
     // already on one of them is moved to a free cell. Throws
     // std::invalid_argument for a cell outside the grid or on the snake.
-    void setObstacles(std::vector<GridPosition> obstacles);
+    void setObstacles(const std::vector<GridPosition>& obstacles);
     const std::vector<GridPosition>& obstacles() const noexcept;
 
     // Ends a running session for a reason decided outside the engine, such
     // as TIME_UP. Ignored when the game is already over or reason is None.
     void endGame(GameOverReason reason) noexcept;
+
+    // Power-up hooks (C8 PowerUpManager, issue #14).
+
+    // Cells new food avoids while any other cell is free, such as the cell
+    // of a power-up waiting on the grid. Food already on one of them stays.
+    void setFoodExclusions(std::vector<GridPosition> cells);
+    const std::vector<GridPosition>& foodExclusions() const noexcept;
+
+    // FR-015: removes up to `segments` tail segments but keeps at least
+    // `minimumLength` segments (and always the head). Returns how many were
+    // removed; does nothing once the game is over.
+    std::size_t shrink(std::size_t segments, std::size_t minimumLength) noexcept;
 
 private:
     bool isObstacle(GridPosition cell) const noexcept;
@@ -118,6 +130,9 @@ private:
     GameOverReason gameOverReason_{GameOverReason::None};
 
     std::vector<GridPosition> obstacles_;
+
+    // Cells new food avoids while it can (setFoodExclusions).
+    std::vector<GridPosition> foodExclusions_;
 };
 
 } // namespace snake

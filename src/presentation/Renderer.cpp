@@ -15,6 +15,7 @@
 #include "snakextreme/GameConfig.hpp"
 #include "snakextreme/GameplayController.hpp"
 
+#include <algorithm>
 #include <array>
 #include <chrono>
 
@@ -86,6 +87,28 @@ const sf::Color Danger(255, 110, 110);
 const sf::Color Warning(255, 170, 60);
 const sf::Color ObstacleFill(190, 135, 70);
 const sf::Color ObstacleEdge(110, 72, 34);
+// Power-ups: one colour per type, all drawn as diamonds (SAD 4.5).
+const sf::Color SpeedColour(70, 170, 255);
+const sf::Color MultiplierColour(255, 205, 60);
+const sf::Color ShrinkColour(200, 120, 255);
+const sf::Color IconColour(15, 23, 32);
+
+sf::Color powerUpColour(PowerUpType type) {
+    switch (type) {
+    case PowerUpType::Speed:
+        return SpeedColour;
+    case PowerUpType::Multiplier:
+        return MultiplierColour;
+    case PowerUpType::Shrink:
+        return ShrinkColour;
+    }
+    return SpeedColour;
+}
+
+sf::Color withAlpha(sf::Color colour, sf::Uint8 alpha) {
+    colour.a = alpha;
+    return colour;
+}
 
 // UTF-8 for the symbols the bundled DejaVu Sans font provides.
 const char* const ArrowLeft = "\xE2\x86\x90";
@@ -120,20 +143,17 @@ void centreOn(sf::Text& label, float x, float y) {
     label.setPosition(x, y);
 }
 
-// True when a snake segment, the food or an obstacle lies under `area`, so
-// the HUD can fade there instead of hiding the board.
-bool coversGameplay(const sf::FloatRect& area, const GameEngine& engine) {
-    for (const GridPosition& segment : engine.snake()) {
-        if (area.intersects(cellRect(segment))) {
-            return true;
-        }
-    }
-    for (const GridPosition& obstacle : engine.obstacles()) {
-        if (area.intersects(cellRect(obstacle))) {
-            return true;
-        }
-    }
-    return engine.hasFood() && area.intersects(cellRect(engine.food()));
+// True when a snake segment, the food, an obstacle or a power-up lies under
+// `area`, so the HUD can fade there instead of hiding the board.
+bool coversGameplay(const sf::FloatRect& area, const GameEngine& engine,
+                    const std::optional<PowerUp>& powerUp) {
+    const auto under = [&area](GridPosition cell) { return area.intersects(cellRect(cell)); };
+    const auto& body = engine.snake();
+    const auto& obstacles = engine.obstacles();
+    return (powerUp && under(powerUp->cell)) ||
+           std::any_of(body.begin(), body.end(), under) ||
+           std::any_of(obstacles.begin(), obstacles.end(), under) ||
+           (engine.hasFood() && under(engine.food()));
 }
 
 std::string modeDescription(GameMode mode) {
@@ -178,6 +198,10 @@ void Renderer::draw(sf::RenderTarget& target, const FrameView& frame) const {
 
     if (frame.engine != nullptr) {
         drawBoard(target, *frame.engine);
+    }
+
+    if (frame.engine != nullptr && frame.powerUp) {
+        drawPowerUp(target, *frame.powerUp);
     }
 
     if (frame.screen == Screen::Paused) {
@@ -373,7 +397,7 @@ void Renderer::drawHud(sf::RenderTarget& target, const FrameView& frame) const {
     // Compact panels in the top corners. Each one fades when part of the
     // board is underneath, so the HUD never fully hides the game.
     const auto drawPanel = [&](const sf::FloatRect& area) {
-        const bool faded = coversGameplay(area, *frame.engine);
+        const bool faded = coversGameplay(area, *frame.engine, frame.powerUp);
         sf::RectangleShape panel({area.width, area.height});
         panel.setPosition(area.left, area.top);
         panel.setFillColor(sf::Color(8, 14, 20, faded ? 110 : 215));
@@ -421,6 +445,43 @@ void Renderer::drawHud(sf::RenderTarget& target, const FrameView& frame) const {
         countdown.setPosition(settingsArea.left + settingsArea.width - 12.f,
                               settingsArea.top + 17.f);
         target.draw(countdown);
+    }
+
+    // Top centre: the running power-up effect with its seconds left and a
+    // bar that empties (SAD 4.5). Hidden once the game is over.
+    if (frame.activeEffect && frame.gameOverReason == GameOverReason::None) {
+        const ActiveEffect& effect = *frame.activeEffect;
+        const sf::Color colour = powerUpColour(effect.type);
+
+        sf::Text label = text(describeEffect(effect), 20, TextMain);
+        const float labelWidth = label.getLocalBounds().width;
+        const float effectWidth = labelWidth + 50.f;
+        const sf::FloatRect effectArea(static_cast<float>(Width) / 2.f - effectWidth / 2.f, 8.f,
+                                       effectWidth, 34.f);
+        drawPanel(effectArea);
+
+        sf::CircleShape icon(8.f, 4);
+        icon.setOrigin(8.f, 8.f);
+        icon.setPosition(effectArea.left + 18.f, effectArea.top + 17.f);
+        icon.setFillColor(colour);
+        target.draw(icon);
+
+        const sf::FloatRect labelBounds = label.getLocalBounds();
+        label.setOrigin(labelBounds.left, capMiddle(label));
+        label.setPosition(effectArea.left + 34.f, effectArea.top + 17.f);
+        target.draw(label);
+
+        const auto total = std::chrono::duration_cast<std::chrono::microseconds>(
+            effectFor(effect.type).duration());
+        if (total.count() > 0) {
+            float fraction = static_cast<float>(effect.remaining.count()) /
+                             static_cast<float>(total.count());
+            fraction = fraction < 0.f ? 0.f : (fraction > 1.f ? 1.f : fraction);
+            sf::RectangleShape bar({(effectArea.width - 8.f) * fraction, 3.f});
+            bar.setPosition(effectArea.left + 4.f, effectArea.top + effectArea.height - 6.f);
+            bar.setFillColor(colour);
+            target.draw(bar);
+        }
     }
 }
 
@@ -494,6 +555,65 @@ void Renderer::drawGameOver(sf::RenderTarget& target, const FrameView& frame) co
     sf::Text hint = text("Enter  play again       M  menu", 17, TextDim);
     centreOn(hint, 450.f, top + 164.f);
     target.draw(hint);
+}
+
+void Renderer::drawPowerUp(sf::RenderTarget& target, const PowerUp& item) const {
+    // Blinks during its last 1.5 s, so the player sees it is about to go.
+    const bool dimmed = item.remaining < std::chrono::milliseconds{1500} &&
+                        (item.remaining.count() / 125000) % 2 == 0;
+    const sf::Uint8 alpha = static_cast<sf::Uint8>(dimmed ? 90 : 255);
+
+    const float centreX = static_cast<float>(item.cell.x) * Cell + Cell / 2.f;
+    const float centreY = static_cast<float>(item.cell.y) * Cell + Cell / 2.f;
+
+    // A diamond, so power-ups differ by shape from the round food and the
+    // square obstacles and snake, not only by colour (SAD 4.5).
+    const float radius = Cell / 2.f - 2.f;
+    sf::CircleShape diamond(radius, 4);
+    diamond.setOrigin(radius, radius);
+    diamond.setPosition(centreX, centreY);
+    diamond.setFillColor(withAlpha(powerUpColour(item.type), alpha));
+    diamond.setOutlineColor(sf::Color(255, 255, 255, alpha));
+    diamond.setOutlineThickness(1.5f);
+    target.draw(diamond);
+
+    // A small dark sign on top: >> for Speed, x2 for Multiplier, - for Shrink.
+    const sf::Color sign = withAlpha(IconColour, alpha);
+    switch (item.type) {
+    case PowerUpType::Speed: {
+        sf::CircleShape arrow(4.f, 3);
+        arrow.setOrigin(4.f, 4.f);
+        arrow.setRotation(90.f);
+        arrow.setFillColor(sign);
+        arrow.setPosition(centreX - 3.f, centreY);
+        target.draw(arrow);
+        arrow.setPosition(centreX + 4.f, centreY);
+        target.draw(arrow);
+        break;
+    }
+    case PowerUpType::Multiplier:
+        if (fontLoaded_) {
+            sf::Text times = text("x2", 12, sign);
+            times.setStyle(sf::Text::Bold);
+            centreOn(times, centreX, centreY);
+            target.draw(times);
+        } else {
+            sf::CircleShape dot(3.5f);
+            dot.setOrigin(3.5f, 3.5f);
+            dot.setPosition(centreX, centreY);
+            dot.setFillColor(sign);
+            target.draw(dot);
+        }
+        break;
+    case PowerUpType::Shrink: {
+        sf::RectangleShape minus({12.f, 3.f});
+        minus.setOrigin(6.f, 1.5f);
+        minus.setPosition(centreX, centreY);
+        minus.setFillColor(sign);
+        target.draw(minus);
+        break;
+    }
+    }
 }
 
 } // namespace snake

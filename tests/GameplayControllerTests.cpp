@@ -337,9 +337,13 @@ TEST_CASE("Pausing freezes movement and the countdown",
 TEST_CASE("Time up ends the game and stops all movement",
           "[gameplay][timed][TC-MODE-03]") {
     GameplayController game;
+    // No random power-ups: the circling below assumes one move per update,
+    // and a Speed power-up on the square would change that.
+    snake::PowerUpSchedule noPowerUps;
+    noPowerUps.randomSpawns = false;
     REQUIRE(game.start({GameMode::Timed, Difficulty::Easy},
                        GameEngine({{10, 10}, {9, 10}, {8, 10}}, Direction::Right, {29, 19}),
-                       1u));
+                       1u, noPowerUps));
 
     // Easy: one move per 200 ms update. Circle a 6 x 6 square to stay alive.
     const Direction turns[] = {Direction::Down, Direction::Left, Direction::Up, Direction::Right};
@@ -396,22 +400,33 @@ REQUIRE(game.start(
 
     game.update(120ms, Screen::Gameplay);
     REQUIRE(game.score() == 10);
+
     for (int i = 0; i < 100; ++i) {
         game.update(100ms, Screen::Gameplay); // 10 s; the snake hits the wall on the way
     }
+
     REQUIRE(game.remainingTime() < Millis{60s});
 
+    // Capture the high score before restarting. The score may increase
+    // if the snake eats additional food during the updates above.
+    const int highScoreBeforeRestart = game.highScore();
+    REQUIRE(highScoreBeforeRestart >= 10);
+
+    // Restart the game.
     REQUIRE(game.start({GameMode::Timed, Difficulty::Medium}));
 
+    // The countdown and current score reset, but the high score is preserved.
     REQUIRE(game.remainingTime() == Millis{60s});
     REQUIRE(game.score() == 0);
-    REQUIRE(game.highScore() == 10);
+    REQUIRE(game.highScore() == highScoreBeforeRestart);
     REQUIRE_FALSE(game.isGameOver());
 
     // The movement accumulator starts empty: no move before a full interval.
     const GridPosition head = game.engine().snake().front();
+
     game.update(119ms, Screen::Gameplay);
     REQUIRE(game.engine().snake().front() == head);
+
     game.update(1ms, Screen::Gameplay);
     REQUIRE(game.engine().snake().front() != head);
 }

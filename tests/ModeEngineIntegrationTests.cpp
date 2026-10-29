@@ -202,7 +202,7 @@ TEST_CASE("An Obstacle-mode session hands its 8 obstacles to the engine",
     for (std::uint32_t seed = 0; seed < 50; ++seed) {
         INFO("seed " << seed);
         ModeSession session({GameMode::Obstacle, Difficulty::Medium}, seed);
-        GameEngine& engine = session.engine();
+        const GameEngine& engine = session.engine();
 
         REQUIRE(engine.obstacles() == session.modes().obstacles());
         REQUIRE(engine.obstacles().size() == 8);
