@@ -40,17 +40,30 @@ cppcheck 2.13 found 6 issues, all fixed:
 
 The power-up code in #49, on which this branch is stacked, was already clean.
 
-The open pull requests would add these findings when merged. Each needs a one-line fix or a justified suppression:
+On 28 Oct, the open pull requests would have added these findings when merged. In the integrated candidate #53 (`dbf08b5`), all of them are fixed or justified, and cppcheck reports 0 findings:
 
-| PR | Finding |
+| PR | Finding | In candidate #53 |
+| --- | --- | --- |
+| #42 / #44 / #45 / #46 / #48 / #50 | `src/validation/InputValidator.cpp:21` and `:49`: useStlAlgorithm (use `std::all_of` / `std::none_of` and `std::copy_if`) | Resolved |
+| #46 | `include/snakextreme/UiHitTest.hpp:43`: useStlAlgorithm (`std::find_if`); `src/diagnostics/PerformanceProbe.cpp:53` and `:80`: local variable `input` shadows a function | Resolved |
+| #48 / #50 | `src/persistence/LeaderboardRepository.cpp:303`: useStlAlgorithm (`std::count_if`) | Resolved |
+
+No open pull request has a banned-API hit, and neither has the candidate.
+
+## Results after integration (29 Oct 2026)
+
+Rerun on the integrated candidate **#53 at `dbf08b5`**, which contains this branch together with every other Sprint 2 branch. #52's test update (test, tool and report files only, no product code) was added on top. Ubuntu 24.04. Evidence: [docs/qa/evidence/issue-18-candidate-ctest-sanitizers.txt](qa/evidence/issue-18-candidate-ctest-sanitizers.txt) in #52.
+
+| Check | Result |
 | --- | --- |
-| #42 / #44 / #45 / #46 / #48 / #50 | `src/validation/InputValidator.cpp:21` and `:49`: useStlAlgorithm (use `std::all_of` / `std::none_of` and `std::copy_if`) |
-| #46 | `include/snakextreme/UiHitTest.hpp:43`: useStlAlgorithm (`std::find_if`); `src/diagnostics/PerformanceProbe.cpp:53` and `:80`: local variable `input` shadows a function |
-| #48 / #50 | `src/persistence/LeaderboardRepository.cpp:303`: useStlAlgorithm (`std::count_if`) |
+| Clang 18 ASan + UBSan, CI settings, game and all tests, run as a normal user | **21/21 CTest tests pass, 0 sanitizer reports.** Six known-defect tests (D1–D5, #52) are tagged `[!shouldfail]` and still fail as expected; they are acceptance blockers, not passes |
+| GCC 13.3 Release, `-Werror`, game and all tests, normal user | 21/21 pass |
+| The real game built with Clang ASan + UBSan (SFML included) on Xvfb | **0 sanitizer reports and no leak at exit** in every run: power-ups 120 s (16/16 checks), 5 games plus corrupt boards and a refused save (`tools/leaderboard_ui_check.py`), the name-entry and privacy checks, and #53's leaderboard, navigation and settings smoke tests |
+| cppcheck 2.13 on `src/`, `include/` and `tests/` | **0 findings** |
+| Banned-API scan | **0 hits in 46 files.** The self-test finds 12/12 planted calls and reports nothing in the look-alike code |
+| Layering | Pass |
 
-No open pull request has a banned-API hit.
-
-## Results (28 Oct 2026)
+## Results on this branch (28 Oct 2026)
 
 All checks below were run on this branch, which is main plus #49 plus this change.
 
@@ -85,7 +98,7 @@ snake_presentation (SFML) ──► snake_gameplay ──► snake_modes, snake_
                           ──► snake_app_state     snake_scoring
 ```
 
-Nothing below the presentation layer links SFML or includes a presentation header.
+Nothing below the presentation layer links SFML or includes a presentation header. In #53 the layering check also covers `persistence`, `audio` and `diagnostics`. `src/validation` is not on its list yet, though it has no SFML include today; adding it is a one-word change.
 
 Step 2, the review of modules against unit-test targets:
 
@@ -96,7 +109,9 @@ Step 2, the review of modules against unit-test targets:
 | Power-ups (`snake_powerups`, C8) | `powerup_tests` | Pass (#49) |
 | Scoring (`snake_scoring`, C9) | `score_service`, `game_session`, `powerup_tests` (multiplier) | Pass |
 | UI logic (`snake_app_state` C1 navigation, `MenuSelection`, `snake_gameplay`) | `app_state_flow`, `gameplay_tests`, `powerup_tests` | Pass |
-| Persistence (`snake_persistence`, C11–C13) | Placeholder on main. #48 adds SecureFileStore and LeaderboardRepository with `secure_file_store_tests` and `leaderboard_repository_tests`; #42 adds `input_validator_tests` | Passes once #42 and #48 are merged |
+| Persistence (`snake_persistence`, C11–C13) | Placeholder on main. In candidate #53: `secure_file_store_tests`, `leaderboard_repository_tests`, `leaderboard_model_tests`, `security_corpus_tests`, `secure_write_fault_tests` | Pass in #53, except the six known-defect tests (D1–D5), which fail as expected |
+| Settings (`snake_settings`) and name validation (`snake_validation`) | In candidate #53: `settings_tests`, `settings_corpus_tests`, `input_validator_tests` | Pass in #53 |
+| Audio model and performance probe (`snake_audio_model`, `snake_probe`) | In candidate #53: `audio_model_tests`, `performance_probe_tests` | Pass in #53 |
 
 ## TC-PORT-01 Windows 10 / 11 build and run (NFR-006)
 
@@ -118,7 +133,7 @@ ctest --test-dir build -C Release --output-on-failure
 .\build\Release\SnakeXtreme.exe
 ```
 
-Checklist (record each result in the table below):
+Checklist (record each result in the table below). Build the commit Dinesh names for acceptance. Today that is the integrated candidate #53, `dbf08b5`; it will move once the persistence fixes land.
 
 1. Configure and build finish with **0 errors**.
 2. `ctest` passes **every** test.
@@ -130,10 +145,18 @@ Checklist (record each result in the table below):
 5. Collect at least one power-up. The HUD shows its name and seconds left.
 6. Esc pauses and resumes. M returns to the menu. Esc on the menu exits.
 7. Closing the window with its X also exits cleanly.
+8. Leaderboard and settings: after a game, the main menu's Leaderboard lists the score. Changing a setting survives a restart.
 
-| Machine | Windows version (`winver`) | Build errors | CTest | Steps 3–7 | Tester | Date |
-| --- | --- | --- | --- | --- | --- | --- |
-| Windows 10 PC | | | | | | |
-| Windows 11 PC | | | | | | |
+Record for each machine:
+- **Tested SHA:** the full commit (`git rev-parse HEAD`).
+- **Build artifact:** `build\Release\SnakeXtreme.exe`, its size and its SHA-256 (`Get-FileHash .\build\Release\SnakeXtreme.exe`).
+- **OS version:** edition, version and OS build from `winver`, for example "Windows 11 Pro 23H2, build 22631.4317".
+- **Build and run results:** errors and warnings of the build, the CTest summary line, and steps 3–8.
+- **Evidence:** the configure, build and CTest output as text, a `winver` screenshot, and screenshots of the menu, one game and the leaderboard. Attach them to issue #23 or add them under `docs/qa/evidence/`.
 
-Issue #23 can be closed once both rows are filled in and pass. The Linux build is informational only.
+| Machine | Status | Tested SHA | Build artifact (size, SHA-256) | OS version (`winver`) | Build | CTest | Steps 3–8 | Evidence | Tester | Date |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| Windows 10 PC | **Pending**: no Windows 10 machine yet | – | – | – | – | – | – | – | – | – |
+| Windows 11 PC | **Pending**: no Windows 11 machine yet | – | – | – | – | – | – | – | – | – |
+
+A row stays **Pending** until someone runs the checklist on a real PC with that Windows version. The CI jobs on Windows Server (`windows-latest`, MSVC and MinGW-w64) are **not** a substitute: they prove the code compiles and the headless tests pass, not that the game runs on Windows 10 or 11. Issue #23 can be closed once both rows are filled in and pass. The Linux build is informational only.
