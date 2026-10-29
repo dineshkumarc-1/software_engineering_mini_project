@@ -88,6 +88,58 @@ jobs:
       - name: Test
         run: ctest --test-dir build --output-on-failure
 
+  # Every test under Clang AddressSanitizer + UndefinedBehaviorSanitizer
+  # (issue #23; SEC-003, SEC-006). Any report fails the job.
+  sanitizers:
+    name: Sanitizers (Clang ASan + UBSan)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    env:
+      ASAN_OPTIONS: detect_leaks=1:abort_on_error=1:strict_string_checks=1:detect_stack_use_after_return=1:check_initialization_order=1
+      UBSAN_OPTIONS: print_stacktrace=1:halt_on_error=1
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Clang and its sanitizer runtime
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends clang libclang-rt-18-dev
+          clang++ --version
+
+      - name: Configure
+        run: >
+          cmake -S . -B build
+          -DSNAKE_BUILD_APP=OFF
+          -DCMAKE_BUILD_TYPE=Debug
+          -DCMAKE_C_COMPILER=clang
+          -DCMAKE_CXX_COMPILER=clang++
+          -DSNAKE_WARNINGS_AS_ERRORS=ON
+          "-DCMAKE_CXX_FLAGS=-fsanitize=address,undefined -fno-sanitize-recover=all -fno-omit-frame-pointer"
+          "-DCMAKE_EXE_LINKER_FLAGS=-fsanitize=address,undefined"
+
+      - name: Build
+        run: cmake --build build --parallel
+
+      - name: Test
+        run: ctest --test-dir build --output-on-failure
+
+  # cppcheck over src/, include/ and tests/ (issue #23, NFR-005). Any finding
+  # fails the job; run the same check locally with cmake -P.
+  cppcheck:
+    name: Static analysis (cppcheck)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install cppcheck
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends cppcheck
+
+      - name: Run cppcheck
+        run: cmake -P cmake/RunCppcheck.cmake
+
   # Full desktop build with the pinned SFML 2.5.1 (NFR-006). The Windows
   # executable is kept as a download for manual testing and demos.
   app:
