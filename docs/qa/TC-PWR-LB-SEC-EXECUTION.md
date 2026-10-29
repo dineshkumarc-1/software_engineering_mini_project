@@ -20,7 +20,7 @@ STP v1.0 test cases TC-PWR-01…05, TC-LB-01…04 and TC-SEC-01…06, plus the a
 - Clang 18, Debug, AddressSanitizer + UndefinedBehaviorSanitizer, `-Werror`. Run as a normal user, so permission tests are real.
 - The real game ran on Xvfb with XTEST key events.
 
-**Not run here:** Windows and macOS. Once merged, CI runs the same automated suites with GCC, macOS Clang, MSVC and MinGW-w64, and the #51 sanitizer job.
+**Windows and macOS:** not run by hand. CI on this pull request ran `security_corpus_tests` and passed on Linux GCC, macOS Clang, Windows MSVC and Windows MinGW-w64, including the Windows locked-file case. `settings_corpus_tests` joins those jobs once #45/#46 is merged, and the #51 sanitizer job covers everything once #51 is merged.
 
 **New in this pull request:**
 - The JSON corpus in `tests/fixtures/json-corpus/`: 25 valid + 25 malformed `leaderboard.json` files and 25 valid + 25 malformed `config.json` files.
