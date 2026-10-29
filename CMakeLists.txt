@@ -172,6 +172,22 @@ snake_add_catch2_test(input_validator_tests
         LIBS snake_persistence
     )
 
+    # Issue #18: leaderboard and security test execution with the JSON
+    # corpus (25 valid + 25 malformed files per file type, 64 KiB boundary).
+    snake_add_catch2_test(security_corpus_tests
+        SOURCES tests/SecurityCorpusTests.cpp
+        LIBS snake_persistence)
+    target_compile_definitions(security_corpus_tests PRIVATE
+        SNAKE_JSON_CORPUS_DIR="${PROJECT_SOURCE_DIR}/tests/fixtures/json-corpus")
+    # The config.json half, built once the settings module (C12, #20) exists.
+    if(TARGET snake_settings)
+        snake_add_catch2_test(settings_corpus_tests
+            SOURCES tests/SettingsCorpusTests.cpp
+            LIBS snake_settings nlohmann_json::nlohmann_json)
+        target_compile_definitions(settings_corpus_tests PRIVATE
+            SNAKE_JSON_CORPUS_DIR="${PROJECT_SOURCE_DIR}/tests/fixtures/json-corpus")
+    endif()
+
     add_executable(game_session_tests tests/GameSessionTests.cpp)
     target_link_libraries(game_session_tests PRIVATE snake_scoring snake_engine)
     snake_warnings(game_session_tests)
