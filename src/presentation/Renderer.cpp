@@ -295,8 +295,8 @@ void Renderer::drawNavigation(sf::RenderTarget& target, const FrameView& frame) 
             cell(std::to_string(i + 1), 95.f, y, TextDim);
             cell(entry.playerName, 130.f, y, TextMain);
             cell(std::to_string(entry.score), 285.f, y, TextMain);
-            cell(toString(entry.gameMode), 390.f, y, TextMain);
-            cell(toString(entry.difficulty), 480.f, y, TextMain);
+            cell(std::string(toString(entry.gameMode)), 390.f, y, TextMain);
+            cell(std::string(toString(entry.difficulty)), 480.f, y, TextMain);
             cell(entry.dateAchieved, 590.f, y, TextMain);
         }
         if (frame.leaderboard.empty()) label("No scores yet", 22, 280.f, TextDim);
