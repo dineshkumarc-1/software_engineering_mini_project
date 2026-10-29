@@ -270,10 +270,18 @@ LeaderboardRepository::rankedTop10(
 }
 
 std::vector<LeaderboardEntry>
-LeaderboardRepository::top10() const {
+LeaderboardRepository::top10(std::string* warning) const {
+    if (warning != nullptr) {
+        warning->clear();
+    }
+
     auto entries = loadValidatedEntries();
 
     if (!entries) {
+        if (warning != nullptr) {
+            *warning =
+                "E_LEADERBOARD_READ: invalid or unreadable board; empty table shown";
+        }
         return {};
     }
 

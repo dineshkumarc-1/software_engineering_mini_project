@@ -576,3 +576,41 @@ CHECK(*result.rank == 1U);
     CHECK(entries[0].playerName == "Alice");
     CHECK(entries[0].score == 25);
 }
+
+TEST_CASE(
+    "Leaderboard top10 optionally reports read fallback warnings",
+    "[persistence][leaderboard]") {
+
+    TemporaryDirectory directory;
+    const auto file = directory.path() / "leaderboard.json";
+    snake::LeaderboardRepository repository(file);
+
+    std::string warning = "stale warning";
+    CHECK(repository.top10(&warning).empty());
+    CHECK(warning.empty()); // Missing file is a normal empty leaderboard.
+
+    {
+        std::ofstream output(file, std::ios::binary);
+        REQUIRE(output.good());
+        output << R"({"version":1,"entries":[{"player_name":"Alice","score":-1,"game_mode":"Classic","difficulty":"Medium","date_achieved":"2026-10-29"}]})";
+    }
+
+    warning.clear();
+    CHECK(repository.top10(&warning).empty());
+    CHECK_FALSE(warning.empty());
+    CHECK(warning.find("E_LEADERBOARD_READ") != std::string::npos);
+
+    {
+        std::ofstream output(file, std::ios::binary | std::ios::trunc);
+        REQUIRE(output.good());
+        output << R"({"version":1,"entries":[{"player_name":"Alice","score":50,"game_mode":"Classic","difficulty":"Medium","date_achieved":"2026-10-29"}]})";
+    }
+
+    warning = "stale warning";
+    const auto entries = repository.top10(&warning);
+    REQUIRE(entries.size() == 1U);
+    CHECK(warning.empty());
+
+    // Existing callers that omit the optional argument remain source-compatible.
+    CHECK(repository.top10().size() == 1U);
+}

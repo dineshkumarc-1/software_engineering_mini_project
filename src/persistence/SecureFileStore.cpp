@@ -54,17 +54,13 @@ std::filesystem::path makeTemporaryPath(
 constexpr auto StaleTemporaryAge = std::chrono::hours{24};
 
 bool isDecimalNonce(std::string_view value) {
-    if (value.empty()) {
-        return false;
-    }
-
-    for (const char ch : value) {
-        if (ch < '0' || ch > '9') {
-            return false;
-        }
-    }
-
-    return true;
+    return !value.empty() &&
+        std::all_of(
+            value.begin(),
+            value.end(),
+            [](char ch) {
+                return ch >= '0' && ch <= '9';
+            });
 }
 
 // A sidecar lock lets cleanup distinguish a crash leftover from a live
@@ -86,26 +82,38 @@ public:
         handle_ = ::CreateFileW(
             path_.c_str(),
             GENERIC_READ | GENERIC_WRITE,
-            0,
+            FILE_SHARE_DELETE,
             nullptr,
             CREATE_NEW,
-            FILE_ATTRIBUTE_NORMAL,
+            FILE_ATTRIBUTE_NORMAL | FILE_FLAG_OPEN_REPARSE_POINT,
             nullptr);
 
-        if (handle_ == INVALID_HANDLE_VALUE) {
+        if (handle_ == INVALID_HANDLE_VALUE || !isRegularNonReparseHandle()) {
+            if (handle_ != INVALID_HANDLE_VALUE) {
+                (void)::CloseHandle(handle_);
+                handle_ = INVALID_HANDLE_VALUE;
+                (void)::DeleteFileW(path_.c_str());
+            }
             return false;
         }
 #else
+        int flags = O_RDWR | O_CREAT | O_EXCL;
+#ifdef O_NOFOLLOW
+        flags |= O_NOFOLLOW;
+#endif
         descriptor_ = ::open(
             path_.c_str(),
-            O_RDWR | O_CREAT | O_EXCL,
+            flags,
             S_IRUSR | S_IWUSR);
 
         if (descriptor_ < 0) {
             return false;
         }
 
-        if (::flock(descriptor_, LOCK_EX | LOCK_NB) != 0) {
+        struct stat metadata {};
+        if (::fstat(descriptor_, &metadata) != 0 ||
+            !S_ISREG(metadata.st_mode) ||
+            ::flock(descriptor_, LOCK_EX | LOCK_NB) != 0) {
             (void)::close(descriptor_);
             descriptor_ = -1;
             (void)::unlink(path_.c_str());
@@ -125,23 +133,34 @@ public:
         handle_ = ::CreateFileW(
             path_.c_str(),
             GENERIC_READ | GENERIC_WRITE,
-            0,
+            FILE_SHARE_DELETE,
             nullptr,
             OPEN_EXISTING,
-            FILE_ATTRIBUTE_NORMAL,
+            FILE_ATTRIBUTE_NORMAL | FILE_FLAG_OPEN_REPARSE_POINT,
             nullptr);
 
-        if (handle_ == INVALID_HANDLE_VALUE) {
+        if (handle_ == INVALID_HANDLE_VALUE || !isRegularNonReparseHandle()) {
+            if (handle_ != INVALID_HANDLE_VALUE) {
+                (void)::CloseHandle(handle_);
+                handle_ = INVALID_HANDLE_VALUE;
+            }
             return false;
         }
 #else
-        descriptor_ = ::open(path_.c_str(), O_RDWR);
+        int flags = O_RDWR;
+#ifdef O_NOFOLLOW
+        flags |= O_NOFOLLOW;
+#endif
+        descriptor_ = ::open(path_.c_str(), flags);
 
         if (descriptor_ < 0) {
             return false;
         }
 
-        if (::flock(descriptor_, LOCK_EX | LOCK_NB) != 0) {
+        struct stat metadata {};
+        if (::fstat(descriptor_, &metadata) != 0 ||
+            !S_ISREG(metadata.st_mode) ||
+            ::flock(descriptor_, LOCK_EX | LOCK_NB) != 0) {
             (void)::close(descriptor_);
             descriptor_ = -1;
             return false;
@@ -153,13 +172,39 @@ public:
         return true;
     }
 
-    [[nodiscard]] bool ownsPath() const noexcept {
-        return ownsPath_;
+    // Remove the lock marker while its exclusive lease is still held.
+    // The Windows handle allows delete sharing; POSIX unlink leaves the locked
+    // inode alive until close. This avoids an unlock-then-delete race.
+    bool removePathWhileLocked() noexcept {
+        if (!active_) {
+            return false;
+        }
+
+#ifdef _WIN32
+        if (!::DeleteFileW(path_.c_str())) {
+            const DWORD error = ::GetLastError();
+            if (error != ERROR_FILE_NOT_FOUND &&
+                error != ERROR_PATH_NOT_FOUND) {
+                return false;
+            }
+        }
+#else
+        if (::unlink(path_.c_str()) != 0 && errno != ENOENT) {
+            return false;
+        }
+#endif
+
+        ownsPath_ = false;
+        return true;
     }
 
     void release() noexcept {
         if (!active_) {
             return;
+        }
+
+        if (ownsPath_) {
+            (void)removePathWhileLocked();
         }
 
 #ifdef _WIN32
@@ -173,6 +218,7 @@ public:
 
         active_ = false;
 
+        // Best-effort fallback if the platform refused deletion while locked.
         if (ownsPath_) {
             std::error_code ignored;
             std::filesystem::remove(path_, ignored);
@@ -181,17 +227,25 @@ public:
     }
 
 private:
-    std::filesystem::path path_;
-    bool ownsPath_{false};
-    bool active_{false};
-
 #ifdef _WIN32
+    [[nodiscard]] bool isRegularNonReparseHandle() const noexcept {
+        BY_HANDLE_FILE_INFORMATION information{};
+        if (!::GetFileInformationByHandle(handle_, &information)) {
+            return false;
+        }
+
+        return (information.dwFileAttributes &
+                (FILE_ATTRIBUTE_REPARSE_POINT | FILE_ATTRIBUTE_DIRECTORY)) == 0;
+    }
+
     HANDLE handle_{INVALID_HANDLE_VALUE};
 #else
     int descriptor_{-1};
 #endif
+    std::filesystem::path path_;
+    bool ownsPath_{false};
+    bool active_{false};
 };
-
 bool isStaleRegularTemporary(
     const std::filesystem::path& path,
     std::filesystem::file_time_type::clock::time_point now) {
@@ -211,10 +265,28 @@ bool isStaleRegularTemporary(
     return !timeError && now - modified >= StaleTemporaryAge;
 }
 
-// Stale-temp policy: only exact "<destination>.tmp.<decimal nonce>" sibling
-// files older than 24 hours are candidates. A lock is acquired/reserved
-// before deletion, so an active writer's temporary file is never removed.
-// Symlinks, non-regular files, unrelated names and fresh files are ignored.
+// Cleanup policy:
+// - Temp candidates must be exact "<destination>.tmp.<ASCII decimal nonce>"
+//   regular files older than 24 hours.
+// - Orphan lock candidates must be exact
+//   "<destination>.tmp.<ASCII decimal nonce>.lock" regular files older than
+//   24 hours, and the corresponding temp path must be absent.
+// - Never follow symlinks, delete unrelated files, or delete a held lock.
+// The 24-hour age threshold deliberately avoids reclaiming recent files; it
+// does not guarantee cleanup on the very next startup.
+bool pathIsAbsentWithoutFollowing(
+    const std::filesystem::path& path) {
+
+    std::error_code ec;
+    const auto status = std::filesystem::symlink_status(path, ec);
+
+    if (ec == std::errc::no_such_file_or_directory) {
+        return true;
+    }
+
+    return !ec && !std::filesystem::exists(status);
+}
+
 void removeStaleTemporaryFiles(
     const std::filesystem::path& destination) noexcept {
 
@@ -242,88 +314,140 @@ void removeStaleTemporaryFiles(
             return;
         }
 
-        std::error_code iteratorError;
-        std::filesystem::directory_iterator iterator(parent, iteratorError);
-        const std::filesystem::directory_iterator end;
+        const std::string prefix = baseName + ".tmp.";
+        constexpr std::string_view lockSuffix = ".lock";
+        auto now = std::filesystem::file_time_type::clock::now();
 
-        if (iteratorError) {
-            return;
+        // Pass 1: stale temp files. A lock is acquired/reserved before removal.
+        {
+            std::error_code iteratorError;
+            std::filesystem::directory_iterator iterator(parent, iteratorError);
+            const std::filesystem::directory_iterator end;
+            if (iteratorError) {
+                return;
+            }
+
+            for (; iterator != end; iterator.increment(iteratorError)) {
+                if (iteratorError) {
+                    break;
+                }
+
+                const auto candidate = iterator->path();
+                const std::string candidateName =
+                    candidate.filename().string();
+
+                if (candidateName.compare(0U, prefix.size(), prefix) != 0) {
+                    continue;
+                }
+
+                const std::string nonce = candidateName.substr(prefix.size());
+                if (!isDecimalNonce(nonce) ||
+                    !isStaleRegularTemporary(candidate, now)) {
+                    continue;
+                }
+
+                auto lockPath = candidate;
+                lockPath += ".lock";
+
+                std::error_code lockStatusError;
+                const auto lockStatus =
+                    std::filesystem::symlink_status(lockPath, lockStatusError);
+
+                TemporaryFileLock lease;
+                if (!lockStatusError &&
+                    std::filesystem::exists(lockStatus)) {
+                    if (std::filesystem::is_symlink(lockStatus) ||
+                        !std::filesystem::is_regular_file(lockStatus) ||
+                        !lease.acquireExisting(lockPath)) {
+                        continue;
+                    }
+                } else if (
+                    lockStatusError == std::errc::no_such_file_or_directory ||
+                    (!lockStatusError && !std::filesystem::exists(lockStatus))) {
+                    // Reserve the name so another writer cannot create this
+                    // exact temp while this cleanup attempt is active.
+                    if (!lease.createNew(lockPath)) {
+                        continue;
+                    }
+                } else {
+                    continue;
+                }
+
+                if (!isStaleRegularTemporary(candidate, now)) {
+                    lease.release();
+                    continue;
+                }
+
+                std::error_code removeError;
+                const bool removed =
+                    std::filesystem::remove(candidate, removeError);
+
+                if (removed && !removeError) {
+                    (void)lease.removePathWhileLocked();
+                }
+
+                lease.release();
+            }
         }
 
-        const std::string prefix = baseName + ".tmp.";
-        const auto now =
-            std::filesystem::file_time_type::clock::now();
-
-        for (; iterator != end; iterator.increment(iteratorError)) {
+        // Pass 2: orphan lock sidecars. A missing temp can mean a crash
+        // occurred before temp creation or after replacement but before the
+        // writer released its sidecar. Age and lock checks protect live writers.
+        {
+            std::error_code iteratorError;
+            std::filesystem::directory_iterator iterator(parent, iteratorError);
+            const std::filesystem::directory_iterator end;
             if (iteratorError) {
-                break;
+                return;
             }
 
-            const auto candidate = iterator->path();
-            const std::string candidateName =
-                candidate.filename().string();
+            for (; iterator != end; iterator.increment(iteratorError)) {
+                if (iteratorError) {
+                    break;
+                }
 
-            if (candidateName.compare(0U, prefix.size(), prefix) != 0) {
-                continue;
-            }
+                const auto lockPath = iterator->path();
+                const std::string name = lockPath.filename().string();
 
-            const std::string nonce = candidateName.substr(prefix.size());
-            if (!isDecimalNonce(nonce) ||
-                !isStaleRegularTemporary(candidate, now)) {
-                continue;
-            }
-
-            auto lockPath = candidate;
-            lockPath += ".lock";
-
-            std::error_code lockStatusError;
-            const auto lockStatus =
-                std::filesystem::symlink_status(lockPath, lockStatusError);
-
-            bool existingLock = false;
-            TemporaryFileLock lease;
-
-            if (!lockStatusError &&
-                std::filesystem::exists(lockStatus)) {
-                if (std::filesystem::is_symlink(lockStatus) ||
-                    !std::filesystem::is_regular_file(lockStatus) ||
-                    !lease.acquireExisting(lockPath)) {
+                if (name.compare(0U, prefix.size(), prefix) != 0 ||
+                    name.size() <= prefix.size() + lockSuffix.size() ||
+                    name.compare(
+                        name.size() - lockSuffix.size(),
+                        lockSuffix.size(),
+                        lockSuffix) != 0) {
                     continue;
                 }
 
-                existingLock = true;
-            } else if (
-                (lockStatusError ==
-                    std::errc::no_such_file_or_directory) ||
-                (!lockStatusError &&
-                    !std::filesystem::exists(lockStatus))) {
-                // Reserve this nonce so a concurrently starting writer cannot
-                // create the same temporary file while it is being cleaned.
-                if (!lease.createNew(lockPath)) {
+                const std::size_t nonceLength =
+                    name.size() - prefix.size() - lockSuffix.size();
+                const std::string nonce =
+                    name.substr(prefix.size(), nonceLength);
+
+                if (!isDecimalNonce(nonce) ||
+                    !isStaleRegularTemporary(lockPath, now)) {
                     continue;
                 }
-            } else {
-                continue;
-            }
 
-            // Recheck both symlink status and age after acquiring the lock.
-            if (!isStaleRegularTemporary(candidate, now)) {
-                lease.release();
-                continue;
-            }
+                const auto temporary = parent / (prefix + nonce);
+                if (!pathIsAbsentWithoutFollowing(temporary)) {
+                    continue;
+                }
 
-            std::error_code removeError;
-            const bool removed =
-                std::filesystem::remove(candidate, removeError);
+                // acquireExisting uses O_NOFOLLOW / OPEN_REPARSE_POINT and a
+                // non-blocking lock; active lock holders are skipped.
+                TemporaryFileLock lease;
+                if (!lease.acquireExisting(lockPath)) {
+                    continue;
+                }
 
-            if (removed && !removeError && existingLock) {
-                lease.release();
-                std::error_code lockRemoveError;
-                std::filesystem::remove(lockPath, lockRemoveError);
-            } else {
-                // If this cleanup created the lock marker, release() removes it.
-                // If a pre-existing lock remains, keep it unless the temp was
-                // removed while this cleanup held the lock.
+                now = std::filesystem::file_time_type::clock::now();
+                if (!isStaleRegularTemporary(lockPath, now) ||
+                    !pathIsAbsentWithoutFollowing(temporary)) {
+                    lease.release();
+                    continue;
+                }
+
+                (void)lease.removePathWhileLocked();
                 lease.release();
             }
         }
@@ -331,7 +455,6 @@ void removeStaleTemporaryFiles(
         // Cleanup is best-effort; a cleanup error must never block normal I/O.
     }
 }
-
 // Create a new temporary file exclusively.
 // POSIX files are readable/writable only by their owner.
 bool writeAndFlushNewFile(

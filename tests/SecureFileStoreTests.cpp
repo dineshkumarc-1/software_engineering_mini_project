@@ -571,3 +571,139 @@ TEST_CASE(
         CHECK(name.find("locked.json.tmp.") != 0U);
     }
 }
+
+
+TEST_CASE(
+    "SecureFileStore removes only stale orphan lock sidecars",
+    "[persistence][store][security]") {
+
+    TemporaryDirectory directory;
+    const auto destination = directory.path() / "data.json";
+    const snake::SecureFileStore store(destination);
+    REQUIRE(store.writeJson(nlohmann::json{{"value", 42}}));
+
+    const auto staleOrphan = directory.path() / "data.json.tmp.991.lock";
+    const auto freshOrphan = directory.path() / "data.json.tmp.992.lock";
+    const auto unrelatedOrphan = directory.path() / "other.json.tmp.993.lock";
+    const auto nonNumericOrphan = directory.path() / "data.json.tmp.abc.lock";
+    const auto emptyNonceOrphan = directory.path() / "data.json.tmp..lock";
+    const auto freshTemporary = directory.path() / "data.json.tmp.994";
+
+    const auto writeMarker = [](const std::filesystem::path& path) {
+        std::ofstream output(path, std::ios::binary);
+        REQUIRE(output.good());
+        output << "marker";
+    };
+
+    writeMarker(staleOrphan);
+    writeMarker(freshOrphan);
+    writeMarker(unrelatedOrphan);
+    writeMarker(nonNumericOrphan);
+    writeMarker(emptyNonceOrphan);
+    writeMarker(freshTemporary);
+
+    const auto oldTime =
+        std::filesystem::file_time_type::clock::now() -
+        std::chrono::hours(48);
+    std::error_code timeError;
+    std::filesystem::last_write_time(staleOrphan, oldTime, timeError);
+    REQUIRE_FALSE(timeError);
+    std::filesystem::last_write_time(unrelatedOrphan, oldTime, timeError);
+    REQUIRE_FALSE(timeError);
+    std::filesystem::last_write_time(nonNumericOrphan, oldTime, timeError);
+    REQUIRE_FALSE(timeError);
+    std::filesystem::last_write_time(emptyNonceOrphan, oldTime, timeError);
+    REQUIRE_FALSE(timeError);
+
+    const auto target = directory.path() / "link-target.json";
+    const auto symlinkOrphan = directory.path() / "data.json.tmp.995.lock";
+    {
+        std::ofstream output(target, std::ios::binary);
+        REQUIRE(output.good());
+        output << "target must not be modified";
+    }
+
+    std::error_code symlinkError;
+    std::filesystem::create_symlink(target, symlinkOrphan, symlinkError);
+
+    const auto read = store.readJson();
+    REQUIRE(read.status == snake::StoreReadStatus::Ok);
+
+    CHECK_FALSE(std::filesystem::exists(staleOrphan));
+    CHECK(std::filesystem::exists(freshOrphan));
+    CHECK(std::filesystem::exists(unrelatedOrphan));
+    CHECK(std::filesystem::exists(nonNumericOrphan));
+    CHECK(std::filesystem::exists(emptyNonceOrphan));
+    CHECK(std::filesystem::exists(freshTemporary));
+
+    if (!symlinkError) {
+        CHECK(std::filesystem::is_symlink(
+            std::filesystem::symlink_status(symlinkOrphan)));
+        std::ifstream targetInput(target, std::ios::binary);
+        REQUIRE(targetInput.good());
+        const std::string targetContents(
+            (std::istreambuf_iterator<char>(targetInput)),
+            std::istreambuf_iterator<char>());
+        CHECK(targetContents == "target must not be modified");
+    } else {
+        WARN("Symbolic links unavailable in this environment: "
+             << symlinkError.message());
+    }
+}
+
+TEST_CASE(
+    "SecureFileStore preserves an aged orphan lock while it is actively held",
+    "[persistence][store][security]") {
+
+    TemporaryDirectory directory;
+    const auto destination = directory.path() / "data.json";
+    const snake::SecureFileStore store(destination);
+    REQUIRE(store.writeJson(nlohmann::json{{"value", 42}}));
+
+    const auto orphan = directory.path() / "data.json.tmp.991.lock";
+    {
+        std::ofstream output(orphan, std::ios::binary);
+        REQUIRE(output.good());
+        output << "active lock marker";
+    }
+
+    std::error_code timeError;
+    std::filesystem::last_write_time(
+        orphan,
+        std::filesystem::file_time_type::clock::now() -
+            std::chrono::hours(48),
+        timeError);
+    REQUIRE_FALSE(timeError);
+
+#ifdef _WIN32
+    HANDLE activeLock = ::CreateFileW(
+        orphan.c_str(),
+        GENERIC_READ | GENERIC_WRITE,
+        0,
+        nullptr,
+        OPEN_EXISTING,
+        FILE_ATTRIBUTE_NORMAL | FILE_FLAG_OPEN_REPARSE_POINT,
+        nullptr);
+    REQUIRE(activeLock != INVALID_HANDLE_VALUE);
+#else
+    const int activeLock = ::open(orphan.c_str(), O_RDWR);
+    REQUIRE(activeLock >= 0);
+    REQUIRE(::flock(activeLock, LOCK_EX | LOCK_NB) == 0);
+#endif
+
+    const auto whileHeld = store.readJson();
+    REQUIRE(whileHeld.status == snake::StoreReadStatus::Ok);
+    CHECK(std::filesystem::exists(orphan));
+
+#ifdef _WIN32
+    REQUIRE(::CloseHandle(activeLock));
+#else
+    REQUIRE(::flock(activeLock, LOCK_UN) == 0);
+    REQUIRE(::close(activeLock) == 0);
+#endif
+
+    const auto afterRelease = store.readJson();
+    REQUIRE(afterRelease.status == snake::StoreReadStatus::Ok);
+    CHECK_FALSE(std::filesystem::exists(orphan));
+}
+
