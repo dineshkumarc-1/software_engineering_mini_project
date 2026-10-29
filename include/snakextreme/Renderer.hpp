@@ -27,6 +27,9 @@ struct FrameView {
     int score{0};
     int highScore{0};
     std::string menuError;
+    std::string playerName;
+    std::string nameError;
+    std::size_t menuIndex{0};
 };
 
 class Renderer {
@@ -40,6 +43,7 @@ public:
     void draw(sf::RenderTarget& target, const FrameView& frame) const;
 
 private:
+    void drawNavigation(sf::RenderTarget& target, const FrameView& frame) const;
     void drawMenu(sf::RenderTarget& target, const FrameView& frame) const;
     void drawBoard(sf::RenderTarget& target, const GameEngine& engine) const;
     void drawHud(sf::RenderTarget& target, const FrameView& frame) const;
