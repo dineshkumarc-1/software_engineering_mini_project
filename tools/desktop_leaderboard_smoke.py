@@ -80,8 +80,9 @@ try:
             def open_board():
                 key("Down", "Return"); screen("| Leaderboard |")
             screen("Main menu"); open_board(); screen("| 10 entries")
-            check(all(f"| {i+1}. Player{i} {1000-i*10}" in title() for i in range(10)),
-                  "Top-10 table exposes rank name and descending score for every row")
+            check(all(f"| {i+1}. Player{i} {1000-i*10} Classic Medium 2026-10-28" in title()
+                       for i in range(10)),
+                  "Top-10 exposes rank, name, score, mode, difficulty and date for every row")
             key("Escape"); screen("Main menu")
             check(True, "Escape returns to menu")
             key("Return"); screen("| Leaderboard |")
