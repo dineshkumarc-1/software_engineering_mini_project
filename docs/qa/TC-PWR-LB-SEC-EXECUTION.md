@@ -2,14 +2,46 @@
 
 STP v1.0 test cases TC-PWR-01…05, TC-LB-01…04 and TC-SEC-01…06, plus the acceptance criteria of issue #18. Executed by B V Tejas.
 
-The cases were run twice:
+The cases were run three times:
 
 | Run | Date | Build under test |
 | --- | --- | --- |
 | 1 | 29 Oct 2026 | All open pull requests merged locally: `main` `df9b5cc`, #49 `21168fd`, #51 `66ddaa4`, #46 `51fd38f`, #50 `07d37d2`, #52 `8d6acd2`. The leaderboard was not yet in the game. |
 | **2 (current)** | 29 Oct 2026 | **The integrated candidate #53 at `dbf08b5`** (all Sprint 2 branches, including #49, #50, #51, this pull request at `8d6acd2` and the leaderboard UI of #21), plus this pull request's test update at `12441e5`. The test update adds or changes only test, tool and report files: no product code. |
+| **3 (fix)** | 29 Oct 2026 | Candidate #53 `dbf08b5` with **Bharath's persistence fix, #48 at `0d516f3`** (`31602b5` plus a cppcheck fix), plus this pull request's tests: `eb91f1d`, then the promotion of the D1–D5 tests (`15892ba`). Also re-run on this pull request itself, after its base #50 took the fix (`5915e58`, base `6e28118`). See [Run 3](#run-3-the-persistence-fix-48-at-31602b5-and-0d516f3) |
 
-Unless a row says otherwise, every result below is from run 2.
+Unless a row says otherwise, every result below is from run 2. Run 3 re-checked what the persistence fix changes; its results are in the next section and in the Defects table.
+
+## Run 3: the persistence fix (#48 at `31602b5` and `0d516f3`)
+
+Bharath fixed D1–D5 on the #48 branch (`31602b5`), then removed a cppcheck finding (`0d516f3`), under the cleanup policy agreed on #48 (`docs/sprint2/evidence/issue-15-17-temp-cleanup-policy.md` there). Test-file ownership as agreed on #52: Bharath edits the persistence code, `LeaderboardRepositoryTests.cpp` and `SecureFileStoreTests.cpp`; the corpus, fault-injection and security tests, fixtures and this report stay with #52.
+
+**Policy.** Only regular files named exactly `<file>.tmp.<decimal nonce>` are removed, or that name plus `.lock` once its temporary file is gone. They must be older than 24 hours and not locked by a live save. So a crash leftover is **not** removed on the very next start, only on the first load or save after it is 24 hours old. TC-SEC-04's "stale .tmp removed" is met in that sense, which is an acceptance decision for the team.
+
+**Test changes for the policy (on this pull request, `eb91f1d`; they pass with and without the fix):**
+- The D5 tests age their leftover by 48 hours (setup only; the assertions are unchanged). The injected D5 test also covers a crash after the rename, which leaves only a lock sidecar.
+- New: "Known defect D5 (simulated orphan lock)": a 48-hour-old `leaderboard.json.tmp.991.lock` with no temporary file is removed by the next load (the case found in the #48 review).
+- New: a fresh crash leftover is kept by the next load and save, so cleanup never races a live save.
+- The stale-temp safety test now also covers aged files that must stay: a non-decimal nonce, another store's temporary file, a fresh temporary file and a fresh sidecar, a stale temporary file whose lock is held, a directory, and old symbolic links (POSIX).
+- The fault injector ignores the new lock sidecar, and every failed or successful save is checked to leave no sidecar.
+
+**Results** ([evidence](evidence/issue-18-run3-fix-verification.txt)):
+- **Before the fix**, on this pull request's base (#50), the tests behave as before. Six known-defect tests in `security_corpus_tests` and one in `secure_write_fault_tests` fail as expected; everything else passes, under GCC and ASan + UBSan.
+- **With the fix**, every one of those known-defect tests passes, under GCC and ASan + UBSan.
+- **After promotion,** on candidate + fix, the D1–D5 tests are ordinary tests and the corpus has no exceptions:
+  - 21/21 CTest suites pass with GCC and with ASan + UBSan, with 0 sanitizer reports.
+  - `security_corpus_tests`: 21 cases. All 25 valid and all 25 malformed leaderboard files behave as specified; the one expected failure left is D6.
+  - `secure_write_fault_tests`: 8/8, including the settings variant.
+  - Bharath's suites pass: `leaderboard_repository_tests` 13 cases, `secure_file_store_tests` 20 cases.
+- **Real game, both builds:** TC-LB-01 now writes `YYYY-MM-DD` (D4 fixed). TC-LB-04 with wrong type, negative score or bad enum now saves the next score and replaces the bad file (D3 fixed). The 11-entry board now shows an empty table with the warning and is replaced (D2 fixed). 65/66 checks pass; the one failure is D6. The refused save (6/6), the power-ups (18/18 Release, 15/15 ASan), the name-entry and privacy checks (23/23), and #53's leaderboard, navigation and settings smoke tests all pass.
+- **cppcheck: 0 findings with `0d516f3`.** `31602b5` had one (`src/persistence/SecureFileStore.cpp:445`, knownConditionTrueFalse); `0d516f3` drops the redundant pre-check and keeps the re-check after the lock is taken. With `0d516f3`, all 21 suites pass again on both builds (0 sanitizer reports), and the real-game leaderboard checks were repeated with the same results. Banned-API scan: 0 hits.
+
+**On this pull request.** Bharath rebuilt #50 on top of the fix (`6e28118`). After merging it (`5915e58`, his files taken unchanged from #50), the promotion went in as `15892ba`:
+- the seven D1–D5 known-defect tests lost `[!shouldfail]` and are named after the behaviour they check;
+- the two corpus exceptions are gone, so all 25 + 25 leaderboard files are checked;
+- a D6 known-defect test was added.
+
+Verified on that exact tree, GCC and Clang ASan + UBSan as a normal user: 12/12 CTest suites pass. `security_corpus_tests` has 21 cases: 20 pass and D6 fails as expected. `secure_write_fault_tests` passes 7/7 (the settings variant needs the settings module). Harness fixes for the real-game scripts followed in `2dc86bc`.
 
 **Environment.** An Ubuntu 24.04 container:
 - GCC 13.3, Release, `-Werror`: the game and all tests.
@@ -23,8 +55,8 @@ Unless a row says otherwise, every result below is from run 2.
 | Status | What |
 | --- | --- |
 | **Passed** | TC-PWR-01…05, TC-LB-03, TC-SEC-01, TC-SEC-02, TC-SEC-05, TC-SEC-06. Acceptance criteria 2 (64 KiB + 1) and 3 (timers, multiplier). Every TC-SEC-04 check except the stale-temporary-file cleanup (D5) |
-| **Remaining failures** | TC-LB-01 (D4), TC-LB-02 (D7), TC-LB-04 (D2, D3, D6), TC-SEC-03 (D1, D2), TC-SEC-04 (D5), acceptance criterion 1 (D1, D2). The six known-defect tests for D1–D5 still fail as expected, so they remain acceptance blockers. D5 has two tests: a simulated leftover and an injected crash. D6 and D7 are new in run 2 |
-| **Blocked** | Turning the six known-defect tests into ordinary regression tests, removing the two corpus exceptions, and re-running on a fixed candidate. All of these wait for the persistence fixes (Bharath) |
+| **Remaining failures** (run 2; after run 3 only D6 and D7 remain) | TC-LB-01 (D4), TC-LB-02 (D7), TC-LB-04 (D2, D3, D6), TC-SEC-03 (D1, D2), TC-SEC-04 (D5), acceptance criterion 1 (D1, D2). The six known-defect tests for D1–D5 still fail as expected, so they remain acceptance blockers. D5 has two tests: a simulated leftover and an injected crash. D6 and D7 are new in run 2 |
+| **Blocked** | Nothing in this pull request. The D1–D5 tests are promoted (`15892ba`). Windows 10/11 runs (#23) wait for real PCs |
 | **Not executed** | Manual runs on real Windows 10/11 and macOS machines. Crash injection on Windows and macOS (the injector is Linux-only). Audio is not involved in these cases |
 
 All 21 CTest suites of the candidate pass with GCC and again under Clang ASan + UBSan as a normal user. Expected failures are counted as passes by Catch2's `[!shouldfail]`, so the suites are green while D1–D5 exist. cppcheck reports 0 findings and the banned-API scan finds 0 hits in 46 files ([evidence](evidence/issue-18-candidate-ctest-sanitizers.txt)).
@@ -92,7 +124,9 @@ Real refusals and safety:
 
 All D1–D5 still reproduce on candidate `dbf08b5`. D6 and D7 are new in run 2.
 
-| ID | Component (owner) | Requirement | Observed | Expected | Reproduce |
+Status after run 3: **D1–D5 are fixed in #48 (`31602b5`, `0d516f3`) and verified** (see Run 3). D6 and D7 are open.
+
+| ID | Component (owner) | Requirement | Observed (run 2, before the fix) | Expected | Reproduce |
 | --- | --- | --- | --- | --- | --- |
 | D1 | C11 leaderboard validation (Bharath) | SAD 4.3.5, SRS Appendix B | `date_achieved` is only checked for being non-empty: `"28/10/2026"` loads | Not `YYYY-MM-DD` → schema violation → empty board | `malformed/23-bad-date-format.json`; test "Known defect D1" |
 | D2 | C11 (Bharath) | SAD 4.3.5 "at most 10 entries", TC-LB-04 | A board with 11 entries loads and shows 10. No warning. The next score is judged against it and the file is kept | Schema violation → empty board, warning, next valid score stored | `malformed/24-eleven-entries.json`; test "Known defect D2"; `leaderboard_ui_check.py` |
@@ -104,16 +138,18 @@ All D1–D5 still reproduce on candidate `dbf08b5`. D6 and D7 are new in run 2.
 
 ### Known-defect tests
 
-| Test | File | When its defect is fixed |
+| Known-defect test (run 2) | File | Now (`15892ba`) |
 | --- | --- | --- |
-| Known defect D1: a date_achieved that is not YYYY-MM-DD is accepted | `SecurityCorpusTests.cpp` | Remove `[!shouldfail]`, rename it to the behaviour, and remove `23-bad-date-format.json` from the corpus exceptions |
-| Known defect D2: a board with more than 10 entries is accepted | `SecurityCorpusTests.cpp` | Same, with `24-eleven-entries.json` |
-| Known defect D3: a schema-invalid board is not replaced by the next valid score | `SecurityCorpusTests.cpp` | Remove `[!shouldfail]` and rename it |
-| Known defect D4: date_achieved is written as a timestamp, not YYYY-MM-DD | `SecurityCorpusTests.cpp` | Remove `[!shouldfail]` and rename it |
-| Known defect D5 (simulated leftover): a stale temporary file is never removed | `SecurityCorpusTests.cpp` | Remove `[!shouldfail]` and rename it. If the agreed cleanup is age-based, its leftover file must first be made older than the threshold (setup only; the assertion stays) |
-| Known defect D5 (injected crash): a crashed save's temporary file is never removed | `SecureWriteFaultTests.cpp` | Remove `[!shouldfail]` and rename it |
+| Known defect D1: a date_achieved that is not YYYY-MM-DD is accepted | `SecurityCorpusTests.cpp` | "TC-SEC-03: a date_achieved that is not a valid YYYY-MM-DD date is rejected (D1)"; `23-bad-date-format.json` is no longer a corpus exception |
+| Known defect D2: a board with more than 10 entries is accepted | `SecurityCorpusTests.cpp` | "TC-LB-04: a board with more than 10 entries is rejected (D2)"; `24-eleven-entries.json` is no longer an exception |
+| Known defect D3: a schema-invalid board is not replaced by the next valid score | `SecurityCorpusTests.cpp` | "TC-LB-04: a schema-invalid board is replaced by the next valid score (D3)" |
+| Known defect D4: date_achieved is written as a timestamp, not YYYY-MM-DD | `SecurityCorpusTests.cpp` | "TC-LB-01: date_achieved is written as YYYY-MM-DD (D4)" |
+| Known defect D5 (simulated leftover): a stale temporary file is never removed | `SecurityCorpusTests.cpp` | "TC-SEC-04 (simulated leftover): a temporary file older than 24 hours is removed (D5)" |
+| Known defect D5 (simulated orphan lock) | `SecurityCorpusTests.cpp` | "TC-SEC-04 (simulated orphan lock): a lock sidecar older than 24 hours without its temporary file is removed (D5)" |
+| Known defect D5 (injected crash) | `SecureWriteFaultTests.cpp` | "TC-SEC-04 injected crash: what a crashed save leaves is removed once it is older than 24 hours (D5)" |
+| – (new) | `SecurityCorpusTests.cpp` | "Known defect D6: an empty or whitespace-only board shows no warning", tagged `[!shouldfail]` |
 
-Each test passes while its defect exists and fails once the defect is fixed. Its assertions describe the specified behaviour, so they stay unchanged. Once all of D1–D5 are fixed, the leaderboard corpus test checks all 25 valid and 25 malformed files with no exceptions.
+The assertions were not changed when the tags came off; only the D5 setup ages its leftovers by 48 hours, as the agreed policy needs. The leaderboard corpus test now checks all 25 valid and 25 malformed files with no exceptions.
 
 ### Observations
 
@@ -151,6 +187,7 @@ For the sanitizer configuration, use the configure line in `docs/quality-gates.m
 
 ## Evidence files
 
+- [issue-18-run3-fix-verification.txt](evidence/issue-18-run3-fix-verification.txt): run 3, the persistence fix, before and after, the promoted tests, cppcheck, and every real-game check on both builds.
 - [issue-18-candidate-ctest-sanitizers.txt](evidence/issue-18-candidate-ctest-sanitizers.txt): run 2, all 21 suites with GCC and with ASan + UBSan as a normal user, per-suite counts, cppcheck and the banned-API scan.
 - [issue-18-fault-injection.txt](evidence/issue-18-fault-injection.txt): run 2, every injected crash and failure.
 - [issue-18-leaderboard-ui.txt](evidence/issue-18-leaderboard-ui.txt): run 2, TC-LB-01/02/04 and TC-SEC-04 in the real game, Release and ASan + UBSan.
