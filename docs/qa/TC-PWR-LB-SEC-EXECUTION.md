@@ -38,9 +38,9 @@ Executed 30 Oct 2026 on the unmodified `7c6733d` tree; Ubuntu 24.04, GCC 13.3.0,
 **Cleanup policy.** D5 is met as a 24-hour best-effort cleanup: leftovers older than 24 hours are removed by a later load or save. A leftover from a crash moments ago is kept on purpose, so it is **not** removed on the very next start. Accepting that for TC-SEC-04 is the team's decision.
 
 **Still Pending after run 4:**
-- Windows 10 and Windows 11 clean build and run (TC-PORT-01, #23): no result from a real PC yet. The record and checklist are in `docs/quality-gates.md`.
-- Manual runs of the system cases on real Windows and macOS machines.
-- Crash injection on Windows and macOS (Linux-only injector).
+- **Windows 10:** The older statement that no real-PC result was available is historical. Dinesh has since reported successful Windows 10 gameplay. See the [current Windows 10 evidence register](WINDOWS10-EVIDENCE-REGISTER.md); the report remains collaborator-reported evidence pending supporting-log review.
+- **Windows 11:** Windows 11 has not been tested against source candidate `7c6733d`; Windows 11 acceptance remains Pending.
+- **Unsupported manual checks:** Manual system checks not substantiated by available evidence remain Pending. Native Windows/macOS crash-injection verification remains Pending until a platform-appropriate method is available. The Linux-only `LD_PRELOAD` injector cannot run natively on Windows or macOS. Existing native Windows locked-file test evidence is separate and does not constitute full crash-injection coverage. Historical CI results do not substitute for native manual acceptance.
 
 ## Run 3: the persistence fix (#48 at `31602b5` and `0d516f3`)
 
@@ -87,7 +87,7 @@ Verified on that exact tree, GCC and Clang ASan + UBSan as a normal user: 12/12 
 | **Passed** | TC-PWR-01…05, TC-LB-03, TC-SEC-01, TC-SEC-02, TC-SEC-05, TC-SEC-06. Acceptance criteria 2 (64 KiB + 1) and 3 (timers, multiplier). Every TC-SEC-04 check except the stale-temporary-file cleanup (D5) |
 | **Remaining failures** (run 2; after run 3 only D6 and D7 remain) | TC-LB-01 (D4), TC-LB-02 (D7), TC-LB-04 (D2, D3, D6), TC-SEC-03 (D1, D2), TC-SEC-04 (D5), acceptance criterion 1 (D1, D2). The six known-defect tests for D1–D5 still fail as expected, so they remain acceptance blockers. D5 has two tests: a simulated leftover and an injected crash. D6 and D7 are new in run 2 |
 | **Blocked** | Nothing in this pull request. The D1–D5 tests are promoted (`15892ba`). Windows 10/11 runs (#23) wait for real PCs |
-| **Not executed** | Manual runs on real Windows 10/11 and macOS machines. Crash injection on Windows and macOS (the injector is Linux-only). Audio is not involved in these cases |
+| **Not executed** | Manual runs on real Windows 10/11 and macOS machines. Native Windows/macOS crash-injection verification remains Pending until a platform-appropriate method is available. The Linux-only `LD_PRELOAD` injector cannot run natively on Windows or macOS; existing native Windows locked-file tests are separate evidence, not full crash-injection coverage. Audio is not involved in these cases |
 
 All 21 CTest suites of the candidate pass with GCC and again under Clang ASan + UBSan as a normal user. Expected failures are counted as passes by Catch2's `[!shouldfail]`, so the suites are green while D1–D5 exist. cppcheck reports 0 findings and the banned-API scan finds 0 hits in 46 files ([evidence](evidence/issue-18-candidate-ctest-sanitizers.txt)).
 
@@ -183,7 +183,7 @@ The assertions were not changed when the tags came off; only the D5 setup ages i
 
 ### Observations
 
-- **O1 (updated).** The candidate now reports corrupt boards on the Leaderboard screen ("Leaderboard unavailable: empty table shown") and in the log (`[WARN] E_LEADERBOARD_READ`). A failed save shows `E_LEADERBOARD_SAVE` on the game-over screen and logs it. The gaps are D2 and D6.
+- **O1 (updated after Run 4).** On Linux candidate `7c6733d`, corrupt boards are reported on the Leaderboard screen ("Leaderboard unavailable: empty table shown") and in the log (`[WARN] E_LEADERBOARD_READ`). A failed save shows `E_LEADERBOARD_SAVE` on the game-over screen and logs it. D2 (rejection of boards with more than 10 entries) and D6 (warning for empty or whitespace-only boards) are recorded as fixed and verified in Run 4. These results apply to the documented Linux candidate; they do not establish native Windows or macOS acceptance.
 - **O2.** STP TC-SEC-03 lists "extra fields" as malformed, but SAD 4.3.5 says "unknown keys are ignored". The corpus follows the SAD: valid files 13, 14, 22 and 25 carry unknown keys.
 - **O3 (resolved).** Run 1 had no way to crash a real save. The `LD_PRELOAD` injector now does this without any product change, but only on Linux.
 - **O4 (resolved).** Run 1 could not run the app-level steps of TC-LB-01, TC-LB-02, TC-LB-04 and TC-SEC-02. They ran on the candidate.
@@ -194,7 +194,7 @@ The assertions were not changed when the tags came off; only the D5 setup ages i
 | Check | Why | Needed |
 | --- | --- | --- |
 | TC-LB-02 and the other system cases by hand on real Windows 10, Windows 11 and macOS | No such machines in this environment. CI covers unit and integration suites on Windows Server and macOS runners, which is not a manual run | A team member with each machine. The Windows 10/11 checklist is in `docs/quality-gates.md` (#51) |
-| TC-SEC-04 crash injection on Windows and macOS | `LD_PRELOAD` and `fork`/`execve` are Linux-only | The Windows locked-file refusal runs in CI |
+| TC-SEC-04 crash injection on Windows and macOS | `LD_PRELOAD` and `fork`/`execve` are Linux-only; native verification needs a platform-appropriate method | The Windows locked-file refusal runs in CI, but is separate evidence and does not constitute full crash-injection coverage |
 | TC-SEC-04 real refusal at app level on Windows | Linux only (read-only folder) | – |
 
 ## Reproduce
