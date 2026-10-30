@@ -2,7 +2,8 @@
 """App-level leaderboard checks on the real game (issue #18).
 
 STP TC-LB-01 (5 real games, leaderboard.json inspected, restart), TC-LB-02
-(10-entry and empty boards on the Leaderboard screen, Esc back), TC-LB-04
+(10-entry and empty boards on the Leaderboard screen with all six columns,
+Esc and the Back button), TC-LB-04
 (missing / corrupt boards, then a real game's score) and TC-SEC-04 at app
 level (a real game's score cannot be saved because the folder is read-only;
 needs a normal user). Linux only: Xvfb, xdotool (XTEST key events) and Pillow
@@ -298,6 +299,14 @@ def entries_in_title(title):
     return re.findall(r"\| (\d+)\. (.+?) (\d+)(?= \|)", title)
 
 
+def fields_in_title(title):
+    """Rows with all six columns, as the window title mirrors them once the
+    Leaderboard screen shows mode, difficulty and date (D7):
+    "| 1. Name 900 | Timed / Easy / 2026-10-11"."""
+    return [(int(r), n, int(s), m, d, day) for r, n, s, m, d, day in re.findall(
+        r"\| (\d+)\. (.+?) (\d+) \| (\w+) / (\w+) / (\d{4}-\d{2}-\d{2})(?= \|)", title)]
+
+
 def temp_files(work):
     return sorted(p.name for p in Path(work).iterdir() if ".tmp." in p.name)
 
@@ -390,6 +399,10 @@ try:
         check("TC-LB-01: after a restart the Leaderboard shows the 5 saved games in order",
               [(n, int(s)) for _, n, s in shown] == [(e.get("player_name"), e.get("score")) for e in entries],
               app.title()[:200])
+        check("TC-LB-01: after a restart every row also shows its mode, difficulty and date (D7)",
+              fields_in_title(app.title()) ==
+              [(i + 1, e.get("player_name"), e.get("score"), e.get("game_mode"), e.get("difficulty"),
+                e.get("date_achieved")) for i, e in enumerate(entries)], app.title()[:260], defect="D7")
         check("TC-LB-01: the app exits normally after the restart", app.quit() == 0)
         check("TC-LB-01: viewing the board does not rewrite the file", board_path.read_bytes() == raw)
 
@@ -416,7 +429,17 @@ try:
               [(i + 1, e["player_name"], e["score"]) for i, e in enumerate(expected)], app.title()[:260])
         check("TC-LB-02: equal scores keep their stored order (Tie_A before Tie_B)",
               [n for _, n, _ in shown].index("Tie_A") < [n for _, n, _ in shown].index("Tie_B"))
+        check("TC-LB-02: all 10 rows show rank, name, score, mode, difficulty and date (D7)",
+              fields_in_title(app.title()) ==
+              [(i + 1, e["player_name"], e["score"], e["game_mode"], e["difficulty"], e["date_achieved"])
+               for i, e in enumerate(expected)], app.title()[:400], defect="D7")
         check("TC-LB-02: Esc returns to the main menu", app.press("Escape", "Main menu"), app.title()[:80])
+        # The Back button (UiHitTest: 260..440 x 434..478) returns by mouse too.
+        app.main_item(1)
+        app.screen("| Leaderboard |")
+        xdo("mousemove", "--window", app.win, 350, 456)
+        xdo("click", "1")
+        check("TC-LB-02: the Back button returns to the main menu", app.screen("Main menu"), app.title()[:80])
         check("TC-LB-02: the app exits normally", app.quit() == 0)
         work = Path(tempfile.mkdtemp(prefix="snake-lb02-empty-"))
         shutil.copyfile(CORPUS / "valid" / "01-empty-board.json", work / "leaderboard.json")
