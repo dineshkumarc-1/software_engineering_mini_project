@@ -81,6 +81,14 @@ The following activities remain necessary before current-branch automated test c
 
 Do not infer that every STP test case passed from the CTest totals alone.
 
+### 3.4 Owner automated verification — exact candidate 7c6733d
+
+A new independent Linux-only run on 30 October 2026 passed fresh Release CTest 21/21, ASan/UBSan CTest 21/21, coverage CTest 21/21, 33 Python tests, cppcheck (zero findings), and all executed desktop UI harnesses. C6–C11 line coverage is 91.84%–98.12%.
+
+See [Owner automated QA report](OWNER-AUTOMATED-QA-7c6733d.md) for exact SHA/binary/tool identities, all actual counts, original setup failures, sanitized transcripts and pending native/manual cases. Tejas PR58's enhanced leaderboard harness passed 75/75 against unchanged game source 7c6733d; these are assertions/checks, not 75 unique STP cases.
+
+Historical results below remain unchanged. Automated Linux key-remap evidence does not relabel the outstanding Windows manual checks as passed. Windows10/11 clean source-build/run, audible F5/audio, final-candidate privacy, target performance/usability and final STP reconciliation remain Pending. **Final QA sign-off remains pending.**
+
 ## 4. Windows x64 Manual-Test Results
 
 Seven Windows x64 manual checks were reported as passing on 28 October 2026.
