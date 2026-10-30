@@ -14,7 +14,7 @@ This checklist is a working document. Test cases must be checked against STP v1.
 
 Automated headless results and Windows manual results are recorded separately because they were obtained in different environments.
 
-The master tracker in Section 11 covers all 44 approved STP test cases. Its status values are provisional and must be reconciled with the approved test steps and available evidence.
+The approved STP contains 44 planned test cases. This is the planned inventory, not a final pass count. Execution status and final results must be based on individual test outcomes and supporting evidence recorded in the [authoritative STP execution matrix](STP_EXECUTION_MATRIX.md).
 
 ## Current reconciliation (supersedes stale generic Not Started/integration-blocked labels)
 
@@ -93,7 +93,11 @@ A new independent Linux-only run on 30 October 2026 passed fresh Release CTest 2
 
 See [Owner automated QA report](OWNER-AUTOMATED-QA-7c6733d.md) for exact SHA/binary/tool identities, all actual counts, original setup failures, sanitized transcripts and pending native/manual cases. Tejas PR58's enhanced leaderboard harness passed 75/75 against unchanged game source 7c6733d; these are assertions/checks, not 75 unique STP cases.
 
-Historical results below remain unchanged. Automated Linux key-remap evidence does not relabel the outstanding Windows manual checks as passed. Windows 10/11 clean source-build/run, audible F5/audio, final-candidate privacy, target performance/usability and final STP reconciliation remain Pending. **Final QA sign-off remains pending.**
+Historical results below retain their original run identities and observations. Dinesh has personally reported successful Windows 10 gameplay. This is an owner-reported gameplay result, not independent confirmation that every prescribed manual observation or acceptance threshold passed.
+
+For current platform status, consult the [Windows 10 evidence register](WINDOWS10-EVIDENCE-REGISTER.md). Windows 10 remains reported evidence pending supporting-log review. Detailed independent-channel and F5 listening checks remain Pending until the corresponding observations are supplied. At SFX volume 0, F5 silence is expected. Available themes are Classic, Neon, and Retro—not Dark. The baseline Windows 10 report does not cover PR #60 audio commit `09bbf96`.
+
+Windows 11 remains Not tested against the identified final candidate. Earlier Windows 11 privacy sampling is historical evidence and does not establish candidate `7c6733d` portability or privacy acceptance. Final-candidate firewall/offline evidence, cold-cache launch acceptance, performance/usability campaigns, unsupported manual checks, and final STP reconciliation remain Pending. **Final QA sign-off remains pending.**
 
 ## 4. Windows x64 Manual-Test Results
 
@@ -205,7 +209,7 @@ The detailed execution records are maintained in `docs/qa/TEST_EXECUTION_LOG.md`
 
 - Record or link the exact PR #50 evidence note for future reviewers.
 - Verify the collector evidence against the approved requirements and applicable STP test cases.
-- Execute and record the corresponding Windows 10 test.
+- Historical action: execute and record the corresponding Windows 10 test. Dinesh has since reported a Windows 10 gameplay result; consult the [Windows 10 evidence register](WINDOWS10-EVIDENCE-REGISTER.md) for current evidence status. Supporting-log review remains pending.
 - Repeat applicable checks against the identified final integrated candidate and record its exact SHA and artifact reference.
 - Complete outstanding platform, usability, performance, and regression testing.
 

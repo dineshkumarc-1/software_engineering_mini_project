@@ -38,9 +38,9 @@ Executed 30 Oct 2026 on the unmodified `7c6733d` tree; Ubuntu 24.04, GCC 13.3.0,
 **Cleanup policy.** D5 is met as a 24-hour best-effort cleanup: leftovers older than 24 hours are removed by a later load or save. A leftover from a crash moments ago is kept on purpose, so it is **not** removed on the very next start. Accepting that for TC-SEC-04 is the team's decision.
 
 **Still Pending after run 4:**
-- Windows 10 and Windows 11 clean build and run (TC-PORT-01, #23): no result from a real PC yet. The record and checklist are in `docs/quality-gates.md`.
-- Manual runs of the system cases on real Windows and macOS machines.
-- Crash injection on Windows and macOS (Linux-only injector).
+- **Windows 10:** The older statement that no real-PC result was available is historical. Dinesh has since reported successful Windows 10 gameplay. See the [current Windows 10 evidence register](WINDOWS10-EVIDENCE-REGISTER.md); the report remains collaborator-reported evidence pending supporting-log review.
+- **Windows 11:** Not tested against Linux candidate `7c6733d`; Windows 11 acceptance remains Pending.
+- **Unsupported manual checks:** Manual system checks not substantiated by available evidence, and crash injection on Windows/macOS using the Linux-only injector, remain Pending. Historical CI results do not substitute for native manual acceptance.
 
 ## Run 3: the persistence fix (#48 at `31602b5` and `0d516f3`)
 
@@ -183,7 +183,7 @@ The assertions were not changed when the tags came off; only the D5 setup ages i
 
 ### Observations
 
-- **O1 (updated).** The candidate now reports corrupt boards on the Leaderboard screen ("Leaderboard unavailable: empty table shown") and in the log (`[WARN] E_LEADERBOARD_READ`). A failed save shows `E_LEADERBOARD_SAVE` on the game-over screen and logs it. The gaps are D2 and D6.
+- **O1 (updated after Run 4).** On Linux candidate `7c6733d`, corrupt boards are reported on the Leaderboard screen ("Leaderboard unavailable: empty table shown") and in the log (`[WARN] E_LEADERBOARD_READ`). A failed save shows `E_LEADERBOARD_SAVE` on the game-over screen and logs it. D2 (rejection of boards with more than 10 entries) and D6 (warning for empty or whitespace-only boards) are recorded as fixed and verified in Run 4. These results apply to the documented Linux candidate; they do not establish native Windows or macOS acceptance.
 - **O2.** STP TC-SEC-03 lists "extra fields" as malformed, but SAD 4.3.5 says "unknown keys are ignored". The corpus follows the SAD: valid files 13, 14, 22 and 25 carry unknown keys.
 - **O3 (resolved).** Run 1 had no way to crash a real save. The `LD_PRELOAD` injector now does this without any product change, but only on Linux.
 - **O4 (resolved).** Run 1 could not run the app-level steps of TC-LB-01, TC-LB-02, TC-LB-04 and TC-SEC-02. They ran on the candidate.
