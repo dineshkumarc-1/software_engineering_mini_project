@@ -12,6 +12,12 @@ On 30 October 2026, automated QA was executed against unchanged source `7c6733d9
 
 [Full owner report and sanitized evidence](OWNER-AUTOMATED-QA-7c6733d.md) records exact counts, component coverage, Tejas PR58 tooling revision, permission-environment failures and clean reruns. Null audio is not audible acceptance; Linux UI tests are not native Windows/macOS tests. No historical run/artifact has been relabeled and no final QA sign-off has been given.
 
+## Documentation reconciliation / received Windows report (not a new execution)
+
+See [Windows 10evidence register](WINDOWS10-EVIDENCE-REGISTER.md) for the received baseline 7c6733dlocalbuild20/20 CTest,33/33 Python,D6/D7reportedresults and exactEXEhash. Referenced raw logs/client-area screenshot have not all been independently reviewed here. Dinesh personally played andaccepted functionality; no per-case audio-channel values,measurements or volunteers are invented.
+
+The [44-case matrix](STP_EXECUTION_MATRIX.md) and [Test Summary Report](TEST_SUMMARY_REPORT.md) reconcile published evidence against the submittedPDF. NFR-004 means3 primary screens; TC-PWR-05 means effectreplacement; CMake'sLinux-only fault suite explains20versus21CTest entries. Historical runs below remain unchanged. PR #60audio 09bbf96is separate unmergedsource,not covered by the baselineEXE.
+
 ## 1. Test Environment
 
 ### Run A — Earlier Headless Test Run

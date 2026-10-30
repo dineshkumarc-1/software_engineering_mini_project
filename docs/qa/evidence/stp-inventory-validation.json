@@ -1,0 +1,20 @@
+{
+  "baseline_document": "Team16_SnakeXtreme_Deliverables_Part1_SRS_SAD_STP.pdf",
+  "baseline_sha256": "492b1fae00629444c8ed28f8d67c361c84b481d22c03421bd328440b4077323f",
+  "case_count": 44,
+  "unique_case_count": 44,
+  "requirement_count": 43,
+  "priority_counts": {
+    "H": 30,
+    "M": 13,
+    "L": 1
+  },
+  "scoped_status_counts": {
+    "Pending acceptance measurement": 3,
+    "Partial evidence": 16,
+    "Automated scope passed": 24,
+    "Pending human walkthrough": 1
+  },
+  "final_signoff": "Pending",
+  "not_new_test_execution": true
+}
