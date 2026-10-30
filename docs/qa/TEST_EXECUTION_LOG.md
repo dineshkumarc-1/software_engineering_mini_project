@@ -6,6 +6,12 @@
 **Tester:** Ayushi Srivastava  
 **Status:** Preliminary testing — final sign-off pending
 
+## Current-candidate owner automation (separate from historical Runs A–C)
+
+On 30 October 2026, automated QA was executed against unchanged source `7c6733d95a4fa61a3af83c413a27d1ad2f40d44b` on Amazon Linux 2023, not Windows. Fresh Release, ASan/UBSan and coverage CTest each passed 21/21; 33 Python tests and the unchanged cppcheck/layering/banned-API gates passed. All executed real-window Linux harnesses passed.
+
+[Full owner report and sanitized evidence](OWNER-AUTOMATED-QA-7c6733d.md) records exact counts, component coverage, Tejas PR58 tooling revision, permission-environment failures and clean reruns. Null audio is not audible acceptance; Linux UI tests are not native Windows/macOS tests. No historical run/artifact has been relabeled and no final QA sign-off has been given.
+
 ## 1. Test Environment
 
 ### Run A — Earlier Headless Test Run

@@ -1,0 +1,59 @@
+{
+  "C6": {
+    "covered": 209,
+    "total": 213,
+    "percent": 98.12,
+    "files": [
+      "src/engine/GameEngine.cpp",
+      "include/snakextreme/GameEngine.hpp"
+    ]
+  },
+  "C7": {
+    "covered": 205,
+    "total": 212,
+    "percent": 96.7,
+    "files": [
+      "src/modes/ModeManager.cpp",
+      "src/modes/ModeStrategy.cpp",
+      "include/snakextreme/GameMode.hpp",
+      "include/snakextreme/ModeManager.hpp",
+      "include/snakextreme/ModeStrategy.hpp",
+      "include/snakextreme/DifficultyProfile.hpp"
+    ]
+  },
+  "C8": {
+    "covered": 178,
+    "total": 183,
+    "percent": 97.27,
+    "files": [
+      "src/powerups/PowerUpManager.cpp",
+      "src/powerups/PowerUpEffects.cpp",
+      "include/snakextreme/PowerUp.hpp",
+      "include/snakextreme/PowerUpManager.hpp"
+    ]
+  },
+  "C9": {
+    "covered": 24,
+    "total": 25,
+    "percent": 96.0,
+    "files": [
+      "src/scoring/ScoreService.cpp"
+    ]
+  },
+  "C10": {
+    "covered": 36,
+    "total": 37,
+    "percent": 97.3,
+    "files": [
+      "src/validation/InputValidator.cpp"
+    ]
+  },
+  "C11": {
+    "covered": 180,
+    "total": 196,
+    "percent": 91.84,
+    "files": [
+      "src/persistence/LeaderboardRepository.cpp"
+    ]
+  }
+}

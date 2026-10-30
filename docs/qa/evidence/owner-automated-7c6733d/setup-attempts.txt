@@ -1,0 +1,218 @@
+INVALID PERMISSION ENVIRONMENT — NOT PRODUCT ACCEPTANCE
+Initial sanitizer and coverage runs inherited effective CAP_DAC_OVERRIDE despite uid 1000.
+The read-only-folder tests could write, so two suites failed: SecureFileStoreTests.cpp:558/567 and SecurityCorpusTests.cpp:813.
+A control experiment showed writes refused after dropping all process capabilities.
+No product or test assertion was changed. Full clean runs with CapEff/CapPrm/CapBnd/CapAmb zero passed 21/21 each.
+Initial desktop configure also lacked GL development headers; dependencies were restored.
+An initial manual desktop configuration omitted BUILD_SHARED_LIBS=OFF and failed at link time.
+Reconfiguration explicitly matched the app preset's static-library setting; final build passed.
+
+=== Initial sanitizer run ===
+Test project <qa-workspace>/build-sanitized
+      Start  1: app_state_flow
+ 1/21 Test  #1: app_state_flow .................................   Passed    0.09 sec
+      Start  2: score_service
+ 2/21 Test  #2: score_service ..................................   Passed    0.03 sec
+      Start  3: input_validator_tests
+ 3/21 Test  #3: input_validator_tests ..........................   Passed    0.07 sec
+      Start  4: secure_file_store_tests
+ 4/21 Test  #4: secure_file_store_tests ........................***Failed    0.63 sec
+Randomness seeded to: 67880025
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+secure_file_store_tests is a Catch2 v3.8.1 host application.
+Run with -? for options
+
+-------------------------------------------------------------------------------
+SecureFileStore failed replacement preserves the destination and cleans its
+temp files
+-------------------------------------------------------------------------------
+<qa-workspace>/candidate/tests/SecureFileStoreTests.cpp:526
+...............................................................................
+
+<qa-workspace>/candidate/tests/SecureFileStoreTests.cpp:558: FAILED:
+  CHECK_FALSE( store.writeJson(nlohmann::json{{"value", 99}}) )
+with expansion:
+  !true
+
+<qa-workspace>/candidate/tests/SecureFileStoreTests.cpp:567: FAILED:
+  CHECK( result.value == original )
+with expansion:
+  {"value":99} == {"value":42}
+
+===============================================================================
+test cases:  20 |  19 passed | 1 failed
+assertions: 387 | 385 passed | 2 failed
+
+
+      Start  5: leaderboard_repository_tests
+ 5/21 Test  #5: leaderboard_repository_tests ...................   Passed    0.50 sec
+      Start  6: leaderboard_model_tests
+ 6/21 Test  #6: leaderboard_model_tests ........................   Passed    0.09 sec
+      Start  7: security_corpus_tests
+ 7/21 Test  #7: security_corpus_tests ..........................***Failed    0.98 sec
+Randomness seeded to: 372996885
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+security_corpus_tests is a Catch2 v3.8.1 host application.
+Run with -? for options
+
+-------------------------------------------------------------------------------
+TC-SEC-04 (real refusal): a save into a read-only folder or locked file keeps
+the old board
+-------------------------------------------------------------------------------
+<qa-workspace>/candidate/tests/SecurityCorpusTests.cpp:789
+...............................................................................
+
+<qa-workspace>/candidate/tests/SecurityCorpusTests.cpp:813: FAILED:
+  REQUIRE( result.status == ScoreSubmissionStatus::Error )
+with expansion:
+  0 == 2
+
+===============================================================================
+test cases:  21 |  20 passed | 1 failed
+assertions: 731 | 730 passed | 1 failed
+
+
+      Start  8: settings_corpus_tests
+ 8/21 Test  #8: settings_corpus_tests ..........................   Passed    0.28 sec
+      Start  9: secure_write_fault_tests
+ 9/21 Test  #9: secure_write_fault_tests .......................   Passed    1.50 sec
+      Start 10: game_session
+10/21 Test #10: game_session ...................................   Passed    0.04 sec
+      Start 11: game_engine_tests
+11/21 Test #11: game_engine_tests ..............................   Passed    2.70 sec
+      Start 12: game_mode_tests
+12/21 Test #12: game_mode_tests ................................   Passed   53.86 sec
+      Start 13: powerup_tests
+13/21 Test #13: powerup_tests ..................................   Passed    4.13 sec
+      Start 14: gameplay_tests
+14/21 Test #14: gameplay_tests .................................   Passed    1.08 sec
+      Start 15: settings_tests
+15/21 Test #15: settings_tests .................................   Passed    0.17 sec
+      Start 16: audio_model_tests
+16/21 Test #16: audio_model_tests ..............................   Passed    0.13 sec
+      Start 17: performance_probe_tests
+17/21 Test #17: performance_probe_tests ........................   Passed    0.07 sec
+      Start 18: layering_core_is_sfml_free
+18/21 Test #18: layering_core_is_sfml_free .....................   Passed    0.02 sec
+      Start 19: security_banned_api_scan
+19/21 Test #19: security_banned_api_scan .......................   Passed    0.38 sec
+      Start 20: security_banned_api_scan_finds_planted_calls
+20/21 Test #20: security_banned_api_scan_finds_planted_calls ...   Passed    0.02 sec
+      Start 21: security_banned_api_scan_ignores_lookalikes
+21/21 Test #21: security_banned_api_scan_ignores_lookalikes ....   Passed    0.01 sec
+
+90% tests passed, 2 tests failed out of 21
+
+Total Test time (real) =  66.79 sec
+
+The following tests FAILED:
+	  4 - secure_file_store_tests (Failed)
+	  7 - security_corpus_tests (Failed)
+Errors while running CTest
+
+=== Initial coverage run ===
+Test project <qa-workspace>/build-coverage
+      Start  1: app_state_flow
+ 1/21 Test  #1: app_state_flow .................................   Passed    0.01 sec
+      Start  2: score_service
+ 2/21 Test  #2: score_service ..................................   Passed    0.00 sec
+      Start  3: input_validator_tests
+ 3/21 Test  #3: input_validator_tests ..........................   Passed    0.01 sec
+      Start  4: secure_file_store_tests
+ 4/21 Test  #4: secure_file_store_tests ........................***Failed    0.11 sec
+Randomness seeded to: 1552935151
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+secure_file_store_tests is a Catch2 v3.8.1 host application.
+Run with -? for options
+
+-------------------------------------------------------------------------------
+SecureFileStore failed replacement preserves the destination and cleans its
+temp files
+-------------------------------------------------------------------------------
+<qa-workspace>/candidate/tests/SecureFileStoreTests.cpp:524
+...............................................................................
+
+<qa-workspace>/candidate/tests/SecureFileStoreTests.cpp:558: FAILED:
+  CHECK_FALSE( store.writeJson(nlohmann::json{{"value", 99}}) )
+with expansion:
+  !true
+
+<qa-workspace>/candidate/tests/SecureFileStoreTests.cpp:567: FAILED:
+  CHECK( result.value == original )
+with expansion:
+  {"value":99} == {"value":42}
+
+===============================================================================
+test cases:  20 |  19 passed | 1 failed
+assertions: 387 | 385 passed | 2 failed
+
+
+      Start  5: leaderboard_repository_tests
+ 5/21 Test  #5: leaderboard_repository_tests ...................   Passed    0.05 sec
+      Start  6: leaderboard_model_tests
+ 6/21 Test  #6: leaderboard_model_tests ........................   Passed    0.01 sec
+      Start  7: security_corpus_tests
+ 7/21 Test  #7: security_corpus_tests ..........................***Failed    0.12 sec
+Randomness seeded to: 2748304054
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+security_corpus_tests is a Catch2 v3.8.1 host application.
+Run with -? for options
+
+-------------------------------------------------------------------------------
+TC-SEC-04 (real refusal): a save into a read-only folder or locked file keeps
+the old board
+-------------------------------------------------------------------------------
+<qa-workspace>/candidate/tests/SecurityCorpusTests.cpp:788
+...............................................................................
+
+<qa-workspace>/candidate/tests/SecurityCorpusTests.cpp:813: FAILED:
+  REQUIRE( result.status == ScoreSubmissionStatus::Error )
+with expansion:
+  0 == 2
+
+===============================================================================
+test cases:  21 |  20 passed | 1 failed
+assertions: 731 | 730 passed | 1 failed
+
+
+      Start  8: settings_corpus_tests
+ 8/21 Test  #8: settings_corpus_tests ..........................   Passed    0.03 sec
+      Start  9: secure_write_fault_tests
+ 9/21 Test  #9: secure_write_fault_tests .......................   Passed    0.11 sec
+      Start 10: game_session
+10/21 Test #10: game_session ...................................   Passed    0.00 sec
+      Start 11: game_engine_tests
+11/21 Test #11: game_engine_tests ..............................   Passed    0.24 sec
+      Start 12: game_mode_tests
+12/21 Test #12: game_mode_tests ................................   Passed    3.44 sec
+      Start 13: powerup_tests
+13/21 Test #13: powerup_tests ..................................   Passed    0.50 sec
+      Start 14: gameplay_tests
+14/21 Test #14: gameplay_tests .................................   Passed    0.16 sec
+      Start 15: settings_tests
+15/21 Test #15: settings_tests .................................   Passed    0.03 sec
+      Start 16: audio_model_tests
+16/21 Test #16: audio_model_tests ..............................   Passed    0.02 sec
+      Start 17: performance_probe_tests
+17/21 Test #17: performance_probe_tests ........................   Passed    0.01 sec
+      Start 18: layering_core_is_sfml_free
+18/21 Test #18: layering_core_is_sfml_free .....................   Passed    0.02 sec
+      Start 19: security_banned_api_scan
+19/21 Test #19: security_banned_api_scan .......................   Passed    0.25 sec
+      Start 20: security_banned_api_scan_finds_planted_calls
+20/21 Test #20: security_banned_api_scan_finds_planted_calls ...   Passed    0.01 sec
+      Start 21: security_banned_api_scan_ignores_lookalikes
+21/21 Test #21: security_banned_api_scan_ignores_lookalikes ....   Passed    0.01 sec
+
+90% tests passed, 2 tests failed out of 21
+
+Total Test time (real) =   5.14 sec
+
+The following tests FAILED:
+	  4 - secure_file_store_tests (Failed)
+	  7 - security_corpus_tests (Failed)
+Errors while running CTest

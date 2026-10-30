@@ -1,0 +1,26 @@
+[
+  {
+    "run": 1,
+    "requested_records": 100,
+    "accepted": 4,
+    "rejected": 96,
+    "launch_traces": 3,
+    "acceptance": "not_assessed"
+  },
+  {
+    "run": 2,
+    "requested_records": 100,
+    "accepted": 4,
+    "rejected": 96,
+    "launch_traces": 3,
+    "acceptance": "not_assessed"
+  },
+  {
+    "run": 3,
+    "requested_records": 100,
+    "accepted": 4,
+    "rejected": 96,
+    "launch_traces": 3,
+    "acceptance": "not_assessed"
+  }
+]

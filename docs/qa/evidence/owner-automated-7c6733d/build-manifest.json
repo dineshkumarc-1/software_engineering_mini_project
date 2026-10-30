@@ -1,0 +1,30 @@
+{
+  "source_commit": "7c6733d95a4fa61a3af83c413a27d1ad2f40d44b",
+  "source_tree": "e83825372214b6c11296c59d47301cf236a5f716",
+  "source_unmodified": true,
+  "enhanced_leaderboard_tool_commit": "48bec8c5da9b198984fe91f2946b2b8607c5910c",
+  "environment": "Amazon Linux 2023 x86_64, Xvfb/Mesa software graphics, OpenAL null output",
+  "compiler_release_coverage": "GCC 11.5.0",
+  "compiler_sanitizers": "Clang 15.0.7",
+  "cmake_ctest": "4.4.4",
+  "cppcheck": "2.13.0",
+  "gcovr": "8.8",
+  "test_identity": "uid 1000; all inherited/permitted/effective/bounding/ambient capabilities removed for tests",
+  "linux_executable_size": 1240040,
+  "linux_executable_sha256": "3c0d35c41d63e0596ab61980e42efc5aa31a44219f23274124403a2ff93e6666",
+  "official_windows_executable_sha256": "8442dcb9a8ea16d347af70b8e4af9b739399633f1d9e053885964a2a170b14fd",
+  "results_are_linux_only": true,
+  "tools_sha256": {
+    "tools/analyze_performance.py": "a3bc31ddfc816ce3e7859d3f2a0c06794c9fc468a4ecc614e1ee9f6f9ef92eaf",
+    "tools/collect_launch.py": "f785b7c1d8da7d7cf6cd0dd9dc60aa5879645e5a16fc7ae8401aa93d708bbef8",
+    "tools/desktop_leaderboard_smoke.py": "3a3cfb528cc31f50bc4236030a8564e1c95322324559976437ce8ef57d1cf5b7",
+    "tools/desktop_navigation_smoke.py": "c2e8d2fadacaf99efc4f33a12147ff10012446a50dc8d0125d5f42828f15a5da",
+    "tools/desktop_probe_smoke.py": "fb68573e4a0760860079a4179c3be5e970cbc58e3a51567aa72f8f6dcf2c04d7",
+    "tools/desktop_settings_smoke.py": "590deaf6b07639d4fc46cc3feccdfaec542801174234651996d62d76de58ea1a",
+    "tools/leaderboard_ui_check.py": "e987d9e7089f6e6c4ef0959d9b11998ddc5f99877f49ec21eb552904428c4fea",
+    "tools/powerup_runtime_check.py": "1a96bad70a0a8ac29f9ddc9b188b0909ad580f7d539bc2f8d743c3b115739aab",
+    "tools/prepare_acceptance.py": "a91ae17eabcbf2d6fcf0b9033118d81bba52220436ecd7b8622b111f5c455e84",
+    "tools/security_ui_smoke.py": "5f8f228609b3969efe43caa512fdd6839a60ca990544e5d80be6978027bfbd15"
+  },
+  "enhanced_leaderboard_tool_sha256": "732b499a7089bc378e1a4e75e6840498da68f94dadf2469a13d4e32d1efc8c44"
+}

@@ -1,0 +1,49 @@
+------------------------------------------------------------------------------
+                           GCC Code Coverage Report
+Directory: sprint2-owner-qa-now/candidate
+------------------------------------------------------------------------------
+File                                         Lines     Exec  Cover   Missing
+------------------------------------------------------------------------------
+include/snakextreme/AppState.hpp                 1        1   100%
+include/snakextreme/AudioModel.hpp               2        2   100%
+include/snakextreme/DifficultyProfile.hpp
+                                                11       10    90%   31
+include/snakextreme/GameEngine.hpp               5        5   100%
+include/snakextreme/GameMode.hpp                28       26    92%   43,55
+include/snakextreme/GameSession.hpp             19       19   100%
+include/snakextreme/LeaderboardModel.hpp
+                                                 5        5   100%
+include/snakextreme/LeaderboardTable.hpp
+                                                 9        9   100%
+include/snakextreme/MenuSelection.hpp           33       33   100%
+include/snakextreme/ModeManager.hpp              1        1   100%
+include/snakextreme/ModeStrategy.hpp             4        4   100%
+include/snakextreme/NameEntry.hpp               31       29    93%   44-45
+include/snakextreme/PerformanceProbe.hpp
+                                                 6        6   100%
+include/snakextreme/PowerUp.hpp                 15       14    93%   39
+include/snakextreme/PowerUpManager.hpp           2        2   100%
+include/snakextreme/Settings.hpp                 5        5   100%
+include/snakextreme/SettingsRepository.hpp
+                                                 1        1   100%
+include/snakextreme/UiHitTest.hpp               32       28    87%   30-33
+src/app/AppState.cpp                            32       31    96%   35
+src/audio/AudioModel.cpp                        26       24    92%   29,37
+src/diagnostics/PerformanceProbe.cpp            83       78    94%   12,67,89,97-98
+src/engine/GameEngine.cpp                      208      204    98%   91,93,196,198
+src/gameplay/GameplayController.cpp            143      140    97%   250-251,253
+src/modes/ModeManager.cpp                       49       47    95%   43-44
+src/modes/ModeStrategy.cpp                     119      117    98%   60,251
+src/persistence/LeaderboardModel.cpp            21       14    66%   15,19-20,25-28
+src/persistence/LeaderboardRepository.cpp
+                                               196      180    91%   33,53,103,114-116,214,226-228,329-330,338-339,345,380
+src/persistence/SecureFileStore.cpp            365      316    86%   117-120,157,180,193,223-225,287,295,304,314,327,332,366,370,373,377-378,401,406,445-446,455,530,543,559,630,635,659,665,678,680,682,685,690,725,777,828,840,854-856,871,894,929-930
+src/persistence/Settings.cpp                    60       56    93%   28-31
+src/persistence/SettingsRepository.cpp          50       49    98%   69
+src/powerups/PowerUpEffects.cpp                 60       56    93%   76,95-97
+src/powerups/PowerUpManager.cpp                106      106   100%
+src/scoring/ScoreService.cpp                    25       24    96%   18
+src/validation/InputValidator.cpp               37       36    97%   67
+------------------------------------------------------------------------------
+TOTAL                                         1790     1678    93%
+------------------------------------------------------------------------------
