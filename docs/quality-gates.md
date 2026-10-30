@@ -50,6 +50,23 @@ On 28 Oct, the open pull requests would have added these findings when merged. I
 
 No open pull request has a banned-API hit, and neither has the candidate.
 
+## Final candidate: `main` at `7c6733d` (30 Oct 2026)
+
+The candidate Dinesh pinned for final QA: `main` `7c6733d95a4fa61a3af83c413a27d1ad2f40d44b`, tree `e83825372214b6c11296c59d47301cf236a5f716`. Every gate below ran unchanged on the unmodified tree, on Ubuntu 24.04 with GCC 13.3.0, Clang 18.1.3 and cppcheck 2.13.0, tests as a normal user. Evidence: [`docs/qa/evidence/issue-18-23-final-candidate-7c6733d.txt`](qa/evidence/issue-18-23-final-candidate-7c6733d.txt).
+
+| Gate | Result |
+| --- | --- |
+| Clang ASan + UBSan, CI settings, all tests | **21/21 pass, 0 sanitizer reports** |
+| GCC Release, `-Werror`, game and all tests | **21/21 pass** |
+| cppcheck (`cmake -P cmake/RunCppcheck.cmake`) | **0 findings** |
+| Banned-API scan and its self-tests | **0 hits in 47 files**; finds 12/12 planted calls, nothing in the look-alikes |
+| Layering (TC-MNT-01) | **Pass**: 35 SFML-free files, no SFML include |
+| Relevant runtime checks (game on Xvfb) | Leaderboard 69/69 (including D7's six columns), refused save 6/6, security UI 23/23, power-ups 17/17, #53 smokes 29/23/22. Harness start-up failures and one 22/23 security-UI run are recorded in the evidence; each passed on rerun |
+| **Line coverage of C6–C11** (STP exit criterion ≥ 80 %) | **Met.** C6 GameEngine 99.0 %, C7 ModeManager 96.7 %, C8 PowerUpManager 97.3 %, C9 ScoreService 96.0 %, C10 InputValidator 97.3 %, C11 LeaderboardRepository 92.5 %; C6–C11 together 96.4 % (832 of 863 lines). GCC `--coverage`, all 21 headless suites, gcovr 8.8. Report: [`docs/qa/evidence/coverage-C6-C11-7c6733d.txt`](qa/evidence/coverage-C6-C11-7c6733d.txt). The SFML presentation code is not measured |
+| TC-PORT-01, real Windows 10 and Windows 11 | **Pending** (see below) |
+
+The earlier results below are kept as they were recorded.
+
 ## Results after integration (29 Oct 2026)
 
 Rerun on the integrated candidate **#53 at `dbf08b5`**, which contains this branch together with every other Sprint 2 branch. #52's test update (test, tool and report files only, no product code) was added on top. Ubuntu 24.04. Evidence: [docs/qa/evidence/issue-18-candidate-ctest-sanitizers.txt](qa/evidence/issue-18-candidate-ctest-sanitizers.txt) in #52.
@@ -143,7 +160,7 @@ ctest --test-dir build -C Release --output-on-failure
 .\build\Release\SnakeXtreme.exe
 ```
 
-Checklist (record each result in the table below). Build the commit Dinesh names for acceptance. Today that is the integrated candidate #53, `dbf08b5`; it will move once the persistence fixes land.
+Checklist (record each result in the table below). Build the final candidate, **`main` at `7c6733d95a4fa61a3af83c413a27d1ad2f40d44b`**: after cloning, run `git checkout 7c6733d95a4fa61a3af83c413a27d1ad2f40d44b`. CI built a Windows package from the same commit (Actions run 40994581558, `SnakeXtreme.exe` 1,902,080 bytes, SHA-256 `8442dcb9a8ea16d347af70b8e4af9b739399633f1d9e053885964a2a170b14fd`). Running that package is useful too, but TC-PORT-01 needs a clean build from source on each PC. If the candidate changes, record the new SHA and never relabel older results.
 
 1. Configure and build finish with **0 errors**.
 2. `ctest` passes **every** test.
@@ -161,12 +178,13 @@ Record for each machine:
 - **Tested SHA:** the full commit (`git rev-parse HEAD`).
 - **Build artifact:** `build\Release\SnakeXtreme.exe`, its size and its SHA-256 (`Get-FileHash .\build\Release\SnakeXtreme.exe`).
 - **OS version:** edition, version and OS build from `winver`, for example "Windows 11 Pro 23H2, build 22631.4317".
+- **Compiler and build:** Visual Studio and MSVC version (`cl` prints it), CMake version, the configure line and build type.
 - **Build and run results:** errors and warnings of the build, the CTest summary line, and steps 3–8.
 - **Evidence:** the configure, build and CTest output as text, a `winver` screenshot, and screenshots of the menu, one game and the leaderboard. Attach them to issue #23 or add them under `docs/qa/evidence/`.
 
-| Machine | Status | Tested SHA | Build artifact (size, SHA-256) | OS version (`winver`) | Build | CTest | Steps 3–8 | Evidence | Tester | Date |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| Windows 10 PC | **Pending**: no Windows 10 machine yet | – | – | – | – | – | – | – | – | – |
-| Windows 11 PC | **Pending**: no Windows 11 machine yet | – | – | – | – | – | – | – | – | – |
+| Machine | Status | Tested SHA | Build artifact (size, SHA-256) | OS version (`winver`) | Compiler / build | Build | CTest | Steps 3–8 | Evidence | Tester | Date |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| Windows 10 PC | **Pending**: no clean build and run on a real Windows 10 PC has been reported for `7c6733d` | – | – | – | – | – | – | – | – | – | – |
+| Windows 11 PC | **Pending**: no clean build and run on a real Windows 11 PC has been reported for `7c6733d` | – | – | – | – | – | – | – | – | – | – |
 
 A row stays **Pending** until someone runs the checklist on a real PC with that Windows version. The CI jobs on Windows Server (`windows-latest`, MSVC and MinGW-w64) are **not** a substitute: they prove the code compiles and the headless tests pass, not that the game runs on Windows 10 or 11. Issue #23 can be closed once both rows are filled in and pass. The Linux build is informational only.
