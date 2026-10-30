@@ -1,0 +1,154 @@
+# Issue #23 - gates rerun after PR #60 on main 3fcc586d740d2b9b461193e482d6861ca8f905e5 (tree 41b54378c177d7d1e01ff17f2bf7b22663789ec6)
+# Executed 30 Oct 2026 by B V Tejas. Ubuntu 24.04 container; GCC 13.3.0, Clang 18.1.3, CMake 3.28.3, cppcheck 2.13.0. Tests run as a normal (non-root) user.
+# Separate from the baseline 7c6733d results (issue-18-23-final-candidate-7c6733d.txt); nothing here is carried back to 7c6733d or to any Windows EXE.
+#
+# Why rerun: 3fcc586 differs from 7c6733d in product code only by src/audio/AudioModel.cpp (PR #60, Game Over alert).
+# Non-doc diff 7c6733d..3fcc586:
+#    src/audio/AudioModel.cpp      | 13 ++++++++++++-
+#    tests/AudioModelTests.cpp     | 36 ++++++++++++++++++++++++++++++++++++
+#    tests/SecurityCorpusTests.cpp |  4 ++--
+#    tools/leaderboard_ui_check.py | 25 ++++++++++++++++++++++++-
+#    4 files changed, 74 insertions(+), 4 deletions(-)
+# C6-C11 coverage was NOT rerun: no C6-C11 source file changed (GameEngine, ModeManager, PowerUpManager, ScoreService, InputValidator, LeaderboardRepository).
+# The real-game Xvfb checks and any Windows/manual/audible check were NOT run here.
+# Working tree: git status --short printed 0 lines (clean).
+
+## 1. GCC 13.3 Release, -Werror (SNAKE_WARNINGS_AS_ERRORS=ON), game + all tests, static libs
+# Build: exit 0; the only compiler warnings are 2 std::auto_ptr deprecations inside third-party SFML 2.5.1 (AudioDevice.cpp), none in project code.
+# id -un: tester (non-root)
+Test project <scratch>/f3-gcc
+      Start  1: app_state_flow
+ 1/21 Test  #1: app_state_flow .................................   Passed    0.01 sec
+      Start  2: score_service
+ 2/21 Test  #2: score_service ..................................   Passed    0.00 sec
+      Start  3: input_validator_tests
+ 3/21 Test  #3: input_validator_tests ..........................   Passed    0.00 sec
+      Start  4: secure_file_store_tests
+ 4/21 Test  #4: secure_file_store_tests ........................   Passed    0.10 sec
+      Start  5: leaderboard_repository_tests
+ 5/21 Test  #5: leaderboard_repository_tests ...................   Passed    0.08 sec
+      Start  6: leaderboard_model_tests
+ 6/21 Test  #6: leaderboard_model_tests ........................   Passed    0.01 sec
+      Start  7: security_corpus_tests
+ 7/21 Test  #7: security_corpus_tests ..........................   Passed    0.16 sec
+      Start  8: settings_corpus_tests
+ 8/21 Test  #8: settings_corpus_tests ..........................   Passed    0.02 sec
+      Start  9: secure_write_fault_tests
+ 9/21 Test  #9: secure_write_fault_tests .......................   Passed    0.13 sec
+      Start 10: game_session
+10/21 Test #10: game_session ...................................   Passed    0.00 sec
+      Start 11: game_engine_tests
+11/21 Test #11: game_engine_tests ..............................   Passed    0.03 sec
+      Start 12: game_mode_tests
+12/21 Test #12: game_mode_tests ................................   Passed    0.15 sec
+      Start 13: powerup_tests
+13/21 Test #13: powerup_tests ..................................   Passed    0.02 sec
+      Start 14: gameplay_tests
+14/21 Test #14: gameplay_tests .................................   Passed    0.02 sec
+      Start 15: settings_tests
+15/21 Test #15: settings_tests .................................   Passed    0.02 sec
+      Start 16: audio_model_tests
+16/21 Test #16: audio_model_tests ..............................   Passed    0.00 sec
+      Start 17: performance_probe_tests
+17/21 Test #17: performance_probe_tests ........................   Passed    0.00 sec
+      Start 18: layering_core_is_sfml_free
+18/21 Test #18: layering_core_is_sfml_free .....................   Passed    0.01 sec
+      Start 19: security_banned_api_scan
+19/21 Test #19: security_banned_api_scan .......................   Passed    0.17 sec
+      Start 20: security_banned_api_scan_finds_planted_calls
+20/21 Test #20: security_banned_api_scan_finds_planted_calls ...   Passed    0.01 sec
+      Start 21: security_banned_api_scan_ignores_lookalikes
+21/21 Test #21: security_banned_api_scan_ignores_lookalikes ....   Passed    0.01 sec
+
+100% tests passed, 0 tests failed out of 21
+
+Total Test time (real) =   0.96 sec
+
+## 2. Clang 18 Debug, -fsanitize=address,undefined -fno-sanitize-recover=all -fno-omit-frame-pointer, all tests
+# ASAN_OPTIONS=detect_leaks=1:abort_on_error=1:strict_string_checks=1:detect_stack_use_after_return=1:check_initialization_order=1
+# UBSAN_OPTIONS=print_stacktrace=1:halt_on_error=1
+# Headless build (SNAKE_BUILD_APP=OFF), all 21 suites; run as the same non-root user.
+      Start  1: app_state_flow
+ 1/21 Test  #1: app_state_flow .................................   Passed    0.02 sec
+      Start  2: score_service
+ 2/21 Test  #2: score_service ..................................   Passed    0.01 sec
+      Start  3: input_validator_tests
+3: All tests passed (34 assertions in 9 test cases)
+ 3/21 Test  #3: input_validator_tests ..........................   Passed    0.01 sec
+      Start  4: secure_file_store_tests
+4: All tests passed (387 assertions in 20 test cases)
+ 4/21 Test  #4: secure_file_store_tests ........................   Passed    0.21 sec
+      Start  5: leaderboard_repository_tests
+5: All tests passed (218 assertions in 16 test cases)
+ 5/21 Test  #5: leaderboard_repository_tests ...................   Passed    0.16 sec
+      Start  6: leaderboard_model_tests
+6: All tests passed (106 assertions in 5 test cases)
+ 6/21 Test  #6: leaderboard_model_tests ........................   Passed    0.03 sec
+      Start  7: security_corpus_tests
+7: All tests passed (732 assertions in 21 test cases)
+ 7/21 Test  #7: security_corpus_tests ..........................   Passed    0.36 sec
+      Start  8: settings_corpus_tests
+8: All tests passed (362 assertions in 3 test cases)
+ 8/21 Test  #8: settings_corpus_tests ..........................   Passed    0.07 sec
+      Start  9: secure_write_fault_tests
+9: All tests passed (214 assertions in 8 test cases)
+ 9/21 Test  #9: secure_write_fault_tests .......................   Passed    0.45 sec
+      Start 10: game_session
+10/21 Test #10: game_session ...................................   Passed    0.01 sec
+      Start 11: game_engine_tests
+11: All tests passed (10213 assertions in 22 test cases)
+11/21 Test #11: game_engine_tests ..............................   Passed    0.39 sec
+      Start 12: game_mode_tests
+12: All tests passed (84890 assertions in 37 test cases)
+12/21 Test #12: game_mode_tests ................................   Passed    8.15 sec
+      Start 13: powerup_tests
+13: All tests passed (22031 assertions in 41 test cases)
+13/21 Test #13: powerup_tests ..................................   Passed    0.83 sec
+      Start 14: gameplay_tests
+14: All tests passed (460 assertions in 22 test cases)
+14/21 Test #14: gameplay_tests .................................   Passed    0.31 sec
+      Start 15: settings_tests
+15: All tests passed (195 assertions in 17 test cases)
+15/21 Test #15: settings_tests .................................   Passed    0.19 sec
+      Start 16: audio_model_tests
+16: All tests passed (161 assertions in 5 test cases)
+16/21 Test #16: audio_model_tests ..............................   Passed    0.03 sec
+      Start 17: performance_probe_tests
+17: All tests passed (81 assertions in 11 test cases)
+17/21 Test #17: performance_probe_tests ........................   Passed    0.02 sec
+      Start 18: layering_core_is_sfml_free
+18/21 Test #18: layering_core_is_sfml_free .....................   Passed    0.01 sec
+      Start 19: security_banned_api_scan
+19/21 Test #19: security_banned_api_scan .......................   Passed    0.18 sec
+      Start 20: security_banned_api_scan_finds_planted_calls
+20/21 Test #20: security_banned_api_scan_finds_planted_calls ...   Passed    0.01 sec
+      Start 21: security_banned_api_scan_ignores_lookalikes
+21/21 Test #21: security_banned_api_scan_ignores_lookalikes ....   Passed    0.01 sec
+100% tests passed, 0 tests failed out of 21
+Total Test time (real) =  11.45 sec
+Per-suite Catch2 summaries:
+3: All tests passed (34 assertions in 9 test cases)
+4: All tests passed (387 assertions in 20 test cases)
+5: All tests passed (218 assertions in 16 test cases)
+6: All tests passed (106 assertions in 5 test cases)
+7: All tests passed (732 assertions in 21 test cases)
+8: All tests passed (362 assertions in 3 test cases)
+9: All tests passed (214 assertions in 8 test cases)
+11: All tests passed (10213 assertions in 22 test cases)
+12: All tests passed (84890 assertions in 37 test cases)
+13: All tests passed (22031 assertions in 41 test cases)
+14: All tests passed (460 assertions in 22 test cases)
+15: All tests passed (195 assertions in 17 test cases)
+16: All tests passed (161 assertions in 5 test cases)
+17: All tests passed (81 assertions in 11 test cases)
+Sanitizer reports in the full log (ERROR: AddressSanitizer/LeakSanitizer, runtime error:): 0
+
+## 3. cppcheck gate (cmake -P cmake/RunCppcheck.cmake, unchanged)
+-- Running Cppcheck 2.13.0
+-- cppcheck: no findings in src/, include/ and tests/
+
+## 4. Banned-API scan and layering (from the sanitizer CTest run, -V)
+18: -- Layering OK: 35 SFML-free files checked
+19: -- Banned-API scan OK: 0 hits in 47 files
+20:   12 banned API call(s) (SEC-005): commands, code loading, unbounded C
+21: -- Banned-API scan OK: 0 hits in 1 files

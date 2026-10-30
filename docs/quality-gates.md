@@ -65,6 +65,20 @@ The candidate Dinesh pinned for final QA: `main` `7c6733d95a4fa61a3af83c413a27d1
 | **Line coverage of C6–C11** (STP exit criterion ≥ 80 %) | **Met.** C6 GameEngine 99.0 %, C7 ModeManager 96.7 %, C8 PowerUpManager 97.3 %, C9 ScoreService 96.0 %, C10 InputValidator 97.3 %, C11 LeaderboardRepository 92.5 %; C6–C11 together 96.4 % (832 of 863 lines). GCC `--coverage`, all 21 headless suites, gcovr 8.8. Report: [`docs/qa/evidence/coverage-C6-C11-7c6733d.txt`](qa/evidence/coverage-C6-C11-7c6733d.txt). The SFML presentation code is not measured |
 | TC-PORT-01, real Windows 10 and Windows 11 | **Pending** (see below) |
 
+### After PR #60: `main` at `3fcc586` (30 Oct 2026, Linux)
+
+`main` `3fcc586d740d2b9b461193e482d6861ca8f905e5` (tree `41b54378c177d7d1e01ff17f2bf7b22663789ec6`) includes #60. It differs from `7c6733d` in product code only in `src/audio/AudioModel.cpp`, the Game Over alert. The gates that this change can affect were rerun unchanged on the clean tree, with the same tools and settings as above and tests as a normal user. Evidence: [`docs/qa/evidence/gates-3fcc586-after-pr60.txt`](qa/evidence/gates-3fcc586-after-pr60.txt). These results are kept **separate**: they are not results for `7c6733d`, and they say nothing about any Windows EXE.
+
+| Gate | Result on `3fcc586` |
+| --- | --- |
+| Clang ASan + UBSan + leak detection, all tests | **21/21 pass, 0 sanitizer reports**; `audio_model_tests` 161 assertions in 5 cases |
+| GCC Release, `-Werror`, game and all tests | **21/21 pass** |
+| cppcheck | **0 findings** |
+| Banned-API scan and its self-tests | **0 hits in 47 files**; finds the 12 planted calls |
+| Layering (TC-MNT-01) | **Pass**: 35 SFML-free files |
+| Line coverage of C6–C11 | **Not rerun.** No C6–C11 file changed, so the `7c6733d` result above still describes this code |
+| Real game on Xvfb, Windows, manual and listening checks | **Not run here** |
+
 The earlier results below are kept as they were recorded.
 
 ## Results after integration (29 Oct 2026)
@@ -162,6 +176,8 @@ ctest --test-dir build -C Release --output-on-failure
 
 Checklist (record each result in the table below). Build the final candidate, **`main` at `7c6733d95a4fa61a3af83c413a27d1ad2f40d44b`**: after cloning, run `git checkout 7c6733d95a4fa61a3af83c413a27d1ad2f40d44b`. CI built a Windows package from the same commit (Actions run 40994581558, `SnakeXtreme.exe` 1,902,080 bytes, SHA-256 `8442dcb9a8ea16d347af70b8e4af9b739399633f1d9e053885964a2a170b14fd`). Running that package is useful too, but TC-PORT-01 needs a clean build from source on each PC. If the candidate changes, record the new SHA and never relabel older results.
 
+**PR #60 (30 Oct 2026).** `main` is now at `3fcc586d740d2b9b461193e482d6861ca8f905e5`, which includes #60. #60 changes the Game Over sound in `src/audio/AudioModel.cpp`, so a Windows EXE built from `7c6733d` does not contain it. Build whichever SHA Dinesh pins as the final candidate: `7c6733d` for the baseline, or `3fcc586` or later if #60 is included. Record that SHA in the table. A result recorded for one SHA never counts for another.
+
 1. Configure and build finish with **0 errors**.
 2. `ctest` passes **every** test.
 3. The game window opens with the menu text visible, so the bundled font loaded.
@@ -184,7 +200,7 @@ Record for each machine:
 
 | Machine | Status | Tested SHA | Build artifact (size, SHA-256) | OS version (`winver`) | Compiler / build | Build | CTest | Steps 3–8 | Evidence | Tester | Date |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| Windows 10 PC | **Pending**: no clean build and run on a real Windows 10 PC has been reported for `7c6733d` | – | – | – | – | – | – | – | – | – | – |
-| Windows 11 PC | **Pending**: no clean build and run on a real Windows 11 PC has been reported for `7c6733d` | – | – | – | – | – | – | – | – | – | – |
+| Windows 10 PC | **Reported; independent review Pending.** The report was received; the raw logs and a client-area screenshot are not yet uploaded | `7c6733d95a4fa61a3af83c413a27d1ad2f40d44b` (reported clean tree) | 1,906,688 bytes, `FE3AA1316D634611F3D690665C5D802696BE80DA5124C34B2475D05391CEF1F3` (local build, not the CI package) | Windows 10 Pro 10.0.19045 | MSVC 19.44.35229.0 (VS 2022 Build Tools), CMake 4.4.4, Release | Reported exit 0 | Reported **20/20** (the 21st suite, `secure_write_fault_tests`, is Linux-only) | The owner reports playing and that everything works. The step-by-step record for steps 3–8 is not supplied | [Windows 10 register](qa/WINDOWS10-EVIDENCE-REGISTER.md) | Dinesh / Antigravity (reported) | 30 Oct 2026 |
+| Windows 11 PC | **Not tested.** No Windows 11 machine with a clean build has been reported. Bharath has been asked on issue #23. If no machine is available, this needs a scope-deviation decision (DV06) by Dinesh | – | – | – | – | – | – | – | – | – | – |
 
-A row stays **Pending** until someone runs the checklist on a real PC with that Windows version. The CI jobs on Windows Server (`windows-latest`, MSVC and MinGW-w64) are **not** a substitute: they prove the code compiles and the headless tests pass, not that the game runs on Windows 10 or 11. Issue #23 can be closed once both rows are filled in and pass. The Linux build is informational only.
+A row stays **Pending** or **Not tested** until someone runs the checklist on a real PC with that Windows version and the evidence is uploaded. A reported result stays *Reported* until its logs are reviewed. Nobody but the owner can accept the omission of a Windows version. The CI jobs on Windows Server (`windows-latest`, MSVC and MinGW-w64) are **not** a substitute: they prove the code compiles and the headless tests pass, not that the game runs on Windows 10 or 11. Issue #23 can be closed once both rows are filled in and pass. The Linux build is informational only.
