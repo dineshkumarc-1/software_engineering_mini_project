@@ -527,8 +527,8 @@ TEST_CASE("TC-LB-04: missing, empty and truncated files show an empty board and 
 TEST_CASE("TC-LB-04: an empty or whitespace-only board returns a warning (D6)",
           "[leaderboard][TC-LB-04][D6]") {
     // STP TC-LB-04 lists "empty" with the other corrupt fixtures: "empty
-    // leaderboard shown; warning logged". Today an empty or blank file is
-    // read as a new board, with no warning (truncated files do warn).
+    // leaderboard shown; warning logged". Before the D6 fix (#55, f898f8c)
+    // an empty or blank file was read as a new board with no warning.
     for (const char* name : {"01-empty-file.json", "02-whitespace-only.json"}) {
         CAPTURE(name);
         TempDir dir;
