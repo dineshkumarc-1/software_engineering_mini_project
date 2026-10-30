@@ -1,0 +1,452 @@
+{
+    "CapturedAt": "2026-10-29T19:19:15.0416909+05:30",
+    "ComputerName": "[REDACTED]",
+    "OperatingSystem": "Microsoft Windows 11 Home Single Language",
+    "ExecutablePath": "SnakeXtreme.exe (local filesystem path redacted)",
+    "ProcessId": 32772,
+    "CaptureStartedAt": "2026-10-29T19:17:30.3387277+05:30",
+    "DurationSecondsRequested": 60,
+    "ObservationCount": 60,
+    "ActiveStoreRuleVerifiedAtStart": true,
+    "ActiveStoreRuleVerifiedAtEnd": true,
+    "FirewallRule": {
+        "DisplayName": "SnakeXtreme-Issue24-Block-[redacted]",
+        "EnabledAtStart": 1,
+        "Direction": 2,
+        "Action": 4,
+        "Profile": "Any",
+        "Program": "SnakeXtreme.exe (local filesystem path redacted)"
+    },
+    "Observations": [
+        {
+            "Timestamp": "2026-10-29T19:17:34.0681385+05:30",
+            "ProcessId": 32772,
+            "ProcessRunning": true,
+            "TcpConnections": [],
+            "UdpEndpoints": []
+        },
+        {
+            "Timestamp": "2026-10-29T19:17:35.9389200+05:30",
+            "ProcessId": 32772,
+            "ProcessRunning": true,
+            "TcpConnections": [],
+            "UdpEndpoints": []
+        },
+        {
+            "Timestamp": "2026-10-29T19:17:37.9376103+05:30",
+            "ProcessId": 32772,
+            "ProcessRunning": true,
+            "TcpConnections": [],
+            "UdpEndpoints": []
+        },
+        {
+            "Timestamp": "2026-10-29T19:17:39.7476972+05:30",
+            "ProcessId": 32772,
+            "ProcessRunning": true,
+            "TcpConnections": [],
+            "UdpEndpoints": []
+        },
+        {
+            "Timestamp": "2026-10-29T19:17:41.4859171+05:30",
+            "ProcessId": 32772,
+            "ProcessRunning": true,
+            "TcpConnections": [],
+            "UdpEndpoints": []
+        },
+        {
+            "Timestamp": "2026-10-29T19:17:43.1968619+05:30",
+            "ProcessId": 32772,
+            "ProcessRunning": true,
+            "TcpConnections": [],
+            "UdpEndpoints": []
+        },
+        {
+            "Timestamp": "2026-10-29T19:17:45.0161773+05:30",
+            "ProcessId": 32772,
+            "ProcessRunning": true,
+            "TcpConnections": [],
+            "UdpEndpoints": []
+        },
+        {
+            "Timestamp": "2026-10-29T19:17:46.7367912+05:30",
+            "ProcessId": 32772,
+            "ProcessRunning": true,
+            "TcpConnections": [],
+            "UdpEndpoints": []
+        },
+        {
+            "Timestamp": "2026-10-29T19:17:48.3781448+05:30",
+            "ProcessId": 32772,
+            "ProcessRunning": true,
+            "TcpConnections": [],
+            "UdpEndpoints": []
+        },
+        {
+            "Timestamp": "2026-10-29T19:17:50.1279125+05:30",
+            "ProcessId": 32772,
+            "ProcessRunning": true,
+            "TcpConnections": [],
+            "UdpEndpoints": []
+        },
+        {
+            "Timestamp": "2026-10-29T19:17:51.9494176+05:30",
+            "ProcessId": 32772,
+            "ProcessRunning": true,
+            "TcpConnections": [],
+            "UdpEndpoints": []
+        },
+        {
+            "Timestamp": "2026-10-29T19:17:53.7574487+05:30",
+            "ProcessId": 32772,
+            "ProcessRunning": true,
+            "TcpConnections": [],
+            "UdpEndpoints": []
+        },
+        {
+            "Timestamp": "2026-10-29T19:17:55.6072222+05:30",
+            "ProcessId": 32772,
+            "ProcessRunning": true,
+            "TcpConnections": [],
+            "UdpEndpoints": []
+        },
+        {
+            "Timestamp": "2026-10-29T19:17:57.4055753+05:30",
+            "ProcessId": 32772,
+            "ProcessRunning": true,
+            "TcpConnections": [],
+            "UdpEndpoints": []
+        },
+        {
+            "Timestamp": "2026-10-29T19:17:59.1458620+05:30",
+            "ProcessId": 32772,
+            "ProcessRunning": true,
+            "TcpConnections": [],
+            "UdpEndpoints": []
+        },
+        {
+            "Timestamp": "2026-10-29T19:18:00.8820812+05:30",
+            "ProcessId": 32772,
+            "ProcessRunning": true,
+            "TcpConnections": [],
+            "UdpEndpoints": []
+        },
+        {
+            "Timestamp": "2026-10-29T19:18:02.5957215+05:30",
+            "ProcessId": 32772,
+            "ProcessRunning": true,
+            "TcpConnections": [],
+            "UdpEndpoints": []
+        },
+        {
+            "Timestamp": "2026-10-29T19:18:04.3428975+05:30",
+            "ProcessId": 32772,
+            "ProcessRunning": true,
+            "TcpConnections": [],
+            "UdpEndpoints": []
+        },
+        {
+            "Timestamp": "2026-10-29T19:18:06.1329283+05:30",
+            "ProcessId": 32772,
+            "ProcessRunning": true,
+            "TcpConnections": [],
+            "UdpEndpoints": []
+        },
+        {
+            "Timestamp": "2026-10-29T19:18:07.8698050+05:30",
+            "ProcessId": 32772,
+            "ProcessRunning": true,
+            "TcpConnections": [],
+            "UdpEndpoints": []
+        },
+        {
+            "Timestamp": "2026-10-29T19:18:09.5636650+05:30",
+            "ProcessId": 32772,
+            "ProcessRunning": true,
+            "TcpConnections": [],
+            "UdpEndpoints": []
+        },
+        {
+            "Timestamp": "2026-10-29T19:18:11.1877082+05:30",
+            "ProcessId": 32772,
+            "ProcessRunning": true,
+            "TcpConnections": [],
+            "UdpEndpoints": []
+        },
+        {
+            "Timestamp": "2026-10-29T19:18:12.8925789+05:30",
+            "ProcessId": 32772,
+            "ProcessRunning": true,
+            "TcpConnections": [],
+            "UdpEndpoints": []
+        },
+        {
+            "Timestamp": "2026-10-29T19:18:14.5801887+05:30",
+            "ProcessId": 32772,
+            "ProcessRunning": true,
+            "TcpConnections": [],
+            "UdpEndpoints": []
+        },
+        {
+            "Timestamp": "2026-10-29T19:18:16.2598177+05:30",
+            "ProcessId": 32772,
+            "ProcessRunning": true,
+            "TcpConnections": [],
+            "UdpEndpoints": []
+        },
+        {
+            "Timestamp": "2026-10-29T19:18:17.9453545+05:30",
+            "ProcessId": 32772,
+            "ProcessRunning": true,
+            "TcpConnections": [],
+            "UdpEndpoints": []
+        },
+        {
+            "Timestamp": "2026-10-29T19:18:19.6098174+05:30",
+            "ProcessId": 32772,
+            "ProcessRunning": true,
+            "TcpConnections": [],
+            "UdpEndpoints": []
+        },
+        {
+            "Timestamp": "2026-10-29T19:18:21.2395897+05:30",
+            "ProcessId": 32772,
+            "ProcessRunning": true,
+            "TcpConnections": [],
+            "UdpEndpoints": []
+        },
+        {
+            "Timestamp": "2026-10-29T19:18:22.8333839+05:30",
+            "ProcessId": 32772,
+            "ProcessRunning": true,
+            "TcpConnections": [],
+            "UdpEndpoints": []
+        },
+        {
+            "Timestamp": "2026-10-29T19:18:24.5050854+05:30",
+            "ProcessId": 32772,
+            "ProcessRunning": true,
+            "TcpConnections": [],
+            "UdpEndpoints": []
+        },
+        {
+            "Timestamp": "2026-10-29T19:18:26.1289860+05:30",
+            "ProcessId": 32772,
+            "ProcessRunning": true,
+            "TcpConnections": [],
+            "UdpEndpoints": []
+        },
+        {
+            "Timestamp": "2026-10-29T19:18:27.8561761+05:30",
+            "ProcessId": 32772,
+            "ProcessRunning": true,
+            "TcpConnections": [],
+            "UdpEndpoints": []
+        },
+        {
+            "Timestamp": "2026-10-29T19:18:29.5263092+05:30",
+            "ProcessId": 32772,
+            "ProcessRunning": true,
+            "TcpConnections": [],
+            "UdpEndpoints": []
+        },
+        {
+            "Timestamp": "2026-10-29T19:18:31.2379478+05:30",
+            "ProcessId": 32772,
+            "ProcessRunning": true,
+            "TcpConnections": [],
+            "UdpEndpoints": []
+        },
+        {
+            "Timestamp": "2026-10-29T19:18:32.8678753+05:30",
+            "ProcessId": 32772,
+            "ProcessRunning": true,
+            "TcpConnections": [],
+            "UdpEndpoints": []
+        },
+        {
+            "Timestamp": "2026-10-29T19:18:34.6262548+05:30",
+            "ProcessId": 32772,
+            "ProcessRunning": true,
+            "TcpConnections": [],
+            "UdpEndpoints": []
+        },
+        {
+            "Timestamp": "2026-10-29T19:18:36.2403120+05:30",
+            "ProcessId": 32772,
+            "ProcessRunning": true,
+            "TcpConnections": [],
+            "UdpEndpoints": []
+        },
+        {
+            "Timestamp": "2026-10-29T19:18:37.8388866+05:30",
+            "ProcessId": 32772,
+            "ProcessRunning": true,
+            "TcpConnections": [],
+            "UdpEndpoints": []
+        },
+        {
+            "Timestamp": "2026-10-29T19:18:39.4393033+05:30",
+            "ProcessId": 32772,
+            "ProcessRunning": true,
+            "TcpConnections": [],
+            "UdpEndpoints": []
+        },
+        {
+            "Timestamp": "2026-10-29T19:18:40.9938043+05:30",
+            "ProcessId": 32772,
+            "ProcessRunning": true,
+            "TcpConnections": [],
+            "UdpEndpoints": []
+        },
+        {
+            "Timestamp": "2026-10-29T19:18:42.6103437+05:30",
+            "ProcessId": 32772,
+            "ProcessRunning": true,
+            "TcpConnections": [],
+            "UdpEndpoints": []
+        },
+        {
+            "Timestamp": "2026-10-29T19:18:44.1773903+05:30",
+            "ProcessId": 32772,
+            "ProcessRunning": true,
+            "TcpConnections": [],
+            "UdpEndpoints": []
+        },
+        {
+            "Timestamp": "2026-10-29T19:18:45.7278024+05:30",
+            "ProcessId": 32772,
+            "ProcessRunning": true,
+            "TcpConnections": [],
+            "UdpEndpoints": []
+        },
+        {
+            "Timestamp": "2026-10-29T19:18:47.2898834+05:30",
+            "ProcessId": 32772,
+            "ProcessRunning": true,
+            "TcpConnections": [],
+            "UdpEndpoints": []
+        },
+        {
+            "Timestamp": "2026-10-29T19:18:48.9265479+05:30",
+            "ProcessId": 32772,
+            "ProcessRunning": true,
+            "TcpConnections": [],
+            "UdpEndpoints": []
+        },
+        {
+            "Timestamp": "2026-10-29T19:18:50.5148595+05:30",
+            "ProcessId": 32772,
+            "ProcessRunning": true,
+            "TcpConnections": [],
+            "UdpEndpoints": []
+        },
+        {
+            "Timestamp": "2026-10-29T19:18:52.1489671+05:30",
+            "ProcessId": 32772,
+            "ProcessRunning": true,
+            "TcpConnections": [],
+            "UdpEndpoints": []
+        },
+        {
+            "Timestamp": "2026-10-29T19:18:53.8033601+05:30",
+            "ProcessId": 32772,
+            "ProcessRunning": true,
+            "TcpConnections": [],
+            "UdpEndpoints": []
+        },
+        {
+            "Timestamp": "2026-10-29T19:18:55.3654510+05:30",
+            "ProcessId": 32772,
+            "ProcessRunning": true,
+            "TcpConnections": [],
+            "UdpEndpoints": []
+        },
+        {
+            "Timestamp": "2026-10-29T19:18:56.8988452+05:30",
+            "ProcessId": 32772,
+            "ProcessRunning": true,
+            "TcpConnections": [],
+            "UdpEndpoints": []
+        },
+        {
+            "Timestamp": "2026-10-29T19:18:58.4440483+05:30",
+            "ProcessId": 32772,
+            "ProcessRunning": true,
+            "TcpConnections": [],
+            "UdpEndpoints": []
+        },
+        {
+            "Timestamp": "2026-10-29T19:19:00.0227429+05:30",
+            "ProcessId": 32772,
+            "ProcessRunning": true,
+            "TcpConnections": [],
+            "UdpEndpoints": []
+        },
+        {
+            "Timestamp": "2026-10-29T19:19:01.5486791+05:30",
+            "ProcessId": 32772,
+            "ProcessRunning": true,
+            "TcpConnections": [],
+            "UdpEndpoints": []
+        },
+        {
+            "Timestamp": "2026-10-29T19:19:03.0695498+05:30",
+            "ProcessId": 32772,
+            "ProcessRunning": true,
+            "TcpConnections": [],
+            "UdpEndpoints": []
+        },
+        {
+            "Timestamp": "2026-10-29T19:19:04.5988255+05:30",
+            "ProcessId": 32772,
+            "ProcessRunning": true,
+            "TcpConnections": [],
+            "UdpEndpoints": []
+        },
+        {
+            "Timestamp": "2026-10-29T19:19:06.2026348+05:30",
+            "ProcessId": 32772,
+            "ProcessRunning": true,
+            "TcpConnections": [],
+            "UdpEndpoints": []
+        },
+        {
+            "Timestamp": "2026-10-29T19:19:07.7697218+05:30",
+            "ProcessId": 32772,
+            "ProcessRunning": true,
+            "TcpConnections": [],
+            "UdpEndpoints": []
+        },
+        {
+            "Timestamp": "2026-10-29T19:19:09.3562968+05:30",
+            "ProcessId": 32772,
+            "ProcessRunning": true,
+            "TcpConnections": [],
+            "UdpEndpoints": []
+        },
+        {
+            "Timestamp": "2026-10-29T19:19:10.8795789+05:30",
+            "ProcessId": 32772,
+            "ProcessRunning": true,
+            "TcpConnections": [],
+            "UdpEndpoints": []
+        },
+        {
+            "Timestamp": "2026-10-29T19:19:12.4186453+05:30",
+            "ProcessId": 32772,
+            "ProcessRunning": true,
+            "TcpConnections": [],
+            "UdpEndpoints": []
+        }
+    ],
+    "Limitations": [
+        "Interact with the game during the capture and record separately whether normal play/menu navigation remained functional.",
+        "TCP connection and UDP endpoint snapshots are process-scoped observations, not a packet capture.",
+        "A UDP endpoint does not identify every remote destination; do not describe this result as proof that no network attempt is possible."
+    ],
+    "Redactions": [
+        "ComputerName was redacted to avoid publishing the local device identifier.",
+        "ExecutablePath and FirewallRule.Program were replaced with the executable name; the local filesystem path and Windows account name are withheld.",
+        "The random suffix in FirewallRule.DisplayName was redacted."
+    ]
+}
