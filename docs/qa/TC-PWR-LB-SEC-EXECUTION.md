@@ -183,7 +183,7 @@ The assertions were not changed when the tags came off; only the D5 setup ages i
 
 ### Observations
 
-- **O1 (updated).** The candidate now reports corrupt boards on the Leaderboard screen ("Leaderboard unavailable: empty table shown") and in the log (`[WARN] E_LEADERBOARD_READ`). A failed save shows `E_LEADERBOARD_SAVE` on the game-over screen and logs it. The gaps are D2 and D6.
+- **O1 (updated after run 4).** The final candidate at `7c6733d` reports corrupt boards on the Leaderboard screen ("Leaderboard unavailable: empty table shown") and in the log (`[WARN] E_LEADERBOARD_READ`). A failed save shows `E_LEADERBOARD_SAVE` on the game-over screen and logs it. D2 (boards with more than 10 entries) and D6 (empty or whitespace-only boards without a warning) were historical defects; both are recorded as fixed and verified in run 4. These results apply to the documented Linux candidate tests and do not establish native Windows/macOS acceptance.
 - **O2.** STP TC-SEC-03 lists "extra fields" as malformed, but SAD 4.3.5 says "unknown keys are ignored". The corpus follows the SAD: valid files 13, 14, 22 and 25 carry unknown keys.
 - **O3 (resolved).** Run 1 had no way to crash a real save. The `LD_PRELOAD` injector now does this without any product change, but only on Linux.
 - **O4 (resolved).** Run 1 could not run the app-level steps of TC-LB-01, TC-LB-02, TC-LB-04 and TC-SEC-02. They ran on the candidate.

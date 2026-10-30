@@ -14,7 +14,7 @@ This checklist is a working document. Test cases must be checked against STP v1.
 
 Automated headless results and Windows manual results are recorded separately because they were obtained in different environments.
 
-The master tracker in Section 11 covers all 44 approved STP test cases. Its status values are provisional and must be reconciled with the approved test steps and available evidence.
+The approved STP v1.0 inventory contains 44 planned test cases. Reconcile each case against its actual execution result and available evidence before reporting a final execution count or pass rate. This checklist does not contain the complete 44-case master tracker. Broad QA categories and automated assertion counts are not substitutes for approved STP test cases. Windows 10 and Windows 11 acceptance requirements are documented in `docs/quality-gates.md`; both remain pending until the required real-PC evidence is recorded or an explicit scope deviation is approved.
 
 ## 2. Execution Status Definitions
 
