@@ -3,8 +3,8 @@
 ## Candidate decision
 - [x] Original implementation/evidence stack merged through PR59; baseline 7c6733d,docs/tooling main 6db9a7a.
 - [x] Owner functional Windows 10acceptance recorded; implementation issues15/16/17/19/20/21closed with scoped rationale.
-- [ ] Merge or explicitly defer PR #60danger audio. If included,pin final source SHA and build fresh Windows package; record EXE+runtime assets hashes. Do not overwrite/relabel7cQA evidence.
-- [ ] Verify final candidate's actualCI results and package contents; preserve licenses/fonts/DLLs.
+- [x] PR #60 audio enhancement is merged into main at `3fcc586` (feature commit `09bbf96`). Record owner-reported collision-audio listening and original Windows archive results with their evidence limitations. Preserve baseline `7c6733d` evidence and all historical run identities.
+- [ ] Verify the accepted final candidate's actual CI results, executable and runtime package contents; preserve licenses, fonts and DLLs. Do not treat the PR #60 merge or owner-reported ZIP results as verification of the final release artifact.
 
 ## Evidence acceptance
 - [ ] Review44-case CSV,all30 Highcases and43 requirements; distinguish scoped automated evidence from final case pass.
@@ -18,7 +18,7 @@
 - [ ] FinalTest Summary Report and deviations reviewed by QA; residual defect severities and accepted risks recorded.
 
 ## UAT/tag/freeze (#26)
-- [ ] Dinesh/QA execute end-to-end all3modes,settings,leaderboard,restart/exit on selectedfinalbuild.
+- [ ] the implementation owner/QA execute end-to-end all3modes,settings,leaderboard,restart/exit on selectedfinalbuild.
 - [ ] Required exit criteria satisfied or explicit authorized changes documented. Owner release decision recorded.
 - [ ] Tag `v1.0.0-final` on accepted commit,not an old or assumed latest SHA.
 - [ ] Publish complete identified runtime package and evidence links; verify extracted package runs.
