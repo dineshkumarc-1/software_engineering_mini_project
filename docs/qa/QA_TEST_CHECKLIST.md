@@ -95,9 +95,9 @@ See [Owner automated QA report](OWNER-AUTOMATED-QA-7c6733d.md) for exact SHA/bin
 
 Historical results below retain their original run identities and observations. Dinesh has personally reported successful Windows 10 gameplay. This is an owner-reported gameplay result, not independent confirmation that every prescribed manual observation or acceptance threshold passed.
 
-For current platform status, consult the [Windows 10 evidence register](WINDOWS10-EVIDENCE-REGISTER.md). Windows 10 remains reported evidence pending supporting-log review. Detailed independent-channel and F5 listening checks remain Pending until the corresponding observations are supplied. At SFX volume 0, F5 silence is expected. Available themes are Classic, Neon, and Retro—not Dark. The baseline Windows 10 report does not cover PR #60 audio commit `09bbf96`.
+For current platform status, consult the [Windows 10 evidence register](WINDOWS10-EVIDENCE-REGISTER.md). Windows 10 remains reported evidence pending supporting-log review. Final-candidate Windows 10 TCP/UDP and approved scoped-firewall collection remains Pending. Dinesh's reported Windows 10 build/gameplay results are separate evidence and do not satisfy this privacy collection. See [WINDOWS10-EVIDENCE-REGISTER.md](WINDOWS10-EVIDENCE-REGISTER.md) for exact-build evidence requirements and historical capture limitations. Detailed independent-channel and F5 listening checks remain Pending until the corresponding observations are supplied. At SFX volume 0, F5 silence is expected. Available themes are Classic, Neon, and Retro—not Dark. The baseline Windows 10 report does not cover PR #60 audio commit `09bbf96`.
 
-Windows 11 remains Not tested against the identified final candidate. Earlier Windows 11 privacy sampling is historical evidence and does not establish candidate `7c6733d` portability or privacy acceptance. Final-candidate firewall/offline evidence, cold-cache launch acceptance, performance/usability campaigns, unsupported manual checks, and final STP reconciliation remain Pending. **Final QA sign-off remains pending.**
+Windows 11 has not been tested against source candidate `7c6733d`. Earlier Windows 11 privacy sampling is historical evidence and does not establish candidate portability or privacy acceptance. Final-candidate firewall/offline evidence, cold-cache launch acceptance, performance/usability campaigns, unsupported manual checks, and final STP reconciliation remain Pending. **Final QA sign-off remains pending.**
 
 ## 4. Windows x64 Manual-Test Results
 
@@ -209,7 +209,7 @@ The detailed execution records are maintained in `docs/qa/TEST_EXECUTION_LOG.md`
 
 - Record or link the exact PR #50 evidence note for future reviewers.
 - Verify the collector evidence against the approved requirements and applicable STP test cases.
-- Historical action: execute and record the corresponding Windows 10 test. Dinesh has since reported a Windows 10 gameplay result; consult the [Windows 10 evidence register](WINDOWS10-EVIDENCE-REGISTER.md) for current evidence status. Supporting-log review remains pending.
+- Final-candidate Windows 10 TCP/UDP and approved scoped-firewall collection remains Pending. Dinesh's reported Windows 10 build/gameplay results are separate evidence and do not satisfy this privacy collection. See [WINDOWS10-EVIDENCE-REGISTER.md](WINDOWS10-EVIDENCE-REGISTER.md) for exact-build evidence requirements and historical capture limitations.
 - Repeat applicable checks against the identified final integrated candidate and record its exact SHA and artifact reference.
 - Complete outstanding platform, usability, performance, and regression testing.
 
