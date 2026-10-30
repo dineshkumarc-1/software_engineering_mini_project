@@ -29,9 +29,20 @@ std::vector<std::int16_t> makeMusicSamples() {
 }
 std::vector<std::int16_t> makeSoundSamples(SoundCue cue) {
     const unsigned durationMs = cue == SoundCue::GameOver ? 350 : cue == SoundCue::Food ? 140 : 100;
-    const double frequency = cue == SoundCue::GameOver ? 164.81 : cue == SoundCue::Food ? 783.99 : 523.25;
     const std::size_t count = static_cast<std::size_t>(AudioSampleRate) * durationMs / 1000;
     std::vector<std::int16_t> samples(count);
+    if (cue == SoundCue::GameOver) {
+        // A distinct descending danger alert: 150 ms high, 50 ms silence,
+        // then 150 ms low. Keep the existing bounded 350 ms, one-shot cue.
+        const std::size_t firstCount = static_cast<std::size_t>(AudioSampleRate) * 150 / 1000;
+        const std::size_t secondStart = static_cast<std::size_t>(AudioSampleRate) * 200 / 1000;
+        for (std::size_t i = 0; i < firstCount; ++i)
+            samples[i] = tone(i, firstCount, 880.0, 6000.0);
+        for (std::size_t i = secondStart; i < count; ++i)
+            samples[i] = tone(i - secondStart, count - secondStart, 440.0, 6000.0);
+        return samples;
+    }
+    const double frequency = cue == SoundCue::Food ? 783.99 : 523.25;
     for (std::size_t i = 0; i < count; ++i) samples[i] = tone(i, count, frequency, 6000.0);
     return samples;
 }

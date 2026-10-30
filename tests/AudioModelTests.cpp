@@ -48,3 +48,39 @@ TEST_CASE("SFX are bounded distinct mono PCM with silent endpoints", "[audio]") 
     }
     CHECK(makeSoundSamples(SoundCue::Food) != makeSoundSamples(SoundCue::Preview));
 }
+
+TEST_CASE("Game Over danger alert has two descending pulses separated by silence", "[audio][collision]") {
+    const auto samples = makeSoundSamples(SoundCue::GameOver);
+    const std::size_t firstCount = static_cast<std::size_t>(AudioSampleRate) * 150 / 1000;
+    const std::size_t secondStart = static_cast<std::size_t>(AudioSampleRate) * 200 / 1000;
+    REQUIRE(samples.size() == static_cast<std::size_t>(AudioSampleRate) * 350 / 1000);
+    REQUIRE(secondStart < samples.size());
+    bool firstAudible = false;
+    bool secondAudible = false;
+    bool gapSilent = true;
+    std::size_t firstCrossings = 0;
+    std::size_t secondCrossings = 0;
+    for (std::size_t i = 0; i < samples.size(); ++i) {
+        if (i < firstCount) {
+            firstAudible = firstAudible || std::abs(static_cast<int>(samples[i])) > 5000;
+            if (i > 0 && samples[i - 1] <= 0 && samples[i] > 0) ++firstCrossings;
+        } else if (i < secondStart) {
+            gapSilent = gapSilent && samples[i] == 0;
+        } else {
+            secondAudible = secondAudible || std::abs(static_cast<int>(samples[i])) > 5000;
+            if (i > secondStart && samples[i - 1] <= 0 && samples[i] > 0) ++secondCrossings;
+        }
+    }
+    CHECK(firstAudible);
+    CHECK(secondAudible);
+    CHECK(gapSilent);
+    CHECK(samples.front() == 0);
+    CHECK(samples[firstCount - 1] == 0);
+    CHECK(samples[secondStart] == 0);
+    CHECK(samples.back() == 0);
+    REQUIRE(secondCrossings > 0);
+    CHECK(firstCrossings * 10 > secondCrossings * 18);
+    CHECK(firstCrossings * 10 < secondCrossings * 22);
+    CHECK(samples != makeSoundSamples(SoundCue::Preview));
+    CHECK(samples != makeSoundSamples(SoundCue::Food));
+}
