@@ -1,0 +1,79 @@
+# Line coverage of C6-C11 on the final candidate main 7c6733d (tree e83825372214b6c11296c59d47301cf236a5f716)
+# STP exit criterion: line coverage of C6-C11 >= 80 %.
+# Method: GCC 13.3.0, Debug, CMAKE_CXX_FLAGS='--coverage -O0', SNAKE_BUILD_APP=OFF (headless; the SFML presentation code is not built),
+#   all 21 CTest suites run once as a normal user (21/21 pass), then gcovr 8.8:
+#   gcovr -r . <build>/CMakeFiles --filter src/ --filter include/   (third-party _deps excluded)
+# Component-to-file mapping from the SAD component table (C6 GameEngine, C7 ModeManager, C8 PowerUpManager, C9 ScoreService, C10 InputValidator, C11 LeaderboardRepository); header lines with executable code are counted.
+
+# Line coverage of SAD components C6-C11 (STP exit criterion: >= 80 %)
+# component | lines | executed | coverage | files
+C6 GameEngine | 207 | 205 | 99.0 % | src/engine/GameEngine.cpp, include/snakextreme/GameEngine.hpp
+C7 ModeManager (modes, difficulty) | 211 | 204 | 96.7 % | src/modes/ModeManager.cpp, src/modes/ModeStrategy.cpp, include/snakextreme/GameMode.hpp, include/snakextreme/ModeManager.hpp, include/snakextreme/ModeStrategy.hpp, include/snakextreme/DifficultyProfile.hpp
+C8 PowerUpManager | 183 | 178 | 97.3 % | src/powerups/PowerUpManager.cpp, src/powerups/PowerUpEffects.cpp, include/snakextreme/PowerUp.hpp, include/snakextreme/PowerUpManager.hpp
+C9 ScoreService | 25 | 24 | 96.0 % | src/scoring/ScoreService.cpp
+C10 InputValidator | 37 | 36 | 97.3 % | src/validation/InputValidator.cpp
+C11 LeaderboardRepository | 200 | 185 | 92.5 % | src/persistence/LeaderboardRepository.cpp
+C6-C11 combined | 863 | 832 | 96.4 % |
+
+# For information, outside C6-C11:
+src/persistence/SecureFileStore.cpp | 370 | 321 | 86.8 %
+src/persistence/LeaderboardModel.cpp | 21 | 14 | 66.7 %
+include/snakextreme/LeaderboardTable.hpp | 10 | 10 | 100.0 %
+src/persistence/SettingsRepository.cpp | 52 | 50 | 96.2 %
+src/persistence/Settings.cpp | 60 | 56 | 93.3 %
+src/gameplay/GameplayController.cpp | 142 | 139 | 97.9 %
+All src/ and include/ files measured | 1797 | 1687 | 93.9 %
+
+# Result: every component C6-C11 is above 80 % (lowest: C11 at 92.5 %). Exit criterion met for line coverage.
+# Not measured: presentation code (Renderer, AppManager, AudioService), which needs SFML and a display.
+
+## Full per-file report (gcovr --txt)
+------------------------------------------------------------------------------
+                           GCC Code Coverage Report
+Directory: .
+------------------------------------------------------------------------------
+File                                         Lines     Exec  Cover   Missing
+------------------------------------------------------------------------------
+include/snakextreme/AppState.hpp                 1        1   100%
+include/snakextreme/AudioModel.hpp               2        2   100%
+include/snakextreme/DifficultyProfile.hpp
+                                                11       10    90%   31
+include/snakextreme/GameEngine.hpp               5        5   100%
+include/snakextreme/GameMode.hpp                28       26    92%   43,55
+include/snakextreme/GameSession.hpp             19       19   100%
+include/snakextreme/LeaderboardModel.hpp
+                                                 5        5   100%
+include/snakextreme/LeaderboardTable.hpp
+                                                10       10   100%
+include/snakextreme/MenuSelection.hpp           33       33   100%
+include/snakextreme/ModeManager.hpp              1        1   100%
+include/snakextreme/ModeStrategy.hpp             4        4   100%
+include/snakextreme/NameEntry.hpp               31       29    93%   44-45
+include/snakextreme/PerformanceProbe.hpp
+                                                 6        6   100%
+include/snakextreme/PowerUp.hpp                 15       14    93%   39
+include/snakextreme/PowerUpManager.hpp           2        2   100%
+include/snakextreme/Settings.hpp                 5        5   100%
+include/snakextreme/SettingsRepository.hpp
+                                                 1        1   100%
+include/snakextreme/UiHitTest.hpp               32       28    87%   30-33
+src/app/AppState.cpp                            32       31    96%   35
+src/audio/AudioModel.cpp                        26       24    92%   29,37
+src/diagnostics/PerformanceProbe.cpp            86       81    94%   12,67,89,97-98
+src/engine/GameEngine.cpp                      202      200    99%   93,198
+src/gameplay/GameplayController.cpp            142      139    97%   250-251,253
+src/modes/ModeManager.cpp                       48       46    95%   43-44
+src/modes/ModeStrategy.cpp                     119      117    98%   60,251
+src/persistence/LeaderboardModel.cpp            21       14    66%   15,19-20,25-28
+src/persistence/LeaderboardRepository.cpp
+                                               200      185    92%   33,53,114-116,214,226-228,329-330,338-339,345,380
+src/persistence/SecureFileStore.cpp            370      321    86%   117-120,157,180,193,223-225,287,295,304,314,327,332,366,370,373,377-378,401,406,445-446,455,530,543,559,630,635,659,665,678,680,682,685,690,725,777,828,840,854-856,871,894,929-930
+src/persistence/Settings.cpp                    60       56    93%   28-31
+src/persistence/SettingsRepository.cpp          52       50    96%   62,69
+src/powerups/PowerUpEffects.cpp                 60       56    93%   76,95-97
+src/powerups/PowerUpManager.cpp                106      106   100%
+src/scoring/ScoreService.cpp                    25       24    96%   18
+src/validation/InputValidator.cpp               37       36    97%   67
+------------------------------------------------------------------------------
+TOTAL                                         1797     1687    93%
+------------------------------------------------------------------------------
