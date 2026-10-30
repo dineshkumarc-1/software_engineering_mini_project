@@ -2,15 +2,45 @@
 
 STP v1.0 test cases TC-PWR-01…05, TC-LB-01…04 and TC-SEC-01…06, plus the acceptance criteria of issue #18. Executed by B V Tejas.
 
-The cases were run three times:
+The cases were run four times. Runs 1–3 are kept as they were recorded; run 4 is the final candidate.
 
 | Run | Date | Build under test |
 | --- | --- | --- |
 | 1 | 29 Oct 2026 | All open pull requests merged locally: `main` `df9b5cc`, #49 `21168fd`, #51 `66ddaa4`, #46 `51fd38f`, #50 `07d37d2`, #52 `8d6acd2`. The leaderboard was not yet in the game. |
-| **2 (current)** | 29 Oct 2026 | **The integrated candidate #53 at `dbf08b5`** (all Sprint 2 branches, including #49, #50, #51, this pull request at `8d6acd2` and the leaderboard UI of #21), plus this pull request's test update at `12441e5`. The test update adds or changes only test, tool and report files: no product code. |
+| 2 | 29 Oct 2026 | **The integrated candidate #53 at `dbf08b5`** (all Sprint 2 branches, including #49, #50, #51, this pull request at `8d6acd2` and the leaderboard UI of #21), plus this pull request's test update at `12441e5`. The test update adds or changes only test, tool and report files: no product code. |
 | **3 (fix)** | 29 Oct 2026 | Candidate #53 `dbf08b5` with **Bharath's persistence fix, #48 at `0d516f3`** (`31602b5` plus a cppcheck fix), plus this pull request's tests: `eb91f1d`, then the promotion of the D1–D5 tests (`15892ba`). Also re-run on this pull request itself, after its base #50 took the fix (`5915e58`, base `6e28118`). See [Run 3](#run-3-the-persistence-fix-48-at-31602b5-and-0d516f3) |
 
-Unless a row says otherwise, every result below is from run 2. Run 3 re-checked what the persistence fix changes; its results are in the next section and in the Defects table.
+| **4 (final candidate)** | 30 Oct 2026 | **`main` at `7c6733d`** (tree `e838253`), the candidate Dinesh pinned for final QA after merging #53. It contains #51, #52, Bharath's persistence work up to `4793a7a` (including the D6 fix `f898f8c`) and Dinesh's six-column leaderboard (D7). Built unmodified. See [Run 4](#run-4-final-candidate-main-at-7c6733d) |
+
+Run 4 is the current status. In the sections after it, unless a row says otherwise, results are from run 2; run 3 re-checked what the persistence fix changes.
+
+## Run 4: final candidate (`main` at `7c6733d`)
+
+Executed 30 Oct 2026 on the unmodified `7c6733d` tree; Ubuntu 24.04, GCC 13.3.0, Clang 18.1.3, cppcheck 2.13.0; tests as a normal user. [Evidence](evidence/issue-18-23-final-candidate-7c6733d.txt).
+
+| Check | Result |
+| --- | --- |
+| All 21 CTest suites, GCC Release with the game | **21/21 pass.** `security_corpus_tests` 21 cases / 732 assertions, `secure_write_fault_tests` 8 / 214, `leaderboard_repository_tests` 16 / 218, `secure_file_store_tests` 20 / 387, `settings_corpus_tests` 3 / 362. No test keeps `[!shouldfail]` |
+| Sanitizer gate (Clang ASan + UBSan, CI settings) | **21/21 pass**, 0 sanitizer reports |
+| cppcheck gate (unchanged) | **0 findings** |
+| Banned-API scan and layering | **0 hits in 47 files**; self-tests pass. **Layering OK**, 35 SFML-free files |
+| **D6** ("TC-LB-04: an empty or whitespace-only board returns a warning (D6)") | **Pass, 4 of 4 assertions**: for the 0-byte and the whitespace-only file the board is empty and a warning is returned. Dinesh removed its `[!shouldfail]` in the integration (`152fa65`) without changing the assertions; this run confirms both cases genuinely pass, so the promotion stands. Real game: the empty file now shows and logs `E_LEADERBOARD_READ`, then the next score is saved |
+| Leaderboard corpus | **All 25 valid and all 25 malformed files** checked, with no exceptions (`checked == 25`) |
+| Security and fault coverage | All kept and passing: failed write/flush/rename keep the destination byte for byte; injected crashes at points (a)–(d); the next save after a crash; fresh leftovers and actively locked files are kept; symbolic links and unrelated files are never removed; 48-hour-old temporary files and orphan locks are removed |
+| **D7** (TC-LB-02, the leaderboard tool) | **Pass.** The merged tool: 66/66. With the new field checks (follow-up PR): **69/69**. All 10 rows show rank, name, score, mode, difficulty and date, in descending score order, matching the fixture; equal scores keep their stored order. The empty board shows "No scores yet". Esc and the Back button return to the main menu. After 5 real games and a restart, every row shows the game's mode, difficulty and date (`2026-10-30`). [Screenshot](evidence/screenshots/final-7c6733d-lb02-ten-entries.png) |
+| TC-LB-01 / TC-LB-04 in the real game | Pass: 5 games stored sorted with `YYYY-MM-DD` dates; every corrupt fixture (empty, truncated, wrong type, negative score, bad enum, 11 entries) shows an empty table with the warning and is replaced by the next score |
+| TC-SEC-04 app level (read-only folder, normal user) | 6/6 |
+| TC-SEC-01/02/06 real game | 23/23 on rerun. The first run was 22/23: for `España` the refused-character message was not seen for `ñ`, although the field was correct. It did not recur |
+| Power-ups in the real game (150 s) | 17/17: Speed 71.7 ms for 5.08 s then 119.9 ms; ×2 gave +20 for 13 foods, +10 otherwise; pause froze 10.0 s; Shrink −1 three times |
+| #53 desktop smoke tests | Leaderboard 29, navigation 23, Settings 22 checks pass. The leaderboard smoke failed three times at start-up with "Failed to open X11 display" before the game ran, and the Settings smoke once with a missing window; both passed on rerun. All are recorded in the evidence |
+| **C6–C11 line coverage** | **All above 80 %**: C6 99.0 %, C7 96.7 %, C8 97.3 %, C9 96.0 %, C10 97.3 %, C11 92.5 %; 96.4 % combined. [Report](evidence/coverage-C6-C11-7c6733d.txt). The SFML presentation code is not measured |
+
+**Cleanup policy.** D5 is met as a 24-hour best-effort cleanup: leftovers older than 24 hours are removed by a later load or save. A leftover from a crash moments ago is kept on purpose, so it is **not** removed on the very next start. Accepting that for TC-SEC-04 is the team's decision.
+
+**Still Pending after run 4:**
+- Windows 10 and Windows 11 clean build and run (TC-PORT-01, #23): no result from a real PC yet. The record and checklist are in `docs/quality-gates.md`.
+- Manual runs of the system cases on real Windows and macOS machines.
+- Crash injection on Windows and macOS (Linux-only injector).
 
 ## Run 3: the persistence fix (#48 at `31602b5` and `0d516f3`)
 
@@ -50,7 +80,7 @@ Verified on that exact tree, GCC and Clang ASan + UBSan as a normal user: 12/12 
 
 **Not covered here:** real Windows 10, Windows 11 and macOS machines. CI ran the unit and integration suites on Windows Server (MSVC, MinGW) and macOS runners. CI is not a manual run on those systems. See "Not executed" below.
 
-## Summary
+## Summary (run 2, before the fixes)
 
 | Status | What |
 | --- | --- |
@@ -124,7 +154,7 @@ Real refusals and safety:
 
 All D1–D5 still reproduce on candidate `dbf08b5`. D6 and D7 are new in run 2.
 
-Status after run 3: **D1–D5 are fixed in #48 (`31602b5`, `0d516f3`; `2402449` adds only a cppcheck comment) and verified** (see Run 3). D6 (#55) and D7 are open.
+Status after run 3: **D1–D5 are fixed in #48 (`31602b5`, `0d516f3`; `2402449` adds only a cppcheck comment) and verified** (see Run 3). D6 (#55) and D7 were then open. **After run 4: D6 and D7 are fixed and verified on `7c6733d`; no open defect from this report remains.**
 
 | ID | Component (owner) | Requirement | Observed (run 2, before the fix) | Expected | Reproduce |
 | --- | --- | --- | --- | --- | --- |
@@ -133,8 +163,8 @@ Status after run 3: **D1–D5 are fixed in #48 (`31602b5`, `0d516f3`; `2402449` 
 | D3 | C11 (Bharath) | TC-LB-04 step 2 | After a schema-invalid file (wrong type, negative score, bad enum), `addScore` returns `Error` ("E_LEADERBOARD_SAVE: score not saved" in the game) and keeps the bad file | The valid score is stored and the bad file replaced atomically, as already happens for malformed JSON | `malformed/14`, `15`, `18`; test "Known defect D3"; `leaderboard_ui_check.py` |
 | D4 | C11 (Bharath) | SRS Appendix B "Date (YYYY-MM-DD)", TC-LB-01 | New entries get `date_achieved` like `2026-10-29T09:09:14Z` | `2026-10-29` | Test "Known defect D4"; `leaderboard_ui_check.py` |
 | D5 | C13 secure file store (Bharath) | SAD 4.3.4 `removeStaleTemp`, TC-SEC-04 | `leaderboard.json.tmp.*` left by a crashed save stays forever | Removed on a later load or save, without touching anything else | Tests "Known defect D5 (simulated leftover)" and "Known defect D5 (injected crash)" |
-| D6 | C11, logged as #55 for triage | TC-LB-04 "warning logged" | An empty (0-byte) or whitespace-only `leaderboard.json` is read as a new board: nothing on screen and nothing in the log. Truncated or invalid files do show and log `E_LEADERBOARD_READ` | The same warning as for other corrupt files | `leaderboard_ui_check.py`, "TC-LB-04 empty"; `malformed/01`, `02`. No known-defect unit test yet: the warning API (`top10(std::string*)`) exists only in #53, not in this pull request's base |
-| D7 | Leaderboard screen, #21 (to triage) | STP TC-LB-02 | The table has Rank, Player name and Score only | Rank, name, score, mode, difficulty and date | [lb02-ten-entries.png](evidence/screenshots/lb02-ten-entries.png) |
+| D6 | C11, logged as #55 for triage | TC-LB-04 "warning logged" | An empty (0-byte) or whitespace-only `leaderboard.json` is read as a new board: nothing on screen and nothing in the log. Truncated or invalid files do show and log `E_LEADERBOARD_READ` | The same warning as for other corrupt files | `leaderboard_ui_check.py`, "TC-LB-04 empty"; `malformed/01`, `02`. Unit test: "Known defect D6: an empty or whitespace-only board shows no warning" (added in `15892ba` with `[!shouldfail]`), promoted to "TC-LB-04: an empty or whitespace-only board returns a warning (D6)" after the fix `f898f8c`. **Fixed and verified in run 4** |
+| D7 | Leaderboard screen, #21 (Dinesh) | STP TC-LB-02 | The table has Rank, Player name and Score only | Rank, name, score, mode, difficulty and date | [lb02-ten-entries.png](evidence/screenshots/lb02-ten-entries.png) (run 2). **Fixed in #53 and verified in run 4:** [final screenshot](evidence/screenshots/final-7c6733d-lb02-ten-entries.png) |
 
 ### Known-defect tests
 
@@ -185,7 +215,19 @@ python3 tools/powerup_runtime_check.py "$PWD/build-app/SnakeXtreme" out/powerups
 
 For the sanitizer configuration, use the configure line in `docs/quality-gates.md` (#51).
 
+C6–C11 line coverage (run 4):
+
+```sh
+cmake -S . -B build-cov -DSNAKE_BUILD_APP=OFF -DCMAKE_BUILD_TYPE=Debug \
+  "-DCMAKE_CXX_FLAGS=--coverage -O0" "-DCMAKE_EXE_LINKER_FLAGS=--coverage"
+cmake --build build-cov --parallel && ctest --test-dir build-cov
+gcovr -r . build-cov/CMakeFiles --filter src/ --filter include/
+```
+
 ## Evidence files
+
+- [issue-18-23-final-candidate-7c6733d.txt](evidence/issue-18-23-final-candidate-7c6733d.txt): **run 4**, the final candidate: every suite, the gates, D6, D7, the security and fault coverage, and every real-game check.
+- [coverage-C6-C11-7c6733d.txt](evidence/coverage-C6-C11-7c6733d.txt): **run 4**, line coverage per component and per file.
 
 - [issue-18-run3-fix-verification.txt](evidence/issue-18-run3-fix-verification.txt): run 3, the persistence fix, before and after, the promoted tests, cppcheck, and every real-game check on both builds.
 - [issue-18-candidate-ctest-sanitizers.txt](evidence/issue-18-candidate-ctest-sanitizers.txt): run 2, all 21 suites with GCC and with ASan + UBSan as a normal user, per-suite counts, cppcheck and the banned-API scan.
