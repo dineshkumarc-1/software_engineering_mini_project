@@ -16,6 +16,12 @@ Automated headless results and Windows manual results are recorded separately be
 
 The master tracker in Section 11 covers all 44 approved STP test cases. Its status values are provisional and must be reconciled with the approved test steps and available evidence.
 
+## Current reconciliation (supersedes stale generic Not Started/integration-blocked labels)
+
+The integrated validator,UI,persistence and Settings are present; do not interpret historical generic rows below as missing current code. Implementation issues15/16/17/19/20/21were accepted by Dinesh andclosed. Use the [44-case authoritative matrix](STP_EXECUTION_MATRIX.md),[Test Summary Report](TEST_SUMMARY_REPORT.md),[Windows evidence register](WINDOWS10-EVIDENCE-REGISTER.md) and [current deviation matrix](REQUIREMENTS_DEVIATION_MATRIX.md) for current scope/status. The submitted STP has44 cases,43 requirements and30 Highcases. Mapping is complete; finalexecution/signoff is not.
+
+Case-specific listening/visual/performance/volunteer/privacy evidence must not be invented from general owner acceptance. NewPR #60audio is unmerged product code and needs separate Windows build/listening. Historical runs below retain their actual identities and observations.
+
 ## 2. Execution Status Definitions
 
 - **Not Started:** No execution attempt has been made.
@@ -87,7 +93,7 @@ A new independent Linux-only run on 30 October 2026 passed fresh Release CTest 2
 
 See [Owner automated QA report](OWNER-AUTOMATED-QA-7c6733d.md) for exact SHA/binary/tool identities, all actual counts, original setup failures, sanitized transcripts and pending native/manual cases. Tejas PR58's enhanced leaderboard harness passed 75/75 against unchanged game source 7c6733d; these are assertions/checks, not 75 unique STP cases.
 
-Historical results below remain unchanged. Automated Linux key-remap evidence does not relabel the outstanding Windows manual checks as passed. Windows10/11 clean source-build/run, audible F5/audio, final-candidate privacy, target performance/usability and final STP reconciliation remain Pending. **Final QA sign-off remains pending.**
+Historical results below remain unchanged. Automated Linux key-remap evidence does not relabel the outstanding Windows manual checks as passed. Windows 10/11 clean source-build/run, audible F5/audio, final-candidate privacy, target performance/usability and final STP reconciliation remain Pending. **Final QA sign-off remains pending.**
 
 ## 4. Windows x64 Manual-Test Results
 
