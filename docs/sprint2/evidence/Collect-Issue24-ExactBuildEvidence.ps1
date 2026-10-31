@@ -68,6 +68,15 @@ $osVersion = $null
 $osBuild = $null
 
 try {
+    $expectedCandidateSha = "3fcc586d740d2b9b461193e482d6861ca8f905e5"
+    $expectedCandidateTree = "41b54378c177d7d1e01ff17f2bf7b22663789ec6"
+    if ($SourceCommitSha -ine $expectedCandidateSha) {
+        throw "This privacy campaign is pinned to $expectedCandidateSha; refusing source commit $SourceCommitSha."
+    }
+    if ($SourceTreeSha -ine $expectedCandidateTree) {
+        throw "This privacy campaign is pinned to tree $expectedCandidateTree; refusing source tree $SourceTreeSha."
+    }
+
     $resolvedExecutable = (Resolve-Path -LiteralPath $ExecutablePath).Path
     $executableInfo = Get-Item -LiteralPath $resolvedExecutable
     $executableHash = (Get-FileHash -LiteralPath $resolvedExecutable -Algorithm SHA256).Hash
