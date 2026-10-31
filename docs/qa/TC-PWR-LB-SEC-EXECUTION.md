@@ -239,3 +239,13 @@ gcovr -r . build-cov/CMakeFiles --filter src/ --filter include/
 - [issue-18-leaderboard-corpus.txt](evidence/issue-18-leaderboard-corpus.txt) and [issue-18-config-corpus.txt](evidence/issue-18-config-corpus.txt): every corpus file with its result and load time (run 2).
 - [issue-18-integration-ctest-sanitizers.txt](evidence/issue-18-integration-ctest-sanitizers.txt): run 1, all 19 suites under ASan + UBSan.
 - [screenshots/](evidence/screenshots/): the Leaderboard screen with 10 entries, empty, after a corrupt file and after 11 entries, plus the refused save.
+
+<!-- Evidence reconciliation: Windows performance and grid review -->
+
+### Evidence reconciliation — scope of reviewed evidence
+
+The reviewed Windows performance traces pass the unchanged analyzer's schema/timestamp checks, but do not demonstrate the required three continuous 300-second Hard/Obstacle sessions. The available continuous segments are 3, 1, and 5 seconds; the automated attempts each contain only one qualifying second. Treat the measurements as diagnostic, not as acceptance or grounds for a waiver.
+
+The 100-input trace reports 18 accepted, 82 rejected, and zero dropped inputs. Its 1–6 microsecond registration interval is internal dequeue-to-registration timing and excludes OS/SFML queue-inclusive acceptance. Launch measurements are cache-unknown/warm diagnostics, not verified cold-launch results.
+
+The reported grid timing results are not first-render passes. The reported TC-CORE-01 screenshot depicts a conversation rather than the game grid, and the referenced artifacts were not present in this checkout for independent reinspection. Preserve historical results while recording this limitation. Required performance acceptance, outstanding issue dispositions, and final QA sign-off remain pending.
