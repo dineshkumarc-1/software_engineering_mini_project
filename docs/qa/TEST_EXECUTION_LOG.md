@@ -3,7 +3,7 @@
 **Project:** SnakeXtreme  
 **Issue:** #25 — QA Sign-off, Test Summary Report & Documentation  
 **Sprint:** Sprint 2 (26–30 October 2026)  
-**Tester:** Ayushi Srivastava  
+**Documentation Maintainer:** Ayushi Srivastava
 **Status:** Preliminary testing — final sign-off pending
 
 ## Current-candidate owner automation (separate from historical Runs A–C)
@@ -287,3 +287,45 @@ The reported grid-results JSON's title-based timing pass does not prove first-gr
 A separate fresh Linux Release regression on merged revision `3fcc586` / tree `41b54378c177d7d1e01ff17f2bf7b22663789ec6` succeeded with warnings-as-errors. CTest passed 21/21, Python passed 33/33, audio reported 161 assertions across 5 cases, cppcheck 2.13.0 reported zero findings, and sequential Xvfb UI checks passed navigation (23), Settings (22), and leaderboard (29). The initial parallel run's Settings missing-window and leaderboard X11 startup failures remain in the preserved logs; unchanged sequential reruns passed, and no cause was established. Permission tests ran with effective capabilities dropped and gates unchanged. The Linux EXE SHA-256 was `4abc22684ff77b433f7a900194ff2dc6a2f8c8fa1811b00030ff831c558f8b34`.
 
 This Linux run is not a Windows-target campaign, fresh sanitizer/coverage evidence, privacy/volunteer acceptance, or release approval. The redacted 19-file evidence ZIP was supplied in the owner conversation, not committed here. Preserve earlier historical run records and reported Windows manual results with their existing build/artifact limitations. Issues #22/#25 and final QA sign-off remain pending.
+
+### Subsequent evidence reconciliation — 2026-10-31
+
+This dated entry supplements the existing historical execution records. It does not replace captures, rerun tests, or change previous run results.
+
+Two later-reviewed captures were reported separately:
+
+- Performance archive: 1,028,500 bytes, supplied identifier `5c63ca97...`.
+- Evidence batch: 1,420,509 bytes, supplied identifier `6ede6694...`; its manifest reportedly verifies 45 files.
+
+The raw captures are not present in this checkout, so their supplied identifiers and sizes have not been independently rehashed here. Preserve the original review attribution and do not infer exact build provenance beyond the supplied evidence.
+
+The batch review reported zero complete qualifying Hard/Obstacle windows across its two new probes, ten inconclusive or skipped grid observations, and no obstacle-pixel feedback from the box-loop. It therefore provides no completion evidence for the required three continuous 300-second Hard/Obstacle campaigns or complete grid-render acceptance.
+
+Functional interpretation is also limited: the nine-combination array is empty; the 16-character and invalid-character assertions ran on Mode Selection; `settings_saved=false`; and `cancel_preserved_music=false`. A no-crash result does not demonstrate successful theme loading. Valid pause/resume/restart and corrupt-board observations remain usable within their demonstrated scope. Retain the genuine six-column image with its actual provenance.
+
+These findings are not a blanket Passed result. The historical 71,558-byte archive and its 3-, 1-, and 5-second segments remain a separate historical record. No replacement capture or retrospective extension of those runs is implied.
+
+Windows 11 access has been confirmed in issue #23. This confirms reported access only; it does not establish that the current candidate has been executed or accepted on Windows 11. The earlier platform history remains unchanged.
+
+No tests were rerun for this documentation update. Issue #22 remains In Progress; issue #25 and final QA/release sign-off remain pending. No waiver or release authorization is granted.
+
+### Fresh Linux Release regression — merged revision 3fcc586
+
+A separate Linux Release regression on merged revision `3fcc586`, tree `41b54378c177d7d1e01ff17f2bf7b22663789ec6`, succeeded with warnings treated as errors.
+
+Reported results:
+- CTest: 21/21 passed.
+- Python tests: 33/33 passed.
+- Audio: 161 assertions across 5 cases.
+- cppcheck 2.13.0: zero findings.
+- Sequential Xvfb UI checks: navigation 23, Settings 22, leaderboard 29; all passed.
+- Permission tests ran with effective capabilities dropped and gates unchanged.
+- Linux executable SHA-256: `4abc22684ff77b433f7a900194ff2dc6a2f8c8fa1811b00030ff831c558f8b34`.
+
+The initial parallel run's Settings missing-window and leaderboard X11 startup failures remain part of the preserved logs. Sequential reruns passed without changes; the cause of the initial failures was not established. The successful sequential reruns do not erase or explain the initial failures.
+
+The redacted 19-file evidence ZIP was supplied in the owner conversation and is not committed in this checkout. This log records the supplied results; it does not claim independent revalidation of that ZIP or establish build attribution beyond the revision, tree, and executable hash reported above.
+
+**Scope limitation:** This Linux regression is not a Windows-target campaign, fresh sanitizer or coverage evidence, privacy or volunteer acceptance, or release approval. Preserve earlier historical run records and reported Windows manual results with their existing build and artifact limitations.
+
+Issue #22 and issue #25 remain open. Final QA/release acceptance remains Pending. This regression entry does not grant a waiver or authorize release.
