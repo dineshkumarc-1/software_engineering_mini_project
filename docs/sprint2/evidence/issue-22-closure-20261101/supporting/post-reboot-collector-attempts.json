@@ -1,0 +1,15 @@
+{
+  "first_post_reboot_collector": {
+    "result": "failed_before_application_launch",
+    "reason": "Scheduled Windows PowerShell host did not resolve Get-FileHash; the collector aborted before starting the candidate.",
+    "evidence": "The original failed attempt is retained in the local QA evidence directory; no gameplay or launch measurement was collected from it.",
+    "recovery": "Collector hashing was changed to .NET SHA256 and the subsequent six-launch capture completed with exit code 0.",
+    "failed_attempt_counts_as_launch": false
+  },
+  "successful_retry": {
+    "evidence_directory": "pr69-post-reboot/",
+    "first_candidate_launch_external_ms": 1419.062,
+    "source_commit": "841ee1dccac37236a4bdcf92ec3dbf17e7a18c80",
+    "executable_sha256": "341bd6394a93741137866c88d95c3b00ae9ccb6d160e19d9044a0fddde68b57b"
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "measurement_source": "run-issue22-perf-20261030/input-latency/",
+  "n_inputs": 100,
+  "accepted": 18,
+  "rejected": 82,
+  "dropped": 0,
+  "internal_registration_us": {
+    "min": 1,
+    "median": 2.0,
+    "mean": 2.83,
+    "max": 6,
+    "endpoint_A": "SFML event dequeue timestamp (probe-recorded)",
+    "endpoint_B": "gameplay engine direction-registered timestamp (probe-recorded)"
+  },
+  "explicit_limitation": "This interval (A\u2192B) measures ONLY the internal processing latency from SFML event dequeue to gameplay engine direction registration. It EXCLUDES: OS keyboard driver buffering, SFML event queue waiting (time from key press to dequeue). Classification: INTERNAL LOWER BOUND. Not an end-to-end TC-PERF-02 pass.",
+  "display_latency_us": {
+    "min": 151800,
+    "median": 344300,
+    "mean": 339800,
+    "max": 401800,
+    "note": "displayed_us - dequeued_us; includes render frame + V-Sync wait"
+  },
+  "acceptance_status": "PENDING",
+  "acceptance_gap": "TC-PERF-02 specifies end-to-end input acknowledgement <100ms including OS queue. Internal lower bound (1-6\u00b5s) far exceeds acceptance, but full end-to-end including OS/SFML waiting was not measured. 100% of inputs recorded in order, 0 dropped. The internal measurement is valid diagnostic data, not a full acceptance pass."
+}

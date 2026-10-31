@@ -22,7 +22,7 @@ Evidence anchors: [owner Linux report](OWNER-AUTOMATED-QA-7c6733d.md), [Tejas ca
 
 | Case | Priority | Requirement(s) | Title | Scoped execution status | Remaining action |
 |---|---|---|---|---|---|
-| TC-CORE-01 | H | FR-001 | Grid and snake render on new game | Pending acceptance measurement | Record approved 10 new-game first-grid measurements <=2000ms; do not substitute 3 warm process launches. |
+| TC-CORE-01 | H | FR-001 | Grid and snake render on new game | Pending acceptance measurement | Record 10 new-game confirmation-to-visible-grid measurements <=2000ms; do not substitute title updates, locked-desktop timeouts, or startup first-frame markers. The PR #69 launch series is startup evidence only and contains no grid observation. |
 | TC-CORE-02 | H | FR-002 | Tick interval per difficulty | Partial evidence | Attach 50 consecutive system tick timestamps per difficulty and +/-10% calculation. |
 | TC-CORE-03 | H | FR-003 | Direction via arrows and WASD | Partial evidence | Reconcile all eight physical key/direction combinations at system level. |
 | TC-CORE-04 | H | FR-003 | 180-degree reversal and queued turns | Automated scope passed | None for defined automated scope; preserve candidate identity. |
@@ -53,10 +53,10 @@ Evidence anchors: [owner Linux report](OWNER-AUTOMATED-QA-7c6733d.md), [Tejas ca
 | TC-SET-02 | M | FR-027 | Independent music and SFX volume | Partial evidence | Human listening for both channel combinations and range behavior; earlier only background sound was explicitly reported. F5 preview at SFX0 must be silent. |
 | TC-SET-03 | L | FR-028 | Classic Neon Retro visual themes | Partial evidence | Record snake/grid appearance in gameplay for all three themes; no Dark theme. |
 | TC-SET-04 | H | FR-029 | Settings persist across restart | Automated scope passed | None for defined automated scope; native report can add independent results. |
-| TC-PERF-01 | H | NFR-001 | Sustained minimum30FPS | Pending acceptance measurement | Three continuous300sHard/Obstacle sessions with power-ups on reference hardware; no one-second window below30FPS, report min/avg/median. |
-| TC-PERF-02 | H | NFR-002 | Input acknowledgement within100ms | Pending acceptance measurement | Approved100 random-time keypress campaign with full requested/accepted/rejected/registered accounting; verify timestamp origin and queue-delay scope. Visible turn is informational, not acknowledgement threshold. |
-| TC-REL-01 | H | NFR-003;SEC-003 | Missing/corrupt config fallback | Automated scope passed | None for defined automated scope. |
-| TC-USE-01 | M | NFR-004 | First game within three screens | Pending human walkthrough | Three outside-team first-time volunteers without help, count primary screens. Not three total clicks/keystrokes and not an AI usability result. |
+| TC-PERF-01 | H | NFR-001 | Sustained minimum30FPS | Pending acceptance measurement | Three separate, uninterrupted 300s Hard/Obstacle sessions with active power-ups on reference hardware; preserve each complete one-second FPS window, including stalls; no window below30FPS; report min/avg/median. Existing short attempts remain separate and do not qualify. |
+| TC-PERF-02 | H | NFR-002 | Input acknowledgement within100ms | Pending acceptance measurement | Approved100 random-time keypress campaign with full requested/accepted/rejected/registered accounting; verify timestamp origin and queue-delay scope. Historical Windows 100-record probe (18 accepted/82 rejected) measured only SFML dequeue-to-registration, so does not meet this endpoint. Visible turn is informational, not acknowledgement threshold. |
+| TC-REL-01 | H | NFR-003;SEC-003 | Missing/corrupt config fallback | Automated scope passed | None for the defined automated scope. Additional owner-reported Windows manual recovery records E_PARSE defaults, usable gameplay and later save; exit code and initially displayed defaults are unrecorded, and the manual executable identity is unknown. Preserve as supplemental evidence, not a new candidate-specific result. |
+| TC-USE-01 | M | NFR-004 | First game within three screens | Partial evidence | Dinesh's owner report says at least three outside-team first-time friends built from GitHub and reached gameplay without help via Main Menu -> Name Entry -> Mode/Difficulty -> Gameplay, matching the prescribed three primary screens. Exact build/date are not recorded; retain attribution and do not invent participant records. |
 | TC-MNT-01 | M | NFR-005 | Module separation | Automated scope passed | None for defined automated scope; specific SAD interface differences remain documented separately. |
 | TC-PORT-01 | M | NFR-006 | Windows 10 and11 clean build/run | Partial evidence | Windows 11 Not tested; proposed omission awaiting explicit disposition. Preserve Windows 10 report and supporting raw logs; no duplicated teammate campaign needed. |
 | TC-TEST-01 | M | NFR-007 | Headless testability | Automated scope passed | None for defined automated scope. |
@@ -70,8 +70,8 @@ Evidence anchors: [owner Linux report](OWNER-AUTOMATED-QA-7c6733d.md), [Tejas ca
 ## Reconciliation totals
 
 - Automated scope passed: **24**.
-- Partial evidence: **16**.
+- Partial evidence: **17**.
 - Pending acceptance measurement: **3**.
-- Pending human walkthrough: **1**.
+- Pending human walkthrough: **0**. TC-USE-01 has owner-reported completion evidence and is now Partial pending build/date provenance; it is not marked Passed.
 
 Inventory completeness:44/44 unique cases,43/43 unique requirement references,30 High,13 Medium,1 Low. **Final STP pass count and requirement pass percentage are NOT certified**: some cases are partial/pending and evidence/deviations need acceptance.

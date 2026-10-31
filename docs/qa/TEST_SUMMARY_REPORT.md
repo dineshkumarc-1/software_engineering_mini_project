@@ -33,11 +33,11 @@ Source: submitted Part1PDF,STP§13/AppendixA. **44 unique cases,43 unique requir
 | Scoped status | Count |
 |---|---|
 | Automated scope passed |24 |
-| Partial evidence |16 |
+| Partial evidence |17 |
 | Pending acceptance measurement |3 |
-| Pending human walkthrough |1 |
+| Pending human walkthrough |0 |
 
-These are evidence-reconciliation statuses,not a final approved44-case execution result. **Do not claim100% execution,100% Highpass or100% requirement-pass coverage.** [Per-case matrix](STP_EXECUTION_MATRIX.md) and [CSV](STP_EXECUTION_MATRIX.csv) identify exact remaining steps. Mapping completeness100% does not mean execution completeness100%.
+These are evidence-reconciliation statuses,not a final approved44-case execution result. TC-USE-01 moved from Pending human walkthrough to Partial evidence based on Dinesh's saved owner report; exact build/date are absent and no Passed status is assigned. **Do not claim100% execution,100% Highpass or100% requirement-pass coverage.** [Per-case matrix](STP_EXECUTION_MATRIX.md) and [CSV](STP_EXECUTION_MATRIX.csv) identify exact remaining steps. Mapping completeness100% does not mean execution completeness100%.
 
 ## Defects and deviations
 
@@ -47,7 +47,7 @@ D1=date validation,D2=>10-entry rejection,D3=schema-corrupt recovery,D4date-only
 
 ## Team close-out and release gates
 
-Implementation issues 14–21 are Done following their recorded implementation, tests, and owner-acceptance evidence. Issue #22 has owner-reported usability evidence: at least three outside-team first-time users reportedly started a game without instructions or help and successfully completed gameplay. Exact build/EXE, OS, execution date, screen route, and individual feedback are not recorded, so full TC-USE-01 acceptance is not asserted. Issue #22 performance and remaining acceptance, #23 portability disposition, #24 exact-build privacy, #25 final report/STP acceptance, #26 UAT/tag/freeze, and #28 complete-product video remain open. PR #60 is merged; this does not grant final QA sign-off.
+Implementation issues 14–21 are Done following their recorded implementation, tests, and owner-acceptance evidence. Dinesh's saved Issue #22 report records at least three outside-team first-time friends, built from GitHub, reaching gameplay without help through Main Menu → Name Entry → Mode/Difficulty → Gameplay, matching the STP's three primary screens. Exact source/EXE and date, plus participant-level observations, are absent; TC-USE-01 is Partial evidence, not Passed or candidate-specific. Issue #22 performance and remaining acceptance, #23 portability disposition, #24 exact-build privacy, #25 final report/STP acceptance, #26 UAT/tag/freeze, and #28 complete-product video remain open. PR #60 is merged; this does not grant final QA sign-off.
 
 Final-signoff decision must check the approved exit criteria:100% planned execution,100% Highpass,0 open Critical/High,agreedMediumplans,43/43 requirements withpassing evidence,C6-C11>=80%,nosanitizer/cppcheck findings. Current evidence does not yet establish all criteria. No release authorization/signature is asserted.
 
@@ -68,3 +68,11 @@ Final-signoff decision must check the approved exit criteria:100% planned execut
 The separate Linux Release regression is additional evidence for the merged code, not a substitute for Windows-target acceptance. The fresh warnings-as-errors Release build succeeded; CTest passed 21/21, Python tests passed 33/33, audio tests reported 161 assertions across 5 cases, cppcheck 2.13.0 reported zero findings, and Xvfb UI reruns passed navigation (23 checks), Settings (22), and leaderboard (29). An initial parallel UI run had a missing Settings app window and a leaderboard X11 display-startup failure; original logs were preserved and unchanged sequential reruns passed, with no causal diagnosis established. Permission checks ran with effective capabilities dropped and gates unchanged.
 
 The Linux run does not establish Windows performance/privacy/volunteer acceptance, fresh sanitizer or coverage results, or final release approval. Its redacted 19-file evidence ZIP was supplied in the owner conversation and is not committed repository evidence. Issues #22 and #25 and final QA sign-off remain pending. PR #60's merge does not authorize a release tag or final QA sign-off.
+
+## Issue #22 owner closure reconciliation — 2026-11-01
+
+The local Windows Release candidate built from PR #69 head `841ee1dccac37236a4bdcf92ec3dbf17e7a18c80` has executable SHA-256 `341bd6394a93741137866c88d95c3b00ae9ccb6d160e19d9044a0fddde68b57b` (1,911,808 bytes). It is a local build, not a CI artifact. The first post-reboot normal-audio launch produced a 1,419.062 ms external process-create-to-first-frame-marker upper bound and a 1,049.583 ms internal `main`-to-first-display phase. Audio began 1,876.168 ms after first display. Six process reports validated and exited 0. The laptop was on battery/offline, other applications were restored after login, and OS cache state is unknown; this does not meet the documented plugged-in/other-apps-closed protocol, and no deviation is approved. Five pre-reboot diagnostics were 1,027.585, 621.219, 579.294, 612.492 and 590.747 ms with unverified cache condition. These results are recorded as limited evidence, not cold-launch acceptance. Full metadata and raw reports are in the [closure package](../sprint2/evidence/issue-22-closure-20261101/closure-report.md).
+
+TC-CORE-01 remains Pending: no valid ten-run confirmation-to-visible-grid set exists; the locked-desktop poll timed out without pixels. TC-PERF-01 remains Pending at 0/3 qualifying continuous 300-second Hard/Obstacle runs with power-ups. TC-PERF-02 remains Pending: the historical 100-record Windows probe reports 18 accepted and 82 rejected, but timestamps begin at SFML dequeue and omit OS/SFML queue wait. TC-REL-01's automated scope remains passed; the supplemental owner manual record supports `E_PARSE: defaults loaded`, usable play and subsequent save, with exit code and initial defaults unrecorded. TC-USE-01 is Partial as above. PR #69 remains Draft; its Windows-audio regression checks have not been recorded. No waiver or final sign-off is approved.
+
+See the [Issue #22 closure report and criterion table](../sprint2/evidence/issue-22-closure-20261101/closure-report.md) and its [supporting evidence](../sprint2/evidence/issue-22-closure-20261101/supporting/).

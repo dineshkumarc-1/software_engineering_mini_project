@@ -1,0 +1,149 @@
+{
+  "acceptance": "not_assessed",
+  "source_snapshot_operator_supplied": "841ee1dccac37236a4bdcf92ec3dbf17e7a18c80",
+  "platform": "Windows",
+  "audio_null_output": false,
+  "cache_condition": "unverified; no OS cache was cleared",
+  "target_hardware_verified": false,
+  "measurement_scope": "process creation request to observed stdout marker after first display; IPC/scheduling adds delay",
+  "warnings": [
+    "Not proof of cold-cache launch or the specified Windows hardware.",
+    "Use the full executable/DLL/assets package. First-run config regeneration is included.",
+    "No personal player input is recorded; inspect local stderr logs before sharing."
+  ],
+  "runs": [
+    {
+      "report_valid": true,
+      "report_error": null,
+      "collection_ok": true,
+      "run": 1,
+      "process_exit": 0,
+      "timed_out": false,
+      "launch_to_observed_first_frame_marker_us": 1027585.0,
+      "startup_phases_us": {
+        "audio_objects_constructed": 568,
+        "window_created": 638508,
+        "renderer_ready": 656190,
+        "settings_ready": 668206,
+        "audio_started": 2713764
+      },
+      "startup_step_us": {
+        "audio_objects_constructed": 568,
+        "window_created": 637940,
+        "renderer_ready": 17682,
+        "settings_ready": 12016,
+        "first_frame": 216301,
+        "audio_started": 1829257
+      },
+      "report": "launch-1.json",
+      "config_fixture": "missing_temporary_config"
+    },
+    {
+      "report_valid": true,
+      "report_error": null,
+      "collection_ok": true,
+      "run": 2,
+      "process_exit": 0,
+      "timed_out": false,
+      "launch_to_observed_first_frame_marker_us": 621219.3,
+      "startup_phases_us": {
+        "audio_objects_constructed": 861,
+        "window_created": 405568,
+        "renderer_ready": 406603,
+        "settings_ready": 416245,
+        "audio_started": 1138174
+      },
+      "startup_step_us": {
+        "audio_objects_constructed": 861,
+        "window_created": 404707,
+        "renderer_ready": 1035,
+        "settings_ready": 9642,
+        "first_frame": 155382,
+        "audio_started": 566547
+      },
+      "report": "launch-2.json",
+      "config_fixture": "missing_temporary_config"
+    },
+    {
+      "report_valid": true,
+      "report_error": null,
+      "collection_ok": true,
+      "run": 3,
+      "process_exit": 0,
+      "timed_out": false,
+      "launch_to_observed_first_frame_marker_us": 579293.8,
+      "startup_phases_us": {
+        "audio_objects_constructed": 225,
+        "window_created": 386137,
+        "renderer_ready": 387950,
+        "settings_ready": 404155,
+        "audio_started": 1016787
+      },
+      "startup_step_us": {
+        "audio_objects_constructed": 225,
+        "window_created": 385912,
+        "renderer_ready": 1813,
+        "settings_ready": 16205,
+        "first_frame": 129733,
+        "audio_started": 482899
+      },
+      "report": "launch-3.json",
+      "config_fixture": "missing_temporary_config"
+    },
+    {
+      "report_valid": true,
+      "report_error": null,
+      "collection_ok": true,
+      "run": 4,
+      "process_exit": 0,
+      "timed_out": false,
+      "launch_to_observed_first_frame_marker_us": 612492.0,
+      "startup_phases_us": {
+        "audio_objects_constructed": 689,
+        "window_created": 407506,
+        "renderer_ready": 408620,
+        "settings_ready": 423974,
+        "audio_started": 1044642
+      },
+      "startup_step_us": {
+        "audio_objects_constructed": 689,
+        "window_created": 406817,
+        "renderer_ready": 1114,
+        "settings_ready": 15354,
+        "first_frame": 144522,
+        "audio_started": 476146
+      },
+      "report": "launch-4.json",
+      "config_fixture": "missing_temporary_config"
+    },
+    {
+      "report_valid": true,
+      "report_error": null,
+      "collection_ok": true,
+      "run": 5,
+      "process_exit": 0,
+      "timed_out": false,
+      "launch_to_observed_first_frame_marker_us": 590746.6,
+      "startup_phases_us": {
+        "audio_objects_constructed": 306,
+        "window_created": 383899,
+        "renderer_ready": 385131,
+        "settings_ready": 400626,
+        "audio_started": 1090570
+      },
+      "startup_step_us": {
+        "audio_objects_constructed": 306,
+        "window_created": 383593,
+        "renderer_ready": 1232,
+        "settings_ready": 15495,
+        "first_frame": 148893,
+        "audio_started": 541051
+      },
+      "report": "launch-5.json",
+      "config_fixture": "missing_temporary_config"
+    }
+  ],
+  "executable_sha256": "341bd6394a93741137866c88d95c3b00ae9ccb6d160e19d9044a0fddde68b57b",
+  "executable_size_bytes": 1911808,
+  "source_commit_built": "841ee1dccac37236a4bdcf92ec3dbf17e7a18c80"
+}\n

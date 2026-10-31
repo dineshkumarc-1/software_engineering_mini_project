@@ -1,0 +1,10 @@
+﻿{
+    "test":  "Corrupt config fallback",
+    "malformed_config_detected":  true,
+    "startup_warning":  "[WARN] SettingsRepository: E_PARSE: defaults loaded",
+    "game_remained_usable":  true,
+    "user_changed_volumes_and_saved":  true,
+    "process_exited":  true,
+    "exit_code":  null,
+    "initial_displayed_default_values":  "Not recorded"
+}

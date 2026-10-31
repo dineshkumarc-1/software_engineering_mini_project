@@ -1,0 +1,44 @@
+﻿{
+    "protocol":  "Reboot; sign in; settle for 120 seconds; normal audio; first launch followed by five warm launches.",
+    "antivirus_disabled":  false,
+    "audio_null_output":  false,
+    "boot_time_local":  "2026-11-01T04:59:33.5000000+05:30",
+    "collector_start_local":  "2026-11-01T05:14:21.2672818+05:30",
+    "wait_after_task_start_seconds":  120,
+    "collection_start_local":  "2026-11-01T05:16:23.7409045+05:30",
+    "os":  "Microsoft Windows 10 Pro, build 19045",
+    "model":  "Inspiron 15-3567",
+    "cpu":  "Intel(R) Core(TM) i3-6006U CPU @ 2.00GHz",
+    "gpus":  [
+                 {
+                     "Name":  "Intel(R) HD Graphics 520",
+                     "DriverVersion":  "31.0.101.2111"
+                 },
+                 {
+                     "Name":  "AMD Radeon (TM) R5 M330",
+                     "DriverVersion":  "27.20.1034.6"
+                 }
+             ],
+    "power_line_status":  "Offline",
+    "battery":  [
+                    {
+                        "BatteryStatus":  1,
+                        "EstimatedChargeRemaining":  73
+                    }
+                ],
+    "audio_devices":  [
+                          {
+                              "Name":  "Intel(R) Display Audio",
+                              "Status":  "OK"
+                          },
+                          {
+                              "Name":  "Realtek Audio",
+                              "Status":  "OK"
+                          }
+                      ],
+    "source_commit":  "841ee1dccac37236a4bdcf92ec3dbf17e7a18c80",
+    "executable_size_bytes":  1911808,
+    "executable_sha256":  "341bd6394a93741137866c88d95c3b00ae9ccb6d160e19d9044a0fddde68b57b",
+    "method":  "collect_launch.py external process creation request to stdout marker after first display; raw phase report also retained",
+    "acceptance":  "not_assessed_pending_review"
+}

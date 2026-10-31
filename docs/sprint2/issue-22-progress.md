@@ -1,5 +1,29 @@
 # Current owner follow-up — #22 remains In Progress
 
+## 2026-11-01 candidate and acceptance reconciliation
+
+PR #69 remains Draft and was not merged. Its head is
+`841ee1dccac37236a4bdcf92ec3dbf17e7a18c80` (startup source change
+`8411808f2682403cbdcd5f43d0fe742b56edd9da`). A local Windows Release build is
+1,911,808 bytes, SHA-256
+`341bd6394a93741137866c88d95c3b00ae9ccb6d160e19d9044a0fddde68b57b`.
+Five pre-reboot normal-audio diagnostics were collected; they are not a cold
+acceptance result. The closure report preserves the first post-reboot attempt,
+environment, and any execution limitation.
+
+TC-CORE-01 is Pending: the old title proxy is invalid and the DWM polling run
+timed out on a locked desktop. TC-PERF-02 is Pending because the existing input
+probe excludes OS/SFML queue wait. TC-PERF-01 remains Pending with 0/3
+qualifying 300-second Hard/Obstacle runs. The corrupt-config manual report is
+partial supplemental evidence; Dinesh's owner usability report matches the
+three-screen/no-help steps but lacks exact build/date, so TC-USE-01 is Partial,
+not Passed. PR #69 affected audio regression checks remain pending.
+
+See [the closure report](evidence/issue-22-closure-20261101/closure-report.md)
+and [the authoritative STP execution matrix](../qa/STP_EXECUTION_MATRIX.md).
+Keep #22 Open/In Progress until all required rows pass or an authorized
+disposition is recorded. Do not change #26 or #28.
+
 ## Subsequent owner hardening — still In Progress
 
 `tools/prepare_acceptance.py` creates exact-file hashes plus an entirely Pending
