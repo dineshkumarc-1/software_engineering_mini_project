@@ -82,9 +82,9 @@ Interpretation limit: process-owned TCP/UDP endpoint snapshots are point-in-time
 ## Persistence/security handoff — existing evidence, not duplicated
 
 Use the already-published regression evidence:
-- [Run 3 persistence-fix verification](../qa/evidence/issue-18-run3-fix-verification.txt)
-- [Run 4 final-candidate regression evidence](../qa/evidence/issue-18-23-final-candidate-7c6733d.txt)
-- [Full TC-PWR-LB-SEC execution record](../qa/TC-PWR-LB-SEC-EXECUTION.md)
+- [Run 3 persistence-fix verification](../../qa/evidence/issue-18-run3-fix-verification.txt)
+- [Run 4 final-candidate regression evidence](../../qa/evidence/issue-18-23-final-candidate-7c6733d.txt)
+- [Full TC-PWR-LB-SEC execution record](../../qa/TC-PWR-LB-SEC-EXECUTION.md)
 - [24-hour cleanup policy](./issue-15-17-temp-cleanup-policy.md)
 
 The historical Run 4 reports D6 at 4/4 assertions and the Linux fault-injection suite at 214 assertions / 8 cases on candidate `7c6733d`. Keep that scoped to its recorded candidate/platform; do not relabel it as a new Windows 11 run.
