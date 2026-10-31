@@ -43,8 +43,11 @@ AppManager::AppManager(PerformanceProbe* probe, std::chrono::steady_clock::time_
         }
     }
     settingsEditor_.open(settings_);
-    if (!audio_.start(settings_.musicVolume, settings_.sfxVolume))
+    markPhase("settings_ready");
+    const bool audioReady = audio_.start(settings_.musicVolume, settings_.sfxVolume);
+    if (!audioReady)
         std::cerr << "[WARN] AudioService: playback unavailable; silent fallback\n";
+    markPhase(audioReady ? "audio_started" : "audio_unavailable");
     refreshTitle();
 }
 
@@ -89,6 +92,10 @@ int AppManager::run() {
     }
 
     return 0;
+}
+
+void AppManager::markPhase(const char* name) const {
+    if (probe_ != nullptr) probe_->phase(name, probeNow());
 }
 
 std::int64_t AppManager::probeNow() const {
