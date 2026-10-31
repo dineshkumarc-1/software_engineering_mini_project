@@ -30,15 +30,27 @@ function Add-CollectionError {
         [System.Collections.Generic.List[object]]$Target,
         [string]$Stage,
         [string]$Message,
-        [string]$ErrorType
+        [string]$ErrorType,
+        [string]$ErrorId = $null,
+        [string]$Category = $null
     )
 
     $Target.Add([pscustomobject]@{
         TimestampUtc = [DateTimeOffset]::UtcNow.ToString("o")
         Stage = $Stage
         ErrorType = $ErrorType
+        ErrorId = $ErrorId
+        Category = $Category
         Message = $Message
     })
+}
+
+# Filtered NetTCPIP/NetSecurity queries can return ObjectNotFound when there
+# are no matching process-owned endpoints or no matching firewall rule. For
+# these queries that means a successful lookup with zero results.
+function Test-IsNotFound {
+    param([System.Management.Automation.ErrorRecord]$Record)
+    return ($Record.CategoryInfo.Category -eq [System.Management.Automation.ErrorCategory]::ObjectNotFound)
 }
 
 $errors = [System.Collections.Generic.List[object]]::new()
@@ -52,6 +64,8 @@ $firewall = [ordered]@{
     CleanupAttempted = $false
     CleanupSucceeded = $null
     VerifiedAbsentAfterCleanup = $null
+    AbsentInPersistentStore = $null
+    AbsentInActiveStore = $null
     CleanupError = $null
 }
 $process = $null
@@ -120,6 +134,7 @@ try {
 
         $firewall.RuleCreated = $true
         $firewall.RuleName = $newRule.Name
+        Write-Host "Temporary rule created: $($newRule.Name). If this run is interrupted, remove it with: Remove-NetFirewallRule -PolicyStore PersistentStore -Name '$($newRule.Name)'"
 
         $activeRule = Get-NetFirewallRule -PolicyStore ActiveStore -Name $newRule.Name -ErrorAction Stop
         $appFilters = @(Get-NetFirewallApplicationFilter -AssociatedNetFirewallRule $activeRule -ErrorAction Stop)
@@ -173,9 +188,14 @@ try {
             )
         }
         catch {
-            $tcpSucceeded = $false
-            Add-CollectionError -Target $sampleErrors -Stage "Get-NetTCPConnection" -Message $_.Exception.Message -ErrorType $_.Exception.GetType().FullName
-            Add-CollectionError -Target $errors -Stage "Get-NetTCPConnection" -Message $_.Exception.Message -ErrorType $_.Exception.GetType().FullName
+            if (Test-IsNotFound $_) {
+                $tcp = @()
+            }
+            else {
+                $tcpSucceeded = $false
+                Add-CollectionError -Target $sampleErrors -Stage "Get-NetTCPConnection" -Message $_.Exception.Message -ErrorType $_.Exception.GetType().FullName -ErrorId $_.FullyQualifiedErrorId -Category $_.CategoryInfo.Category
+                Add-CollectionError -Target $errors -Stage "Get-NetTCPConnection" -Message $_.Exception.Message -ErrorType $_.Exception.GetType().FullName -ErrorId $_.FullyQualifiedErrorId -Category $_.CategoryInfo.Category
+            }
         }
 
         try {
@@ -185,9 +205,14 @@ try {
             )
         }
         catch {
-            $udpSucceeded = $false
-            Add-CollectionError -Target $sampleErrors -Stage "Get-NetUDPEndpoint" -Message $_.Exception.Message -ErrorType $_.Exception.GetType().FullName
-            Add-CollectionError -Target $errors -Stage "Get-NetUDPEndpoint" -Message $_.Exception.Message -ErrorType $_.Exception.GetType().FullName
+            if (Test-IsNotFound $_) {
+                $udp = @()
+            }
+            else {
+                $udpSucceeded = $false
+                Add-CollectionError -Target $sampleErrors -Stage "Get-NetUDPEndpoint" -Message $_.Exception.Message -ErrorType $_.Exception.GetType().FullName -ErrorId $_.FullyQualifiedErrorId -Category $_.CategoryInfo.Category
+                Add-CollectionError -Target $errors -Stage "Get-NetUDPEndpoint" -Message $_.Exception.Message -ErrorType $_.Exception.GetType().FullName -ErrorId $_.FullyQualifiedErrorId -Category $_.CategoryInfo.Category
+            }
         }
 
         try {
@@ -231,6 +256,8 @@ try {
         $nextSampleAtMilliseconds = $sampleElapsedMilliseconds + $SampleIntervalMilliseconds
     }
 
+    # Freeze the capture duration before firewall post-checks or operator prompts.
+    $stopwatch.Stop()
     $captureEndedAt = [DateTimeOffset]::UtcNow
 
     if ($EnableScopedOutboundBlock -and $firewall.RuleCreated) {
@@ -278,21 +305,31 @@ finally {
             Add-CollectionError -Target $errors -Stage "FirewallCleanup" -Message $_.Exception.Message -ErrorType $_.Exception.GetType().FullName
         }
 
-        try {
-            $lookupErrors = @()
-            $remainingRules = @(Get-NetFirewallRule -PolicyStore ActiveStore -Name $firewall.RuleName -ErrorAction SilentlyContinue -ErrorVariable lookupErrors)
-            if ($lookupErrors.Count -eq 0) {
-                $firewall.VerifiedAbsentAfterCleanup = ($remainingRules.Count -eq 0)
+        $absentIn = [ordered]@{}
+        foreach ($store in @("PersistentStore", "ActiveStore")) {
+            try {
+                $remainingRules = @(Get-NetFirewallRule -PolicyStore $store -Name $firewall.RuleName -ErrorAction Stop)
+                $absentIn[$store] = ($remainingRules.Count -eq 0)
+                if ($remainingRules.Count -ne 0) {
+                    Add-CollectionError -Target $errors -Stage "FirewallCleanupVerification" -Message "The temporary rule is still present in $store after removal." -ErrorType "VerificationFailure"
+                }
             }
-            else {
-                $firewall.VerifiedAbsentAfterCleanup = $false
-                Add-CollectionError -Target $errors -Stage "FirewallCleanupVerification" -Message (($lookupErrors | ForEach-Object { $_.Exception.Message }) -join "; ") -ErrorType "QueryError"
+            catch {
+                if (Test-IsNotFound $_) {
+                    $absentIn[$store] = $true
+                }
+                else {
+                    $absentIn[$store] = $false
+                    Add-CollectionError -Target $errors -Stage "FirewallCleanupVerification" -Message $_.Exception.Message -ErrorType $_.Exception.GetType().FullName -ErrorId $_.FullyQualifiedErrorId -Category $_.CategoryInfo.Category
+                }
             }
         }
-        catch {
-            $firewall.VerifiedAbsentAfterCleanup = $false
-            Add-CollectionError -Target $errors -Stage "FirewallCleanupVerification" -Message $_.Exception.Message -ErrorType $_.Exception.GetType().FullName
-        }
+        $firewall.AbsentInPersistentStore = $absentIn["PersistentStore"]
+        $firewall.AbsentInActiveStore = $absentIn["ActiveStore"]
+        $firewall.VerifiedAbsentAfterCleanup = (
+            $absentIn["PersistentStore"] -eq $true -and
+            $absentIn["ActiveStore"] -eq $true
+        )
     }
 }
 
@@ -361,7 +398,17 @@ $result = [ordered]@{
         ActualDurationMilliseconds = [Math]::Round($stopwatch.Elapsed.TotalMilliseconds, 3)
         SampleIntervalRequestedMilliseconds = $SampleIntervalMilliseconds
         ObservationCount = $observations.Count
+        FirstToLastSampleMilliseconds = if ($observations.Count -gt 1) { [Math]::Round($observations[$observations.Count - 1].ElapsedMilliseconds - $observations[0].ElapsedMilliseconds, 3) } else { $null }
         IntervalSummary = $intervalSummary
+        SampleOutcomes = [ordered]@{
+            ProcessRunning = @($observations | Where-Object { $_.ProcessState -eq "Running" }).Count
+            ProcessExited = @($observations | Where-Object { $_.ProcessState -eq "Exited" }).Count
+            ProcessQueryError = @($observations | Where-Object { $_.ProcessState -eq "QueryError" }).Count
+            TcpQueryFailed = @($observations | Where-Object { -not $_.TcpQuerySucceeded }).Count
+            UdpQueryFailed = @($observations | Where-Object { -not $_.UdpQuerySucceeded }).Count
+            WithTcpRecords = @($observations | Where-Object { @($_.TcpConnections).Count -gt 0 }).Count
+            WithUdpRecords = @($observations | Where-Object { @($_.UdpEndpoints).Count -gt 0 }).Count
+        }
     }
     Firewall = $firewall
     GameplayObservation = $gameplayObservation
