@@ -1,6 +1,6 @@
 # Requirements and design deviation matrix — reconciled baseline
 
-**Issue25:** documentation reconciliation,not final QA sign-off. Baseline game 7c6733d; current documentation base6db9a7a; PR #60audio 09bbf96 separate and unmerged. Preserve earlier matrix in [history](history/REQUIREMENTS_DEVIATION_MATRIX-pre-reconciliation.md).
+**Issue #25:** documentation reconciliation, not final QA sign-off. Baseline Windows evidence remains tied to game source `7c6733d`. This documentation refresh is based on main at `3fcc586`. PR #60 audio commit `09bbf96` is merged. Owner-reported listening confirms collision-alert audibility, one-shot/no-loop behavior, and silence at SFX volume 0. Original Windows archive results are reported evidence; corrected pause/restart records in the revised archive remain unverified. Preserve the earlier matrix in [history](history/REQUIREMENTS_DEVIATION_MATRIX-pre-reconciliation.md).
 
 ## Sources and interpretation
 
@@ -79,7 +79,7 @@ Submitted `Team16_SnakeXtreme_Deliverables_Part1_SRS_SAD_STP.pdf`: SRS§5-6,Adde
 | C2 UI Screens | Renderer,AppState,NameEntry,MenuSelection and hit tests | Responsibilities realized without independent IScreen classes; DV02. |
 | C3 InputMapper | Settings movementForKey plus AppManager event dispatch | Mapping behavior supported; dedicated map(sf::Event)->Action class not implemented as drawn; DV02. |
 | C4 Renderer/ThemeProvider | Renderer with Classic/Neon/Retro; model/UI tests | No deviation in reviewed responsibilities; final per-theme visual observations separate. |
-| C5 AudioService | SFML sound buffers and independent gains,model/backend/UI tests | No deviation in reviewed gain/routing scope; human audibility pending. PR #60 is explicit requested waveform enhancement,DV07. |
+| C5 AudioService | SFML sound buffers and independent gains, model/backend/UI tests | Existing model, backend and UI logs support the reviewed gain/routing scope. Owner-reported listening confirms collision-alert audibility, one-shot/no-loop behavior, and silence at SFX volume 0. Independent-channel listening, F5 behavior, platform-specific acceptance and other case-specific checks remain separate and pending. PR #60 waveform enhancement (`09bbf96`) is merged at `3fcc586`; this does not constitute overall audio or final QA acceptance. |
 | C6 GameEngine | deterministic grid,queue,collision,food/growth; unit tests | No deviation in reviewed engine responsibility. |
 | C7 ModeManager | mode strategies,difficulty,timer,obstacles | No deviation in reviewed responsibility/tests. |
 | C8 PowerUpManager | schedules,pickup,replacement,effects | Core duties supported; uncollected lifetime difference DV03. |
@@ -101,7 +101,7 @@ Submitted `Team16_SnakeXtreme_Deliverables_Part1_SRS_SAD_STP.pdf`: SRS§5-6,Adde
 | DV04 | SAD§3.9C14 | Application-managed size-limited log rotation not found | stderr warning/result handling exists; no evidence of rotating Logger. Decide whether to implement or explicitly accept a design deviation; do not assert no-deviation for all architecture. |
 | DV05 | FR022/TC-UI-01 | Menu label Start Game instead of exactly New Game | Same navigation purpose; wording rationale not recorded. Record as minor naming difference for disposition,not an invented runtime failure. |
 | DV06 | NFR006/TC-PORT-01 | Windows 11unavailable; owner proposes Windows 10only | Access limitation documented; Windows 10build/play report available. Proposed omission must be explicitly accepted and documented; Windows 11notPassed. |
-| DV07 | C5 / owner enhancement | PR #60changes GameOver waveform after baseline acceptance | Owner expressly requested danger sound. New source09bbf96 needs separate Windows build/listening evidence; request is not proof of test pass or merge/release approval. |
+| DV07 | C5 / owner enhancement | PR #60 changes the GameOver waveform following baseline acceptance. The enhancement is merged at `3fcc586`. Owner-reported listening and original Windows archive results are scoped evidence; corrected pause/restart records in the revised archive have not been independently verified. This does not establish all audio, platform, or release acceptance. |
 | DV08 | SAD C15 | Passed chrono steps and seeded RNG replace explicit IClock/IRandom interfaces | Deterministic tests support purpose; exact facade adaptation/rationale requires team review. |
 
 These differences are not automatically8new product defects. Severity,requirement impact and acceptance require review. Do not perform an unrequested architecture rewrite just to make a table green.
