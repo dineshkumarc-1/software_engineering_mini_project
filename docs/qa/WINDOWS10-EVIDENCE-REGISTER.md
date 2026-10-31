@@ -56,3 +56,32 @@ The input trace records 100 directions in the requested order, with 18 accepted,
 The owner/reviewer-reported grid-results JSON retains `all_passed: true` / `passed: true` for title-based 4–16 ms timing. That result is not proof of first-grid-render acceptance; the corrected report leaves first render pending. The reported `tc_core_01_grid_snake_frame.png` was visually inspected and depicts a conversation rather than the game grid, so it cannot support TC-CORE-01 rendering. The referenced grid artifacts were not found in this checkout for independent reinspection. Preserve the historical report and results, document their scope, and do not silently substitute a replacement capture.
 
 Issue #22 remains In Progress and issue #25/final QA sign-off remain pending. No confirmed performance product defect was established by these short runs, but required acceptance remains unproven. The reported volunteer attestation is retained with build/route unknown. This reconciliation does not approve a waiver, close issues, or authorize release.
+
+### Addendum — subsequent performance, grid, and functional evidence review (2026-10-31)
+
+This addendum records two later-reviewed evidence captures separately from the historical 71,558-byte archive documented above. The raw files for these two captures are not present in this checkout. Their identifiers, sizes, and review observations below are recorded from the supplied review information; they have not been independently rehashed or reproduced during this documentation update.
+
+| Evidence record | Reported size | Supplied identifier | Review disposition |
+|---|---:|---|---|
+| Subsequent performance archive | 1,028,500 bytes | `5c63ca97...` | Separate later capture; do not merge its results into the historical 71,558-byte archive record. |
+| Subsequent evidence batch | 1,420,509 bytes | `6ede6694...` | Separate batch; its reported 45-file manifest validation does not imply that all observations passed. |
+
+**Performance scope:** The batch review found zero complete qualifying Hard/Obstacle windows in its two new probes. These probes do not satisfy the required three continuous 300-second Hard/Obstacle campaigns with power-ups active. Preserve the reported probe results as diagnostic evidence only. Performance acceptance remains Pending.
+
+**Grid scope:** All ten grid observations in the reviewed batch were inconclusive or skipped. The box-loop observation has no obstacle-pixel feedback. These observations do not establish first-grid-render timing, correct obstacle rendering, or TC-CORE-01 acceptance.
+
+**Functional evidence corrections:**
+
+- The reported nine-combination array is empty; it does not establish successful coverage of the nine required combinations.
+- The 16-character and invalid-character assertions were executed on Mode Selection. They do not establish the corresponding settings-screen validation behavior.
+- `settings_saved=false` does not establish successful settings persistence.
+- `cancel_preserved_music=false` does not establish that Cancel preserved the previous music setting.
+- A no-crash observation establishes only that no crash was observed in that run; it does not prove that a requested theme loaded or rendered correctly.
+- Retain the valid pause/resume/restart observations and corrupt-board observations within their demonstrated scope.
+- Retain the genuine six-column image with its actual provenance. Do not substitute a different image or claim an unverified build association.
+
+The manifest's reported validation of 45 files is a batch-integrity observation, not a blanket pass for the individual probes or functional checks. Preserve individual results and limitations rather than promoting the supplied batch summary wholesale to Passed.
+
+The two new captures do not replace, relabel, or retrospectively extend the historical 71,558-byte archive. The historical 3-, 1-, and 5-second Hard/Obstacle segments remain short diagnostic runs and do not satisfy the required 300-second campaigns.
+
+**Disposition:** Evidence review only; acceptance remains incomplete. Issue #22 remains In Progress, issue #25 remains open, and final QA/release sign-off remains Pending. This addendum approves no waiver and authorizes no release.
