@@ -64,10 +64,10 @@ function Invoke-LoggedNative {
     )
 
     $commandLine = "$Path " + ($Arguments -join " ")
-    "COMMAND: $commandLine" | Tee-Object -FilePath $LogPath -Append
-    & $Path @Arguments 2>&1 | Tee-Object -FilePath $LogPath -Append
+    "COMMAND: $commandLine" | Tee-Object -FilePath $LogPath -Append | Out-Host
+    & $Path @Arguments 2>&1 | Tee-Object -FilePath $LogPath -Append | Out-Host
     $nativeExitCode = $LASTEXITCODE
-    "EXIT CODE: $nativeExitCode" | Tee-Object -FilePath $LogPath -Append
+    "EXIT CODE: $nativeExitCode" | Tee-Object -FilePath $LogPath -Append | Out-Host
     return $nativeExitCode
 }
 
