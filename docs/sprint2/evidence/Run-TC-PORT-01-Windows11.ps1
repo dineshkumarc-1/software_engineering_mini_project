@@ -91,8 +91,23 @@ function Invoke-LoggedNative {
 
     $commandLine = "$Path " + ($Arguments -join " ")
     "COMMAND: $commandLine" | Tee-Object -FilePath $LogPath -Append | Out-Host
-    & $Path @Arguments 2>&1 | Tee-Object -FilePath $LogPath -Append | Out-Host
-    $nativeExitCode = $LASTEXITCODE
+
+    # In Windows PowerShell 5.1, native stderr can become an ErrorRecord.
+    # The runner uses Stop globally for cmdlet failures, so temporarily use
+    # Continue while collecting native output; the native exit code remains
+    # the authoritative success/failure signal.
+    $previousErrorActionPreference = $ErrorActionPreference
+    try {
+        $ErrorActionPreference = "Continue"
+        & $Path @Arguments 2>&1 |
+            Tee-Object -FilePath $LogPath -Append |
+            Out-Host
+        $nativeExitCode = $LASTEXITCODE
+    }
+    finally {
+        $ErrorActionPreference = $previousErrorActionPreference
+    }
+
     "EXIT CODE: $nativeExitCode" | Tee-Object -FilePath $LogPath -Append | Out-Host
     return $nativeExitCode
 }
@@ -136,7 +151,19 @@ try {
     "=== Toolchain versions ===" | Tee-Object -FilePath $toolchainLog
     Invoke-LoggedNative -Path $cmakeCommand.Source -Arguments @("--version") -LogPath $toolchainLog | Out-Null
     Invoke-LoggedNative -Path $gitCommand.Source -Arguments @("--version") -LogPath $toolchainLog | Out-Null
-    Invoke-LoggedNative -Path $clCommand.Source -Arguments @("/Bv") -LogPath $toolchainLog | Out-Null
+
+    # Do not invoke cl.exe /Bv without a translation unit: MSVC prints its
+    # version and then exits with D8003 (missing source filename). Record the
+    # installed compiler product/file versions from the executable metadata.
+    $clVersionInfo = (Get-Item -LiteralPath $clCommand.Source).VersionInfo
+    $clProductVersion = $clVersionInfo.ProductVersion
+    $clFileVersion = $clVersionInfo.FileVersion
+    "MSVCCompilerPath: $($clCommand.Source)" | Tee-Object -FilePath $toolchainLog -Append | Out-Host
+    "MSVCProductVersion: $clProductVersion" | Tee-Object -FilePath $toolchainLog -Append | Out-Host
+    "MSVCFileVersion: $clFileVersion" | Tee-Object -FilePath $toolchainLog -Append | Out-Host
+    if ([string]::IsNullOrWhiteSpace($clProductVersion) -and [string]::IsNullOrWhiteSpace($clFileVersion)) {
+        throw "Could not read MSVC compiler version metadata from cl.exe."
+    }
 
     $programFilesX86 = [Environment]::GetEnvironmentVariable("ProgramFiles(x86)")
     $vswherePath = Join-Path $programFilesX86 "Microsoft Visual Studio\Installer\vswhere.exe"
