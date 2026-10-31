@@ -32,6 +32,7 @@ if ($evidence.ComputerName) {
 }
 if ($evidence.Executable.FullPath) {
     $privateValues.Add([string]$evidence.Executable.FullPath)
+    $privateValues.Add([string](Split-Path -Parent ([string]$evidence.Executable.FullPath)))
     $evidence.Executable.FullPath = "<REDACTED_EXECUTABLE_PATH>"
 }
 if ($evidence.Firewall -and $evidence.Firewall.RuleName) {
@@ -48,6 +49,9 @@ $evidence | Add-Member -NotePropertyName RedactionNotice -NotePropertyValue @(
 $redactedText = $evidence | ConvertTo-Json -Depth 16
 foreach ($privateValue in $privateValues) {
     if (-not [string]::IsNullOrEmpty($privateValue)) {
+        # JSON escapes backslashes, so replace the escaped value as well as the raw value.
+        $escapedValue = (ConvertTo-Json -InputObject $privateValue -Compress).Trim('"')
+        $redactedText = $redactedText.Replace($escapedValue, "<REDACTED_LOCAL_VALUE>")
         $redactedText = $redactedText.Replace($privateValue, "<REDACTED_LOCAL_VALUE>")
     }
 }
