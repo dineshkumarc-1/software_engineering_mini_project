@@ -137,7 +137,7 @@ try {
         }
     }
 
-    $process = Start-Process -FilePath $resolvedExecutable -PassThru -ErrorAction Stop
+    $process = Start-Process -FilePath $resolvedExecutable -WorkingDirectory (Split-Path -Parent $resolvedExecutable) -PassThru -ErrorAction Stop
     $captureStartedAt = [DateTimeOffset]::UtcNow
     $stopwatch.Start()
 
