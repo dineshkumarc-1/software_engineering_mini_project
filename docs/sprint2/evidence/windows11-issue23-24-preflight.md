@@ -91,7 +91,7 @@ The historical Run 4 reports D6 at 4/4 assertions and the Linux fault-injection 
 
 The persistence cleanup contract remains **24-hour best-effort**. Eligible stale temporary/orphan-lock files are removed by a later read or write after the age threshold. Fresh crash leftovers are intentionally preserved; cleanup is not guaranteed on the next startup.
 
-Deterministic malformed/truncated-input tests are **fuzz-style regression tests**, not coverage-guided fuzzing. Linux `LD_PRELOAD` crash-injection evidence is not native Windows crash-injection evidence. Native Windows locked-file refusal tests are separate and do not prove full crash-injection coverage. Tejas has been asked to confirm the outstanding Windows crash-injection disposition on [Issue #24](https://github.com/dineshkumarc-1/software_engineering_mini_project/issues/24#issuecomment-6545052538).
+Deterministic malformed/truncated-input tests are **fuzz-style regression tests**, not coverage-guided fuzzing. Linux `LD_PRELOAD` crash-injection evidence is not native Windows crash-injection evidence. Native Windows locked-file refusal tests are separate and do not prove full crash-injection coverage. Tejas's [Issue #23 handoff](https://github.com/dineshkumarc-1/software_engineering_mini_project/issues/23#issuecomment-6528464409) already records Windows crash injection as **Pending** because no native injector exists. Tejas suggests a test-only interposer DLL (for example, Detours or IAT hooks) on `WriteFile`, `FlushFileBuffers`, `MoveFileExW` and `ReplaceFileW`, loaded only into a child test process; the parent would verify old/new board recovery. This must not add a product hook. Dinesh must decide whether this additional platform-specific test is in scope or is documented as a limitation.
 
 ## Current status table
 
@@ -106,7 +106,7 @@ Deterministic malformed/truncated-input tests are **fuzz-style regression tests*
 | Final-candidate passive TCP/UDP capture | **Blocked** | Candidate pin + collector corrections |
 | Firewall/offline privacy test | **Blocked** | Dinesh approval required before elevation/rule creation |
 | Persistence regression (existing Linux evidence) | **Pass, scoped** | Run 3 / Run 4 links above |
-| Native Windows crash injection | **Not tested / Pending** | Tejas to confirm method or record remaining gap |
+| Native Windows crash injection | **Not tested / Pending** | Tejas records no native injector; proposed test-only interposer DLL (Detours/IAT); Dinesh decides scope vs limitation |
 | Final review PR and issue closure | **Blocked** | Assemble after actual Windows evidence is returned; issues remain open |
 
 No issue closure, final QA approval, Sprint 2 sign-off, release/tag/freeze, or demo approval is implied by this preflight note.
