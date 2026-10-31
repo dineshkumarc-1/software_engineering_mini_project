@@ -78,7 +78,7 @@ It refuses to reuse an existing evidence directory, verifies the requested full 
 
 ## Issue #24 — exact-build privacy
 
-**Status: Blocked pending candidate pin, collector correction and explicit owner approval for elevation/firewall changes.**
+**Status: Candidate pinned; collector corrections prepared and Tejas review requested. Passive exact-build capture is ready once the Windows 11 EXE exists. The outbound firewall step remains blocked pending Dinesh's explicit approval.**
 
 Historical public evidence:
 - [Redacted 60-observation JSON](https://github.com/dineshkumarc-1/software_engineering_mini_project/blob/d59d85e2e028a244fee71d8b95c5e2e77e6c8b66/docs/sprint2/evidence/issue-24-offline-evidence.redacted.json)
@@ -120,7 +120,7 @@ The script does **not** publish files. Manually review the entire redacted JSON 
 
 [Dinesh was asked to explicitly approve or decline](https://github.com/dineshkumarc-1/software_engineering_mini_project/issues/24#issuecomment-6545039355) the following limited operation: elevate PowerShell, create one temporary outbound-block rule scoped only to the exact agreed test EXE, verify that rule in ActiveStore, exercise the game offline, remove only that temporary rule, and verify it is absent afterward. No profile-wide block or unrelated firewall-policy change is intended. No elevation or firewall change has been made as part of this handoff.
 
-After approval and collector correction, retain raw JSON privately, publish only a reviewed redacted copy, and record source SHA/tree, build configuration/toolchain, EXE size/hash separately from the JSON evidence hash, all timestamps, sampling interval/duration, collection errors, firewall rule verification, game usability observations, and cleanup verification.
+After Tejas reviews the collector, run passive exact-build capture against the locally built EXE. Run the separate firewall mode only after Dinesh's explicit approval. Retain raw JSON privately, publish only a reviewed redacted copy, and record source SHA/tree, build configuration/toolchain, EXE size/hash separately from the JSON evidence hash, all timestamps, sampling interval/duration, collection errors, firewall rule verification, game usability observations, and cleanup verification.
 
 Interpretation limit: process-owned TCP/UDP endpoint snapshots are point-in-time observations, not packet capture. They cannot rule out brief activity between samples or prove that no possible network attempt occurred.
 
@@ -153,6 +153,7 @@ Deterministic malformed/truncated-input tests are **fuzz-style regression tests*
 | Firewall/offline privacy test | **Blocked** | Dinesh approval required before elevation/rule creation; no rule has been created in this work |
 | Persistence regression (existing Linux evidence) | **Pass, scoped** | Run 3 / Run 4 links above |
 | Native Windows crash injection | **Not tested / Pending** | Tejas records no native injector; proposed test-only interposer DLL (Detours/IAT); Dinesh decides scope vs limitation |
-| Final review PR and issue closure | **Blocked** | Assemble after actual Windows evidence is returned; issues remain open |
+| Hosted Windows CI | **Pass, supplemental only** | Run `41215354989`: Windows MSVC app build and 20/20 CTest; not TC-PORT-01 |
+| Final review PR and issue closure | **Blocked** | Review actual Windows 11 evidence and Tejas collector review; issues remain open |
 
 No issue closure, final QA approval, Sprint 2 sign-off, release/tag/freeze, or demo approval is implied by this preflight note.
