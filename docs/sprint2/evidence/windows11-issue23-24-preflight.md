@@ -10,7 +10,7 @@ The existing records refer to more than one candidate:
 
 - Historical final-QA pin: `7c6733d95a4fa61a3af83c413a27d1ad2f40d44b`.
 - Product revision including PR #60: `3fcc586d740d2b9b461193e482d6861ca8f905e5`.
-- Current repository main at preparation time: `5b947efaeccfcf56f874d068854df935256eafc0`. Its delta from `3fcc586` is documentation/evidence only (QA checklist, deviation matrix, release closeout, test summary, the #60 gate log and quality-gates document); this is not a selection of the accepted test candidate.
+- Current repository main at this update: `447b84c8f6e8196b78009be7d1b70b86e6bc916b`. A compare against `3fcc586d740d2b9b461193e482d6861ca8f905e5` shows the intervening seven commits modify QA documents/evidence only; no product source, assets or build configuration changed. This is not a selection of the accepted test candidate.
 
 Dinesh and Tejas must name one exact full SHA and agree it is the shared target for both issues. The test must not be run against a branch tip or a prebuilt Windows 10 executable by inference. Record the accepted SHA, tree SHA, and a clean checkout before building. Tejas's written Windows TC-PORT-01 instructions on [Issue #23](https://github.com/dineshkumarc-1/software_engineering_mini_project/issues/23#issuecomment-6528475763) specify **20/20 CTest on Windows** because `secure_write_fault_tests` is Linux-only. Capture `ctest -N` on the selected SHA to verify the registered inventory and report 20/20; do not use Linux's 21 as the Windows expectation.
 
@@ -49,7 +49,14 @@ The manual checklist and evidence must include:
 
 Required evidence: complete configure/build/CTest logs (including warnings/failures), `winver` screenshot, menu/gameplay/leaderboard client-area screenshots, manual observations, source SHA/tree/clean status, toolchain, and the built EXE size/hash. Preserve failed attempts and their original logs.
 
-A helper script was prepared outside the repository for the documented clean checkout/build/log capture. It records the actual `ctest -N` inventory against the **20-test Windows expectation** and preserves configure, build, CTest, toolchain and EXE identity output. It has not been executed or validated on PowerShell/Windows in this environment and is not a substitute for the actual Windows run.
+A clean-checkout runner is included as [`Run-TC-PORT-01-Windows11.ps1`](./Run-TC-PORT-01-Windows11.ps1). Run it from a **Visual Studio 2022 Developer PowerShell** with Git, MSVC, CMake and CTest available:
+
+```powershell
+Set-ExecutionPolicy -Scope Process Bypass
+.\Run-TC-PORT-01-Windows11.ps1 -CandidateSha <AGREED_FULL_SHA> -EvidenceRoot .\TC-PORT-01-Windows11-Evidence-<UNIQUE_SUFFIX>
+```
+
+It refuses to reuse an existing evidence directory, verifies the requested full SHA and clean source checkout, builds out-of-tree using the documented CMake options, saves complete configure/build/CTest/toolchain logs, records `ctest -N`, and treats **20** as the Windows inventory expectation. It also records the generated EXE size and SHA-256, then launches `winver` and the game. The script leaves all manual gameplay checklist rows as **Not recorded**; the operator must perform them and save actual client screenshots. The helper has not been run or validated on Windows/PowerShell here, so preserve any first-run errors as evidence rather than assuming success.
 
 ## Issue #24 — exact-build privacy
 
@@ -70,6 +77,19 @@ The existing [PowerShell collector](https://github.com/dineshkumarc-1/software_e
 - record cleanup outcome after the temporary rule is removed, including a post-removal ActiveStore check.
 
 The current script writes its JSON before its `finally` cleanup and silently ignores removal errors, so its existing JSON does not prove cleanup succeeded. The source review and findings are recorded on [Issue #24](https://github.com/dineshkumarc-1/software_engineering_mini_project/issues/24#issuecomment-6545090501).
+
+A replacement helper, [`Collect-Issue24-ExactBuildEvidence.ps1`](./Collect-Issue24-ExactBuildEvidence.ps1), is included in this draft. Passive process-owned TCP/UDP/liveness sampling is the default and does not create firewall rules. It records exact source commit/tree, EXE byte size/SHA-256, OS and PowerShell identity, UTC sample timestamps, actual elapsed time, sampling interval min/average/max, and per-sample/global collection errors. It writes the JSON after the cleanup path has completed. The helper has not been executed or validated on Windows here.
+
+Passive capture command (run against the EXE produced by the agreed Windows 11 source build):
+
+```powershell
+$source = .\TC-PORT-01-Windows11-Evidence-<UNIQUE_SUFFIX>\source
+$sourceSha = (git -C $source rev-parse HEAD).Trim()
+$treeSha = (git -C $source rev-parse 'HEAD^{tree}').Trim()
+.\Collect-Issue24-ExactBuildEvidence.ps1 -ExecutablePath .\TC-PORT-01-Windows11-Evidence-<UNIQUE_SUFFIX>\build\Release\SnakeXtreme.exe -SourceCommitSha $sourceSha -SourceTreeSha $treeSha -DurationSeconds 60 -OutputPath .\issue-24-exact-build-raw.json
+```
+
+Only after explicit owner approval in the conversation, the separate firewall run may be made from an elevated PowerShell session by adding `-EnableScopedOutboundBlock`. The script then requires the operator to type `APPROVED`, verifies the exact executable-scoped outbound block in ActiveStore before and during sampling, removes only the unique rule it created, and records whether it is absent afterward. The typed phrase is an additional guard, not a substitute for obtaining Dinesh's explicit approval. Do not launch this mode before that approval. The raw JSON includes the computer name and full EXE path; keep it private and publish only a reviewed redacted copy.
 
 ### Approval gate
 
@@ -103,8 +123,8 @@ Deterministic malformed/truncated-input tests are **fuzz-style regression tests*
 | Windows 11 EXE size/hash | **Not tested** | Hash the locally generated Release EXE |
 | Windows 11 gameplay/manual screenshots | **Not tested** | Execute all checklist observations and capture real client area |
 | Historical privacy observations | **Pass, historical only** | 60 snapshots; not tied to exact source/EXE identity |
-| Final-candidate passive TCP/UDP capture | **Blocked** | Candidate pin + collector corrections |
-| Firewall/offline privacy test | **Blocked** | Dinesh approval required before elevation/rule creation |
+| Exact-build passive TCP/UDP/liveness collector | **Prepared; not run** | New helper in this PR; candidate pin and actual Windows 11 execution required |
+| Firewall/offline privacy test | **Blocked** | Dinesh approval required before elevation/rule creation; no rule has been created in this work |
 | Persistence regression (existing Linux evidence) | **Pass, scoped** | Run 3 / Run 4 links above |
 | Native Windows crash injection | **Not tested / Pending** | Tejas records no native injector; proposed test-only interposer DLL (Detours/IAT); Dinesh decides scope vs limitation |
 | Final review PR and issue closure | **Blocked** | Assemble after actual Windows evidence is returned; issues remain open |
