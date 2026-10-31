@@ -18,6 +18,14 @@ Coordination requests:
 - [Issue #23 candidate pin request](https://github.com/dineshkumarc-1/software_engineering_mini_project/issues/23#issuecomment-6545038214)
 - [Issue #23 Windows 11 availability confirmation](https://github.com/dineshkumarc-1/software_engineering_mini_project/issues/23#issuecomment-6545105677)
 
+## Separate Windows 10 evidence — do not relabel
+
+The earlier Windows 10 artifacts are retained as independent records and are not inputs to, substitutes for, or evidence of this Windows 11 source-build campaign:
+
+- **Windows 10 baseline report:** source `7c6733d95a4fa61a3af83c413a27d1ad2f40d44b`, tree `e83825372214b6c11296c59d47301cf236a5f716`; Windows 10 Pro build 19045; MSVC 19.44.35229.0 / CMake 4.4.4; reported EXE size 1,906,688 bytes and SHA-256 `FE3AA1316D634611F3D690665C5D802696BE80DA5124C34B2475D05391CEF1F3`; reported 20/20 CTest. The report register says the complete raw logs and actual OpenGL client-area screenshot are not all uploaded for independent review. See [WINDOWS10-EVIDENCE-REGISTER.md](../../qa/WINDOWS10-EVIDENCE-REGISTER.md).
+- **Separate Windows 10 PR #60 audio build:** source revision `09bbf96e14d9b8f037d46b4b55e07d32aeacf26c`; EXE size 1,906,688 bytes and SHA-256 `780B5AB208B7FD6DF91916E4E386848E179FE4B71CBA27BC4BCEE60207D2E946`. Its reported 20/20 CTest, audio assertions and backend checks remain attached to that actual build identity; do not relabel it as a binary built from the later merge commit.
+- **Windows 11:** this campaign must produce its own detached source checkout, source/tree SHA, toolchain details, configure/build/CTest logs, game screenshots and EXE size/SHA-256. No Windows 10 binary, report, screenshot or privacy observation is reused as Windows 11 evidence.
+
 ## TC-PORT-01 — Windows 11
 
 **Status: Not tested.** No Windows 11 source build or visible-client gameplay test is represented by this handoff. The exact OS edition/version/build, Visual Studio/MSVC, CMake version, source-tree status, compiler output, configure/build/CTest logs, EXE size and EXE SHA-256 must come from the actual Windows 11 machine.
