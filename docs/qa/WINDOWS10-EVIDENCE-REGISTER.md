@@ -42,3 +42,17 @@ The user specifically reported hearing background sound without the volume setti
 ## Privacy provenance
 
 Historical redacted capture exists at audit branch commit`d59d85e2e028a244fee71d8b95c5e2e77e6c8b66`,not baseline main; redacted JSON hash`0a2ac44068c9fecf7c288d2f1fbc9023026bb06598f35b7700681ed439c47dc4`. It records60samples,zero observed process-ownedTCP/UDP and ActiveStore checks at endpoints;104.7soverall,98.35ssample span. It lacks exact source/EXE identity. Sampling is not a packet capture or a universal no-network proof. Final exact-candidate approved firewall/offline evidence remains Pending.
+
+<!-- Evidence reconciliation: Windows performance and grid review -->
+
+### Evidence reconciliation — performance and grid review
+
+**Disposition: Incomplete / pending acceptance.** The reviewed Windows performance archive contains 32 entries (71,558 bytes; SHA-256 `150317713668114380ac058700c50df177d6c55772ba93504b84ba55a49393c5`). Its manifest identifies source/EXE revision `09bbf96` and EXE SHA-256 `780B5AB208B7FD6DF91916E4E386848E179FE4B71CBA27BC4BCEE60207D2E946`. The unchanged analyzer from merged revision `3fcc586` accepts the schema and timestamps in all 11 supplied raw probe JSON files. This validates the supplied traces and their format; it does not independently establish Windows execution, binary provenance, or target-machine conditions.
+
+Manual FPS traces contain only 3-, 1-, and 5-second continuous Hard/Obstacle segments. The eligible windows reported are respectively 4 (mean 60.25 FPS, minimum 60), 1 (45 FPS), and 10 (mean 59.8 FPS, minimum 59); no eligible window below 30 FPS was observed. Each of the three original automated attempts had only one qualifying second, while the idle-menu run had no gameplay. These observations do **not** meet the required three continuous 300-second sessions and do not justify a waiver.
+
+The input trace records 100 directions in the requested order, with 18 accepted, 82 rejected, and zero drops. The reported 1–6 microsecond registration interval is an internal dequeue-to-registration measurement, not an OS/SFML queue-inclusive input-acceptance measurement. Launch times of 3.007, 1.179, and 1.321 seconds remain cache-unknown/warm diagnostics; cold-launch acceptance is unverified.
+
+The owner/reviewer-reported grid-results JSON retains `all_passed: true` / `passed: true` for title-based 4–16 ms timing. That result is not proof of first-grid-render acceptance; the corrected report leaves first render pending. The reported `tc_core_01_grid_snake_frame.png` was visually inspected and depicts a conversation rather than the game grid, so it cannot support TC-CORE-01 rendering. The referenced grid artifacts were not found in this checkout for independent reinspection. Preserve the historical report and results, document their scope, and do not silently substitute a replacement capture.
+
+Issue #22 remains In Progress and issue #25/final QA sign-off remain pending. No confirmed performance product defect was established by these short runs, but required acceptance remains unproven. The reported volunteer attestation is retained with build/route unknown. This reconciliation does not approve a waiver, close issues, or authorize release.

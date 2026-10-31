@@ -275,3 +275,15 @@ Update this log whenever additional tests are executed or existing results are r
 For every test, record the test-case ID, actual result, environment, tested build or commit, and supporting evidence. Record failures with their expected behavior, observed behavior, reproduction steps, and associated defect reference.
 
 Do not mark a test as passed without supporting execution evidence, and do not make a final QA sign-off decision until the applicable release exit criteria have been assessed.
+
+<!-- Evidence reconciliation: Windows performance and grid review -->
+
+### Evidence reconciliation — later evidence review
+
+This section supplements, and does not replace, historical execution records. The Windows performance archive's 11 raw probe JSON files pass the unchanged analyzer's schema/timestamp checks, but the available continuous Hard/Obstacle segments are only 3, 1, and 5 seconds. Three automated attempts each had one qualifying second; the idle-menu run had no gameplay. The required three 300-second sessions therefore remain pending. The 100-input trace reports 18 accepted, 82 rejected, and zero drops; its 1–6 microsecond interval is internal dequeue-to-registration timing rather than queue-inclusive acceptance. Launch measurements remain cache-unknown/warm diagnostics.
+
+The reported grid-results JSON's title-based timing pass does not prove first-grid-render acceptance. The reported TC-CORE-01 image depicts a conversation rather than the game grid. The related grid artifacts were not found in this checkout for independent reinspection; retain the historical record and qualify its evidentiary scope rather than silently replacing it.
+
+A separate fresh Linux Release regression on merged revision `3fcc586` / tree `41b54378c177d7d1e01ff17f2bf7b22663789ec6` succeeded with warnings-as-errors. CTest passed 21/21, Python passed 33/33, audio reported 161 assertions across 5 cases, cppcheck 2.13.0 reported zero findings, and sequential Xvfb UI checks passed navigation (23), Settings (22), and leaderboard (29). The initial parallel run's Settings missing-window and leaderboard X11 startup failures remain in the preserved logs; unchanged sequential reruns passed, and no cause was established. Permission tests ran with effective capabilities dropped and gates unchanged. The Linux EXE SHA-256 was `4abc22684ff77b433f7a900194ff2dc6a2f8c8fa1811b00030ff831c558f8b34`.
+
+This Linux run is not a Windows-target campaign, fresh sanitizer/coverage evidence, privacy/volunteer acceptance, or release approval. The redacted 19-file evidence ZIP was supplied in the owner conversation, not committed here. Preserve earlier historical run records and reported Windows manual results with their existing build/artifact limitations. Issues #22/#25 and final QA sign-off remain pending.
