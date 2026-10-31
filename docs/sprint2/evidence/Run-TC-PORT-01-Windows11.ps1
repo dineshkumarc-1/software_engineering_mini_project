@@ -78,6 +78,9 @@ try {
     $clCommand = Get-Command cl.exe -ErrorAction Stop
 
     $os = Get-CimInstance -ClassName Win32_OperatingSystem -ErrorAction Stop
+    if ($os.Caption -notmatch "Windows 11") {
+        throw "This helper is for a Windows 11 PC. Detected OS: $($os.Caption) $($os.Version) build $($os.BuildNumber)."
+    }
     $machineInfo = @(
         "CapturedAtUtc: $([DateTimeOffset]::UtcNow.ToString('o'))"
         "ComputerName: $env:COMPUTERNAME"
