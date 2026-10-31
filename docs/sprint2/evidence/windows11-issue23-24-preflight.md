@@ -2,7 +2,7 @@
 
 **Prepared:** 2026-10-31  
 **Scope:** Issues #23 (TC-PORT-01) and #24 (SEC-002..004 / SEC-007)  
-**Status:** Preflight only. This document does not claim a Windows 11 build, test, gameplay run, privacy capture, or QA sign-off.
+**Status:** Partial Windows 11 execution evidence is now recorded. A local GCC/MinGW Release build and 20/20 CTest run passed, four visible game states were captured, and an exact-build passive TCP/UDP capture was completed. This is supplemental evidence, **not** completion of the documented Visual Studio/MSVC TC-PORT-01 gate, final QA sign-off, or Sprint 2 sign-off.
 
 ## Candidate identity — pinned for this verification campaign
 
@@ -38,7 +38,20 @@ The uploaded CI artifact `SnakeXtreme-windows-x64` from that hosted run contains
 
 ## TC-PORT-01 — Windows 11
 
-**Status: Not tested.** No Windows 11 source build or visible-client gameplay test is represented by this handoff. The exact OS edition/version/build, Visual Studio/MSVC, CMake version, source-tree status, compiler output, configure/build/CTest logs, EXE size and EXE SHA-256 must come from the actual Windows 11 machine.
+**Status: Partially verified on Windows 11 using GCC/MinGW; documented MSVC gate remains incomplete.** The fresh source checkout used the pinned commit/tree and was built locally with GCC 16.2.0 through the MSYS2 UCRT64 toolchain. This is a valid record of a Windows 11 GCC build, but it is not the documented Visual Studio 2022/MSVC TC-PORT-01 path and must not be labelled as an MSVC run.
+
+### Actual local Windows 11 GCC run — supplemental evidence
+
+- OS: Windows 11 Home Single Language, version 25H2, build `26200.9711` (kernel/build number `26200`), 64-bit.
+- Source: clean fresh checkout at commit `3fcc586d740d2b9b461193e482d6861ca8f905e5`; tree `41b54378c177d7d1e01ff17f2bf7b22663789ec6`.
+- Toolchain: GCC/G++ `16.2.0` (MSYS2 UCRT64), CMake/CTest `4.5.0-rc1`, GNU Make `4.4.1`, generator `MinGW Makefiles`, SFML `2.5.1` with system dependencies (`SFML_USE_SYSTEM_DEPS=ON`, `BUILD_SHARED_LIBS=OFF`). This was a custom GCC configuration using UCRT64 system dependencies, not the repository's documented MSVC configuration.
+- Build: Release build completed successfully; `SnakeXtreme` and `audio_backend_smoke` reached 100%; build exit code `0`. Earlier failed attempts were preserved in the private evidence folder. Compiler/dependency warnings were observed in SFML 2.5.1 (`std::auto_ptr` deprecation and a bundled `stb_image.h` diagnostic); no project build failure remained in the successful retry.
+- CTest inventory: **20 tests**, matching the expected Windows inventory. Full CTest result: **20/20 passed**, 0 failed, 23.41 seconds; exit code `0`.
+- Local executable: `1,495,228` bytes; SHA-256 `c043cd941e55888a13e06cbce5c049729dcb27118e1997f6d941b5e4287e992c`.
+- Manual visible states shown: main menu; Classic gameplay with a visible purple diamond power-up; Game Over after wall collision (score 110, saved, rank 1); leaderboard showing rank, name, score, mode, difficulty and date. Four corresponding screenshots were captured during the manual walkthrough. The full eight-item checklist below was **not** completed: Timed countdown, obstacle collision message, pause/resume and menu/exit keyboard flows, window-X exit, and settings persistence after restart have not been evidenced here. Confirm the screenshot image files are saved into the local evidence directory before treating them as attached repository evidence.
+- Local logs and screenshots are retained in `TC-PORT-01-Windows11-GCC-Evidence-20261031` on the test machine. The complete configure/build/CTest/toolchain logs are not all published in this PR at this point.
+
+The `Run-TC-PORT-01-Windows11.ps1` helper is MSVC-specific and was **not** run against this GCC build. The evidence below therefore records a supplemental Windows 11 GCC portability run, not a passing documented MSVC TC-PORT-01 acceptance run. To complete the documented gate, a separate clean Visual Studio 2022 Developer PowerShell run is still required.
 
 Use the documented commands and options in [quality-gates.md](../../quality-gates.md), from a clean checkout of the agreed SHA:
 
@@ -78,7 +91,7 @@ It refuses to reuse an existing evidence directory, verifies the requested full 
 
 ## Issue #24 — exact-build privacy
 
-**Status: Candidate pinned; collector corrections prepared and Tejas review requested. Passive exact-build capture is ready once the Windows 11 EXE exists. The outbound firewall step remains blocked pending Dinesh's explicit approval.**
+**Status: Exact-build passive capture completed on 31 Oct 2026; outbound firewall-block test not run and remains gated on Dinesh's explicit approval.** The passive capture used the locally built Windows 11 GCC EXE from the pinned candidate. It did not create or modify a firewall rule.
 
 Historical public evidence:
 - [Redacted 60-observation JSON](https://github.com/dineshkumarc-1/software_engineering_mini_project/blob/d59d85e2e028a244fee71d8b95c5e2e77e6c8b66/docs/sprint2/evidence/issue-24-offline-evidence.redacted.json)
@@ -96,7 +109,7 @@ The existing [PowerShell collector](https://github.com/dineshkumarc-1/software_e
 
 The current script writes its JSON before its `finally` cleanup and silently ignores removal errors, so its existing JSON does not prove cleanup succeeded. The source review and findings are recorded on [Issue #24](https://github.com/dineshkumarc-1/software_engineering_mini_project/issues/24#issuecomment-6545090501).
 
-A replacement helper, [`Collect-Issue24-ExactBuildEvidence.ps1`](./Collect-Issue24-ExactBuildEvidence.ps1), is included in this draft. Passive process-owned TCP/UDP/liveness sampling is the default and does not create firewall rules. It records exact source commit/tree, EXE byte size/SHA-256, OS and PowerShell identity, UTC sample timestamps, actual elapsed time, sampling interval min/average/max, and per-sample/global collection errors. It writes the JSON after the cleanup path has completed. The helper has not been executed or validated on Windows here.
+A replacement helper, [`Collect-Issue24-ExactBuildEvidence.ps1`](./Collect-Issue24-ExactBuildEvidence.ps1), is included in this draft. Passive process-owned TCP/UDP/liveness sampling is the default and does not create firewall rules. It records exact source commit/tree, EXE byte size/SHA-256, OS and PowerShell identity, UTC sample timestamps, actual elapsed time, sampling interval min/average/max, and per-sample/global collection errors. It writes the JSON after the cleanup path has completed. The helper has now been executed on the Windows 11 test machine against the exact pinned GCC-built EXE; the results are recorded below. The separate firewall mode was not invoked.
 
 Passive capture command (run against the EXE produced by the agreed Windows 11 source build):
 
@@ -115,6 +128,21 @@ Get-Content .\issue-24-exact-build-redacted.json
 ```
 
 The script does **not** publish files. Manually review the entire redacted JSON for paths, usernames, hostnames or local details in collection error messages before adding the redacted derivative and its SHA-256 manifest to the PR. Never commit the raw file.
+
+### Actual exact-build passive capture — 31 October 2026
+
+The updated `Collect-Issue24-ExactBuildEvidence.ps1` was executed from PR #67 head `e965d3a08b31c07de8f886355f2cc8a2d7f9a2fd` against the locally built Windows 11 GCC executable described above. The source commit/tree and executable identity were checked by the script and matched the pinned candidate. `Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass` was used only in that PowerShell process to permit the local signed-off script invocation; no machine-wide execution policy was changed.
+
+Published redacted evidence:
+- [`issue-24-windows11-gcc-passive-redacted.json`](./issue-24-windows11-gcc-passive-redacted.json)
+- [`issue-24-windows11-gcc-passive-redacted.sha256.txt`](./issue-24-windows11-gcc-passive-redacted.sha256.txt)
+- Redacted JSON SHA-256: `404FD695AA6D48BA7CE3178911A6676C3C14DF9FE340BED02C16BDFFDE14CE6D`.
+
+Capture results: requested 60 seconds; actual elapsed `60,062.836 ms`; 58 observations spanning `59,047.278 ms` from first to last sample. The 57 observed sample intervals ranged from `1,000.518 ms` to `2,497.032 ms`, average `1,035.917 ms`. The process was reported running in all 58 samples and at the end. TCP and UDP queries succeeded in all 58 samples; no sample contained a process-owned TCP record or UDP endpoint. There were zero per-sample/global collection errors and no fatal error. This records endpoint snapshots only: it does not rule out brief activity between samples or prove that no network attempt is possible.
+
+The capture was **passive**: `Firewall.Requested=false`, `Firewall.RuleCreated=false`; no firewall block rule was created as part of this exact-build run. `GameplayObservation` is `Not recorded`, so the capture proves process liveness and successful endpoint queries, not that gameplay/menu interaction was independently verified during the sampling window. Separate manual UI screenshots are recorded in the TC-PORT-01 section.
+
+The raw JSON remains private on the test machine and was not committed. The redacted derivative was manually reviewed, scanned for the local username, computer name, local paths, evidence-root path, repository path and temporary rule name, and its hash was independently checked against the manifest before being committed in PR #67. Commit `66d76408231b8b3cedcb314f6d1889aa5ebceac1` added only the redacted JSON and hash manifest. A prior read-only check after the historical 29 Oct firewall test found its old rule absent from both ActiveStore and PersistentStore; this is separate from the 31 Oct passive capture.
 
 ### Approval gate
 
@@ -143,13 +171,13 @@ Deterministic malformed/truncated-input tests are **fuzz-style regression tests*
 | Work item | Status | Evidence / action |
 |---|---|---|
 | Shared exact candidate SHA | **Pinned for this campaign** | `3fcc586d740d2b9b461193e482d6861ca8f905e5` (not release approval) |
-| Windows 11 clean source checkout/build | **Not tested** | Run TC-PORT-01 on pinned SHA; hosted Windows CI is supplemental only |
-| Windows 11 CTest | **Not tested locally** | Hosted Windows MSVC CTest 20/20 passed; actual Windows 11 run still required |
-| Windows 11 EXE size/hash | **Not tested** | Hash the locally generated Release EXE |
-| Windows 11 gameplay/manual screenshots | **Not tested** | Execute all checklist observations and capture real client area |
-| Historical privacy observations | **Pass, historical only** | 60 snapshots; not tied to exact source/EXE identity |
-| Exact-build passive TCP/UDP/liveness collector | **Prepared; not run** | Run helper against EXE built from pinned SHA |
-| Redacted privacy evidence helper | **Prepared; not run** | Produces a redacted derivative; manual review and exact-build raw capture still required |
+| Windows 11 clean source checkout/build | **Supplemental GCC build passed** | Exact candidate/tree; GCC 16.2.0 / MinGW; documented MSVC gate still required |
+| Windows 11 CTest | **Pass, local GCC** | Expected 20-test inventory matched; 20/20 passed, 23.41 seconds |
+| Windows 11 EXE size/hash | **Recorded, local GCC** | 1,495,228 bytes; SHA-256 `c043cd941e55888a13e06cbce5c049729dcb27118e1997f6d941b5e4287e992c` |
+| Windows 11 gameplay/manual screenshots | **Partial** | Main menu, Classic power-up gameplay, Game Over and six-column leaderboard shown; remaining checklist items not verified |
+| Historical privacy observations | **Pass, historical only** | 29 Oct capture used another executable; not tied to exact source/EXE identity |
+| Exact-build passive TCP/UDP/liveness collector | **Pass, passive capture** | 31 Oct capture: 58 samples, 0 query failures/errors, no TCP/UDP records; no firewall rule created |
+| Redacted privacy evidence helper | **Pass; evidence published** | Redacted JSON and SHA-256 manifest committed in `66d7640`; raw remains private |
 | Firewall/offline privacy test | **Blocked** | Dinesh approval required before elevation/rule creation; no rule has been created in this work |
 | Persistence regression (existing Linux evidence) | **Pass, scoped** | Run 3 / Run 4 links above |
 | Native Windows crash injection | **Not tested / Pending** | Tejas records no native injector; proposed test-only interposer DLL (Detours/IAT); Dinesh decides scope vs limitation |
