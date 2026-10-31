@@ -212,13 +212,39 @@ try {
         "Release executable was not found at expected path: $exePath" | Tee-Object -FilePath $summaryPath -Append
     }
 
-    "Open winver and save a screenshot into this evidence folder." | Tee-Object -FilePath $summaryPath -Append
+    "Open winver, capture the version/build dialog, and save the actual screenshot into the evidence folder." | Tee-Object -FilePath $summaryPath -Append
     Start-Process -FilePath "winver.exe"
-
-    "=== Manual checklist (operator must record actual results and screenshots) ===" | Tee-Object -FilePath $summaryPath -Append
-    foreach ($check in $manualChecks) {
-        "[ ] NOT RECORDED: $check" | Tee-Object -FilePath $summaryPath -Append
+    $winverScreenshot = Read-Host "Enter the winver screenshot path (or NOT RECORDED)"
+    if ([string]::IsNullOrWhiteSpace($winverScreenshot)) {
+        $winverScreenshot = "NOT RECORDED"
     }
+
+    "When ready, perform each visible-client check on the locally built EXE. Record Pass, Fail, or Not tested honestly; add the screenshot filename and concise observation." | Tee-Object -FilePath $summaryPath -Append
+    $manualResultLines = [System.Collections.Generic.List[string]]::new()
+    $manualResultLines.Add("TC-PORT-01 Windows 11 manual observations")
+    $manualResultLines.Add("Winver screenshot: $winverScreenshot")
+    $manualResultLines.Add("Capture timestamp UTC: $([DateTimeOffset]::UtcNow.ToString('o'))")
+
+    $manualIndex = 0
+    foreach ($check in $manualChecks) {
+        $manualIndex++
+        $manualResult = Read-Host "Check $manualIndex/$($manualChecks.Count): $check [Passed/Failed/Not tested]"
+        if ($manualResult -notin @("Passed", "Failed", "Not tested")) {
+            $manualResult = "Not tested"
+            Write-Warning "Unrecognized result. Recorded as Not tested."
+        }
+        $observation = Read-Host "Observed result and screenshot filename for check $manualIndex"
+        if ([string]::IsNullOrWhiteSpace($observation)) {
+            $observation = "No observation or screenshot supplied."
+        }
+        $manualResultLines.Add("")
+        $manualResultLines.Add("[$manualResult] $check")
+        $manualResultLines.Add("Observation / screenshot: $observation")
+    }
+
+    $manualEvidencePath = Join-Path $EvidenceRoot "manual-gameplay-results.txt"
+    $manualResultLines | Set-Content -LiteralPath $manualEvidencePath -Encoding UTF8
+    "Manual result record: $manualEvidencePath" | Tee-Object -FilePath $summaryPath -Append
 }
 catch {
     $overallError = $_.Exception.Message
