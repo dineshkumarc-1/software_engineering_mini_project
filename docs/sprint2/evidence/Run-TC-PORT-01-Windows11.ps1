@@ -28,11 +28,37 @@ $identityLog = Join-Path $EvidenceRoot "source-and-machine-identity.txt"
 
 $repoUrl = "https://github.com/dineshkumarc-1/software_engineering_mini_project.git"
 $expectedWindowsCTestCount = 20
+$expectedWindowsCTestNames = @(
+    "app_state_flow",
+    "score_service",
+    "input_validator_tests",
+    "secure_file_store_tests",
+    "leaderboard_repository_tests",
+    "leaderboard_model_tests",
+    "security_corpus_tests",
+    "settings_corpus_tests",
+    "game_session",
+    "game_engine_tests",
+    "game_mode_tests",
+    "powerup_tests",
+    "gameplay_tests",
+    "settings_tests",
+    "audio_model_tests",
+    "performance_probe_tests",
+    "layering_core_is_sfml_free",
+    "security_banned_api_scan",
+    "security_banned_api_scan_finds_planted_calls",
+    "security_banned_api_scan_ignores_lookalikes"
+)
 $configureExitCode = $null
 $buildExitCode = $null
 $inventoryExitCode = $null
 $ctestExitCode = $null
 $registeredTestCount = $null
+$registeredTestNames = @()
+$missingTestNames = @()
+$unexpectedTestNames = @()
+$testInventoryMatches = $false
 $exeSizeBytes = $null
 $exeSha256 = $null
 $sourceTreeSha = $null
@@ -188,7 +214,23 @@ try {
         $inventoryExitCode = $LASTEXITCODE
         $inventoryText = $inventoryOutput -join [Environment]::NewLine
         $registeredTestCount = [regex]::Matches($inventoryText, "(?m)^\s*Test\s+#\d+:").Count
+        $registeredTestNames = @(
+            [regex]::Matches($inventoryText, "(?m)^\s*Test\s+#\d+:\s*(.+?)\s*$") |
+                ForEach-Object { $_.Groups[1].Value.Trim() }
+        )
+        $missingTestNames = @($expectedWindowsCTestNames | Where-Object { $_ -notin $registeredTestNames })
+        $unexpectedTestNames = @($registeredTestNames | Where-Object { $_ -notin $expectedWindowsCTestNames })
+        $testInventoryMatches = (
+            $registeredTestCount -eq $expectedWindowsCTestCount -and
+            $missingTestNames.Count -eq 0 -and
+            $unexpectedTestNames.Count -eq 0
+        )
         "RegisteredTestsParsed: $registeredTestCount" | Tee-Object -FilePath $inventoryLog -Append
+        "ExpectedTestNames: $($expectedWindowsCTestNames -join ', ')" | Tee-Object -FilePath $inventoryLog -Append
+        "ActualTestNames: $($registeredTestNames -join ', ')" | Tee-Object -FilePath $inventoryLog -Append
+        "MissingTestNames: $($missingTestNames -join ', ')" | Tee-Object -FilePath $inventoryLog -Append
+        "UnexpectedTestNames: $($unexpectedTestNames -join ', ')" | Tee-Object -FilePath $inventoryLog -Append
+        "TestInventoryMatches: $testInventoryMatches" | Tee-Object -FilePath $inventoryLog -Append
         "InventoryExitCode: $inventoryExitCode" | Tee-Object -FilePath $inventoryLog -Append
 
         $ctestExitCode = Invoke-LoggedNative -Path $ctestCommand.Source -Arguments @(
@@ -285,6 +327,9 @@ finally {
         "Configure exit code: $configureExitCode"
         "Build exit code: $buildExitCode"
         "Registered CTest tests: $registeredTestCount (Windows expectation: $expectedWindowsCTestCount)"
+        "CTest inventory names match: $testInventoryMatches"
+        "Missing CTest names: $($missingTestNames -join ', ')"
+        "Unexpected CTest names: $($unexpectedTestNames -join ', ')"
         "CTest inventory exit code: $inventoryExitCode"
         "CTest exit code: $ctestExitCode"
         "EXE size bytes: $exeSizeBytes"
@@ -297,7 +342,6 @@ finally {
     Stop-Transcript | Out-Null
 }
 
-$testInventoryMatches = ($registeredTestCount -eq $expectedWindowsCTestCount)
 $automatedChecksPassed = (
     -not $overallError -and
     $workingTreeStatus -eq "Clean" -and
