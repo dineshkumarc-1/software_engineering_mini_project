@@ -35,7 +35,7 @@ ctest --test-dir build -C Release --output-on-failure
 Get-FileHash .\build\Release\SnakeXtreme.exe -Algorithm SHA256
 ```
 
-Run `ctest -N -C Release` against that configured build to record the actual Windows test inventory. Do not hard-code a Linux count: the historical Windows 10 evidence records 20/20 because `secure_write_fault_tests` is registered only on Linux in the candidate CMake configuration. Use the registered tests from the agreed SHA.
+Tejas's documented Windows expectation is **20/20**: `secure_write_fault_tests` is registered only on Linux in the candidate CMake configuration. Run `ctest -N -C Release` after the build to record the actual Windows inventory. If the agreed SHA reports anything other than 20 registered tests, preserve the output and report the discrepancy; do not silently change the expectation.
 
 The manual checklist and evidence must include:
 1. Menu window opens and visible menu text confirms font loading.
@@ -49,7 +49,7 @@ The manual checklist and evidence must include:
 
 Required evidence: complete configure/build/CTest logs (including warnings/failures), `winver` screenshot, menu/gameplay/leaderboard client-area screenshots, manual observations, source SHA/tree/clean status, toolchain, and the built EXE size/hash. Preserve failed attempts and their original logs.
 
-A helper script was prepared outside the repository for running the documented clean checkout/build/log capture. It has not been executed or validated on PowerShell/Windows in this environment and is not a substitute for the actual Windows run.
+A helper script was prepared outside the repository for the documented clean checkout/build/log capture. It records the actual `ctest -N` inventory against the **20-test Windows expectation** and preserves configure, build, CTest, toolchain and EXE identity output. It has not been executed or validated on PowerShell/Windows in this environment and is not a substitute for the actual Windows run.
 
 ## Issue #24 — exact-build privacy
 
