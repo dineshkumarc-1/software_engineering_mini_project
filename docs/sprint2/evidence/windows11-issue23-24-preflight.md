@@ -12,7 +12,7 @@ The existing records refer to more than one candidate:
 - Product revision including PR #60: `3fcc586d740d2b9b461193e482d6861ca8f905e5`.
 - Current repository main at preparation time: `5b947efaeccfcf56f874d068854df935256eafc0`. Its delta from `3fcc586` is documentation/evidence only (QA checklist, deviation matrix, release closeout, test summary, the #60 gate log and quality-gates document); this is not a selection of the accepted test candidate.
 
-Dinesh and Tejas must name one exact full SHA and agree it is the shared target for both issues. The test must not be run against a branch tip or a prebuilt Windows 10 executable by inference. Record the accepted SHA, tree SHA, and a clean checkout before building.
+Dinesh and Tejas must name one exact full SHA and agree it is the shared target for both issues. The test must not be run against a branch tip or a prebuilt Windows 10 executable by inference. Record the accepted SHA, tree SHA, and a clean checkout before building. Tejas's written Windows TC-PORT-01 instructions on [Issue #23](https://github.com/dineshkumarc-1/software_engineering_mini_project/issues/23#issuecomment-6528475763) specify **20/20 CTest on Windows** because `secure_write_fault_tests` is Linux-only. Capture `ctest -N` on the selected SHA to verify the registered inventory and report 20/20; do not use Linux's 21 as the Windows expectation.
 
 Coordination requests:
 - [Issue #23 candidate pin request](https://github.com/dineshkumarc-1/software_engineering_mini_project/issues/23#issuecomment-6545038214)
