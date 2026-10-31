@@ -42,6 +42,7 @@ private:
     void handleKey(sf::Keyboard::Key key);
     void select(MenuInput input);
     void syncAudio(bool previewSfx = false);
+    void startAudio();
     void handleSettingsKey(sf::Keyboard::Key key);
     void activateSettings();
     void clickSettings(int x, int y);
@@ -59,6 +60,7 @@ private:
     std::int64_t inputDequeuedUs_{0};
     AudioService audio_;
     StartupMark audioObjectsMark_{*this, "audio_objects_constructed"};
+    bool audioStartAttempted_{false};
     SettingsRepository settingsRepository_;
     LeaderboardModel leaderboard_;
     Settings settings_;
