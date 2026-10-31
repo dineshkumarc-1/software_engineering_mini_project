@@ -71,7 +71,7 @@ A clean-checkout runner is included as [`Run-TC-PORT-01-Windows11.ps1`](./Run-TC
 
 ```powershell
 Set-ExecutionPolicy -Scope Process Bypass
-.\Run-TC-PORT-01-Windows11.ps1 -CandidateSha <AGREED_FULL_SHA> -EvidenceRoot .\TC-PORT-01-Windows11-Evidence-<UNIQUE_SUFFIX>
+.\docs\sprint2\evidence\Run-TC-PORT-01-Windows11.ps1 -CandidateSha 3fcc586d740d2b9b461193e482d6861ca8f905e5 -EvidenceRoot .\TC-PORT-01-Windows11-Evidence-20261031
 ```
 
 It refuses to reuse an existing evidence directory, verifies the requested full SHA and clean source checkout, builds out-of-tree using the documented CMake options, saves complete configure/build/CTest/toolchain logs, records `ctest -N`, and treats **20** as the Windows inventory expectation. It also records the generated EXE size and SHA-256, opens `winver` first, then launches the game. The operator is prompted for the actual result (`Passed`, `Failed`, or `Not tested`), observation and screenshot filename for each checklist item; if the EXE is absent, all game checks are recorded **Not tested**. Actual client screenshots must still be captured manually and independently inspected. The helper has not been run or validated on Windows/PowerShell here, so preserve any first-run errors as evidence rather than assuming success.
@@ -104,13 +104,13 @@ Passive capture command (run against the EXE produced by the agreed Windows 11 s
 $source = .\TC-PORT-01-Windows11-Evidence-<UNIQUE_SUFFIX>\source
 $sourceSha = (git -C $source rev-parse HEAD).Trim()
 $treeSha = (git -C $source rev-parse 'HEAD^{tree}').Trim()
-.\Collect-Issue24-ExactBuildEvidence.ps1 -ExecutablePath .\TC-PORT-01-Windows11-Evidence-<UNIQUE_SUFFIX>\build\Release\SnakeXtreme.exe -SourceCommitSha $sourceSha -SourceTreeSha $treeSha -DurationSeconds 60 -OutputPath .\issue-24-exact-build-raw.json
+.\docs\sprint2\evidence\Collect-Issue24-ExactBuildEvidence.ps1 -ExecutablePath .\TC-PORT-01-Windows11-Evidence-<UNIQUE_SUFFIX>\build\Release\SnakeXtreme.exe -SourceCommitSha $sourceSha -SourceTreeSha $treeSha -DurationSeconds 60 -OutputPath .\issue-24-exact-build-raw.json
 ```
 
 Only after explicit owner approval in the conversation, the separate firewall run may be made from an elevated PowerShell session by adding `-EnableScopedOutboundBlock`. The script then requires the operator to type `APPROVED`, verifies the exact executable-scoped outbound block in ActiveStore before and during sampling, removes only the unique rule it created, and records whether it is absent afterward. The typed phrase is an additional guard, not a substitute for obtaining Dinesh's explicit approval. Do not launch this mode before that approval. The raw JSON includes the computer name and full EXE path; keep it private and publish only a reviewed redacted copy. A helper [`New-Redacted-Issue24Evidence.ps1`](./New-Redacted-Issue24Evidence.ps1) creates a derivative with the computer name, executable path and temporary firewall rule name redacted, and prints the redacted artifact SHA-256:
 
 ```powershell
-.\New-Redacted-Issue24Evidence.ps1 -RawEvidencePath .\issue-24-exact-build-raw.json -RedactedOutputPath .\issue-24-exact-build-redacted.json
+.\docs\sprint2\evidence\New-Redacted-Issue24Evidence.ps1 -RawEvidencePath .\issue-24-exact-build-raw.json -RedactedOutputPath .\issue-24-exact-build-redacted.json
 Get-Content .\issue-24-exact-build-redacted.json
 ```
 
