@@ -4,19 +4,21 @@
 **Scope:** Issues #23 (TC-PORT-01) and #24 (SEC-002..004 / SEC-007)  
 **Status:** Preflight only. This document does not claim a Windows 11 build, test, gameplay run, privacy capture, or QA sign-off.
 
-## Candidate identity — blocked pending owner pin
+## Candidate identity — pinned for this verification campaign
 
-The existing records refer to more than one candidate:
+**Selected test candidate:** `3fcc586d740d2b9b461193e482d6861ca8f905e5`  
+**Source tree:** `41b54378c177d7d1e01ff17f2bf7b22663789ec6`  
+**Reason:** This is the merged #60 product revision containing the integrated collision/Game Over audio change.
 
-- Historical final-QA pin: `7c6733d95a4fa61a3af83c413a27d1ad2f40d44b`.
-- Product revision including PR #60: `3fcc586d740d2b9b461193e482d6861ca8f905e5`.
-- Current repository main at this update: `447b84c8f6e8196b78009be7d1b70b86e6bc916b`. A compare against `3fcc586d740d2b9b461193e482d6861ca8f905e5` shows the intervening seven commits modify QA documents/evidence only; no product source, assets or build configuration changed. This is not a selection of the accepted test candidate.
+This exact SHA is selected **only for the Windows 11 verification campaign**. It is not final release approval, a release tag, a scope waiver or Sprint 2 sign-off. The Windows 11 source build and privacy collection must both use this exact commit and its own generated EXE identity.
 
-Dinesh and Tejas must name one exact full SHA and agree it is the shared target for both issues. The test must not be run against a branch tip or a prebuilt Windows 10 executable by inference. Record the accepted SHA, tree SHA, and a clean checkout before building. Tejas's written Windows TC-PORT-01 instructions on [Issue #23](https://github.com/dineshkumarc-1/software_engineering_mini_project/issues/23#issuecomment-6528475763) specify **20/20 CTest on Windows** because `secure_write_fault_tests` is Linux-only. Capture `ctest -N` on the selected SHA to verify the registered inventory and report 20/20; do not use Linux's 21 as the Windows expectation.
+The earlier candidate `7c6733d95a4fa61a3af83c413a27d1ad2f40d44b` remains historical QA evidence only. Its Windows 10 EXE and test results are not relabelled. Windows 10 evidence is recorded separately below. Current main at `447b84c8f6e8196b78009be7d1b70b86e6bc916b` differs from the selected candidate only in QA documents/evidence, but the required Windows 11 clean checkout is still made directly from the exact selected SHA.
 
-Coordination requests:
-- [Issue #23 candidate pin request](https://github.com/dineshkumarc-1/software_engineering_mini_project/issues/23#issuecomment-6545038214)
-- [Issue #23 Windows 11 availability confirmation](https://github.com/dineshkumarc-1/software_engineering_mini_project/issues/23#issuecomment-6545105677)
+Tejas's written Windows TC-PORT-01 instructions on [Issue #23](https://github.com/dineshkumarc-1/software_engineering_mini_project/issues/23#issuecomment-6528475763) specify **20/20 CTest on Windows** because `secure_write_fault_tests` is Linux-only. Capture `ctest -N -C Release` on the selected SHA and preserve any inventory discrepancy rather than changing the expectation.
+
+Owner confirmation:
+- Candidate SHA selected by Dinesh: `3fcc586d740d2b9b461193e482d6861ca8f905e5` (this conversation, 31 Oct 2026).
+- Campaign scope: test verification only; final acceptance remains pending review.
 
 ## Separate Windows 10 evidence — do not relabel
 
@@ -25,6 +27,14 @@ The earlier Windows 10 artifacts are retained as independent records and are not
 - **Windows 10 baseline report:** source `7c6733d95a4fa61a3af83c413a27d1ad2f40d44b`, tree `e83825372214b6c11296c59d47301cf236a5f716`; Windows 10 Pro build 19045; MSVC 19.44.35229.0 / CMake 4.4.4; reported EXE size 1,906,688 bytes and SHA-256 `FE3AA1316D634611F3D690665C5D802696BE80DA5124C34B2475D05391CEF1F3`; reported 20/20 CTest. The report register says the complete raw logs and actual OpenGL client-area screenshot are not all uploaded for independent review. See [WINDOWS10-EVIDENCE-REGISTER.md](../../qa/WINDOWS10-EVIDENCE-REGISTER.md).
 - **Separate Windows 10 PR #60 audio build:** source revision `09bbf96e14d9b8f037d46b4b55e07d32aeacf26c`; EXE size 1,906,688 bytes and SHA-256 `780B5AB208B7FD6DF91916E4E386848E179FE4B71CBA27BC4BCEE60207D2E946`. Its reported 20/20 CTest, audio assertions and backend checks remain attached to that actual build identity; do not relabel it as a binary built from the later merge commit.
 - **Windows 11:** this campaign must produce its own detached source checkout, source/tree SHA, toolchain details, configure/build/CTest logs, game screenshots and EXE size/SHA-256. No Windows 10 binary, report, screenshot or privacy observation is reused as Windows 11 evidence.
+
+## Supplemental hosted Windows CI — not TC-PORT-01
+
+GitHub Actions run [#41215354989](https://github.com/dineshkumarc-1/software_engineering_mini_project/actions/runs/41215354989) for PR #67 completed **8/8 CI jobs successfully**. The Windows jobs were `Tests (Windows MSVC)`, `Tests (Windows MinGW-w64)` and `App build (Windows MSVC)`. The desktop MSVC job completed Release configure/build, then **20/20 CTest passed** (2.65 seconds), and uploaded `SnakeXtreme.exe`.
+
+This run's PR merge snapshot had base `5b947efaeccfcf56f874d068854df935256eafc0` and PR head `61c9dac732d6a9d5ae252e65833ff63f3156bfec`. Comparing the base against the selected candidate `3fcc586` shows only QA documentation/evidence changes; the product source/assets/build inputs are unchanged. Still, this is a GitHub-hosted `windows-latest` runner and a PR merge snapshot, **not a clean Windows 11 PC checkout of the selected SHA**, not manual visible-client gameplay, and not the requested local Windows 11 EXE hash.
+
+The uploaded CI artifact `SnakeXtreme-windows-x64` from that hosted run contains a 1,903,104-byte EXE with SHA-256 `f56a53a288f1d16abc633718d70ad691682a0057011c52171117d07c82b26495`. This identity is recorded only as a hosted-CI artifact; it must not be attributed to Windows 11, the local machine, or the exact selected commit. CI logs also show non-project Node.js deprecation warnings from GitHub Actions tooling; preserve them as CI/tool warnings, not application compiler warnings.
 
 ## TC-PORT-01 — Windows 11
 
@@ -132,13 +142,13 @@ Deterministic malformed/truncated-input tests are **fuzz-style regression tests*
 
 | Work item | Status | Evidence / action |
 |---|---|---|
-| Shared exact candidate SHA | **Blocked** | Await Dinesh + Tejas full-SHA confirmation |
-| Windows 11 clean source checkout/build | **Not tested** | Run TC-PORT-01 on the agreed SHA |
-| Windows 11 CTest | **Not tested** | Record `ctest -N` inventory and complete CTest output on that SHA |
+| Shared exact candidate SHA | **Pinned for this campaign** | `3fcc586d740d2b9b461193e482d6861ca8f905e5` (not release approval) |
+| Windows 11 clean source checkout/build | **Not tested** | Run TC-PORT-01 on pinned SHA; hosted Windows CI is supplemental only |
+| Windows 11 CTest | **Not tested locally** | Hosted Windows MSVC CTest 20/20 passed; actual Windows 11 run still required |
 | Windows 11 EXE size/hash | **Not tested** | Hash the locally generated Release EXE |
 | Windows 11 gameplay/manual screenshots | **Not tested** | Execute all checklist observations and capture real client area |
 | Historical privacy observations | **Pass, historical only** | 60 snapshots; not tied to exact source/EXE identity |
-| Exact-build passive TCP/UDP/liveness collector | **Prepared; not run** | New helper in this PR; candidate pin and actual Windows 11 execution required |
+| Exact-build passive TCP/UDP/liveness collector | **Prepared; not run** | Run helper against EXE built from pinned SHA |
 | Redacted privacy evidence helper | **Prepared; not run** | Produces a redacted derivative; manual review and exact-build raw capture still required |
 | Firewall/offline privacy test | **Blocked** | Dinesh approval required before elevation/rule creation; no rule has been created in this work |
 | Persistence regression (existing Linux evidence) | **Pass, scoped** | Run 3 / Run 4 links above |
