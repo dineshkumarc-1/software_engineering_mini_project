@@ -226,27 +226,36 @@ try {
         "Manual game checks NOT TESTED because the Release EXE is missing." | Tee-Object -FilePath $summaryPath -Append
     }
 
-    "When ready, perform each visible-client check on the locally built EXE. Record Pass, Fail, or Not tested honestly; add the screenshot filename and concise observation." | Tee-Object -FilePath $summaryPath -Append
     $manualResultLines = [System.Collections.Generic.List[string]]::new()
     $manualResultLines.Add("TC-PORT-01 Windows 11 manual observations")
     $manualResultLines.Add("Winver screenshot: $winverScreenshot")
     $manualResultLines.Add("Capture timestamp UTC: $([DateTimeOffset]::UtcNow.ToString('o'))")
 
-    $manualIndex = 0
-    foreach ($check in $manualChecks) {
-        $manualIndex++
-        $manualResult = Read-Host "Check $manualIndex/$($manualChecks.Count): $check [Passed/Failed/Not tested]"
-        if ($manualResult -notin @("Passed", "Failed", "Not tested")) {
-            $manualResult = "Not tested"
-            Write-Warning "Unrecognized result. Recorded as Not tested."
+    if (Test-Path -LiteralPath $exePath -PathType Leaf) {
+        "Perform each visible-client check on the locally built EXE. Record Pass, Fail, or Not tested honestly; add the screenshot filename and concise observation." | Tee-Object -FilePath $summaryPath -Append
+        $manualIndex = 0
+        foreach ($check in $manualChecks) {
+            $manualIndex++
+            $manualResult = Read-Host "Check $manualIndex/$($manualChecks.Count): $check [Passed/Failed/Not tested]"
+            if ($manualResult -notin @("Passed", "Failed", "Not tested")) {
+                $manualResult = "Not tested"
+                Write-Warning "Unrecognized result. Recorded as Not tested."
+            }
+            $observation = Read-Host "Observed result and screenshot filename for check $manualIndex"
+            if ([string]::IsNullOrWhiteSpace($observation)) {
+                $observation = "No observation or screenshot supplied."
+            }
+            $manualResultLines.Add("")
+            $manualResultLines.Add("[$manualResult] $check")
+            $manualResultLines.Add("Observation / screenshot: $observation")
         }
-        $observation = Read-Host "Observed result and screenshot filename for check $manualIndex"
-        if ([string]::IsNullOrWhiteSpace($observation)) {
-            $observation = "No observation or screenshot supplied."
+    }
+    else {
+        foreach ($check in $manualChecks) {
+            $manualResultLines.Add("")
+            $manualResultLines.Add("[Not tested] $check")
+            $manualResultLines.Add("EXE was not generated at expected path: $exePath")
         }
-        $manualResultLines.Add("")
-        $manualResultLines.Add("[$manualResult] $check")
-        $manualResultLines.Add("Observation / screenshot: $observation")
     }
 
     $manualEvidencePath = Join-Path $EvidenceRoot "manual-gameplay-results.txt"
@@ -271,7 +280,7 @@ finally {
         "CTest exit code: $ctestExitCode"
         "EXE size bytes: $exeSizeBytes"
         "EXE SHA-256: $exeSha256"
-        "Manual gameplay checklist: Not recorded by this script"
+        "Manual gameplay observations: see manual-gameplay-results.txt; screenshots must be independently inspected"
         "Overall error: $overallError"
         "Complete logs are preserved in: $EvidenceRoot"
     )
