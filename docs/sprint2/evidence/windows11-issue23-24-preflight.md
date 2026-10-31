@@ -2,7 +2,7 @@
 
 **Prepared:** 2026-10-31  
 **Scope:** Issues #23 (TC-PORT-01) and #24 (SEC-002..004 / SEC-007)  
-**Status:** Partial Windows 11 execution evidence is now recorded. A local GCC/MinGW Release build and 20/20 CTest run passed, four visible game states were captured, and an exact-build passive TCP/UDP capture was completed. This is supplemental evidence, **not** completion of the documented Visual Studio/MSVC TC-PORT-01 gate, final QA sign-off, or Sprint 2 sign-off.
+**Status:** Windows 11 local GCC/MinGW and Visual Studio 2022/MSVC Release builds have both completed, and each has a matching 20/20 CTest pass on the pinned candidate. The MSVC manual checklist has **7/8 checks passed and 1 failed**: the leaderboard was empty after restart despite the preceding Game Over screen reporting that the score was saved; settings persistence was not verified. Screenshots and the full evidence folder are retained locally; the eight PNG screenshots are not yet committed here. The exact-build passive Issue #24 capture was completed against the GCC executable only. This remains a partial preflight, **not** final QA sign-off or Sprint 2 sign-off.
 
 ## Candidate identity — pinned for this verification campaign
 
@@ -38,7 +38,21 @@ The uploaded CI artifact `SnakeXtreme-windows-x64` from that hosted run contains
 
 ## TC-PORT-01 — Windows 11
 
-**Status: Partially verified on Windows 11 using GCC/MinGW; documented MSVC gate remains incomplete.** The fresh source checkout used the pinned commit/tree and was built locally with GCC 16.2.0 through the MSYS2 UCRT64 toolchain. This is a valid record of a Windows 11 GCC build, but it is not the documented Visual Studio 2022/MSVC TC-PORT-01 path and must not be labelled as an MSVC run.
+**Status: Windows 11 local MSVC build and automated checks passed; manual client checklist is 7/8, with the persistence/leaderboard check failed.** The exact candidate was used in a clean fresh checkout, and the runner completed the documented Visual Studio 2022/MSVC Release build and Windows CTest inventory. This is strong evidence for the build/test portion of TC-PORT-01, but the manual acceptance checklist is not fully passed and the leaderboard discrepancy requires investigation.
+
+### Actual local Windows 11 MSVC run — completed 1 November 2026 (local time)
+
+- OS: Windows 11 Home Single Language, 64-bit, version/build family 25H2 / OS build `26200.9711` (kernel version `10.0.26200`). A separate `winver` screenshot is saved as `00-msvc-windows-version.png`.
+- Source: clean fresh clone at commit `3fcc586d740d2b9b461193e482d6861ca8f905e5`; tree `41b54378c177d7d1e01ff17f2bf7b22663789ec6`. The checkout was clean before build.
+- Toolchain: Visual Studio 2022 Community `17.12.35707.178`; MSVC compiler `19.42.34436.0` (tools directory version `14.42.34433`); CMake/CTest `4.5.0-rc1`; Git `2.54.0.windows.1`; Windows PowerShell `5.1.26100.9711`; CMake generator `Visual Studio 17 2022`.
+- Configure: `-DSNAKE_FETCH_SFML=ON -DBUILD_SHARED_LIBS=OFF`; configure exit code `0`. Third-party SFML CMake deprecation/author/policy warnings appeared, but configuration and generation completed successfully.
+- Build: Release build exit code `0`.
+- CTest: Windows inventory contained exactly `20` tests and matched the expected names; **20/20 passed**, inventory exit code `0`, CTest exit code `0`.
+- Local MSVC executable: `1,896,960` bytes; SHA-256 `3496FD8C9E8ED95FB886BEF272DBAF9D62A181237E3FDB39474FF7627C3E42B5`.
+- Manual checklist: **7 Passed / 1 Failed**. Passed: menu/font visibility; Classic food score +10; Timed countdown observed at 0:55 after starting at 1:00; brown-obstacle collision message; Speed boost HUD name and remaining duration (3.9 seconds observed); Esc pause/resume, M to menu and Esc exit; window-X clean exit.
+- **Failed manual check 8:** after restarting the MSVC-built game, the leaderboard displayed `0` entries / “No scores yet”, despite the preceding Game Over screen reporting “Score saved: rank 3”. Settings persistence was **not verified**. The combined leaderboard/settings checklist item is therefore correctly recorded as **Failed**, not Passed. The manual record was corrected after this discrepancy was noticed.
+- Eight PNG screenshots are saved in the local evidence folder under these names: `00-msvc-windows-version.png`, `01-msvc-main-menu.png`, `02-msvc-classic-score-plus10.png`, `03-msvc-timed-countdown.png`, `04-msvc-obstacle-collision.png`, `05-msvc-powerup-hud.png`, `06-msvc-pause-screen.png`, and `08-msvc-leaderboard-after-restart-empty.png`. There is no screenshot for the window-X close action; the runner checklist did not require one. These image files and the detailed configure/build/CTest logs are currently retained locally and have **not yet been added to this PR**.
+- The runner summary reports no overall error; the candidate and source tree hashes match the pinned values. The MSVC executable identity is distinct from the earlier GCC executable identity and must not be conflated with it.
 
 ### Actual local Windows 11 GCC run — supplemental evidence
 
@@ -88,6 +102,8 @@ Set-ExecutionPolicy -Scope Process Bypass
 ```
 
 It refuses to reuse an existing evidence directory, verifies the requested full SHA and clean source checkout, builds out-of-tree using the documented CMake options, saves complete configure/build/CTest/toolchain logs, records `ctest -N`, and treats **20** as the Windows inventory expectation. It also records the generated EXE size and SHA-256, opens `winver` first, then launches the game. The operator is prompted for the actual result (`Passed`, `Failed`, or `Not tested`), observation and screenshot filename for each checklist item; if the EXE is absent, all game checks are recorded **Not tested**. Actual client screenshots must still be captured manually and independently inspected. The helper has not been run or validated on Windows/PowerShell here, so preserve any first-run errors as evidence rather than assuming success.
+
+
 
 ## Issue #24 — exact-build privacy
 
@@ -171,10 +187,10 @@ Deterministic malformed/truncated-input tests are **fuzz-style regression tests*
 | Work item | Status | Evidence / action |
 |---|---|---|
 | Shared exact candidate SHA | **Pinned for this campaign** | `3fcc586d740d2b9b461193e482d6861ca8f905e5` (not release approval) |
-| Windows 11 clean source checkout/build | **Supplemental GCC build passed** | Exact candidate/tree; GCC 16.2.0 / MinGW; documented MSVC gate still required |
-| Windows 11 CTest | **Pass, local GCC** | Expected 20-test inventory matched; 20/20 passed, 23.41 seconds |
-| Windows 11 EXE size/hash | **Recorded, local GCC** | 1,495,228 bytes; SHA-256 `c043cd941e55888a13e06cbce5c049729dcb27118e1997f6d941b5e4287e992c` |
-| Windows 11 gameplay/manual screenshots | **Partial** | Main menu, Classic power-up gameplay, Game Over and six-column leaderboard shown; remaining checklist items not verified |
+| Windows 11 clean source checkout/build | **MSVC and GCC Release builds passed** | Exact candidate/tree; local MSVC 19.42.34436.0 and separate GCC 16.2.0 builds; see distinct executable identities |
+| Windows 11 CTest | **Pass, local MSVC and GCC** | Each local build matched the expected 20-test inventory; 20/20 passed in each configuration |
+| Windows 11 EXE size/hash | **Recorded, local GCC and MSVC** | GCC: 1,495,228 bytes / `c043cd941e55888a13e06cbce5c049729dcb27118e1997f6d941b5e4287e992c`; MSVC: 1,896,960 bytes / `3496FD8C9E8ED95FB886BEF272DBAF9D62A181237E3FDB39474FF7627C3E42B5` |
+| Windows 11 gameplay/manual screenshots | **MSVC: 7/8 passed, 1 failed; GCC: partial** | MSVC manual checklist passed 7 items; leaderboard-after-restart failed; settings persistence not verified. Eight MSVC PNGs remain local and are not yet committed |
 | Historical privacy observations | **Pass, historical only** | 29 Oct capture used another executable; not tied to exact source/EXE identity |
 | Exact-build passive TCP/UDP/liveness collector | **Pass, passive capture** | 31 Oct capture: 58 samples, 0 query failures/errors, no TCP/UDP records; no firewall rule created |
 | Redacted privacy evidence helper | **Pass; evidence published** | Redacted JSON and SHA-256 manifest committed in `66d7640`; raw remains private |
