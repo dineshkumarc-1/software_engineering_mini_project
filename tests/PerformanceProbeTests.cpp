@@ -104,3 +104,37 @@ TEST_CASE("Report has explicit scope, null unobserved inputs, and never overwrit
     CHECK_FALSE(p.writeReport(file.path, error)); CHECK_FALSE(error.empty());
     CHECK_FALSE(p.writeReport(file.path / "missing" / "out.json", error));
 }
+TEST_CASE("Start-up phases are named, ordered, bounded and reported (#22)", "[probe]") {
+    PerformanceProbe p;
+    p.phase("audio_objects_constructed", 100);
+    p.phase("window_created", 400);
+    p.phase("window_created", 500);   // duplicate name
+    p.phase("settings_ready", 300);   // earlier than the last phase
+    p.phase("", 600);                 // unnamed
+    p.phase(std::string(65, 'x'), 600); // over-long name
+    p.phase("audio_started", -1);     // invalid clock
+    CHECK(p.invalidSamples() == 5);
+    REQUIRE(p.phases().size() == 2);
+    CHECK(p.phases()[0].name == "audio_objects_constructed"); CHECK(p.phases()[0].us == 100);
+    CHECK(p.phases()[1].name == "window_created"); CHECK(p.phases()[1].us == 400);
+
+    for (std::size_t i = p.phases().size(); i < PerformanceProbe::MaxPhases + 3; ++i)
+        p.phase("extra_" + std::to_string(i), 1000 + static_cast<std::int64_t>(i));
+    CHECK(p.phases().size() == PerformanceProbe::MaxPhases); CHECK(p.droppedPhases() == 3);
+
+    p.frame(5000, Playing);
+    ReportFile file; std::string error; REQUIRE(p.writeReport(file.path, error));
+    std::ifstream input(file.path); const auto report = nlohmann::json::parse(input);
+    CHECK(report["schema_version"] == 1);
+    CHECK(report["startup_phases_scope"] == "steady_clock_us_since_main_after_each_named_step");
+    REQUIRE(report["startup_phases_us"].size() == PerformanceProbe::MaxPhases);
+    CHECK(report["startup_phases_us"][0]["phase"] == "audio_objects_constructed");
+    CHECK(report["startup_phases_us"][1]["us"] == 400);
+    CHECK(report["dropped_phases"] == 3);
+}
+TEST_CASE("A report without start-up phases still has an empty, explicit list", "[probe]") {
+    PerformanceProbe p; p.frame(10, Playing);
+    ReportFile file; std::string error; REQUIRE(p.writeReport(file.path, error));
+    std::ifstream input(file.path); const auto report = nlohmann::json::parse(input);
+    CHECK(report["startup_phases_us"].empty()); CHECK(report["dropped_phases"] == 0);
+}
