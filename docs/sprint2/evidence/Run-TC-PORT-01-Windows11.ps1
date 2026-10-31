@@ -229,7 +229,7 @@ try {
 
     if (Test-Path -LiteralPath $exePath -PathType Leaf) {
         "Launching the locally built Release EXE after the winver capture: $exePath" | Tee-Object -FilePath $summaryPath -Append
-        Start-Process -FilePath $exePath
+        Start-Process -FilePath $exePath -WorkingDirectory (Split-Path -Parent $exePath)
     }
     else {
         "Manual game checks NOT TESTED because the Release EXE is missing." | Tee-Object -FilePath $summaryPath -Append
