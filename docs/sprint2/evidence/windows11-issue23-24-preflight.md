@@ -64,7 +64,7 @@ Set-ExecutionPolicy -Scope Process Bypass
 .\Run-TC-PORT-01-Windows11.ps1 -CandidateSha <AGREED_FULL_SHA> -EvidenceRoot .\TC-PORT-01-Windows11-Evidence-<UNIQUE_SUFFIX>
 ```
 
-It refuses to reuse an existing evidence directory, verifies the requested full SHA and clean source checkout, builds out-of-tree using the documented CMake options, saves complete configure/build/CTest/toolchain logs, records `ctest -N`, and treats **20** as the Windows inventory expectation. It also records the generated EXE size and SHA-256, then launches `winver` and the game. The script leaves all manual gameplay checklist rows as **Not recorded**; the operator must perform them and save actual client screenshots. The helper has not been run or validated on Windows/PowerShell here, so preserve any first-run errors as evidence rather than assuming success.
+It refuses to reuse an existing evidence directory, verifies the requested full SHA and clean source checkout, builds out-of-tree using the documented CMake options, saves complete configure/build/CTest/toolchain logs, records `ctest -N`, and treats **20** as the Windows inventory expectation. It also records the generated EXE size and SHA-256, opens `winver` first, then launches the game. The operator is prompted for the actual result (`Passed`, `Failed`, or `Not tested`), observation and screenshot filename for each checklist item; if the EXE is absent, all game checks are recorded **Not tested**. Actual client screenshots must still be captured manually and independently inspected. The helper has not been run or validated on Windows/PowerShell here, so preserve any first-run errors as evidence rather than assuming success.
 
 ## Issue #24 — exact-build privacy
 
