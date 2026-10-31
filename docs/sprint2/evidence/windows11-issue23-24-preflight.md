@@ -97,7 +97,14 @@ $treeSha = (git -C $source rev-parse 'HEAD^{tree}').Trim()
 .\Collect-Issue24-ExactBuildEvidence.ps1 -ExecutablePath .\TC-PORT-01-Windows11-Evidence-<UNIQUE_SUFFIX>\build\Release\SnakeXtreme.exe -SourceCommitSha $sourceSha -SourceTreeSha $treeSha -DurationSeconds 60 -OutputPath .\issue-24-exact-build-raw.json
 ```
 
-Only after explicit owner approval in the conversation, the separate firewall run may be made from an elevated PowerShell session by adding `-EnableScopedOutboundBlock`. The script then requires the operator to type `APPROVED`, verifies the exact executable-scoped outbound block in ActiveStore before and during sampling, removes only the unique rule it created, and records whether it is absent afterward. The typed phrase is an additional guard, not a substitute for obtaining Dinesh's explicit approval. Do not launch this mode before that approval. The raw JSON includes the computer name and full EXE path; keep it private and publish only a reviewed redacted copy.
+Only after explicit owner approval in the conversation, the separate firewall run may be made from an elevated PowerShell session by adding `-EnableScopedOutboundBlock`. The script then requires the operator to type `APPROVED`, verifies the exact executable-scoped outbound block in ActiveStore before and during sampling, removes only the unique rule it created, and records whether it is absent afterward. The typed phrase is an additional guard, not a substitute for obtaining Dinesh's explicit approval. Do not launch this mode before that approval. The raw JSON includes the computer name and full EXE path; keep it private and publish only a reviewed redacted copy. A helper [`New-Redacted-Issue24Evidence.ps1`](./New-Redacted-Issue24Evidence.ps1) creates a derivative with the computer name, executable path and temporary firewall rule name redacted, and prints the redacted artifact SHA-256:
+
+```powershell
+.\New-Redacted-Issue24Evidence.ps1 -RawEvidencePath .\issue-24-exact-build-raw.json -RedactedOutputPath .\issue-24-exact-build-redacted.json
+Get-Content .\issue-24-exact-build-redacted.json
+```
+
+The script does **not** publish files. Manually review the entire redacted JSON for paths, usernames, hostnames or local details in collection error messages before adding the redacted derivative and its SHA-256 manifest to the PR. Never commit the raw file.
 
 ### Approval gate
 
@@ -132,6 +139,7 @@ Deterministic malformed/truncated-input tests are **fuzz-style regression tests*
 | Windows 11 gameplay/manual screenshots | **Not tested** | Execute all checklist observations and capture real client area |
 | Historical privacy observations | **Pass, historical only** | 60 snapshots; not tied to exact source/EXE identity |
 | Exact-build passive TCP/UDP/liveness collector | **Prepared; not run** | New helper in this PR; candidate pin and actual Windows 11 execution required |
+| Redacted privacy evidence helper | **Prepared; not run** | Produces a redacted derivative; manual review and exact-build raw capture still required |
 | Firewall/offline privacy test | **Blocked** | Dinesh approval required before elevation/rule creation; no rule has been created in this work |
 | Persistence regression (existing Linux evidence) | **Pass, scoped** | Run 3 / Run 4 links above |
 | Native Windows crash injection | **Not tested / Pending** | Tejas records no native injector; proposed test-only interposer DLL (Detours/IAT); Dinesh decides scope vs limitation |
