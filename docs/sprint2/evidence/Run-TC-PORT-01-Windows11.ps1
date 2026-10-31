@@ -205,8 +205,7 @@ try {
             "ExecutableSHA256: $exeSha256"
         ) | Set-Content -LiteralPath (Join-Path $EvidenceRoot "executable-identity.txt") -Encoding UTF8
 
-        "Launch the locally built Release EXE for the visible-client checklist: $exePath" | Tee-Object -FilePath $summaryPath -Append
-        Start-Process -FilePath $exePath
+        "Locally built Release EXE is ready for the visible-client checklist: $exePath" | Tee-Object -FilePath $summaryPath -Append
     }
     else {
         "Release executable was not found at expected path: $exePath" | Tee-Object -FilePath $summaryPath -Append
@@ -217,6 +216,14 @@ try {
     $winverScreenshot = Read-Host "Enter the winver screenshot path (or NOT RECORDED)"
     if ([string]::IsNullOrWhiteSpace($winverScreenshot)) {
         $winverScreenshot = "NOT RECORDED"
+    }
+
+    if (Test-Path -LiteralPath $exePath -PathType Leaf) {
+        "Launching the locally built Release EXE after the winver capture: $exePath" | Tee-Object -FilePath $summaryPath -Append
+        Start-Process -FilePath $exePath
+    }
+    else {
+        "Manual game checks NOT TESTED because the Release EXE is missing." | Tee-Object -FilePath $summaryPath -Append
     }
 
     "When ready, perform each visible-client check on the locally built EXE. Record Pass, Fail, or Not tested honestly; add the screenshot filename and concise observation." | Tee-Object -FilePath $summaryPath -Append
