@@ -147,6 +147,7 @@ try {
         }
 
         $sampleElapsedMilliseconds = $stopwatch.Elapsed.TotalMilliseconds
+        $sampleTimestampUtc = [DateTimeOffset]::UtcNow
         $sampleErrors = [System.Collections.Generic.List[object]]::new()
         $tcp = @()
         $udp = @()
@@ -203,12 +204,13 @@ try {
         }
 
         $observations.Add([pscustomobject]@{
-            TimestampUtc = [DateTimeOffset]::UtcNow.ToString("o")
+            TimestampUtc = $sampleTimestampUtc.ToString("o")
             ElapsedMilliseconds = [Math]::Round($sampleElapsedMilliseconds, 3)
             IntervalSincePreviousMilliseconds = $intervalMilliseconds
             ProcessId = $process.Id
             ProcessRunning = $processRunning
             ProcessState = $processState
+            ProcessLivenessQuerySucceeded = $processLivenessSucceeded
             TcpQuerySucceeded = $tcpSucceeded
             TcpConnections = $tcp
             UdpQuerySucceeded = $udpSucceeded
@@ -375,7 +377,9 @@ if ($parentDirectory -and -not (Test-Path -LiteralPath $parentDirectory)) {
 $result | ConvertTo-Json -Depth 12 | Set-Content -LiteralPath $fullOutputPath -Encoding UTF8
 
 Write-Host "Raw evidence saved to: $fullOutputPath"
-Write-Host "Source: $($SourceCommitSha.ToLowerInvariant()); EXE size: $($executableInfo.Length) bytes; EXE SHA-256: $($executableHash.ToLowerInvariant())"
+$displaySize = if ($executableInfo) { $executableInfo.Length } else { "not available" }
+$displayHash = if ($executableHash) { $executableHash.ToLowerInvariant() } else { "not available" }
+Write-Host "Source: $($SourceCommitSha.ToLowerInvariant()); EXE size: $displaySize bytes; EXE SHA-256: $displayHash"
 Write-Host "Samples: $($observations.Count); actual elapsed: $([Math]::Round($stopwatch.Elapsed.TotalMilliseconds, 3)) ms; collection errors: $($errors.Count)"
 
 if ($EnableScopedOutboundBlock) {
