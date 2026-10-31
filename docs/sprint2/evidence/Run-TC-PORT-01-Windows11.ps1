@@ -77,6 +77,20 @@ $manualChecks = @(
 
 Start-Transcript -Path $transcriptPath -NoClobber | Out-Null
 
+function Write-LogLine {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$LogPath,
+
+        [Parameter(Mandatory = $true)]
+        [AllowEmptyString()]
+        [string]$Message
+    )
+
+    Add-Content -LiteralPath $LogPath -Value $Message -Encoding UTF8
+    Write-Host $Message
+}
+
 function Invoke-LoggedNative {
     param(
         [Parameter(Mandatory = $true)]
@@ -90,25 +104,25 @@ function Invoke-LoggedNative {
     )
 
     $commandLine = "$Path " + ($Arguments -join " ")
-    "COMMAND: $commandLine" | Tee-Object -FilePath $LogPath -Append | Out-Host
+    Write-LogLine -LogPath $LogPath -Message "COMMAND: $commandLine"
 
-    # In Windows PowerShell 5.1, native stderr can become an ErrorRecord.
-    # The runner uses Stop globally for cmdlet failures, so temporarily use
-    # Continue while collecting native output; the native exit code remains
-    # the authoritative success/failure signal.
+    # Windows PowerShell 5.1 does not support Tee-Object -Append.
+    # Capture native stdout/stderr, then append using Add-Content.
     $previousErrorActionPreference = $ErrorActionPreference
     try {
         $ErrorActionPreference = "Continue"
-        & $Path @Arguments 2>&1 |
-            Tee-Object -FilePath $LogPath -Append |
-            Out-Host
+        $nativeOutput = @(& $Path @Arguments 2>&1)
         $nativeExitCode = $LASTEXITCODE
     }
     finally {
         $ErrorActionPreference = $previousErrorActionPreference
     }
 
-    "EXIT CODE: $nativeExitCode" | Tee-Object -FilePath $LogPath -Append | Out-Host
+    foreach ($entry in $nativeOutput) {
+        Write-LogLine -LogPath $LogPath -Message ([string]$entry)
+    }
+
+    Write-LogLine -LogPath $LogPath -Message "EXIT CODE: $nativeExitCode"
     return $nativeExitCode
 }
 
@@ -158,9 +172,9 @@ try {
     $clVersionInfo = (Get-Item -LiteralPath $clCommand.Source).VersionInfo
     $clProductVersion = $clVersionInfo.ProductVersion
     $clFileVersion = $clVersionInfo.FileVersion
-    "MSVCCompilerPath: $($clCommand.Source)" | Tee-Object -FilePath $toolchainLog -Append | Out-Host
-    "MSVCProductVersion: $clProductVersion" | Tee-Object -FilePath $toolchainLog -Append | Out-Host
-    "MSVCFileVersion: $clFileVersion" | Tee-Object -FilePath $toolchainLog -Append | Out-Host
+    Write-LogLine -LogPath $toolchainLog -Message "MSVCCompilerPath: $($clCommand.Source)"
+    Write-LogLine -LogPath $toolchainLog -Message "MSVCProductVersion: $clProductVersion"
+    Write-LogLine -LogPath $toolchainLog -Message "MSVCFileVersion: $clFileVersion"
     if ([string]::IsNullOrWhiteSpace($clProductVersion) -and [string]::IsNullOrWhiteSpace($clFileVersion)) {
         throw "Could not read MSVC compiler version metadata from cl.exe."
     }
@@ -175,7 +189,7 @@ try {
         ) -LogPath $toolchainLog | Out-Null
     }
     else {
-        "vswhere.exe not found at expected Visual Studio Installer path." | Tee-Object -FilePath $toolchainLog -Append
+        Write-LogLine -LogPath $toolchainLog -Message "vswhere.exe not found at expected Visual Studio Installer path."
     }
 
     $cloneCode = Invoke-LoggedNative -Path $gitCommand.Source -Arguments @(
@@ -234,11 +248,11 @@ try {
 
     if ($buildExitCode -eq 0) {
         "=== ctest -N -C Release ===" | Set-Content -LiteralPath $inventoryLog -Encoding UTF8
-        $inventoryOutput = @(
-            & $ctestCommand.Source --test-dir $buildDirectory -C Release -N 2>&1 |
-                Tee-Object -FilePath $inventoryLog -Append
-        )
+        $inventoryOutput = @(& $ctestCommand.Source --test-dir $buildDirectory -C Release -N 2>&1)
         $inventoryExitCode = $LASTEXITCODE
+        foreach ($entry in $inventoryOutput) {
+            Write-LogLine -LogPath $inventoryLog -Message ([string]$entry)
+        }
         $inventoryText = $inventoryOutput -join [Environment]::NewLine
         $registeredTestCount = [regex]::Matches($inventoryText, "(?m)^\s*Test\s+#\d+:").Count
         $registeredTestNames = @(
@@ -252,13 +266,13 @@ try {
             $missingTestNames.Count -eq 0 -and
             $unexpectedTestNames.Count -eq 0
         )
-        "RegisteredTestsParsed: $registeredTestCount" | Tee-Object -FilePath $inventoryLog -Append
-        "ExpectedTestNames: $($expectedWindowsCTestNames -join ', ')" | Tee-Object -FilePath $inventoryLog -Append
-        "ActualTestNames: $($registeredTestNames -join ', ')" | Tee-Object -FilePath $inventoryLog -Append
-        "MissingTestNames: $($missingTestNames -join ', ')" | Tee-Object -FilePath $inventoryLog -Append
-        "UnexpectedTestNames: $($unexpectedTestNames -join ', ')" | Tee-Object -FilePath $inventoryLog -Append
-        "TestInventoryMatches: $testInventoryMatches" | Tee-Object -FilePath $inventoryLog -Append
-        "InventoryExitCode: $inventoryExitCode" | Tee-Object -FilePath $inventoryLog -Append
+        Write-LogLine -LogPath $inventoryLog -Message "RegisteredTestsParsed: $registeredTestCount"
+        Write-LogLine -LogPath $inventoryLog -Message "ExpectedTestNames: $($expectedWindowsCTestNames -join ', ')"
+        Write-LogLine -LogPath $inventoryLog -Message "ActualTestNames: $($registeredTestNames -join ', ')"
+        Write-LogLine -LogPath $inventoryLog -Message "MissingTestNames: $($missingTestNames -join ', ')"
+        Write-LogLine -LogPath $inventoryLog -Message "UnexpectedTestNames: $($unexpectedTestNames -join ', ')"
+        Write-LogLine -LogPath $inventoryLog -Message "TestInventoryMatches: $testInventoryMatches"
+        Write-LogLine -LogPath $inventoryLog -Message "InventoryExitCode: $inventoryExitCode"
 
         $ctestExitCode = Invoke-LoggedNative -Path $ctestCommand.Source -Arguments @(
             "--test-dir", $buildDirectory,
@@ -283,13 +297,13 @@ try {
             "ExecutableSHA256: $exeSha256"
         ) | Set-Content -LiteralPath (Join-Path $EvidenceRoot "executable-identity.txt") -Encoding UTF8
 
-        "Locally built Release EXE is ready for the visible-client checklist: $exePath" | Tee-Object -FilePath $summaryPath -Append
+        Write-LogLine -LogPath $summaryPath -Message "Locally built Release EXE is ready for the visible-client checklist: $exePath"
     }
     else {
-        "Release executable was not found at expected path: $exePath" | Tee-Object -FilePath $summaryPath -Append
+        Write-LogLine -LogPath $summaryPath -Message "Release executable was not found at expected path: $exePath"
     }
 
-    "Open winver, capture the version/build dialog, and save the actual screenshot into the evidence folder." | Tee-Object -FilePath $summaryPath -Append
+    Write-LogLine -LogPath $summaryPath -Message "Open winver, capture the version/build dialog, and save the actual screenshot into the evidence folder."
     Start-Process -FilePath "winver.exe"
     $winverScreenshot = Read-Host "Enter the winver screenshot path (or NOT RECORDED)"
     if ([string]::IsNullOrWhiteSpace($winverScreenshot)) {
@@ -297,11 +311,11 @@ try {
     }
 
     if (Test-Path -LiteralPath $exePath -PathType Leaf) {
-        "Launching the locally built Release EXE after the winver capture: $exePath" | Tee-Object -FilePath $summaryPath -Append
+        Write-LogLine -LogPath $summaryPath -Message "Launching the locally built Release EXE after the winver capture: $exePath"
         Start-Process -FilePath $exePath -WorkingDirectory (Split-Path -Parent $exePath)
     }
     else {
-        "Manual game checks NOT TESTED because the Release EXE is missing." | Tee-Object -FilePath $summaryPath -Append
+        Write-LogLine -LogPath $summaryPath -Message "Manual game checks NOT TESTED because the Release EXE is missing."
     }
 
     $manualResultLines = [System.Collections.Generic.List[string]]::new()
@@ -310,7 +324,7 @@ try {
     $manualResultLines.Add("Capture timestamp UTC: $([DateTimeOffset]::UtcNow.ToString('o'))")
 
     if (Test-Path -LiteralPath $exePath -PathType Leaf) {
-        "Perform each visible-client check on the locally built EXE. Record Pass, Fail, or Not tested honestly; add the screenshot filename and concise observation." | Tee-Object -FilePath $summaryPath -Append
+        Write-LogLine -LogPath $summaryPath -Message "Perform each visible-client check on the locally built EXE. Record Pass, Fail, or Not tested honestly; add the screenshot filename and concise observation."
         $manualIndex = 0
         foreach ($check in $manualChecks) {
             $manualIndex++
@@ -338,11 +352,11 @@ try {
 
     $manualEvidencePath = Join-Path $EvidenceRoot "manual-gameplay-results.txt"
     $manualResultLines | Set-Content -LiteralPath $manualEvidencePath -Encoding UTF8
-    "Manual result record: $manualEvidencePath" | Tee-Object -FilePath $summaryPath -Append
+    Write-LogLine -LogPath $summaryPath -Message "Manual result record: $manualEvidencePath"
 }
 catch {
     $overallError = $_.Exception.Message
-    "ERROR: $overallError" | Tee-Object -FilePath $summaryPath -Append
+    Write-LogLine -LogPath $summaryPath -Message "ERROR: $overallError"
 }
 finally {
     $resultLines = @(
@@ -365,7 +379,7 @@ finally {
         "Overall error: $overallError"
         "Complete logs are preserved in: $EvidenceRoot"
     )
-    $resultLines | Tee-Object -FilePath $summaryPath -Append
+    Write-LogLine -LogPath $summaryPath -Message $resultLines
     Stop-Transcript | Out-Null
 }
 
