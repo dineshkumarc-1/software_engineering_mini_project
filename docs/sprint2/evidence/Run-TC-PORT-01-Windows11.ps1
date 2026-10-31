@@ -211,14 +211,20 @@ try {
     $statusLines = @(& $gitCommand.Source -C $checkoutDirectory status --porcelain)
     $workingTreeStatus = if ($statusLines.Count -eq 0) { "Clean" } else { "Not clean" }
 
-    @(
+    $identityLines = @(
         "RequestedCommitSha: $($CandidateSha.ToLowerInvariant())"
         "ActualCommitSha: $actualSha"
         "SourceTreeSha: $sourceTreeSha"
         "WorkingTreeStatusBeforeBuild: $workingTreeStatus"
         "GitStatusPorcelain:"
-        if ($statusLines.Count -eq 0) { "(empty)" } else { $statusLines }
-    ) | Set-Content -LiteralPath $identityLog -Encoding UTF8 -Append
+    )
+    if ($statusLines.Count -eq 0) {
+        $identityLines += "(empty)"
+    }
+    else {
+        $identityLines += @($statusLines | ForEach-Object { [string]$_ })
+    }
+    Add-Content -LiteralPath $identityLog -Value $identityLines -Encoding UTF8
 
     if ($actualSha -ine $CandidateSha) {
         throw "Checked-out SHA $actualSha does not match requested SHA $CandidateSha."
@@ -379,7 +385,9 @@ finally {
         "Overall error: $overallError"
         "Complete logs are preserved in: $EvidenceRoot"
     )
-    Write-LogLine -LogPath $summaryPath -Message $resultLines
+    foreach ($resultLine in $resultLines) {
+        Write-LogLine -LogPath $summaryPath -Message ([string]$resultLine)
+    }
     Stop-Transcript | Out-Null
 }
 
