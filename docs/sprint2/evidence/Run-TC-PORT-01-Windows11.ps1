@@ -72,6 +72,12 @@ function Invoke-LoggedNative {
 }
 
 try {
+    $expectedCandidateSha = "3fcc586d740d2b9b461193e482d6861ca8f905e5"
+    $expectedCandidateTree = "41b54378c177d7d1e01ff17f2bf7b22663789ec6"
+    if ($CandidateSha -ine $expectedCandidateSha) {
+        throw "This campaign runner is pinned to $expectedCandidateSha; refusing candidate $CandidateSha."
+    }
+
     $gitCommand = Get-Command git.exe -ErrorAction Stop
     $cmakeCommand = Get-Command cmake.exe -ErrorAction Stop
     $ctestCommand = Get-Command ctest.exe -ErrorAction Stop
@@ -149,6 +155,9 @@ try {
 
     if ($actualSha -ine $CandidateSha) {
         throw "Checked-out SHA $actualSha does not match requested SHA $CandidateSha."
+    }
+    if ($sourceTreeSha -ine $expectedCandidateTree) {
+        throw "Checked-out tree $sourceTreeSha does not match selected candidate tree $expectedCandidateTree."
     }
     if ($statusLines.Count -ne 0) {
         throw "The source checkout is not clean. Preserve this evidence and do not proceed as a clean build."
