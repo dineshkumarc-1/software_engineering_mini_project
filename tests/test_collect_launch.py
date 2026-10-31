@@ -88,6 +88,20 @@ class CollectLaunchTests(unittest.TestCase):
         self.assertTrue(run["report_valid"])
         self.assertIsNone(run["report_error"])
 
+    def test_startup_phases_are_carried_into_each_run(self):
+        self.report["startup_phases_us"] = [{"phase": "window_created", "us": 2000},
+                                            {"phase": "audio_started", "us": 20000}]
+        self.report["dropped_phases"] = 0
+        status, run = self.run_cli()
+        self.assertEqual(status, 0)
+        self.assertEqual(run["startup_phases_us"], {"window_created": 2000, "audio_started": 20000})
+        self.assertEqual(run["startup_step_us"], {"window_created": 2000, "first_frame": 10345, "audio_started": 7655})
+
+    def test_older_reports_without_phases_still_collect(self):
+        status, run = self.run_cli()
+        self.assertEqual(status, 0)
+        self.assertIsNone(run["startup_phases_us"])
+
     def test_valid_report_without_marker_fails(self):
         status, run = self.run_cli(marker=False)
         self.assertEqual(status, 1)

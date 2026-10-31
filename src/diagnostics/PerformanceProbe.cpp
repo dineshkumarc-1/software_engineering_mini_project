@@ -82,6 +82,15 @@ void PerformanceProbe::frame(std::int64_t now, const ProbeContext& context) {
     }
     pending_.erase(std::remove_if(pending_.begin(), pending_.end(), [this](auto i) { return inputs_[i].displayedUs.has_value(); }), pending_.end());
 }
+void PerformanceProbe::phase(const std::string& name, std::int64_t now) {
+    if (!validTime(now) || name.empty() || name.size() > 64 ||
+        (!phases_.empty() && now < phases_.back().us)) { ++invalidSamples_; return; }
+    if (std::any_of(phases_.begin(), phases_.end(), [&name](const StartupPhase& p) { return p.name == name; })) {
+        ++invalidSamples_; return;
+    }
+    if (phases_.size() == MaxPhases) { ++droppedPhases_; return; }
+    phases_.push_back({name, now});
+}
 bool PerformanceProbe::writeReport(const std::filesystem::path& path, std::string& error) const {
     error.clear();
     try {
@@ -92,7 +101,10 @@ bool PerformanceProbe::writeReport(const std::filesystem::path& path, std::strin
             {"acceptance", "not_assessed"}, {"powerups_implemented", false},
             {"first_frame_us", firstFrameUs_ ? Json(*firstFrameUs_) : Json(nullptr)},
             {"dropped_windows", droppedWindows_}, {"dropped_inputs", droppedInputs_},
-            {"invalid_samples", invalidSamples_}, {"fps_windows", Json::array()}, {"inputs", Json::array()}};
+            {"invalid_samples", invalidSamples_}, {"fps_windows", Json::array()}, {"inputs", Json::array()},
+            {"startup_phases_scope", "steady_clock_us_since_main_after_each_named_step"},
+            {"startup_phases_us", Json::array()}, {"dropped_phases", droppedPhases_}};
+        for (const auto& p : phases_) report["startup_phases_us"].push_back({{"phase", p.name}, {"us", p.us}});
         for (const auto& w : windows_) report["fps_windows"].push_back({{"start_us", w.startUs},
             {"duration_us", 1000000}, {"frames", w.frames}, {"screen", w.context.screen},
             {"mode", w.context.mode}, {"difficulty", w.context.difficulty}, {"uniform_context", w.uniform}, {"session", w.session}});

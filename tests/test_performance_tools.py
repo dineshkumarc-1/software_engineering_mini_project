@@ -95,6 +95,50 @@ class PerformanceToolsTests(unittest.TestCase):
         self.report["fps_windows"] = [self.window(0)]
         with self.assertRaises(ValueError): self.run_report()
 
+    def test_reports_without_startup_phases_stay_valid(self):
+        result = self.run_report()
+        self.assertIsNone(result["startup_phases_us"])
+        self.assertIsNone(result["startup_step_us"])
+
+    def test_startup_phases_give_a_timeline_with_the_first_frame(self):
+        report = copy.deepcopy(self.report)
+        report["first_frame_us"] = 900
+        report["startup_phases_us"] = [{"phase": "audio_objects_constructed", "us": 300},
+                                       {"phase": "window_created", "us": 700},
+                                       {"phase": "audio_started", "us": 1500}]
+        report["dropped_phases"] = 0
+        result = self.run_report(report)
+        self.assertEqual(result["startup_phases_us"], {"audio_objects_constructed": 300, "window_created": 700,
+                                                       "audio_started": 1500})
+        self.assertEqual(list(result["startup_step_us"].items()),
+                         [("audio_objects_constructed", 300), ("window_created", 400), ("first_frame", 200),
+                          ("audio_started", 600)])
+        self.assertEqual(result["acceptance"], "not_assessed")
+
+    def test_malformed_startup_phases_are_rejected(self):
+        bad = [
+            "not-a-list",
+            [{"phase": "a", "us": 5}] * 17,
+            [{"phase": "a", "us": -1}],
+            [{"phase": "", "us": 1}],
+            [{"phase": "a", "us": 1}, {"phase": "a", "us": 2}],
+            [{"phase": "a", "us": 5}, {"phase": "b", "us": 4}],
+            [{"phase": "first_frame", "us": 1}],
+            [{"phase": "a", "us": 1, "extra": True}],
+            [{"phase": "a", "us": 1.5}],
+        ]
+        for phases in bad:
+            report = copy.deepcopy(self.report)
+            report["startup_phases_us"] = phases
+            with self.subTest(phases=str(phases)[:40]), self.assertRaises(ValueError):
+                self.run_report(report)
+
+    def test_dropped_startup_phases_are_flagged(self):
+        report = copy.deepcopy(self.report)
+        report["startup_phases_us"] = [{"phase": "a", "us": 1}]
+        report["dropped_phases"] = 2
+        self.assertTrue(any("incomplete" in warning for warning in self.run_report(report)["warnings"]))
+
     def test_300_good_windows_still_require_target_hardware_and_powerups(self):
         self.report["fps_windows"] = [self.window(i * 1000000) for i in range(300)]
         result = self.run_report()
