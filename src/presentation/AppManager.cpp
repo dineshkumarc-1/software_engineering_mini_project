@@ -44,11 +44,21 @@ AppManager::AppManager(PerformanceProbe* probe, std::chrono::steady_clock::time_
     }
     settingsEditor_.open(settings_);
     markPhase("settings_ready");
-    const bool audioReady = audio_.start(settings_.musicVolume, settings_.sfxVolume);
-    if (!audioReady)
-        std::cerr << "[WARN] AudioService: playback unavailable; silent fallback\n";
-    markPhase(audioReady ? "audio_started" : "audio_unavailable");
+    // Audio starts after the first frame is shown (startAudio, from run()).
     refreshTitle();
+}
+
+void AppManager::startAudio() {
+    if (audioStartAttempted_) return;
+    audioStartAttempted_ = true;
+    // Use whatever gains are current now (Settings preview or saved settings),
+    // then apply the pause state for the current screen.
+    const auto& volumes = state_.screen() == Screen::Settings ? settingsEditor_.value() : settings_;
+    const bool ready = audio_.start(volumes.musicVolume, volumes.sfxVolume);
+    if (!ready)
+        std::cerr << "[WARN] AudioService: playback unavailable; silent fallback\n";
+    syncAudio();
+    markPhase(ready ? "audio_started" : "audio_unavailable");
 }
 
 int AppManager::run() {
@@ -88,6 +98,14 @@ int AppManager::run() {
             if (probeSeconds_ && probe_->firstFrameUs() &&
                 now - *probe_->firstFrameUs() >= static_cast<std::int64_t>(*probeSeconds_) * 1000000)
                 dispatch(Action::Quit);
+        }
+        // Open the audio device only once the first frame is on screen (#22).
+        // Device start-up can take hundreds of milliseconds on Windows; it
+        // must not delay the first visible menu. Restart the frame clock so
+        // that time is not fed into the fixed-step simulation.
+        if (!audioStartAttempted_ && window_.isOpen()) {
+            startAudio();
+            clock.restart();
         }
     }
 
