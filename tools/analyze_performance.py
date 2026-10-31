@@ -26,6 +26,32 @@ def distribution(values):
     return {"count": len(values), "min": min(values), "median": statistics.median(values),
             "mean": statistics.mean(values), "max": max(values)}
 
+def startup_timeline(report, first_frame):
+    """Optional named start-up phases (#22); absent in older reports."""
+    phases = report.get("startup_phases_us")
+    if phases is None:
+        return None, None
+    if not isinstance(phases, list) or len(phases) > 16:
+        raise ValueError("invalid start-up phase list")
+    integer(report.get("dropped_phases", 0))
+    named, previous = {}, None
+    for item in phases:
+        if not isinstance(item, dict) or set(item) != {"phase", "us"}:
+            raise ValueError("start-up phase must be an object with phase and us")
+        name, at = item["phase"], integer(item["us"])
+        if type(name) is not str or not 1 <= len(name) <= 64 or name in named or name == "first_frame":
+            raise ValueError("invalid or duplicate start-up phase name")
+        if previous is not None and at < previous:
+            raise ValueError("start-up phases out of order")
+        named[name], previous = at, at
+    timeline = sorted(list(named.items()) + ([("first_frame", first_frame)] if first_frame is not None else []),
+                      key=lambda pair: pair[1])
+    steps, before = {}, 0
+    for name, at in timeline:
+        steps[name] = at - before
+        before = at
+    return named, steps
+
 def summarize(path):
     path = Path(path)
     if path.stat().st_size > MAX_FILE_BYTES:
@@ -47,6 +73,7 @@ def summarize(path):
         integer(first_frame)
     if windows and first_frame is None:
         raise ValueError("FPS windows require a first-frame timestamp")
+    phases, phase_steps = startup_timeline(report, first_frame)
     eligible, previous, longest, chain = [], None, 0, 0
     all_fps = []
     for window in windows:
@@ -101,9 +128,13 @@ def summarize(path):
                 "First-frame time starts at main entry; use collect_launch.py for an external process-launch readiness upper bound.",
                 "Display timestamps mean display() returned, not measured photons or GPU scan-out.",
                 "No measured power-up activity or independent volunteer usability evidence is provided."]
-    if any(report[f] for f in ("dropped_windows", "dropped_inputs", "invalid_samples")):
+    if phases is not None:
+        warnings.append("Start-up phases are steady-clock marks after each named step; each step's time also includes "
+                        "anything else that ran since the previous mark.")
+    if any(report[f] for f in ("dropped_windows", "dropped_inputs", "invalid_samples")) or report.get("dropped_phases"):
         warnings.append("Dropped or invalid samples: this run is incomplete and unsuitable for acceptance.")
     return {"report": path.name, "acceptance": "not_assessed", "main_to_first_frame_us": first_frame,
+            "startup_phases_us": phases, "startup_step_us": phase_steps,
             "all_complete_window_fps": distribution(all_fps), "hard_obstacle_uniform_gameplay_fps": distribution(eligible),
             "longest_same_session_eligible_seconds": longest,
             "fps_below_30_windows": sum(fps < 30 for fps in eligible),
