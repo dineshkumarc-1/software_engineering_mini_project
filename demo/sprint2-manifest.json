@@ -1,0 +1,142 @@
+{
+  "purpose": "Issue #28 final fresh working-product demo after release selection; not universal QA certification",
+  "release_tag": "v1.0.0-final",
+  "release_source_commit": "e4c6f029e9531d3b066a6098e86fab6bf098f56a",
+  "executable_built_from_commit": "3a286625ceb7ed15c24a2a892d6984ba173a529a",
+  "source_applicability": "Only seven docs/qa files differ between build source and release source; src/include/assets/build/test inputs unchanged. This is not a new release-commit rebuild.",
+  "platform": "Linux / SFML 2.5.1 / Xvfb software OpenGL",
+  "executable_sha256": "095f13b5032dee16d25032b303e909cc670943a8fac1ee0601f229cf5656c32b",
+  "video_sha256": "2861d1e42bcf086cc8d35a3f75289a89ffe773e280104faac2c7d0392f5ffc18",
+  "video_size_bytes": 3691321,
+  "duration_seconds": 120.021333,
+  "video_format": "H264 1280x800 30fps / AAC stereo 48kHz",
+  "packaged_at_utc": "2026-11-01T17:25:31.367035+00:00",
+  "capture_after_release_selection": true,
+  "recording_date_utc": "2026-11-01",
+  "audio": "Actual application OpenAL wave output; not microphone/physical endpoint evidence",
+  "timeline": [
+    {
+      "start": 0,
+      "end": 6,
+      "title": "Main menu > Name entry > Mode selection",
+      "source_session": 1,
+      "source_start": 0,
+      "audio_offset_seconds": 0.7786666666666666
+    },
+    {
+      "start": 6,
+      "end": 15,
+      "title": "Classic mode - food and growth",
+      "source_session": 1,
+      "source_start": 6,
+      "audio_offset_seconds": 0.7786666666666666
+    },
+    {
+      "start": 15,
+      "end": 24,
+      "title": "Multiplier power-up",
+      "source_session": 1,
+      "source_start": 45.821,
+      "audio_offset_seconds": 0.7786666666666666
+    },
+    {
+      "start": 24,
+      "end": 32,
+      "title": "Shrink power-up",
+      "source_session": 1,
+      "source_start": 19.252,
+      "audio_offset_seconds": 0.7786666666666666
+    },
+    {
+      "start": 32,
+      "end": 41,
+      "title": "Speed power-up",
+      "source_session": 1,
+      "source_start": 33.89,
+      "audio_offset_seconds": 0.7786666666666666
+    },
+    {
+      "start": 41,
+      "end": 47,
+      "title": "Pause and resume",
+      "source_session": 1,
+      "source_start": 201.628,
+      "audio_offset_seconds": 0.7786666666666666
+    },
+    {
+      "start": 47,
+      "end": 54,
+      "title": "Collision and Game Over",
+      "source_session": 1,
+      "source_start": 209.256,
+      "audio_offset_seconds": 0.7786666666666666
+    },
+    {
+      "start": 54,
+      "end": 60,
+      "title": "Leaderboard - six columns",
+      "source_session": 1,
+      "source_start": 214.685,
+      "audio_offset_seconds": 0.7786666666666666
+    },
+    {
+      "start": 60,
+      "end": 67,
+      "title": "Settings - independent audio controls",
+      "source_session": 1,
+      "source_start": 219.98100000000002,
+      "audio_offset_seconds": 0.7786666666666666
+    },
+    {
+      "start": 67,
+      "end": 75,
+      "title": "Clean relaunch - configuration persists",
+      "source_session": 2,
+      "source_start": 0,
+      "audio_offset_seconds": 0.7786666666666666
+    },
+    {
+      "start": 75,
+      "end": 81,
+      "title": "Leaderboard persists across relaunch",
+      "source_session": 2,
+      "source_start": 8.708,
+      "audio_offset_seconds": 0.7786666666666666
+    },
+    {
+      "start": 81,
+      "end": 96,
+      "title": "Timed Challenge mode",
+      "source_session": 2,
+      "source_start": 17.471,
+      "audio_offset_seconds": 0.7786666666666666
+    },
+    {
+      "start": 96,
+      "end": 120,
+      "title": "Obstacle mode",
+      "source_session": 3,
+      "source_start": 4.079,
+      "audio_offset_seconds": 0.7786666666666666
+    }
+  ],
+  "source_capture_hashes": {
+    "raw-1.mp4": "708f80aacccc5a275ebaea945c36cab528b5395c68b083a7ae34e2516e78f8a5",
+    "raw-2.mp4": "57b06008569b46c464ad67cffda18324f0f64ed9d10c51df9025b0ba78df03bf",
+    "raw-3.mp4": "ca5676a318b87aa1e95a0f9927dc31dac6162d5a6c5b5c197e1920e4026717ca"
+  },
+  "event_log_sha256": "c83aedac99ffc544b47e0530b76dcf8be3afab8401f62d30466c1f658e7156ae",
+  "normal_exit_codes": [
+    0,
+    0,
+    0
+  ],
+  "limitations": [
+    "The course October 30 recording deadline was missed; this completion is late and not backdated.",
+    "PRs #69/#70 were explicitly deferred and are not in this demo or frozen release.",
+    "Real captures from three normally controlled processes, edited at normal playback speed; no game rules, clocks, RNG, scores or saves were changed.",
+    "Original candidate and an incomplete fresh setup attempt with HUD-hidden food are preserved separately; they are not relabeled as the final recording.",
+    "No Windows/macOS native capture, performance acceptance, coverage campaign or universal QA sign-off claimed.",
+    "Product freeze remains unchanged; this is a documentation/media-only follow-up."
+  ]
+}

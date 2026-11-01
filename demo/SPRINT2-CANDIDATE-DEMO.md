@@ -1,3 +1,5 @@
+> Historical candidate retained for traceability. Superseded by the [fresh final working-product demo](SPRINT2-FINAL-DEMO.md); its original recording identity below is unchanged.
+
 # Sprint 2 candidate working-product demo
 
 [Watch or download the two-minute actual-gameplay video](sprint2-candidate.mp4).
