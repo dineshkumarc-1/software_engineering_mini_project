@@ -138,3 +138,42 @@ TEST_CASE("A report without start-up phases still has an empty, explicit list", 
     std::ifstream input(file.path); const auto report = nlohmann::json::parse(input);
     CHECK(report["startup_phases_us"].empty()); CHECK(report["dropped_phases"] == 0);
 }
+TEST_CASE("New-game timing runs from the confirming event to the first Gameplay frame (FR-001)", "[probe]") {
+    const ProbeContext menu{"ModeSelection", "Classic", "Medium"};
+    const ProbeContext play{"Gameplay", "Classic", "Medium"};
+    PerformanceProbe p;
+    p.frame(1000, menu);
+    p.newGameConfirmed("mode_selection", 2000);
+    p.frame(2500, menu);                 // still on the mode screen: not the grid yet
+    p.frame(3100, play);                 // first Gameplay frame completes the sample
+    p.frame(3200, play);                 // later frames do not move it
+    p.newGameConfirmed("restart", 5000); // superseded before any Gameplay frame...
+    p.newGameConfirmed("restart", 6000); // ...by this one
+    p.frame(6400, play);
+    p.newGameConfirmed("unknown", 7000); // invalid trigger
+    p.newGameConfirmed("restart", 1000); // earlier than the last confirmation
+    p.newGameConfirmed("restart", -5);   // invalid clock
+    CHECK(p.invalidSamples() == 3);
+    REQUIRE(p.newGames().size() == 3);
+    CHECK(p.newGames()[0].trigger == "mode_selection");
+    CHECK(p.newGames()[0].firstGridUs == std::optional<std::int64_t>{3100});
+    CHECK_FALSE(p.newGames()[1].firstGridUs.has_value());
+    CHECK(p.newGames()[2].firstGridUs == std::optional<std::int64_t>{6400});
+    CHECK(p.newGames()[2].ordinal == 3);
+
+    ReportFile file; std::string error; REQUIRE(p.writeReport(file.path, error));
+    std::ifstream input(file.path); const auto report = nlohmann::json::parse(input);
+    CHECK(report["new_game_scope"] == "confirm_event_dequeue_to_first_gameplay_display_return");
+    REQUIRE(report["new_games"].size() == 3);
+    CHECK(report["new_games"][0]["confirmed_us"] == 2000);
+    CHECK(report["new_games"][0]["first_grid_us"] == 3100);
+    CHECK(report["new_games"][1]["first_grid_us"].is_null());
+    CHECK(report["dropped_new_games"] == 0);
+}
+TEST_CASE("New-game storage is capped and reports drops", "[probe]") {
+    PerformanceProbe p;
+    for (std::size_t i = 0; i < PerformanceProbe::MaxNewGames + 4; ++i)
+        p.newGameConfirmed("restart", static_cast<std::int64_t>(i) * 10);
+    CHECK(p.newGames().size() == PerformanceProbe::MaxNewGames);
+    CHECK(p.droppedNewGames() == 4);
+}

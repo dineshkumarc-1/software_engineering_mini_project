@@ -139,6 +139,32 @@ class PerformanceToolsTests(unittest.TestCase):
         report["dropped_phases"] = 2
         self.assertTrue(any("incomplete" in warning for warning in self.run_report(report)["warnings"]))
 
+    def test_reports_without_new_games_stay_valid(self):
+        self.assertIsNone(self.run_report()["new_game_timing"])
+
+    def test_new_game_timing_counts_the_2000_ms_boundary(self):
+        report = copy.deepcopy(self.report)
+        report["new_games"] = [
+            {"ordinal": 1, "trigger": "mode_selection", "confirmed_us": 1000, "first_grid_us": 2001000},
+            {"ordinal": 2, "trigger": "restart", "confirmed_us": 3000000, "first_grid_us": 5000001},
+            {"ordinal": 3, "trigger": "restart", "confirmed_us": 6000000, "first_grid_us": None}]
+        report["dropped_new_games"] = 0
+        timing = self.run_report(report)["new_game_timing"]
+        self.assertEqual((timing["count"], timing["completed"], timing["without_gameplay_frame"]), (3, 2, 1))
+        self.assertEqual(timing["over_2000ms"], 1)
+        self.assertEqual(timing["confirm_to_first_grid_us"]["max"], 2000001)
+
+    def test_malformed_new_games_are_rejected(self):
+        good = {"ordinal": 1, "trigger": "mode_selection", "confirmed_us": 10, "first_grid_us": 20}
+        bad = ["x", [dict(good, ordinal=2)], [dict(good, trigger="menu")], [dict(good, first_grid_us=5)],
+               [dict(good, confirmed_us=-1)], [good, dict(good, ordinal=2, confirmed_us=5)],
+               [dict(good, extra=1)], [good] * 257]
+        for games in bad:
+            report = copy.deepcopy(self.report)
+            report["new_games"] = games
+            with self.subTest(games=str(games)[:40]), self.assertRaises(ValueError):
+                self.run_report(report)
+
     def test_300_good_windows_still_require_target_hardware_and_powerups(self):
         self.report["fps_windows"] = [self.window(i * 1000000) for i in range(300)]
         result = self.run_report()
