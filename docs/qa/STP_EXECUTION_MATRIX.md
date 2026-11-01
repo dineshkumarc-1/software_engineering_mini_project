@@ -1,6 +1,6 @@
 # STP execution and traceability matrix — reconciliation snapshot
 
-**Status:** documentation reconciled; final QA sign-off Pending. This is not a new test execution. Baseline game 7c6733d; docs/tooling main 6db9a7a; PR #60 audio 09bbf96 is separate unmerged product code and is not covered by the baseline Windows EXE.
+**Status:** documentation reconciled; final QA sign-off Pending. This is not a new test execution. Baseline game candidate `7c6733d`; preserve its evidence identity. PR #60 audio commit `09bbf96` is merged at `3fcc586`, but that enhancement is not covered by the baseline Windows EXE. Later Windows 11 evidence for candidate `3fcc586` and PR #76 crash-injection evidence remain separately identified.
 
 ## Authoritative baseline
 
@@ -58,12 +58,12 @@ Evidence anchors: [owner Linux report](OWNER-AUTOMATED-QA-7c6733d.md), [Tejas ca
 | TC-REL-01 | H | NFR-003;SEC-003 | Missing/corrupt config fallback | Automated scope passed | None for defined automated scope. |
 | TC-USE-01 | M | NFR-004 | First game within three screens | Pending human walkthrough | Three outside-team first-time volunteers without help, count primary screens. Not three total clicks/keystrokes and not an AI usability result. |
 | TC-MNT-01 | M | NFR-005 | Module separation | Automated scope passed | None for defined automated scope; specific SAD interface differences remain documented separately. |
-| TC-PORT-01 | M | NFR-006 | Windows 10 and11 clean build/run | Partial evidence | Windows 11 Not tested; proposed omission awaiting explicit disposition. Preserve Windows 10 report and supporting raw logs; no duplicated teammate campaign needed. |
+| TC-PORT-01 | M | NFR-006 | Windows 10 and 11 clean build/run | Partial evidence | Windows 11 build/run evidence for candidate `3fcc586` was accepted by the owner for Issue #23; preserve that candidate identity separately from historical candidate `7c6733d`. Windows 10 supporting-log and remaining requirement-level evidence limitations are not erased by Issue #23 closure. Do not report the entire portability requirement as Passed. |
 | TC-TEST-01 | M | NFR-007 | Headless testability | Automated scope passed | None for defined automated scope. |
 | TC-SEC-01 | H | SEC-001 | Name sanitization | Automated scope passed | None for defined automated scope. |
 | TC-SEC-02 | M | SEC-002 | No PII stored | Partial evidence | Reconcile final Windows saved files/log and redacted inspection evidence; network/firewall audit is additional Issue #24 scope, not the entire definition of SEC002. |
 | TC-SEC-03 | H | SEC-003;SEC-007 | Schema and size validation | Automated scope passed | None for defined automated scope; preserve actual platform-specific assertion counts. |
-| TC-SEC-04 | H | SEC-004 | Safe write under injected faults | Partial evidence | 24-hour best-effort cleanup differs from unconditional startup cleanup; disposition required. Linux crash injection is not newly executed native Windows/macOS injection. |
+| TC-SEC-04 | H | SEC-004 | Safe write under injected faults | Partial evidence | PR #76: Windows 11 focused suite 8 cases / 206 assertions; local CTest 21/21; nine published checksums matched; all 8 normal PR CI jobs passed. Test-only child-process injection is separate from production-game execution. Windows 10/macOS native crash injection, physical power loss, kernel/hardware failures, and real disk-full testing remain untested. The 24-hour cleanup test used aged isolated fixtures, not a real-time wait or guaranteed startup sweep. Keep the 24-hour best-effort versus guaranteed startup-cleanup deviation separately tracked. |
 | TC-SEC-05 | H | SEC-005 | Untrusted data never executable | Automated scope passed | None for defined automated scope. |
 | TC-SEC-06 | H | SEC-006 | 10,000-event and validator buffer limit | Partial evidence | Reconcile complete event/string/memory-stability scope against approved case; no native Win10 sanitizer execution claimed. |
 
