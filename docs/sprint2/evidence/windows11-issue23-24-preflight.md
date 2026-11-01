@@ -193,7 +193,93 @@ The historical Run 4 reports D6 at 4/4 assertions and the Linux fault-injection 
 
 The persistence cleanup contract remains **24-hour best-effort**. Eligible stale temporary/orphan-lock files are removed by a later read or write after the age threshold. Fresh crash leftovers are intentionally preserved; cleanup is not guaranteed on the next startup.
 
-Deterministic malformed/truncated-input tests are **fuzz-style regression tests**, not coverage-guided fuzzing. Linux `LD_PRELOAD` crash-injection evidence is not native Windows crash-injection evidence. Native Windows locked-file refusal tests are separate and do not prove full crash-injection coverage. Tejas's [Issue #23 handoff](https://github.com/dineshkumarc-1/software_engineering_mini_project/issues/23#issuecomment-6528464409) already records Windows crash injection as **Pending** because no native injector exists. Tejas suggests a test-only interposer DLL (for example, Detours or IAT hooks) on `WriteFile`, `FlushFileBuffers`, `MoveFileExW` and `ReplaceFileW`, loaded only into a child test process; the parent would verify old/new board recovery. This must not add a product hook. Dinesh must decide whether this additional platform-specific test is in scope or is documented as a limitation.
+Deterministic malformed/truncated-input tests are **fuzz-style regression tests**, not coverage-guided fuzzing. Linux `LD_PRELOAD` crash-injection evidence remains separate from the native Windows run. Native Windows locked-file refusal tests also remain separate. Native Windows crash injection has now been implemented and executed on 1 November 2026; see the evidence section below. A test-only DLL patches the child writer's Import Address Table for `CreateFileW`, `WriteFile`, `FlushFileBuffers`, `MoveFileExW` and `CloseHandle`. It is loaded only into the isolated child writer process; no product hook was added. The tests cover four abrupt process-termination points and three injected API failures, with parent-side leaderboard and settings recovery checks. This is user-mode process-termination and API-failure evidence, not physical power-loss, kernel-crash, hardware-failure or macOS coverage. Independent Tejas/Dinesh review and acceptance remain pending.
+
+## Native Windows crash injection — 1 November 2026
+
+**Status: Executed successfully; independent review pending.**
+
+A native Windows test-only fault injector was added on branch `feature/issue-24-windows-crash-injection`, based on handoff commit `aef168a2fb679ab86b1c1ca401c4e51cf460f633`. The change adds three test source files and a Windows-only CMake test target; no product source file or desktop-game hook was added.
+
+### Environment and configuration
+
+- OS: Windows 11 Home Single Language, 25H2, build `26200.9711`, 64-bit.
+- Compiler: MSVC `19.42.34436.0`; tools `14.42.34433`.
+- Visual Studio generator: `Visual Studio 17 2022`.
+- Windows SDK: `10.0.22621.0`.
+- CMake: `4.5.0-rc1`; Catch2 `3.8.1`.
+- Release configuration with `SNAKE_BUILD_APP=OFF` and `SNAKE_WARNINGS_AS_ERRORS=ON`.
+- CTest inventory: 21 tests, including `secure_write_fault_tests_windows`.
+
+### Injector design
+
+`WindowsFaultInjection.cpp` is a test-only DLL explicitly loaded by `secure_write_fault_writer_windows`. It patches the child writer executable's Import Address Table for:
+
+- `CreateFileW`
+- `WriteFile`
+- `FlushFileBuffers`
+- `MoveFileExW`
+- `CloseHandle`
+
+The parent Catch2 test process starts the isolated child writer with `CreateProcessW`, waits for it to exit, and checks the persisted files. The SnakeXtreme desktop executable does not load the injector DLL.
+
+### Injected failures and termination points
+
+Four controlled child-process termination points are tested:
+
+1. After temporary-file creation.
+2. After the temporary file has been written, before flush.
+3. After successful flush, before replacement.
+4. After successful replacement.
+
+Three Windows API failure modes are also injected:
+
+- `WriteFile` returns `ERROR_DISK_FULL`.
+- `FlushFileBuffers` returns `ERROR_WRITE_FAULT`.
+- `MoveFileExW` returns `ERROR_ACCESS_DENIED`.
+
+### Recovery coverage
+
+The seven Catch2 cases cover:
+
+- The leaderboard remaining the old valid version before replacement, or the new valid version after replacement.
+- A subsequent save succeeding after each injected termination.
+- Failed write, flush and replacement preserving the old leaderboard.
+- Failed first saves leaving no destination or temporary artifacts.
+- Normal control save without injection.
+- Cleanup of crash leftovers after the agreed 24-hour age, using isolated files whose timestamps are advanced to 48 hours.
+- Settings retaining valid old or new data across injected crashes and API failures.
+
+### Results
+
+- Focused `secure_write_fault_tests_windows`: **7/7 cases, 196/196 assertions passed**.
+- Clean Release rebuild: **passed**.
+- Full Windows CTest after clean rebuild: **21/21 passed**, 0 failed; 9.68 seconds.
+- Final inventory contains all 21 tests with no missing executables.
+
+### Binary identities
+
+- Injector DLL SHA-256: `142E4EB26250C76D4C64E462A65393627F558B6CF0BA84B02F6C3F867B671586`
+- Child writer EXE SHA-256: `10A435073CCE9C9DC7115D85AD36E885664808E595D5E0F8E63891B0EA02539B`
+- Catch2 test EXE SHA-256: `411E307A45D444321620F9F8565A4C174F60BB6F81EA5181FCA26BBD292880E8`
+
+### Published evidence
+
+All published files are redacted and have a matching SHA-256 manifest:
+
+- [Evidence summary](./windows11-crash-injection-20261101/native-windows-crash-injection-summary.md)
+- [Clean Release build log](./windows11-crash-injection-20261101/build-release.log)
+- [Full CTest log](./windows11-crash-injection-20261101/ctest-release.log)
+- [Focused fault-injection result](./windows11-crash-injection-20261101/windows-crash-injection-details.log)
+- [CTest inventory](./windows11-crash-injection-20261101/ctest-inventory.log)
+- [Toolchain and binary identities](./windows11-crash-injection-20261101/run-identity.txt)
+- [SHA-256 manifest](./windows11-crash-injection-20261101/SHA256SUMS.txt)
+
+Raw machine-specific logs remain in the local ignored `build-win-crash` directory and are not committed.
+
+### Limitations
+
+This verifies controlled user-mode process termination and injected API failures against the real Windows persistence path. It does **not** simulate physical power loss, kernel crashes, hardware/disk-controller failures or real disk-full conditions. The desktop application was not built in this headless test run. Advancing timestamps on isolated test files is not a 24-hour real-time wait. macOS crash injection remains untested. Independent review and owner acceptance remain required.
 
 ## Current status table
 
@@ -210,8 +296,8 @@ Deterministic malformed/truncated-input tests are **fuzz-style regression tests*
 | Redacted privacy evidence | **Published for both runs** | GCC passive JSON + manifest committed in `66d7640`; MSVC scoped-firewall JSON + manifest committed in `c84c8a6`; raw files remain private |
 | Exact-build MSVC firewall/offline privacy test | **Run completed; cleanup verified; review pending** | Dinesh approved the one-off run on 1 Nov 2026. Exact EXE-scoped rule verified at start/end; 57 samples, 0 query failures/errors, no TCP/UDP records; rule removed and absent from PersistentStore and ActiveStore; redacted JSON + hash manifest committed in `c84c8a6` |
 | Persistence regression (existing Linux evidence) | **Pass, scoped** | Run 3 / Run 4 links above |
-| Native Windows crash injection | **Not tested / Pending** | Tejas records no native injector; proposed test-only interposer DLL (Detours/IAT); Dinesh decides scope vs limitation |
+| Native Windows crash injection | **Executed; review pending** | Windows 11 MSVC Release, 1 Nov 2026: 7/7 cases and 196/196 assertions; full headless CTest 21/21 after clean rebuild. Test-only child-process IAT hooks; no product hooks. Evidence: `windows11-crash-injection-20261101/`; power-loss and macOS coverage remain untested |
 | Hosted Windows CI | **Pass, supplemental only** | Run `41215354989`: Windows MSVC app build and 20/20 CTest; not TC-PORT-01 |
-| Final review PR and issue closure | **Blocked** | Review actual Windows 11 evidence and Tejas collector review; issues remain open |
+| Final review PR and issue closure | **Blocked** | Independent review of Windows 11 build, privacy and native crash-injection evidence; Tejas collector review and remaining owner dispositions; issues remain open |
 
 No issue closure, final QA approval, Sprint 2 sign-off, release/tag/freeze, or demo approval is implied by this preflight note.

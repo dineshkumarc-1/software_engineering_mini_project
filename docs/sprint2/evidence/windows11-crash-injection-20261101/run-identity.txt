@@ -1,0 +1,33 @@
+Captured: 2026-11-01T13:19:12.7072589+05:30
+OS: Windows 10 Home Single Language
+Display version: 25H2
+OS build: 26200.9711
+PowerShell: 5.1.26100.9711
+CMake: cmake version 4.5.0-rc1
+MSVC compiler: 19.42.34436.0
+MSVC tools: 14.42.34433
+Windows SDK: 10.0.22621.0\
+Generator: Visual Studio 17 2022
+Configuration: Release
+Branch: feature/issue-24-windows-crash-injection
+Base HEAD: aef168a2fb679ab86b1c1ca401c4e51cf460f633
+Base tree: 4a6e6cb666789c7bfec0be71f9f18b77eb0d1665
+
+Source file Git blob hashes:
+CMakeLists.txt : 6d40dd2a6626091d400561195eb5b8eec02b2708
+tests/SecureWriteFaultWindowsTests.cpp : a1bea9ca3eb04c018c829b0547860f6c5efc29dd
+tests/fault/WindowsFaultInjection.cpp : fa58812149e0d3ded2456da1ba61c35590a0b750
+tests/fault/WindowsFaultWriter.cpp : 66615c67cad191c1fb57471fd833cac9c5e1a5ba
+
+Built binary SHA-256 hashes:
+snake_fault_inject_windows.dll : 142E4EB26250C76D4C64E462A65393627F558B6CF0BA84B02F6C3F867B671586
+secure_write_fault_writer_windows.exe : 10A435073CCE9C9DC7115D85AD36E885664808E595D5E0F8E63891B0EA02539B
+secure_write_fault_tests_windows.exe : 411E307A45D444321620F9F8565A4C174F60BB6F81EA5181FCA26BBD292880E8
+
+Verified OS identity (Win32_OperatingSystem):
+OS caption: Microsoft Windows 11 Home Single Language
+OS version: 10.0.26200
+OS build: 26200.9711
+Display version: 25H2
+Architecture: 64-bit
+Note: Registry ProductName/Get-ComputerInfo retain a stale Windows 10 label; CIM caption is used for OS identification.
