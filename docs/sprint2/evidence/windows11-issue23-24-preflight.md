@@ -110,7 +110,7 @@ It refuses to reuse an existing evidence directory, verifies the requested full 
 
 ## Issue #24 — exact-build privacy
 
-**Status: Exact-build passive capture completed on 31 Oct 2026; outbound firewall-block test not run and remains gated on Dinesh's explicit approval.** The passive capture used the locally built Windows 11 GCC EXE from the pinned candidate. It did not create or modify a firewall rule.
+**Status: Exact-build passive GCC capture and one-off owner-approved MSVC scoped-firewall capture completed on 31 October / 1 November 2026; the MSVC temporary rule was removed and its absence verified.** The passive capture used the locally built Windows 11 GCC EXE and did not create or modify a firewall rule. The separate MSVC capture used the local MSVC EXE and Dinesh's explicit one-run authorization; keep the two executable identities and results separate.
 
 Historical public evidence:
 - [Redacted 60-observation JSON](https://github.com/dineshkumarc-1/software_engineering_mini_project/blob/d59d85e2e028a244fee71d8b95c5e2e77e6c8b66/docs/sprint2/evidence/issue-24-offline-evidence.redacted.json)
@@ -128,7 +128,7 @@ The existing [PowerShell collector](https://github.com/dineshkumarc-1/software_e
 
 The current script writes its JSON before its `finally` cleanup and silently ignores removal errors, so its existing JSON does not prove cleanup succeeded. The source review and findings are recorded on [Issue #24](https://github.com/dineshkumarc-1/software_engineering_mini_project/issues/24#issuecomment-6545090501).
 
-A replacement helper, [`Collect-Issue24-ExactBuildEvidence.ps1`](./Collect-Issue24-ExactBuildEvidence.ps1), is included in this draft. Passive process-owned TCP/UDP/liveness sampling is the default and does not create firewall rules. It records exact source commit/tree, EXE byte size/SHA-256, OS and PowerShell identity, UTC sample timestamps, actual elapsed time, sampling interval min/average/max, and per-sample/global collection errors. It writes the JSON after the cleanup path has completed. The helper has now been executed on the Windows 11 test machine against the exact pinned GCC-built EXE; the results are recorded below. The separate firewall mode was not invoked.
+A replacement helper, [`Collect-Issue24-ExactBuildEvidence.ps1`](./Collect-Issue24-ExactBuildEvidence.ps1), is included in this draft. Passive process-owned TCP/UDP/liveness sampling is the default and does not create firewall rules. It records exact source commit/tree, EXE byte size/SHA-256, OS and PowerShell identity, UTC sample timestamps, actual elapsed time, sampling interval min/average/max, and per-sample/global collection errors. It writes the JSON after the cleanup path has completed. The helper was executed in passive mode against the pinned GCC-built EXE and in the separately approved scoped-firewall mode against the pinned MSVC-built EXE; results are recorded in the respective sections below.
 
 Passive capture command (run against the EXE produced by the agreed Windows 11 source build):
 
@@ -163,13 +163,23 @@ The capture was **passive**: `Firewall.Requested=false`, `Firewall.RuleCreated=f
 
 The raw JSON remains private on the test machine and was not committed. The redacted derivative was manually reviewed, scanned for the local username, computer name, local paths, evidence-root path, repository path and temporary rule name, and its hash was independently checked against the manifest before being committed in PR #67. Commit `66d76408231b8b3cedcb314f6d1889aa5ebceac1` added only the redacted JSON and hash manifest. A prior read-only check after the historical 29 Oct firewall test found its old rule absent from both ActiveStore and PersistentStore; this is separate from the 31 Oct passive capture.
 
-### Approval gate
+### Actual exact-build MSVC scoped-firewall capture — 1 November 2026
 
-[Dinesh was asked to explicitly approve or decline](https://github.com/dineshkumarc-1/software_engineering_mini_project/issues/24#issuecomment-6545039355) the following limited operation: elevate PowerShell, create one temporary outbound-block rule scoped only to the exact agreed test EXE, verify that rule in ActiveStore, exercise the game offline, remove only that temporary rule, and verify it is absent afterward. No profile-wide block or unrelated firewall-policy change is intended. No elevation or firewall change has been made as part of this handoff.
+Dinesh explicitly approved one narrowly scoped firewall run on Issue #24 on 1 November 2026. The approved operation used elevated PowerShell, created one temporary Windows Firewall outbound-block rule scoped only to the exact pinned MSVC executable, verified the exact rule in ActiveStore, exercised the game offline, removed only the rule created by this run, and verified its absence in both PersistentStore and ActiveStore. No profile-wide block or unrelated firewall-policy change was made.
 
-After Tejas reviews the collector, run passive exact-build capture against the locally built EXE. Run the separate firewall mode only after Dinesh's explicit approval. Retain raw JSON privately, publish only a reviewed redacted copy, and record source SHA/tree, build configuration/toolchain, EXE size/hash separately from the JSON evidence hash, all timestamps, sampling interval/duration, collection errors, firewall rule verification, game usability observations, and cleanup verification.
+- Platform: Windows 11 Home Single Language, OS version `10.0.26200`, build `26200`; Windows PowerShell `5.1.26100.9711`.
+- Source: `3fcc586d740d2b9b461193e482d6861ca8f905e5`; tree `41b54378c177d7d1e01ff17f2bf7b22663789ec6`.
+- Executable: MSVC Release `SnakeXtreme.exe`, 1,896,960 bytes; SHA-256 `3496FD8C9E8ED95FB886BEF272DBAF9D62A181237E3FDB39474FF7627C3E42B5`. This is the MSVC binary, distinct from the GCC binary used by the earlier passive capture.
+- Capture: requested 60 seconds; actual elapsed `60,121.390 ms`; 57 observations spanning `59,106.795 ms` from first to last sample. All 57 observations reported the process running. TCP query failures: `0`; UDP query failures: `0`; observations with process-owned TCP records: `0`; observations with UDP endpoints: `0`; collection errors: `0`; fatal error: `null`.
+- Sampling intervals: 56 intervals; minimum `1,001.446 ms`, average `1,055.478 ms`, maximum `3,371.548 ms`.
+- Gameplay observation while the rule was active: "Main menu displayed correctly; started Classic mode; gameplay remained responsive; controls worked; no crash or error dialog observed."
+- Firewall result: `VerifiedAtStart=True`; `VerifiedAtEndBeforeCleanup=True`; `CleanupSucceeded=True`; `AbsentInPersistentStore=True`; `AbsentInActiveStore=True`; `VerifiedAbsentAfterCleanup=True`. The temporary rule was removed successfully and is verified absent from both stores.
+- Published redacted evidence: [`issue-24-windows11-msvc-firewall-redacted-20261101.json`](./issue-24-windows11-msvc-firewall-redacted-20261101.json) and [matching SHA-256 manifest](./issue-24-windows11-msvc-firewall-redacted-20261101.sha256.txt). Redacted JSON SHA-256: `CDDA55E8D4D3A96F6F0837B4BF9302C9789B407B4D90802FDD01FBFDCA7681C5`. The redacted file was inspected for personal identifiers, absolute paths, escaped paths and the temporary rule GUID; no matches remained. The raw JSON remains private and was not committed.
+- The 31 October passive GCC capture remains a different run against a different executable; its results must not be combined with this MSVC capture. Both runs record sampled process-owned endpoint snapshots, not packet capture. The maximum interval in this MSVC run was `3,371.548 ms`, so gaps between observations remain; these results do not prove that no brief network activity or attempted connection occurred between samples.
 
-Interpretation limit: process-owned TCP/UDP endpoint snapshots are point-in-time observations, not packet capture. They cannot rule out brief activity between samples or prove that no possible network attempt occurred.
+### Owner approval and execution
+
+Dinesh's authorization applied to the single 1 November 2026 run described above. It is not blanket approval for any additional firewall change or repeat run; seek fresh explicit owner approval for any further firewall-policy operation.
 
 ## Persistence/security handoff — existing evidence, not duplicated
 
@@ -196,9 +206,9 @@ Deterministic malformed/truncated-input tests are **fuzz-style regression tests*
 | Windows 11 EXE size/hash | **Recorded, local GCC and MSVC** | GCC: 1,495,228 bytes / `c043cd941e55888a13e06cbce5c049729dcb27118e1997f6d941b5e4287e992c`; MSVC: 1,896,960 bytes / `3496FD8C9E8ED95FB886BEF272DBAF9D62A181237E3FDB39474FF7627C3E42B5` |
 | Windows 11 gameplay/manual screenshots and persistence | **Original manual: 7/8; controlled persistence retest: Pass** | Original initial restart mismatch retained; controlled identical-working-directory retest confirmed leaderboard and Neon settings survive restart. All 8 original MSVC PNGs and 5 retest PNGs plus JSON/log/hash artifacts are committed |
 | Historical privacy observations | **Pass, historical only** | 29 Oct capture used another executable; not tied to exact source/EXE identity |
-| Exact-build passive TCP/UDP/liveness collector | **Pass, passive capture** | 31 Oct capture: 58 samples, 0 query failures/errors, no TCP/UDP records; no firewall rule created |
-| Redacted privacy evidence helper | **Pass; evidence published** | Redacted JSON and SHA-256 manifest committed in `66d7640`; raw remains private |
-| Firewall/offline privacy test | **Blocked** | Dinesh approval required before elevation/rule creation; no rule has been created in this work |
+| Exact-build passive GCC TCP/UDP/liveness capture | **Completed, passive** | 31 Oct capture: 58 samples, 0 query failures/errors, no TCP/UDP records; no firewall rule created; distinct from the later MSVC scoped-firewall run |
+| Redacted privacy evidence | **Published for both runs** | GCC passive JSON + manifest committed in `66d7640`; MSVC scoped-firewall JSON + manifest committed in `c84c8a6`; raw files remain private |
+| Exact-build MSVC firewall/offline privacy test | **Run completed; cleanup verified; review pending** | Dinesh approved the one-off run on 1 Nov 2026. Exact EXE-scoped rule verified at start/end; 57 samples, 0 query failures/errors, no TCP/UDP records; rule removed and absent from PersistentStore and ActiveStore; redacted JSON + hash manifest committed in `c84c8a6` |
 | Persistence regression (existing Linux evidence) | **Pass, scoped** | Run 3 / Run 4 links above |
 | Native Windows crash injection | **Not tested / Pending** | Tejas records no native injector; proposed test-only interposer DLL (Detours/IAT); Dinesh decides scope vs limitation |
 | Hosted Windows CI | **Pass, supplemental only** | Run `41215354989`: Windows MSVC app build and 20/20 CTest; not TC-PORT-01 |
