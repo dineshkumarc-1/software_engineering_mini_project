@@ -52,6 +52,37 @@ def startup_timeline(report, first_frame):
         before = at
     return named, steps
 
+def new_game_timings(report):
+    """Optional FR-001 / TC-CORE-01 samples: confirm event -> first Gameplay display."""
+    games = report.get("new_games")
+    if games is None:
+        return None
+    if not isinstance(games, list) or len(games) > 256:
+        raise ValueError("invalid new-game list")
+    integer(report.get("dropped_new_games", 0))
+    deltas, incomplete, previous = [], 0, None
+    for index, game in enumerate(games, start=1):
+        if not isinstance(game, dict) or set(game) != {"ordinal", "trigger", "confirmed_us", "first_grid_us"}:
+            raise ValueError("new-game sample must have ordinal, trigger, confirmed_us and first_grid_us")
+        if integer(game["ordinal"]) != index or game["trigger"] not in ("mode_selection", "restart"):
+            raise ValueError("invalid new-game ordinal or trigger")
+        confirmed = integer(game["confirmed_us"])
+        if previous is not None and confirmed < previous:
+            raise ValueError("new games out of order")
+        previous = confirmed
+        if game["first_grid_us"] is None:
+            incomplete += 1
+            continue
+        first_grid = integer(game["first_grid_us"])
+        if first_grid < confirmed:
+            raise ValueError("first grid frame before confirmation")
+        deltas.append(first_grid - confirmed)
+    return {"count": len(games), "completed": len(deltas), "without_gameplay_frame": incomplete,
+            "confirm_to_first_grid_us": distribution(deltas),
+            "over_2000ms": sum(delta > 2000000 for delta in deltas),
+            "scope": "SFML event dequeue of the confirming key/click to the first Gameplay display() return; "
+                     "TC-CORE-01 requires 10 runs on the reference hardware, each <= 2000 ms"}
+
 def summarize(path):
     path = Path(path)
     if path.stat().st_size > MAX_FILE_BYTES:
@@ -74,6 +105,7 @@ def summarize(path):
     if windows and first_frame is None:
         raise ValueError("FPS windows require a first-frame timestamp")
     phases, phase_steps = startup_timeline(report, first_frame)
+    new_games = new_game_timings(report)
     eligible, previous, longest, chain = [], None, 0, 0
     all_fps = []
     for window in windows:
@@ -131,10 +163,11 @@ def summarize(path):
     if phases is not None:
         warnings.append("Start-up phases are steady-clock marks after each named step; each step's time also includes "
                         "anything else that ran since the previous mark.")
-    if any(report[f] for f in ("dropped_windows", "dropped_inputs", "invalid_samples")) or report.get("dropped_phases"):
+    if any(report[f] for f in ("dropped_windows", "dropped_inputs", "invalid_samples")) or report.get("dropped_phases") \
+            or report.get("dropped_new_games"):
         warnings.append("Dropped or invalid samples: this run is incomplete and unsuitable for acceptance.")
     return {"report": path.name, "acceptance": "not_assessed", "main_to_first_frame_us": first_frame,
-            "startup_phases_us": phases, "startup_step_us": phase_steps,
+            "startup_phases_us": phases, "startup_step_us": phase_steps, "new_game_timing": new_games,
             "all_complete_window_fps": distribution(all_fps), "hard_obstacle_uniform_gameplay_fps": distribution(eligible),
             "longest_same_session_eligible_seconds": longest,
             "fps_below_30_windows": sum(fps < 30 for fps in eligible),
