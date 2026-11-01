@@ -2,6 +2,8 @@
 
 **Status: In Progress; final sign-off Pending.** Prepared as additive owner QA close-out support,not impersonating Ayushi or a Windows operator. No new game tests were executed for this document edit.
 
+Missing approval: sign-off from the designated final QA approver on the reconciled Test Summary Report, STP execution matrix, and outstanding deviation dispositions. The approver is not identified in the reviewed record.
+
 ## Scope and build separation
 
 | Build/evidence | Identity | Treatment |
@@ -47,15 +49,15 @@ D1=date validation,D2=>10-entry rejection,D3=schema-corrupt recovery,D4date-only
 
 ## Team close-out and release gates
 
-Implementation issues 14–21 are Done following their recorded implementation, tests, and owner-acceptance evidence. Issue #22 has owner-reported usability evidence: at least three outside-team first-time users reportedly started a game without instructions or help and successfully completed gameplay. Exact build/EXE, OS, execution date, screen route, and individual feedback are not recorded, so full TC-USE-01 acceptance is not asserted. Issue #22 performance and remaining acceptance, #23 portability disposition, #24 exact-build privacy, #25 final report/STP acceptance, #26 UAT/tag/freeze, and #28 complete-product video remain open. PR #60 is merged; this does not grant final QA sign-off.
+Implementation issues 14–21 are Done following their recorded implementation, tests, and owner-acceptance evidence. Issues #22 and #23 are Closed / Completed under their recorded owner-acceptance decisions; preserve their original candidate/platform identities and limitations. Issue #24 is Closed / Done following explicit owner acceptance and PR #76 merge/re-review. PR #76 evidence: Windows 11 focused crash-injection suite, 8 cases / 206 assertions; full local CTest 21/21; nine published checksums matched; all 8 normal PR CI jobs passed. The test-only child-process injection harness is distinct from production-game execution. Accepted parser evidence is a deterministic regression corpus, not coverage-guided fuzzing. Accepted privacy evidence is sampled: GCC passive capture, 58 samples; authorized MSVC scoped-firewall capture, 57 running samples, no observed TCP/UDP records or collection errors, and verified firewall-rule cleanup. Neither capture proves universal zero-network activity. Windows 10/macOS native crash-injection, physical power loss, kernel/hardware failures, and real disk-full testing remain untested. The 24-hour cleanup test used aged isolated fixtures, not a real-time wait or guaranteed startup sweep. Issue #22 performance/measurement limitations and the requirement-level gaps in the matrices remain visible. Issue #25 is In Progress pending documentation review and required final QA sign-off. Issues #26 and #28, and final release/tag/freeze approval, remain separate.
 
 Final-signoff decision must check the approved exit criteria:100% planned execution,100% Highpass,0 open Critical/High,agreedMediumplans,43/43 requirements withpassing evidence,C6-C11>=80%,nosanitizer/cppcheck findings. Current evidence does not yet establish all criteria. No release authorization/signature is asserted.
 
 ## Immediate handoff
 
-- Complete remaining native live checks, the required performance campaign, and approved privacy capture. Independently verify the revised audio archive before treating its corrected records as inspected evidence.
+- Complete the required performance campaign and any remaining native/manual checks that are still required for final QA. Issue #24's scoped GCC passive and authorized MSVC firewall captures are accepted; no repeat firewall audit is required or authorized for Issue #24. Preserve unrelated privacy acceptance gaps separately. Independently verify the revised audio archive before treating its corrected records as inspected evidence.
 - Tejas: review portability evidence and deviations without duplicating the same Windows 10campaign.
-- Bharath: review/document exact-build privacy and persistence-cleanup disposition.
+- Bharath: review remaining privacy-requirement gaps and document the persistence-cleanup deviation disposition; do not repeat Issue #24's accepted firewall audit.
 - Ayushi: review this44-case/43-requirement reconciliation,incorporate final raw evidence and actual human observations,and request final sign-off only when conditions are met.
 - Pin the accepted final artifact, accept or reject explicit deviations, and complete UAT/release/demo decisions. PR #60 is already merged; merge status does not authorize a release tag or final QA sign-off. See [release close-out](SPRINT2_RELEASE_CLOSEOUT.md).
 
@@ -67,4 +69,4 @@ Final-signoff decision must check the approved exit criteria:100% planned execut
 
 The separate Linux Release regression is additional evidence for the merged code, not a substitute for Windows-target acceptance. The fresh warnings-as-errors Release build succeeded; CTest passed 21/21, Python tests passed 33/33, audio tests reported 161 assertions across 5 cases, cppcheck 2.13.0 reported zero findings, and Xvfb UI reruns passed navigation (23 checks), Settings (22), and leaderboard (29). An initial parallel UI run had a missing Settings app window and a leaderboard X11 display-startup failure; original logs were preserved and unchanged sequential reruns passed, with no causal diagnosis established. Permission checks ran with effective capabilities dropped and gates unchanged.
 
-The Linux run does not establish Windows performance/privacy/volunteer acceptance, fresh sanitizer or coverage results, or final release approval. Its redacted 19-file evidence ZIP was supplied in the owner conversation and is not committed repository evidence. Issues #22 and #25 and final QA sign-off remain pending. PR #60's merge does not authorize a release tag or final QA sign-off.
+The Linux run does not establish Windows performance or volunteer acceptance, fresh sanitizer or coverage results, or final release approval. Its redacted 19-file evidence ZIP was supplied in the owner conversation and is not committed repository evidence. Issue #22 is owner-accepted closed, with performance and measurement limitations retained. Issue #25 and final QA sign-off remain pending. PR #60's merge does not authorize a release tag or final QA sign-off.
