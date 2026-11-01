@@ -338,7 +338,12 @@ void AppManager::select(MenuInput input) {
 void AppManager::startGame() {
     if (gameplay_.start(selectedConfig_)) {
         leaderboard_.beginSession();
-        if (probe_ != nullptr) probe_->beginSession();
+        if (probe_ != nullptr) {
+            probe_->beginSession();
+            // FR-001 / TC-CORE-01 timing starts at the confirming event.
+            probe_->newGameConfirmed(state_.screen() == Screen::GameOver ? "restart" : "mode_selection",
+                                     inputDequeuedUs_);
+        }
         menuError_.clear();
         if (state_.screen() == Screen::ModeSelection) dispatch(Action::BeginGame);
         else if (state_.screen() == Screen::GameOver) dispatch(Action::Restart);
