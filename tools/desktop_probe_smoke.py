@@ -84,6 +84,10 @@ try:
         assert ("audio_started" in phase_names) != ("audio_unavailable" in phase_names), "audio start-up not recorded once"
         times = [p["us"] for p in parsed["startup_phases_us"]]
         assert times == sorted(times), "start-up phases out of order"
+        # The fix (#22): audio starts only after the first frame is displayed.
+        audio_mark = next(p["us"] for p in parsed["startup_phases_us"]
+                          if p["phase"] in ("audio_started", "audio_unavailable"))
+        assert audio_mark >= parsed["first_frame_us"], "audio started before the first frame"
         # FR-001 / TC-CORE-01: the mode-selection confirmation reached a Gameplay frame.
         games = parsed["new_games"]
         assert len(games) == 1 and games[0]["trigger"] == "mode_selection", "new game not recorded"
@@ -92,7 +96,7 @@ try:
         summary = summarize(report)
         (output / "gameplay-summary.json").write_text(json.dumps(summary, indent=2), encoding="utf-8")
         print("PASS: all 100 synthetic burst requests recorded in order; accepted/rejected/consumed/displayed separated; no display-name leakage")
-        print("PASS: start-up phases recorded in order; new-game confirmation reached a Gameplay frame "
+        print("PASS: start-up phases recorded in order, audio after the first frame; new-game confirmation reached a Gameplay frame "
               f"({(games[0]['first_grid_us'] - games[0]['confirmed_us']) / 1000:.1f} ms here, not a target measurement)")
     # Preserve environment only for this script's child collector (no global OS settings).
     os.environ.update({k: env[k] for k in ("DISPLAY", "ALSOFT_DRIVERS", "LIBGL_ALWAYS_SOFTWARE")})
