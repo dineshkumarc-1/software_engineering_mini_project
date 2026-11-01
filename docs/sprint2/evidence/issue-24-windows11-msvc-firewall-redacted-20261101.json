@@ -1,0 +1,1221 @@
+{
+    "SchemaVersion":  2,
+    "CapturedAtUtc":  "2026-11-01T06:29:56.0685275+00:00",
+    "ComputerName":  "\u003cREDACTED_COMPUTER\u003e",
+    "OperatingSystem":  {
+                            "Caption":  "Microsoft Windows 11 Home Single Language",
+                            "Version":  "10.0.26200",
+                            "BuildNumber":  "26200"
+                        },
+    "PowerShellVersion":  "5.1.26100.9711",
+    "Source":  {
+                   "CommitSha":  "3fcc586d740d2b9b461193e482d6861ca8f905e5",
+                   "TreeSha":  "41b54378c177d7d1e01ff17f2bf7b22663789ec6"
+               },
+    "Executable":  {
+                       "FullPath":  "\u003cREDACTED_EXECUTABLE_PATH\u003e",
+                       "SizeBytes":  1896960,
+                       "Sha256":  "3496fd8c9e8ed95fb886bef272dbaf9d62a181237e3fdb39474ff7627c3e42b5"
+                   },
+    "Process":  {
+                    "Id":  4656,
+                    "StateAtEnd":  "Running"
+                },
+    "Capture":  {
+                    "StartedAtUtc":  "2026-11-01T06:27:29.2433458+00:00",
+                    "EndedAtUtc":  "2026-11-01T06:28:29.3669152+00:00",
+                    "RequestedDurationSeconds":  60,
+                    "ActualDurationMilliseconds":  60121.39,
+                    "SampleIntervalRequestedMilliseconds":  1000,
+                    "ObservationCount":  57,
+                    "FirstToLastSampleMilliseconds":  59106.795,
+                    "IntervalSummary":  {
+                                            "Count":  56,
+                                            "MinimumMilliseconds":  1001.446,
+                                            "AverageMilliseconds":  1055.478,
+                                            "MaximumMilliseconds":  3371.548
+                                        },
+                    "SampleOutcomes":  {
+                                           "ProcessRunning":  57,
+                                           "ProcessExited":  0,
+                                           "ProcessQueryError":  0,
+                                           "TcpQueryFailed":  0,
+                                           "UdpQueryFailed":  0,
+                                           "WithTcpRecords":  0,
+                                           "WithUdpRecords":  0
+                                       }
+                },
+    "Firewall":  {
+                     "Requested":  true,
+                     "RuleCreated":  true,
+                     "RuleName":  "\u003cREDACTED_TEMPORARY_RULE\u003e",
+                     "VerifiedAtStart":  true,
+                     "VerifiedAtEndBeforeCleanup":  true,
+                     "CleanupAttempted":  true,
+                     "CleanupSucceeded":  true,
+                     "VerifiedAbsentAfterCleanup":  true,
+                     "AbsentInPersistentStore":  true,
+                     "AbsentInActiveStore":  true,
+                     "CleanupError":  null
+                 },
+    "GameplayObservation":  "=Main menu displayed correctly; started Classic mode; gameplay remained responsive; controls worked; no crash or error dialog observed.",
+    "FatalError":  null,
+    "CollectionErrors":  [
+
+                         ],
+    "Observations":  [
+                         {
+                             "TimestampUtc":  "2026-11-01T06:27:29.2552667+00:00",
+                             "ElapsedMilliseconds":  8.672,
+                             "IntervalSincePreviousMilliseconds":  null,
+                             "ProcessId":  4656,
+                             "ProcessRunning":  true,
+                             "ProcessState":  "Running",
+                             "ProcessLivenessQuerySucceeded":  true,
+                             "TcpQuerySucceeded":  true,
+                             "TcpConnections":  [
+
+                                                ],
+                             "UdpQuerySucceeded":  true,
+                             "UdpEndpoints":  [
+
+                                              ],
+                             "CollectionErrors":  [
+
+                                                  ]
+                         },
+                         {
+                             "TimestampUtc":  "2026-11-01T06:27:32.6251224+00:00",
+                             "ElapsedMilliseconds":  3380.219,
+                             "IntervalSincePreviousMilliseconds":  3371.548,
+                             "ProcessId":  4656,
+                             "ProcessRunning":  true,
+                             "ProcessState":  "Running",
+                             "ProcessLivenessQuerySucceeded":  true,
+                             "TcpQuerySucceeded":  true,
+                             "TcpConnections":  [
+
+                                                ],
+                             "UdpQuerySucceeded":  true,
+                             "UdpEndpoints":  [
+
+                                              ],
+                             "CollectionErrors":  [
+
+                                                  ]
+                         },
+                         {
+                             "TimestampUtc":  "2026-11-01T06:27:33.6383080+00:00",
+                             "ElapsedMilliseconds":  4393.142,
+                             "IntervalSincePreviousMilliseconds":  1012.922,
+                             "ProcessId":  4656,
+                             "ProcessRunning":  true,
+                             "ProcessState":  "Running",
+                             "ProcessLivenessQuerySucceeded":  true,
+                             "TcpQuerySucceeded":  true,
+                             "TcpConnections":  [
+
+                                                ],
+                             "UdpQuerySucceeded":  true,
+                             "UdpEndpoints":  [
+
+                                              ],
+                             "CollectionErrors":  [
+
+                                                  ]
+                         },
+                         {
+                             "TimestampUtc":  "2026-11-01T06:27:34.6541649+00:00",
+                             "ElapsedMilliseconds":  5408.375,
+                             "IntervalSincePreviousMilliseconds":  1015.233,
+                             "ProcessId":  4656,
+                             "ProcessRunning":  true,
+                             "ProcessState":  "Running",
+                             "ProcessLivenessQuerySucceeded":  true,
+                             "TcpQuerySucceeded":  true,
+                             "TcpConnections":  [
+
+                                                ],
+                             "UdpQuerySucceeded":  true,
+                             "UdpEndpoints":  [
+
+                                              ],
+                             "CollectionErrors":  [
+
+                                                  ]
+                         },
+                         {
+                             "TimestampUtc":  "2026-11-01T06:27:35.6666553+00:00",
+                             "ElapsedMilliseconds":  6420.941,
+                             "IntervalSincePreviousMilliseconds":  1012.566,
+                             "ProcessId":  4656,
+                             "ProcessRunning":  true,
+                             "ProcessState":  "Running",
+                             "ProcessLivenessQuerySucceeded":  true,
+                             "TcpQuerySucceeded":  true,
+                             "TcpConnections":  [
+
+                                                ],
+                             "UdpQuerySucceeded":  true,
+                             "UdpEndpoints":  [
+
+                                              ],
+                             "CollectionErrors":  [
+
+                                                  ]
+                         },
+                         {
+                             "TimestampUtc":  "2026-11-01T06:27:36.6825149+00:00",
+                             "ElapsedMilliseconds":  7437.48,
+                             "IntervalSincePreviousMilliseconds":  1016.539,
+                             "ProcessId":  4656,
+                             "ProcessRunning":  true,
+                             "ProcessState":  "Running",
+                             "ProcessLivenessQuerySucceeded":  true,
+                             "TcpQuerySucceeded":  true,
+                             "TcpConnections":  [
+
+                                                ],
+                             "UdpQuerySucceeded":  true,
+                             "UdpEndpoints":  [
+
+                                              ],
+                             "CollectionErrors":  [
+
+                                                  ]
+                         },
+                         {
+                             "TimestampUtc":  "2026-11-01T06:27:37.6934479+00:00",
+                             "ElapsedMilliseconds":  8448.184,
+                             "IntervalSincePreviousMilliseconds":  1010.703,
+                             "ProcessId":  4656,
+                             "ProcessRunning":  true,
+                             "ProcessState":  "Running",
+                             "ProcessLivenessQuerySucceeded":  true,
+                             "TcpQuerySucceeded":  true,
+                             "TcpConnections":  [
+
+                                                ],
+                             "UdpQuerySucceeded":  true,
+                             "UdpEndpoints":  [
+
+                                              ],
+                             "CollectionErrors":  [
+
+                                                  ]
+                         },
+                         {
+                             "TimestampUtc":  "2026-11-01T06:27:38.6967630+00:00",
+                             "ElapsedMilliseconds":  9451.694,
+                             "IntervalSincePreviousMilliseconds":  1003.511,
+                             "ProcessId":  4656,
+                             "ProcessRunning":  true,
+                             "ProcessState":  "Running",
+                             "ProcessLivenessQuerySucceeded":  true,
+                             "TcpQuerySucceeded":  true,
+                             "TcpConnections":  [
+
+                                                ],
+                             "UdpQuerySucceeded":  true,
+                             "UdpEndpoints":  [
+
+                                              ],
+                             "CollectionErrors":  [
+
+                                                  ]
+                         },
+                         {
+                             "TimestampUtc":  "2026-11-01T06:27:39.7110829+00:00",
+                             "ElapsedMilliseconds":  10465.742,
+                             "IntervalSincePreviousMilliseconds":  1014.047,
+                             "ProcessId":  4656,
+                             "ProcessRunning":  true,
+                             "ProcessState":  "Running",
+                             "ProcessLivenessQuerySucceeded":  true,
+                             "TcpQuerySucceeded":  true,
+                             "TcpConnections":  [
+
+                                                ],
+                             "UdpQuerySucceeded":  true,
+                             "UdpEndpoints":  [
+
+                                              ],
+                             "CollectionErrors":  [
+
+                                                  ]
+                         },
+                         {
+                             "TimestampUtc":  "2026-11-01T06:27:40.7246741+00:00",
+                             "ElapsedMilliseconds":  11479.429,
+                             "IntervalSincePreviousMilliseconds":  1013.688,
+                             "ProcessId":  4656,
+                             "ProcessRunning":  true,
+                             "ProcessState":  "Running",
+                             "ProcessLivenessQuerySucceeded":  true,
+                             "TcpQuerySucceeded":  true,
+                             "TcpConnections":  [
+
+                                                ],
+                             "UdpQuerySucceeded":  true,
+                             "UdpEndpoints":  [
+
+                                              ],
+                             "CollectionErrors":  [
+
+                                                  ]
+                         },
+                         {
+                             "TimestampUtc":  "2026-11-01T06:27:41.7371265+00:00",
+                             "ElapsedMilliseconds":  12491.724,
+                             "IntervalSincePreviousMilliseconds":  1012.295,
+                             "ProcessId":  4656,
+                             "ProcessRunning":  true,
+                             "ProcessState":  "Running",
+                             "ProcessLivenessQuerySucceeded":  true,
+                             "TcpQuerySucceeded":  true,
+                             "TcpConnections":  [
+
+                                                ],
+                             "UdpQuerySucceeded":  true,
+                             "UdpEndpoints":  [
+
+                                              ],
+                             "CollectionErrors":  [
+
+                                                  ]
+                         },
+                         {
+                             "TimestampUtc":  "2026-11-01T06:27:42.7478562+00:00",
+                             "ElapsedMilliseconds":  13502.85,
+                             "IntervalSincePreviousMilliseconds":  1011.126,
+                             "ProcessId":  4656,
+                             "ProcessRunning":  true,
+                             "ProcessState":  "Running",
+                             "ProcessLivenessQuerySucceeded":  true,
+                             "TcpQuerySucceeded":  true,
+                             "TcpConnections":  [
+
+                                                ],
+                             "UdpQuerySucceeded":  true,
+                             "UdpEndpoints":  [
+
+                                              ],
+                             "CollectionErrors":  [
+
+                                                  ]
+                         },
+                         {
+                             "TimestampUtc":  "2026-11-01T06:27:43.7627675+00:00",
+                             "ElapsedMilliseconds":  14517.734,
+                             "IntervalSincePreviousMilliseconds":  1014.885,
+                             "ProcessId":  4656,
+                             "ProcessRunning":  true,
+                             "ProcessState":  "Running",
+                             "ProcessLivenessQuerySucceeded":  true,
+                             "TcpQuerySucceeded":  true,
+                             "TcpConnections":  [
+
+                                                ],
+                             "UdpQuerySucceeded":  true,
+                             "UdpEndpoints":  [
+
+                                              ],
+                             "CollectionErrors":  [
+
+                                                  ]
+                         },
+                         {
+                             "TimestampUtc":  "2026-11-01T06:27:44.7790874+00:00",
+                             "ElapsedMilliseconds":  15533.309,
+                             "IntervalSincePreviousMilliseconds":  1015.574,
+                             "ProcessId":  4656,
+                             "ProcessRunning":  true,
+                             "ProcessState":  "Running",
+                             "ProcessLivenessQuerySucceeded":  true,
+                             "TcpQuerySucceeded":  true,
+                             "TcpConnections":  [
+
+                                                ],
+                             "UdpQuerySucceeded":  true,
+                             "UdpEndpoints":  [
+
+                                              ],
+                             "CollectionErrors":  [
+
+                                                  ]
+                         },
+                         {
+                             "TimestampUtc":  "2026-11-01T06:27:45.7889263+00:00",
+                             "ElapsedMilliseconds":  16543.227,
+                             "IntervalSincePreviousMilliseconds":  1009.919,
+                             "ProcessId":  4656,
+                             "ProcessRunning":  true,
+                             "ProcessState":  "Running",
+                             "ProcessLivenessQuerySucceeded":  true,
+                             "TcpQuerySucceeded":  true,
+                             "TcpConnections":  [
+
+                                                ],
+                             "UdpQuerySucceeded":  true,
+                             "UdpEndpoints":  [
+
+                                              ],
+                             "CollectionErrors":  [
+
+                                                  ]
+                         },
+                         {
+                             "TimestampUtc":  "2026-11-01T06:27:46.8045842+00:00",
+                             "ElapsedMilliseconds":  17559.514,
+                             "IntervalSincePreviousMilliseconds":  1016.287,
+                             "ProcessId":  4656,
+                             "ProcessRunning":  true,
+                             "ProcessState":  "Running",
+                             "ProcessLivenessQuerySucceeded":  true,
+                             "TcpQuerySucceeded":  true,
+                             "TcpConnections":  [
+
+                                                ],
+                             "UdpQuerySucceeded":  true,
+                             "UdpEndpoints":  [
+
+                                              ],
+                             "CollectionErrors":  [
+
+                                                  ]
+                         },
+                         {
+                             "TimestampUtc":  "2026-11-01T06:27:47.8236593+00:00",
+                             "ElapsedMilliseconds":  18578.946,
+                             "IntervalSincePreviousMilliseconds":  1019.432,
+                             "ProcessId":  4656,
+                             "ProcessRunning":  true,
+                             "ProcessState":  "Running",
+                             "ProcessLivenessQuerySucceeded":  true,
+                             "TcpQuerySucceeded":  true,
+                             "TcpConnections":  [
+
+                                                ],
+                             "UdpQuerySucceeded":  true,
+                             "UdpEndpoints":  [
+
+                                              ],
+                             "CollectionErrors":  [
+
+                                                  ]
+                         },
+                         {
+                             "TimestampUtc":  "2026-11-01T06:27:48.8343144+00:00",
+                             "ElapsedMilliseconds":  19588.542,
+                             "IntervalSincePreviousMilliseconds":  1009.596,
+                             "ProcessId":  4656,
+                             "ProcessRunning":  true,
+                             "ProcessState":  "Running",
+                             "ProcessLivenessQuerySucceeded":  true,
+                             "TcpQuerySucceeded":  true,
+                             "TcpConnections":  [
+
+                                                ],
+                             "UdpQuerySucceeded":  true,
+                             "UdpEndpoints":  [
+
+                                              ],
+                             "CollectionErrors":  [
+
+                                                  ]
+                         },
+                         {
+                             "TimestampUtc":  "2026-11-01T06:27:49.8492489+00:00",
+                             "ElapsedMilliseconds":  20604.674,
+                             "IntervalSincePreviousMilliseconds":  1016.132,
+                             "ProcessId":  4656,
+                             "ProcessRunning":  true,
+                             "ProcessState":  "Running",
+                             "ProcessLivenessQuerySucceeded":  true,
+                             "TcpQuerySucceeded":  true,
+                             "TcpConnections":  [
+
+                                                ],
+                             "UdpQuerySucceeded":  true,
+                             "UdpEndpoints":  [
+
+                                              ],
+                             "CollectionErrors":  [
+
+                                                  ]
+                         },
+                         {
+                             "TimestampUtc":  "2026-11-01T06:27:50.8662039+00:00",
+                             "ElapsedMilliseconds":  21621.026,
+                             "IntervalSincePreviousMilliseconds":  1016.352,
+                             "ProcessId":  4656,
+                             "ProcessRunning":  true,
+                             "ProcessState":  "Running",
+                             "ProcessLivenessQuerySucceeded":  true,
+                             "TcpQuerySucceeded":  true,
+                             "TcpConnections":  [
+
+                                                ],
+                             "UdpQuerySucceeded":  true,
+                             "UdpEndpoints":  [
+
+                                              ],
+                             "CollectionErrors":  [
+
+                                                  ]
+                         },
+                         {
+                             "TimestampUtc":  "2026-11-01T06:27:51.8785343+00:00",
+                             "ElapsedMilliseconds":  22633.622,
+                             "IntervalSincePreviousMilliseconds":  1012.595,
+                             "ProcessId":  4656,
+                             "ProcessRunning":  true,
+                             "ProcessState":  "Running",
+                             "ProcessLivenessQuerySucceeded":  true,
+                             "TcpQuerySucceeded":  true,
+                             "TcpConnections":  [
+
+                                                ],
+                             "UdpQuerySucceeded":  true,
+                             "UdpEndpoints":  [
+
+                                              ],
+                             "CollectionErrors":  [
+
+                                                  ]
+                         },
+                         {
+                             "TimestampUtc":  "2026-11-01T06:27:52.8950907+00:00",
+                             "ElapsedMilliseconds":  23650.09,
+                             "IntervalSincePreviousMilliseconds":  1016.468,
+                             "ProcessId":  4656,
+                             "ProcessRunning":  true,
+                             "ProcessState":  "Running",
+                             "ProcessLivenessQuerySucceeded":  true,
+                             "TcpQuerySucceeded":  true,
+                             "TcpConnections":  [
+
+                                                ],
+                             "UdpQuerySucceeded":  true,
+                             "UdpEndpoints":  [
+
+                                              ],
+                             "CollectionErrors":  [
+
+                                                  ]
+                         },
+                         {
+                             "TimestampUtc":  "2026-11-01T06:27:53.9129007+00:00",
+                             "ElapsedMilliseconds":  24667.877,
+                             "IntervalSincePreviousMilliseconds":  1017.787,
+                             "ProcessId":  4656,
+                             "ProcessRunning":  true,
+                             "ProcessState":  "Running",
+                             "ProcessLivenessQuerySucceeded":  true,
+                             "TcpQuerySucceeded":  true,
+                             "TcpConnections":  [
+
+                                                ],
+                             "UdpQuerySucceeded":  true,
+                             "UdpEndpoints":  [
+
+                                              ],
+                             "CollectionErrors":  [
+
+                                                  ]
+                         },
+                         {
+                             "TimestampUtc":  "2026-11-01T06:27:54.9259052+00:00",
+                             "ElapsedMilliseconds":  25680.749,
+                             "IntervalSincePreviousMilliseconds":  1012.872,
+                             "ProcessId":  4656,
+                             "ProcessRunning":  true,
+                             "ProcessState":  "Running",
+                             "ProcessLivenessQuerySucceeded":  true,
+                             "TcpQuerySucceeded":  true,
+                             "TcpConnections":  [
+
+                                                ],
+                             "UdpQuerySucceeded":  true,
+                             "UdpEndpoints":  [
+
+                                              ],
+                             "CollectionErrors":  [
+
+                                                  ]
+                         },
+                         {
+                             "TimestampUtc":  "2026-11-01T06:27:55.9372852+00:00",
+                             "ElapsedMilliseconds":  26692.507,
+                             "IntervalSincePreviousMilliseconds":  1011.758,
+                             "ProcessId":  4656,
+                             "ProcessRunning":  true,
+                             "ProcessState":  "Running",
+                             "ProcessLivenessQuerySucceeded":  true,
+                             "TcpQuerySucceeded":  true,
+                             "TcpConnections":  [
+
+                                                ],
+                             "UdpQuerySucceeded":  true,
+                             "UdpEndpoints":  [
+
+                                              ],
+                             "CollectionErrors":  [
+
+                                                  ]
+                         },
+                         {
+                             "TimestampUtc":  "2026-11-01T06:27:56.9419089+00:00",
+                             "ElapsedMilliseconds":  27696.545,
+                             "IntervalSincePreviousMilliseconds":  1004.038,
+                             "ProcessId":  4656,
+                             "ProcessRunning":  true,
+                             "ProcessState":  "Running",
+                             "ProcessLivenessQuerySucceeded":  true,
+                             "TcpQuerySucceeded":  true,
+                             "TcpConnections":  [
+
+                                                ],
+                             "UdpQuerySucceeded":  true,
+                             "UdpEndpoints":  [
+
+                                              ],
+                             "CollectionErrors":  [
+
+                                                  ]
+                         },
+                         {
+                             "TimestampUtc":  "2026-11-01T06:27:57.9754086+00:00",
+                             "ElapsedMilliseconds":  28730.286,
+                             "IntervalSincePreviousMilliseconds":  1033.741,
+                             "ProcessId":  4656,
+                             "ProcessRunning":  true,
+                             "ProcessState":  "Running",
+                             "ProcessLivenessQuerySucceeded":  true,
+                             "TcpQuerySucceeded":  true,
+                             "TcpConnections":  [
+
+                                                ],
+                             "UdpQuerySucceeded":  true,
+                             "UdpEndpoints":  [
+
+                                              ],
+                             "CollectionErrors":  [
+
+                                                  ]
+                         },
+                         {
+                             "TimestampUtc":  "2026-11-01T06:27:58.9793698+00:00",
+                             "ElapsedMilliseconds":  29734.35,
+                             "IntervalSincePreviousMilliseconds":  1004.064,
+                             "ProcessId":  4656,
+                             "ProcessRunning":  true,
+                             "ProcessState":  "Running",
+                             "ProcessLivenessQuerySucceeded":  true,
+                             "TcpQuerySucceeded":  true,
+                             "TcpConnections":  [
+
+                                                ],
+                             "UdpQuerySucceeded":  true,
+                             "UdpEndpoints":  [
+
+                                              ],
+                             "CollectionErrors":  [
+
+                                                  ]
+                         },
+                         {
+                             "TimestampUtc":  "2026-11-01T06:27:59.9968450+00:00",
+                             "ElapsedMilliseconds":  30751.21,
+                             "IntervalSincePreviousMilliseconds":  1016.86,
+                             "ProcessId":  4656,
+                             "ProcessRunning":  true,
+                             "ProcessState":  "Running",
+                             "ProcessLivenessQuerySucceeded":  true,
+                             "TcpQuerySucceeded":  true,
+                             "TcpConnections":  [
+
+                                                ],
+                             "UdpQuerySucceeded":  true,
+                             "UdpEndpoints":  [
+
+                                              ],
+                             "CollectionErrors":  [
+
+                                                  ]
+                         },
+                         {
+                             "TimestampUtc":  "2026-11-01T06:28:01.0126511+00:00",
+                             "ElapsedMilliseconds":  31767.186,
+                             "IntervalSincePreviousMilliseconds":  1015.976,
+                             "ProcessId":  4656,
+                             "ProcessRunning":  true,
+                             "ProcessState":  "Running",
+                             "ProcessLivenessQuerySucceeded":  true,
+                             "TcpQuerySucceeded":  true,
+                             "TcpConnections":  [
+
+                                                ],
+                             "UdpQuerySucceeded":  true,
+                             "UdpEndpoints":  [
+
+                                              ],
+                             "CollectionErrors":  [
+
+                                                  ]
+                         },
+                         {
+                             "TimestampUtc":  "2026-11-01T06:28:02.0231220+00:00",
+                             "ElapsedMilliseconds":  32777.375,
+                             "IntervalSincePreviousMilliseconds":  1010.189,
+                             "ProcessId":  4656,
+                             "ProcessRunning":  true,
+                             "ProcessState":  "Running",
+                             "ProcessLivenessQuerySucceeded":  true,
+                             "TcpQuerySucceeded":  true,
+                             "TcpConnections":  [
+
+                                                ],
+                             "UdpQuerySucceeded":  true,
+                             "UdpEndpoints":  [
+
+                                              ],
+                             "CollectionErrors":  [
+
+                                                  ]
+                         },
+                         {
+                             "TimestampUtc":  "2026-11-01T06:28:03.0365828+00:00",
+                             "ElapsedMilliseconds":  33791.721,
+                             "IntervalSincePreviousMilliseconds":  1014.345,
+                             "ProcessId":  4656,
+                             "ProcessRunning":  true,
+                             "ProcessState":  "Running",
+                             "ProcessLivenessQuerySucceeded":  true,
+                             "TcpQuerySucceeded":  true,
+                             "TcpConnections":  [
+
+                                                ],
+                             "UdpQuerySucceeded":  true,
+                             "UdpEndpoints":  [
+
+                                              ],
+                             "CollectionErrors":  [
+
+                                                  ]
+                         },
+                         {
+                             "TimestampUtc":  "2026-11-01T06:28:04.0425680+00:00",
+                             "ElapsedMilliseconds":  34797.968,
+                             "IntervalSincePreviousMilliseconds":  1006.248,
+                             "ProcessId":  4656,
+                             "ProcessRunning":  true,
+                             "ProcessState":  "Running",
+                             "ProcessLivenessQuerySucceeded":  true,
+                             "TcpQuerySucceeded":  true,
+                             "TcpConnections":  [
+
+                                                ],
+                             "UdpQuerySucceeded":  true,
+                             "UdpEndpoints":  [
+
+                                              ],
+                             "CollectionErrors":  [
+
+                                                  ]
+                         },
+                         {
+                             "TimestampUtc":  "2026-11-01T06:28:05.0547066+00:00",
+                             "ElapsedMilliseconds":  35809.363,
+                             "IntervalSincePreviousMilliseconds":  1011.394,
+                             "ProcessId":  4656,
+                             "ProcessRunning":  true,
+                             "ProcessState":  "Running",
+                             "ProcessLivenessQuerySucceeded":  true,
+                             "TcpQuerySucceeded":  true,
+                             "TcpConnections":  [
+
+                                                ],
+                             "UdpQuerySucceeded":  true,
+                             "UdpEndpoints":  [
+
+                                              ],
+                             "CollectionErrors":  [
+
+                                                  ]
+                         },
+                         {
+                             "TimestampUtc":  "2026-11-01T06:28:06.0677759+00:00",
+                             "ElapsedMilliseconds":  36822.004,
+                             "IntervalSincePreviousMilliseconds":  1012.641,
+                             "ProcessId":  4656,
+                             "ProcessRunning":  true,
+                             "ProcessState":  "Running",
+                             "ProcessLivenessQuerySucceeded":  true,
+                             "TcpQuerySucceeded":  true,
+                             "TcpConnections":  [
+
+                                                ],
+                             "UdpQuerySucceeded":  true,
+                             "UdpEndpoints":  [
+
+                                              ],
+                             "CollectionErrors":  [
+
+                                                  ]
+                         },
+                         {
+                             "TimestampUtc":  "2026-11-01T06:28:07.0822699+00:00",
+                             "ElapsedMilliseconds":  37836.729,
+                             "IntervalSincePreviousMilliseconds":  1014.725,
+                             "ProcessId":  4656,
+                             "ProcessRunning":  true,
+                             "ProcessState":  "Running",
+                             "ProcessLivenessQuerySucceeded":  true,
+                             "TcpQuerySucceeded":  true,
+                             "TcpConnections":  [
+
+                                                ],
+                             "UdpQuerySucceeded":  true,
+                             "UdpEndpoints":  [
+
+                                              ],
+                             "CollectionErrors":  [
+
+                                                  ]
+                         },
+                         {
+                             "TimestampUtc":  "2026-11-01T06:28:08.0945661+00:00",
+                             "ElapsedMilliseconds":  38849.269,
+                             "IntervalSincePreviousMilliseconds":  1012.54,
+                             "ProcessId":  4656,
+                             "ProcessRunning":  true,
+                             "ProcessState":  "Running",
+                             "ProcessLivenessQuerySucceeded":  true,
+                             "TcpQuerySucceeded":  true,
+                             "TcpConnections":  [
+
+                                                ],
+                             "UdpQuerySucceeded":  true,
+                             "UdpEndpoints":  [
+
+                                              ],
+                             "CollectionErrors":  [
+
+                                                  ]
+                         },
+                         {
+                             "TimestampUtc":  "2026-11-01T06:28:09.1115921+00:00",
+                             "ElapsedMilliseconds":  39866.189,
+                             "IntervalSincePreviousMilliseconds":  1016.92,
+                             "ProcessId":  4656,
+                             "ProcessRunning":  true,
+                             "ProcessState":  "Running",
+                             "ProcessLivenessQuerySucceeded":  true,
+                             "TcpQuerySucceeded":  true,
+                             "TcpConnections":  [
+
+                                                ],
+                             "UdpQuerySucceeded":  true,
+                             "UdpEndpoints":  [
+
+                                              ],
+                             "CollectionErrors":  [
+
+                                                  ]
+                         },
+                         {
+                             "TimestampUtc":  "2026-11-01T06:28:10.1239805+00:00",
+                             "ElapsedMilliseconds":  40878.414,
+                             "IntervalSincePreviousMilliseconds":  1012.226,
+                             "ProcessId":  4656,
+                             "ProcessRunning":  true,
+                             "ProcessState":  "Running",
+                             "ProcessLivenessQuerySucceeded":  true,
+                             "TcpQuerySucceeded":  true,
+                             "TcpConnections":  [
+
+                                                ],
+                             "UdpQuerySucceeded":  true,
+                             "UdpEndpoints":  [
+
+                                              ],
+                             "CollectionErrors":  [
+
+                                                  ]
+                         },
+                         {
+                             "TimestampUtc":  "2026-11-01T06:28:11.1332431+00:00",
+                             "ElapsedMilliseconds":  41888.088,
+                             "IntervalSincePreviousMilliseconds":  1009.673,
+                             "ProcessId":  4656,
+                             "ProcessRunning":  true,
+                             "ProcessState":  "Running",
+                             "ProcessLivenessQuerySucceeded":  true,
+                             "TcpQuerySucceeded":  true,
+                             "TcpConnections":  [
+
+                                                ],
+                             "UdpQuerySucceeded":  true,
+                             "UdpEndpoints":  [
+
+                                              ],
+                             "CollectionErrors":  [
+
+                                                  ]
+                         },
+                         {
+                             "TimestampUtc":  "2026-11-01T06:28:12.1575825+00:00",
+                             "ElapsedMilliseconds":  42912.296,
+                             "IntervalSincePreviousMilliseconds":  1024.208,
+                             "ProcessId":  4656,
+                             "ProcessRunning":  true,
+                             "ProcessState":  "Running",
+                             "ProcessLivenessQuerySucceeded":  true,
+                             "TcpQuerySucceeded":  true,
+                             "TcpConnections":  [
+
+                                                ],
+                             "UdpQuerySucceeded":  true,
+                             "UdpEndpoints":  [
+
+                                              ],
+                             "CollectionErrors":  [
+
+                                                  ]
+                         },
+                         {
+                             "TimestampUtc":  "2026-11-01T06:28:13.1716341+00:00",
+                             "ElapsedMilliseconds":  43927.179,
+                             "IntervalSincePreviousMilliseconds":  1014.883,
+                             "ProcessId":  4656,
+                             "ProcessRunning":  true,
+                             "ProcessState":  "Running",
+                             "ProcessLivenessQuerySucceeded":  true,
+                             "TcpQuerySucceeded":  true,
+                             "TcpConnections":  [
+
+                                                ],
+                             "UdpQuerySucceeded":  true,
+                             "UdpEndpoints":  [
+
+                                              ],
+                             "CollectionErrors":  [
+
+                                                  ]
+                         },
+                         {
+                             "TimestampUtc":  "2026-11-01T06:28:14.1867349+00:00",
+                             "ElapsedMilliseconds":  44941.089,
+                             "IntervalSincePreviousMilliseconds":  1013.91,
+                             "ProcessId":  4656,
+                             "ProcessRunning":  true,
+                             "ProcessState":  "Running",
+                             "ProcessLivenessQuerySucceeded":  true,
+                             "TcpQuerySucceeded":  true,
+                             "TcpConnections":  [
+
+                                                ],
+                             "UdpQuerySucceeded":  true,
+                             "UdpEndpoints":  [
+
+                                              ],
+                             "CollectionErrors":  [
+
+                                                  ]
+                         },
+                         {
+                             "TimestampUtc":  "2026-11-01T06:28:15.1997838+00:00",
+                             "ElapsedMilliseconds":  45954.889,
+                             "IntervalSincePreviousMilliseconds":  1013.8,
+                             "ProcessId":  4656,
+                             "ProcessRunning":  true,
+                             "ProcessState":  "Running",
+                             "ProcessLivenessQuerySucceeded":  true,
+                             "TcpQuerySucceeded":  true,
+                             "TcpConnections":  [
+
+                                                ],
+                             "UdpQuerySucceeded":  true,
+                             "UdpEndpoints":  [
+
+                                              ],
+                             "CollectionErrors":  [
+
+                                                  ]
+                         },
+                         {
+                             "TimestampUtc":  "2026-11-01T06:28:16.2112461+00:00",
+                             "ElapsedMilliseconds":  46966.266,
+                             "IntervalSincePreviousMilliseconds":  1011.377,
+                             "ProcessId":  4656,
+                             "ProcessRunning":  true,
+                             "ProcessState":  "Running",
+                             "ProcessLivenessQuerySucceeded":  true,
+                             "TcpQuerySucceeded":  true,
+                             "TcpConnections":  [
+
+                                                ],
+                             "UdpQuerySucceeded":  true,
+                             "UdpEndpoints":  [
+
+                                              ],
+                             "CollectionErrors":  [
+
+                                                  ]
+                         },
+                         {
+                             "TimestampUtc":  "2026-11-01T06:28:17.2277181+00:00",
+                             "ElapsedMilliseconds":  47982.861,
+                             "IntervalSincePreviousMilliseconds":  1016.595,
+                             "ProcessId":  4656,
+                             "ProcessRunning":  true,
+                             "ProcessState":  "Running",
+                             "ProcessLivenessQuerySucceeded":  true,
+                             "TcpQuerySucceeded":  true,
+                             "TcpConnections":  [
+
+                                                ],
+                             "UdpQuerySucceeded":  true,
+                             "UdpEndpoints":  [
+
+                                              ],
+                             "CollectionErrors":  [
+
+                                                  ]
+                         },
+                         {
+                             "TimestampUtc":  "2026-11-01T06:28:18.2424390+00:00",
+                             "ElapsedMilliseconds":  48997.193,
+                             "IntervalSincePreviousMilliseconds":  1014.332,
+                             "ProcessId":  4656,
+                             "ProcessRunning":  true,
+                             "ProcessState":  "Running",
+                             "ProcessLivenessQuerySucceeded":  true,
+                             "TcpQuerySucceeded":  true,
+                             "TcpConnections":  [
+
+                                                ],
+                             "UdpQuerySucceeded":  true,
+                             "UdpEndpoints":  [
+
+                                              ],
+                             "CollectionErrors":  [
+
+                                                  ]
+                         },
+                         {
+                             "TimestampUtc":  "2026-11-01T06:28:19.2441273+00:00",
+                             "ElapsedMilliseconds":  49999.107,
+                             "IntervalSincePreviousMilliseconds":  1001.914,
+                             "ProcessId":  4656,
+                             "ProcessRunning":  true,
+                             "ProcessState":  "Running",
+                             "ProcessLivenessQuerySucceeded":  true,
+                             "TcpQuerySucceeded":  true,
+                             "TcpConnections":  [
+
+                                                ],
+                             "UdpQuerySucceeded":  true,
+                             "UdpEndpoints":  [
+
+                                              ],
+                             "CollectionErrors":  [
+
+                                                  ]
+                         },
+                         {
+                             "TimestampUtc":  "2026-11-01T06:28:20.2462189+00:00",
+                             "ElapsedMilliseconds":  51000.553,
+                             "IntervalSincePreviousMilliseconds":  1001.446,
+                             "ProcessId":  4656,
+                             "ProcessRunning":  true,
+                             "ProcessState":  "Running",
+                             "ProcessLivenessQuerySucceeded":  true,
+                             "TcpQuerySucceeded":  true,
+                             "TcpConnections":  [
+
+                                                ],
+                             "UdpQuerySucceeded":  true,
+                             "UdpEndpoints":  [
+
+                                              ],
+                             "CollectionErrors":  [
+
+                                                  ]
+                         },
+                         {
+                             "TimestampUtc":  "2026-11-01T06:28:21.2584001+00:00",
+                             "ElapsedMilliseconds":  52013.434,
+                             "IntervalSincePreviousMilliseconds":  1012.88,
+                             "ProcessId":  4656,
+                             "ProcessRunning":  true,
+                             "ProcessState":  "Running",
+                             "ProcessLivenessQuerySucceeded":  true,
+                             "TcpQuerySucceeded":  true,
+                             "TcpConnections":  [
+
+                                                ],
+                             "UdpQuerySucceeded":  true,
+                             "UdpEndpoints":  [
+
+                                              ],
+                             "CollectionErrors":  [
+
+                                                  ]
+                         },
+                         {
+                             "TimestampUtc":  "2026-11-01T06:28:22.2731243+00:00",
+                             "ElapsedMilliseconds":  53028.037,
+                             "IntervalSincePreviousMilliseconds":  1014.603,
+                             "ProcessId":  4656,
+                             "ProcessRunning":  true,
+                             "ProcessState":  "Running",
+                             "ProcessLivenessQuerySucceeded":  true,
+                             "TcpQuerySucceeded":  true,
+                             "TcpConnections":  [
+
+                                                ],
+                             "UdpQuerySucceeded":  true,
+                             "UdpEndpoints":  [
+
+                                              ],
+                             "CollectionErrors":  [
+
+                                                  ]
+                         },
+                         {
+                             "TimestampUtc":  "2026-11-01T06:28:23.2887468+00:00",
+                             "ElapsedMilliseconds":  54043.967,
+                             "IntervalSincePreviousMilliseconds":  1015.93,
+                             "ProcessId":  4656,
+                             "ProcessRunning":  true,
+                             "ProcessState":  "Running",
+                             "ProcessLivenessQuerySucceeded":  true,
+                             "TcpQuerySucceeded":  true,
+                             "TcpConnections":  [
+
+                                                ],
+                             "UdpQuerySucceeded":  true,
+                             "UdpEndpoints":  [
+
+                                              ],
+                             "CollectionErrors":  [
+
+                                                  ]
+                         },
+                         {
+                             "TimestampUtc":  "2026-11-01T06:28:24.3057250+00:00",
+                             "ElapsedMilliseconds":  55060.46,
+                             "IntervalSincePreviousMilliseconds":  1016.493,
+                             "ProcessId":  4656,
+                             "ProcessRunning":  true,
+                             "ProcessState":  "Running",
+                             "ProcessLivenessQuerySucceeded":  true,
+                             "TcpQuerySucceeded":  true,
+                             "TcpConnections":  [
+
+                                                ],
+                             "UdpQuerySucceeded":  true,
+                             "UdpEndpoints":  [
+
+                                              ],
+                             "CollectionErrors":  [
+
+                                                  ]
+                         },
+                         {
+                             "TimestampUtc":  "2026-11-01T06:28:25.3172992+00:00",
+                             "ElapsedMilliseconds":  56071.567,
+                             "IntervalSincePreviousMilliseconds":  1011.107,
+                             "ProcessId":  4656,
+                             "ProcessRunning":  true,
+                             "ProcessState":  "Running",
+                             "ProcessLivenessQuerySucceeded":  true,
+                             "TcpQuerySucceeded":  true,
+                             "TcpConnections":  [
+
+                                                ],
+                             "UdpQuerySucceeded":  true,
+                             "UdpEndpoints":  [
+
+                                              ],
+                             "CollectionErrors":  [
+
+                                                  ]
+                         },
+                         {
+                             "TimestampUtc":  "2026-11-01T06:28:26.3452137+00:00",
+                             "ElapsedMilliseconds":  57099.559,
+                             "IntervalSincePreviousMilliseconds":  1027.992,
+                             "ProcessId":  4656,
+                             "ProcessRunning":  true,
+                             "ProcessState":  "Running",
+                             "ProcessLivenessQuerySucceeded":  true,
+                             "TcpQuerySucceeded":  true,
+                             "TcpConnections":  [
+
+                                                ],
+                             "UdpQuerySucceeded":  true,
+                             "UdpEndpoints":  [
+
+                                              ],
+                             "CollectionErrors":  [
+
+                                                  ]
+                         },
+                         {
+                             "TimestampUtc":  "2026-11-01T06:28:27.3572434+00:00",
+                             "ElapsedMilliseconds":  58112.228,
+                             "IntervalSincePreviousMilliseconds":  1012.669,
+                             "ProcessId":  4656,
+                             "ProcessRunning":  true,
+                             "ProcessState":  "Running",
+                             "ProcessLivenessQuerySucceeded":  true,
+                             "TcpQuerySucceeded":  true,
+                             "TcpConnections":  [
+
+                                                ],
+                             "UdpQuerySucceeded":  true,
+                             "UdpEndpoints":  [
+
+                                              ],
+                             "CollectionErrors":  [
+
+                                                  ]
+                         },
+                         {
+                             "TimestampUtc":  "2026-11-01T06:28:28.3612223+00:00",
+                             "ElapsedMilliseconds":  59115.467,
+                             "IntervalSincePreviousMilliseconds":  1003.239,
+                             "ProcessId":  4656,
+                             "ProcessRunning":  true,
+                             "ProcessState":  "Running",
+                             "ProcessLivenessQuerySucceeded":  true,
+                             "TcpQuerySucceeded":  true,
+                             "TcpConnections":  [
+
+                                                ],
+                             "UdpQuerySucceeded":  true,
+                             "UdpEndpoints":  [
+
+                                              ],
+                             "CollectionErrors":  [
+
+                                                  ]
+                         }
+                     ],
+    "Limitations":  [
+                        "TCP connections and UDP endpoints are process-owned point-in-time snapshots, not packet capture.",
+                        "No observed endpoint in a sample does not rule out brief activity between samples.",
+                        "UDP endpoint records show local endpoints and do not identify every remote destination.",
+                        "This evidence does not prove that no network attempt is possible.",
+                        "A passive run does not establish that Windows Firewall blocked outbound traffic.",
+                        "Keep this raw file private: it includes the computer name and full executable path."
+                    ],
+    "RedactionNotice":  [
+                            "This is a redacted derivative of a private raw evidence file.",
+                            "Computer name, full executable path, and temporary firewall rule name were redacted.",
+                            "Review this file manually before publication; collection error messages may contain additional local details."
+                        ]
+}

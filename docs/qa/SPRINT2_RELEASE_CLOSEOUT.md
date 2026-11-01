@@ -13,7 +13,7 @@
 - [ ] Execute three 300 s Hard/Obstacle FPS sessions and100 random-time input protocol; verify instrumentation timestamps/accounting and target hardware.
 - [ ] Three outside-team first-time volunteers,without help; count <=3 primary screens,notclicks.
 - [ ] Review exact-candidate privacy capture with explicit scoped firewall authorization,source/EXE provenance,actual offlinegameplay,redaction and sampling limits.
-- [x] Historical Windows 11 evidence status for candidate `7c6733d` is documented for traceability. Later Windows 11 evidence for candidate `3fcc586` was accepted for Issue #23. This historical row does not reopen Issue #23 or constitute final QA sign-off or release approval.
+- [x] Historical Windows 11 evidence for candidate `7c6733d` is retained for traceability. Later Windows 11 evidence for candidate `3fcc586` was explicitly accepted by the owner for Issue #23. The initial leaderboard-after-restart mismatch was investigated through a controlled retest; its original cause remains unproven. This acceptance is scoped to Issue #23 and does not constitute final QA sign-off or release approval.
 - [ ] Review concrete deviations:cleanup guarantee,uncollected5s power-up lifetime,UI labels/interfaces,Loggerrotation and testseams. Record rationale and actual acceptance,not inferred signatures.
 - [ ] FinalTest Summary Report and deviations reviewed by QA; residual defect severities and accepted risks recorded.
 

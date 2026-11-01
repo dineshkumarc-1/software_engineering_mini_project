@@ -1,0 +1,31 @@
+=== ctest -N -C Release ===
+Test project <EVIDENCE_ROOT>/build
+  Test  #1: app_state_flow
+  Test  #2: score_service
+  Test  #3: input_validator_tests
+  Test  #4: secure_file_store_tests
+  Test  #5: leaderboard_repository_tests
+  Test  #6: leaderboard_model_tests
+  Test  #7: security_corpus_tests
+  Test  #8: settings_corpus_tests
+  Test  #9: game_session
+  Test #10: game_engine_tests
+  Test #11: game_mode_tests
+  Test #12: powerup_tests
+  Test #13: gameplay_tests
+  Test #14: settings_tests
+  Test #15: audio_model_tests
+  Test #16: performance_probe_tests
+  Test #17: layering_core_is_sfml_free
+  Test #18: security_banned_api_scan
+  Test #19: security_banned_api_scan_finds_planted_calls
+  Test #20: security_banned_api_scan_ignores_lookalikes
+
+Total Tests: 20
+RegisteredTestsParsed: 20
+ExpectedTestNames: app_state_flow, score_service, input_validator_tests, secure_file_store_tests, leaderboard_repository_tests, leaderboard_model_tests, security_corpus_tests, settings_corpus_tests, game_session, game_engine_tests, game_mode_tests, powerup_tests, gameplay_tests, settings_tests, audio_model_tests, performance_probe_tests, layering_core_is_sfml_free, security_banned_api_scan, security_banned_api_scan_finds_planted_calls, security_banned_api_scan_ignores_lookalikes
+ActualTestNames: app_state_flow, score_service, input_validator_tests, secure_file_store_tests, leaderboard_repository_tests, leaderboard_model_tests, security_corpus_tests, settings_corpus_tests, game_session, game_engine_tests, game_mode_tests, powerup_tests, gameplay_tests, settings_tests, audio_model_tests, performance_probe_tests, layering_core_is_sfml_free, security_banned_api_scan, security_banned_api_scan_finds_planted_calls, security_banned_api_scan_ignores_lookalikes
+MissingTestNames:
+UnexpectedTestNames:
+TestInventoryMatches: True
+InventoryExitCode: 0
