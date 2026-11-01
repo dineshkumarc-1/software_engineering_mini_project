@@ -52,16 +52,37 @@ Any replacement has to cover these three things, or state openly that it doesn't
 
   Without these, power-up activity can only be shown by screen recording.
 
-### Option B: automated soak, the literal workload (code change, opt-in)
+### Option B: closed-loop steering driver, the literal workload (recommended)
 
-- **What it is:** an opt-in diagnostic switch (for example `--perf-autopilot`, only together with `--perf-probe`). It plays Hard/Obstacle through the same input queue as the keyboard: the shortest safe path to food or a power-up, falling back to following its own tail. Normal play is unchanged.
-- **Runs:** 3 runs × 300 s.
-- **If the autopilot dies,** that run is **Incomplete**. Runs are never stitched together.
-- **What B measures:** exactly the STP workload (R1, R2 and R3), and it matches the STP's "Auto".
-- **Costs:**
-  - new code, tests and review (about 1–2 days);
-  - a new SHA, so the Windows build has to be repeated;
-  - the autopilot can still trap itself as the snake grows. A tail-reachability check makes that less likely but cannot rule it out.
+This is the same method Dinesh proposed in #72's closure report. It is the recommended **replacement for how the test is run**. TC-PERF-01's workload and thresholds stay unchanged.
+
+**What it is.** An opt-in driver (for example `--perf-autopilot`, accepted only together with `--perf-probe`) steers the snake in an ordinary Hard/Obstacle game. It reads the live game state in the same process and sends directions through **the same input path as the keyboard**. Normal play (no options) is unchanged.
+
+**Requirements that make it verifiable:**
+
+1. **Normal rules only.** All wall, body and obstacle collisions stay on. No pause, restart, invulnerability, speed change or power-up suppression. The driver may only choose among directions the game would accept from a keyboard.
+2. **Deterministic.** The policy and its seed are fixed and recorded. The policy is: a shortest safe path to food or a power-up that keeps the tail reachable; otherwise, follow the tail.
+3. **Every request is logged.** The probe log records each direction the driver sends (source `autopilot`) and whether it was accepted or rejected, just like a key press.
+4. **Power-ups are visible in the data.** The probe records, for each FPS window, whether a power-up was on the board and which effect was active. The hard-coded `powerups_implemented: false` is fixed.
+5. **No stitching.** Each run is one 300 s gameplay interval, counted from the first displayed Gameplay frame. A run that dies, restarts, pauses or changes context is **Incomplete**, and a new full run starts. Attempts are never joined.
+6. **Unchanged pass rule.** 3 runs; no complete 1-s window below 30 FPS; zero-frame stall windows count; min/avg/median reported; same EXE SHA and reference PC for all 3 runs.
+
+**What B verifies:**
+
+- R1: 900 one-second windows of real Hard/Obstacle gameplay.
+- R2: three sustained 5-minute runs, with the snake growing as it does in play.
+- R3: the Hard tick rate, obstacles and power-up effects, including the 42 ms speed-boost tick.
+
+**What B does not verify:**
+
+- How a *human* plays: the driver's movement pattern and snake length are not a player's.
+- The cost of drawing a very long snake, if the driver keeps the snake shorter than a skilled player would. Report the maximum snake length reached in each run.
+
+**Cost:**
+
+- About 1–2 days of code and tests, a new SHA and a new Windows build.
+- The driver can still trap itself; such runs are reported as Incomplete.
+- The driver code must be reviewed so it cannot reach normal play.
 
 ### Option C: "no game over" diagnostic (not recommended)
 
@@ -70,18 +91,20 @@ Any replacement has to cover these three things, or state openly that it doesn't
 
 ## 5. Recommendation and decision needed
 
-1. **If the 3 × 300 s uninterrupted Hard/Obstacle workload must be met as written, choose B.** It is the only option that measures that workload.
-2. **If there is no time for new gameplay code, choose A as an explicitly approved deviation,** with its limits recorded. That also needs:
-   - the small probe/analyzer additions first;
+1. **Recommended replacement: Option B** (the closed-loop driver, as also proposed in #72). It keeps the STP's workload, the 300 s continuity and the 30 FPS rule, and it matches the STP's "Auto" mode. Only the source of the steering changes.
+2. **Fallback, if there is no time for the driver: Option A,** as an explicitly approved deviation with its limits recorded. That needs:
+   - the probe/analyzer additions first;
    - the A3 link check to pass;
    - a deviation entry, recorded by its owner.
-3. In both cases, keep these unchanged: the reference hardware, the 30 FPS limit on **every** window, and min/avg/median reporting. TC-PERF-02 is not affected.
 
-**Decision requested from Dinesh on #22**, by replying with one of:
+   Report A only as "NFR-001 verified under the approved alternative protocol (A)", never as "TC-PERF-01 Passed".
+3. In both cases, keep these unchanged: the reference hardware, the 30 FPS limit on **every** window, min/avg/median reporting, and one EXE SHA per campaign. TC-PERF-02 is not affected.
+
+**Decision requested** from the project owner (Dinesh) **and** the QA owner responsible for the STP baseline, on #22, by replying with one of:
 
 - *"Keep the original protocol"*;
+- *"Approve B as the execution method"*;
 - *"Approve A as the replacement, with its stated limits"*;
-- *"Approve B"*;
 - *"Approve A now, B later"*.
 
-Until then nothing here is a replacement, and no partial run is relabelled.
+Record the approver names, the date and the approved wording. Until then nothing here is a replacement, the driver is not built or run for acceptance, and no partial run is relabelled.
