@@ -269,6 +269,32 @@ snake_add_catch2_test(input_validator_tests
                 endforeach()
             endif()
         endif()
+    elseif(WIN32)
+        # TC-SEC-04 native Windows fault injection. The test-only DLL is loaded
+        # only by a child writer executable; the desktop game never loads it.
+        add_library(snake_fault_inject_windows SHARED
+            tests/fault/WindowsFaultInjection.cpp)
+        snake_warnings(snake_fault_inject_windows)
+
+        add_executable(secure_write_fault_writer_windows
+            tests/fault/WindowsFaultWriter.cpp)
+        target_link_libraries(secure_write_fault_writer_windows PRIVATE
+            snake_persistence snake_settings)
+        target_compile_definitions(secure_write_fault_writer_windows PRIVATE
+            SNAKE_HAVE_SETTINGS)
+        snake_warnings(secure_write_fault_writer_windows)
+        if(MINGW)
+            target_link_options(secure_write_fault_writer_windows PRIVATE -municode)
+        endif()
+
+        snake_add_catch2_test(secure_write_fault_tests_windows
+            SOURCES tests/SecureWriteFaultWindowsTests.cpp
+            LIBS snake_persistence snake_settings)
+        target_compile_definitions(secure_write_fault_tests_windows PRIVATE
+            "SNAKE_WINDOWS_FAULT_WRITER=\"$<TARGET_FILE:secure_write_fault_writer_windows>\""
+            "SNAKE_WINDOWS_FAULT_DLL=\"$<TARGET_FILE:snake_fault_inject_windows>\"")
+        add_dependencies(secure_write_fault_tests_windows
+            secure_write_fault_writer_windows snake_fault_inject_windows)
     endif()
 
     add_executable(game_session_tests tests/GameSessionTests.cpp)

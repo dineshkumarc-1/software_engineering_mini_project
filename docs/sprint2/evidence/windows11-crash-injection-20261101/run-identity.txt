@@ -1,0 +1,37 @@
+Captured: 2026-11-01T14:29:15.5869996+05:30
+OS: Microsoft Windows 11 Home Single Language (Win32_OperatingSystem Caption)
+Display version: 25H2
+OS version: 10.0.26200
+OS build: 26200.9711
+Architecture: 64-bit
+PowerShell: 5.1.26100.9711
+CMake: cmake version 4.5.0-rc1
+MSVC compiler: 19.42.34436.0
+MSVC tools: 14.42.34433
+Windows SDK: 10.0.22621.0
+Generator: Visual Studio 17 2022
+Configuration: Release
+Catch2: 3.8.1
+SNAKE_BUILD_APP: OFF
+SNAKE_WARNINGS_AS_ERRORS: ON
+Branch: feature/issue-24-windows-crash-injection
+Base HEAD: 36ac9e2bf562c6cdfe546dc5a0611c559b248ea8
+Base tree: dd83fe9661adaf5ee8f2b35fcb817d1056be377b
+
+Verification results:
+Focused Windows fault-injection suite: 8 test cases, 206 assertions, all passed.
+Full configured Release build: passed.
+Full Windows CTest: 21/21 passed, 0 failed, 13.07 seconds.
+
+Source file Git blob hashes (review-fix working tree):
+CMakeLists.txt : 446d66b687aab1d3c5b186ad5e22731151b585e3
+tests/SecureWriteFaultWindowsTests.cpp : 60a1a60e226d91bffe63a432de9ea043f44f267b
+tests/fault/WindowsFaultInjection.cpp : 8c048fbe3021f28bc66700df5f363c683de44b76
+tests/fault/WindowsFaultWriter.cpp : 66615c67cad191c1fb57471fd833cac9c5e1a5ba
+
+Built binary SHA-256 hashes:
+snake_fault_inject_windows.dll : AB26FEB4F79E29930E4511772094760F167B35DBCB8943F320426C55343C7F3B
+secure_write_fault_writer_windows.exe : 10A435073CCE9C9DC7115D85AD36E885664808E595D5E0F8E63891B0EA02539B
+secure_write_fault_tests_windows.exe : 5DF88D505389A163B66C2D5BCA7F93AC473B4E9DB0A3B3F2BFB6AC52126059AC
+
+Note: the review-fix source changes were uncommitted at capture time. Base HEAD/tree identify the parent revision; the source blob hashes identify the exact corrected files used for the local build.
