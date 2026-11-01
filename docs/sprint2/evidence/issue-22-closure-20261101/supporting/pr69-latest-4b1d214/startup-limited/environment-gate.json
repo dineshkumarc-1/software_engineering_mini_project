@@ -1,0 +1,11 @@
+﻿{
+    "status":  "waiting_for_clean_test_environment",
+    "checked_at":  "2026-11-01T06:12:53.7614844+05:30",
+    "power_line_status":  "Online",
+    "visible_non_shell_app_windows":  0,
+    "control_window_exclusions":  [
+                                      "ChatGPT: Codex control session",
+                                      "SynTPEnh: touchpad driver utility",
+                                      "Wispr Flow: status utility"
+                                  ]
+}

@@ -1,0 +1,9 @@
+{
+  "acceptance": "not_assessed",
+  "provenance": "Previously recorded owner diagnostic values; source revision and executable hash were not established in the available summary.",
+  "cache_condition": "unverified",
+  "normal_audio_ms": [3025, 1182, 1038, 1080, 1048],
+  "null_audio_ms": [590, 702, 1087, 508, 489],
+  "null_audio_is_acceptance": false,
+  "cold_launch_criterion_satisfied": false
+}

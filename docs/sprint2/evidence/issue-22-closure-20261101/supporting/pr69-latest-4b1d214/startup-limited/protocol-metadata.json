@@ -1,0 +1,58 @@
+﻿{
+    "protocol":  "Reboot; sign in; wait 120 seconds; require AC online and no visible non-shell app windows; settle 120 seconds; normal audio; first candidate launch then five warm launches.",
+    "boot_time_local":  "2026-11-01T06:03:40.5000000+05:30",
+    "collector_start_local":  "2026-11-01T06:10:53.7233511+05:30",
+    "collection_start_local":  "2026-11-01T06:15:04.2306257+05:30",
+    "platform":  "Microsoft Windows 10 Pro, build 19045",
+    "model":  "Inspiron 15-3567",
+    "cpu":  "Intel(R) Core(TM) i3-6006U CPU @ 2.00GHz",
+    "gpus":  [
+                 {
+                     "Name":  "Intel(R) HD Graphics 520",
+                     "DriverVersion":  "31.0.101.2111"
+                 },
+                 {
+                     "Name":  "AMD Radeon (TM) R5 M330",
+                     "DriverVersion":  "27.20.1034.6"
+                 }
+             ],
+    "battery":  [
+                    {
+                        "BatteryStatus":  2,
+                        "EstimatedChargeRemaining":  98
+                    }
+                ],
+    "power_line_status":  "Online",
+    "audio_devices":  [
+                          {
+                              "Name":  "Intel(R) Display Audio",
+                              "Status":  "OK"
+                          },
+                          {
+                              "Name":  "Realtek Audio",
+                              "Status":  "OK"
+                          }
+                      ],
+    "audio_null_output":  false,
+    "antivirus_disabled_by_test":  false,
+    "antivirus_status":  {
+                             "query":  "Get-MpComputerStatus",
+                             "antivirus_enabled":  true,
+                             "realtime_protection_enabled":  true,
+                             "service_enabled":  true
+                         },
+    "security_center_antivirus_product_count":  1,
+    "source_commit":  "841ee1dccac37236a4bdcf92ec3dbf17e7a18c80",
+    "expected_source_commit":  "841ee1dccac37236a4bdcf92ec3dbf17e7a18c80",
+    "source_commit_matches":  true,
+    "executable_size_bytes":  1911808,
+    "executable_sha256":  "341bd6394a93741137866c88d95c3b00ae9ccb6d160e19d9044a0fddde68b57b",
+    "expected_executable_sha256":  "341bd6394a93741137866c88d95c3b00ae9ccb6d160e19d9044a0fddde68b57b",
+    "executable_hash_matches":  true,
+    "visible_non_shell_app_windows":  1,
+    "cache_condition":  "post-reboot first launch; OS cache not explicitly cleared or independently measured",
+    "target_hardware_verified":  true,
+    "acceptance":  "not_assessed_pending_review",
+    "collection_exit_code":  0,
+    "collection_complete":  true
+}

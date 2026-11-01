@@ -1,0 +1,544 @@
+{
+  "source_commit": "841ee1dccac37236a4bdcf92ec3dbf17e7a18c80",
+  "executable_size_bytes": 1911808,
+  "executable_sha256": "341bd6394a93741137866c88d95c3b00ae9ccb6d160e19d9044a0fddde68b57b",
+  "platform": "Windows",
+  "audio_null_output": false,
+  "cold_start": false,
+  "runs": [
+    {
+      "run": 1,
+      "confirmation_to_visible_grid_ms": 299.151,
+      "visible_grid_detected": true,
+      "screenshot_method": "DPI-aware desktop-composited capture of SFML client area; validated 30-column/20-row gridline pattern and >=3 green snake-cell components",
+      "detector": {
+        "grid_vertical_lines": 30,
+        "grid_horizontal_lines": 20,
+        "snake_segments": [
+          {
+            "area": 784,
+            "width": 28,
+            "height": 28,
+            "bbox": [
+              419,
+              296,
+              446,
+              323
+            ]
+          },
+          {
+            "area": 784,
+            "width": 28,
+            "height": 28,
+            "bbox": [
+              449,
+              296,
+              476,
+              323
+            ]
+          },
+          {
+            "area": 784,
+            "width": 28,
+            "height": 28,
+            "bbox": [
+              479,
+              296,
+              506,
+              323
+            ]
+          }
+        ],
+        "capture_size": [
+          896,
+          591
+        ]
+      },
+      "title_confirmed": true,
+      "candidate_sha256": "341bd6394a93741137866c88d95c3b00ae9ccb6d160e19d9044a0fddde68b57b",
+      "audio_null_output": false,
+      "exit_code": 0
+    },
+    {
+      "run": 2,
+      "confirmation_to_visible_grid_ms": 315.944,
+      "visible_grid_detected": true,
+      "screenshot_method": "DPI-aware desktop-composited capture of SFML client area; validated 30-column/20-row gridline pattern and >=3 green snake-cell components",
+      "detector": {
+        "grid_vertical_lines": 30,
+        "grid_horizontal_lines": 20,
+        "snake_segments": [
+          {
+            "area": 784,
+            "width": 28,
+            "height": 28,
+            "bbox": [
+              419,
+              296,
+              446,
+              323
+            ]
+          },
+          {
+            "area": 784,
+            "width": 28,
+            "height": 28,
+            "bbox": [
+              449,
+              296,
+              476,
+              323
+            ]
+          },
+          {
+            "area": 784,
+            "width": 28,
+            "height": 28,
+            "bbox": [
+              479,
+              296,
+              506,
+              323
+            ]
+          }
+        ],
+        "capture_size": [
+          896,
+          591
+        ]
+      },
+      "title_confirmed": true,
+      "candidate_sha256": "341bd6394a93741137866c88d95c3b00ae9ccb6d160e19d9044a0fddde68b57b",
+      "audio_null_output": false,
+      "exit_code": 0
+    },
+    {
+      "run": 3,
+      "confirmation_to_visible_grid_ms": 254.799,
+      "visible_grid_detected": true,
+      "screenshot_method": "DPI-aware desktop-composited capture of SFML client area; validated 30-column/20-row gridline pattern and >=3 green snake-cell components",
+      "detector": {
+        "grid_vertical_lines": 30,
+        "grid_horizontal_lines": 20,
+        "snake_segments": [
+          {
+            "area": 784,
+            "width": 28,
+            "height": 28,
+            "bbox": [
+              419,
+              296,
+              446,
+              323
+            ]
+          },
+          {
+            "area": 784,
+            "width": 28,
+            "height": 28,
+            "bbox": [
+              449,
+              296,
+              476,
+              323
+            ]
+          },
+          {
+            "area": 784,
+            "width": 28,
+            "height": 28,
+            "bbox": [
+              479,
+              296,
+              506,
+              323
+            ]
+          }
+        ],
+        "capture_size": [
+          896,
+          591
+        ]
+      },
+      "title_confirmed": true,
+      "candidate_sha256": "341bd6394a93741137866c88d95c3b00ae9ccb6d160e19d9044a0fddde68b57b",
+      "audio_null_output": false,
+      "exit_code": 0
+    },
+    {
+      "run": 4,
+      "confirmation_to_visible_grid_ms": 268.146,
+      "visible_grid_detected": true,
+      "screenshot_method": "DPI-aware desktop-composited capture of SFML client area; validated 30-column/20-row gridline pattern and >=3 green snake-cell components",
+      "detector": {
+        "grid_vertical_lines": 30,
+        "grid_horizontal_lines": 20,
+        "snake_segments": [
+          {
+            "area": 784,
+            "width": 28,
+            "height": 28,
+            "bbox": [
+              419,
+              296,
+              446,
+              323
+            ]
+          },
+          {
+            "area": 784,
+            "width": 28,
+            "height": 28,
+            "bbox": [
+              449,
+              296,
+              476,
+              323
+            ]
+          },
+          {
+            "area": 784,
+            "width": 28,
+            "height": 28,
+            "bbox": [
+              479,
+              296,
+              506,
+              323
+            ]
+          }
+        ],
+        "capture_size": [
+          896,
+          591
+        ]
+      },
+      "title_confirmed": true,
+      "candidate_sha256": "341bd6394a93741137866c88d95c3b00ae9ccb6d160e19d9044a0fddde68b57b",
+      "audio_null_output": false,
+      "exit_code": 0
+    },
+    {
+      "run": 5,
+      "confirmation_to_visible_grid_ms": 256.901,
+      "visible_grid_detected": true,
+      "screenshot_method": "DPI-aware desktop-composited capture of SFML client area; validated 30-column/20-row gridline pattern and >=3 green snake-cell components",
+      "detector": {
+        "grid_vertical_lines": 30,
+        "grid_horizontal_lines": 20,
+        "snake_segments": [
+          {
+            "area": 784,
+            "width": 28,
+            "height": 28,
+            "bbox": [
+              419,
+              296,
+              446,
+              323
+            ]
+          },
+          {
+            "area": 784,
+            "width": 28,
+            "height": 28,
+            "bbox": [
+              449,
+              296,
+              476,
+              323
+            ]
+          },
+          {
+            "area": 784,
+            "width": 28,
+            "height": 28,
+            "bbox": [
+              479,
+              296,
+              506,
+              323
+            ]
+          }
+        ],
+        "capture_size": [
+          896,
+          591
+        ]
+      },
+      "title_confirmed": true,
+      "candidate_sha256": "341bd6394a93741137866c88d95c3b00ae9ccb6d160e19d9044a0fddde68b57b",
+      "audio_null_output": false,
+      "exit_code": 0
+    },
+    {
+      "run": 6,
+      "confirmation_to_visible_grid_ms": 309.835,
+      "visible_grid_detected": true,
+      "screenshot_method": "DPI-aware desktop-composited capture of SFML client area; validated 30-column/20-row gridline pattern and >=3 green snake-cell components",
+      "detector": {
+        "grid_vertical_lines": 30,
+        "grid_horizontal_lines": 20,
+        "snake_segments": [
+          {
+            "area": 784,
+            "width": 28,
+            "height": 28,
+            "bbox": [
+              419,
+              296,
+              446,
+              323
+            ]
+          },
+          {
+            "area": 784,
+            "width": 28,
+            "height": 28,
+            "bbox": [
+              449,
+              296,
+              476,
+              323
+            ]
+          },
+          {
+            "area": 784,
+            "width": 28,
+            "height": 28,
+            "bbox": [
+              479,
+              296,
+              506,
+              323
+            ]
+          }
+        ],
+        "capture_size": [
+          896,
+          591
+        ]
+      },
+      "title_confirmed": true,
+      "candidate_sha256": "341bd6394a93741137866c88d95c3b00ae9ccb6d160e19d9044a0fddde68b57b",
+      "audio_null_output": false,
+      "exit_code": 0
+    },
+    {
+      "run": 7,
+      "confirmation_to_visible_grid_ms": 314.452,
+      "visible_grid_detected": true,
+      "screenshot_method": "DPI-aware desktop-composited capture of SFML client area; validated 30-column/20-row gridline pattern and >=3 green snake-cell components",
+      "detector": {
+        "grid_vertical_lines": 30,
+        "grid_horizontal_lines": 20,
+        "snake_segments": [
+          {
+            "area": 784,
+            "width": 28,
+            "height": 28,
+            "bbox": [
+              419,
+              296,
+              446,
+              323
+            ]
+          },
+          {
+            "area": 784,
+            "width": 28,
+            "height": 28,
+            "bbox": [
+              449,
+              296,
+              476,
+              323
+            ]
+          },
+          {
+            "area": 784,
+            "width": 28,
+            "height": 28,
+            "bbox": [
+              479,
+              296,
+              506,
+              323
+            ]
+          }
+        ],
+        "capture_size": [
+          896,
+          591
+        ]
+      },
+      "title_confirmed": true,
+      "candidate_sha256": "341bd6394a93741137866c88d95c3b00ae9ccb6d160e19d9044a0fddde68b57b",
+      "audio_null_output": false,
+      "exit_code": 0
+    },
+    {
+      "run": 8,
+      "confirmation_to_visible_grid_ms": 270.188,
+      "visible_grid_detected": true,
+      "screenshot_method": "DPI-aware desktop-composited capture of SFML client area; validated 30-column/20-row gridline pattern and >=3 green snake-cell components",
+      "detector": {
+        "grid_vertical_lines": 30,
+        "grid_horizontal_lines": 20,
+        "snake_segments": [
+          {
+            "area": 784,
+            "width": 28,
+            "height": 28,
+            "bbox": [
+              419,
+              296,
+              446,
+              323
+            ]
+          },
+          {
+            "area": 784,
+            "width": 28,
+            "height": 28,
+            "bbox": [
+              449,
+              296,
+              476,
+              323
+            ]
+          },
+          {
+            "area": 784,
+            "width": 28,
+            "height": 28,
+            "bbox": [
+              479,
+              296,
+              506,
+              323
+            ]
+          }
+        ],
+        "capture_size": [
+          896,
+          591
+        ]
+      },
+      "title_confirmed": true,
+      "candidate_sha256": "341bd6394a93741137866c88d95c3b00ae9ccb6d160e19d9044a0fddde68b57b",
+      "audio_null_output": false,
+      "exit_code": 0
+    },
+    {
+      "run": 9,
+      "confirmation_to_visible_grid_ms": 258.524,
+      "visible_grid_detected": true,
+      "screenshot_method": "DPI-aware desktop-composited capture of SFML client area; validated 30-column/20-row gridline pattern and >=3 green snake-cell components",
+      "detector": {
+        "grid_vertical_lines": 30,
+        "grid_horizontal_lines": 20,
+        "snake_segments": [
+          {
+            "area": 784,
+            "width": 28,
+            "height": 28,
+            "bbox": [
+              419,
+              296,
+              446,
+              323
+            ]
+          },
+          {
+            "area": 784,
+            "width": 28,
+            "height": 28,
+            "bbox": [
+              449,
+              296,
+              476,
+              323
+            ]
+          },
+          {
+            "area": 784,
+            "width": 28,
+            "height": 28,
+            "bbox": [
+              479,
+              296,
+              506,
+              323
+            ]
+          }
+        ],
+        "capture_size": [
+          896,
+          591
+        ]
+      },
+      "title_confirmed": true,
+      "candidate_sha256": "341bd6394a93741137866c88d95c3b00ae9ccb6d160e19d9044a0fddde68b57b",
+      "audio_null_output": false,
+      "exit_code": 0
+    },
+    {
+      "run": 10,
+      "confirmation_to_visible_grid_ms": 262.836,
+      "visible_grid_detected": true,
+      "screenshot_method": "DPI-aware desktop-composited capture of SFML client area; validated 30-column/20-row gridline pattern and >=3 green snake-cell components",
+      "detector": {
+        "grid_vertical_lines": 30,
+        "grid_horizontal_lines": 20,
+        "snake_segments": [
+          {
+            "area": 784,
+            "width": 28,
+            "height": 28,
+            "bbox": [
+              419,
+              296,
+              446,
+              323
+            ]
+          },
+          {
+            "area": 784,
+            "width": 28,
+            "height": 28,
+            "bbox": [
+              449,
+              296,
+              476,
+              323
+            ]
+          },
+          {
+            "area": 784,
+            "width": 28,
+            "height": 28,
+            "bbox": [
+              479,
+              296,
+              506,
+              323
+            ]
+          }
+        ],
+        "capture_size": [
+          896,
+          591
+        ]
+      },
+      "title_confirmed": true,
+      "candidate_sha256": "341bd6394a93741137866c88d95c3b00ae9ccb6d160e19d9044a0fddde68b57b",
+      "audio_null_output": false,
+      "exit_code": 0
+    }
+  ],
+  "all_10_visible": true,
+  "all_10_within_2000ms": true,
+  "median_ms": 269.16700000000003,
+  "maximum_ms": 315.944
+}

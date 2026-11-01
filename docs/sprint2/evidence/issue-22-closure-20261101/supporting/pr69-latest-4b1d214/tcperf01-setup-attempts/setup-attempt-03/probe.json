@@ -1,0 +1,256 @@
+{
+  "acceptance": "not_assessed",
+  "clock": "steady_clock_us_since_main",
+  "display_scope": "first_display_return_after_engine_consumed_input",
+  "dropped_inputs": 0,
+  "dropped_new_games": 0,
+  "dropped_phases": 0,
+  "dropped_windows": 0,
+  "first_frame_us": 639481,
+  "fps_windows": [
+    {
+      "difficulty": "Medium",
+      "duration_us": 1000000,
+      "frames": 1,
+      "mode": "Classic",
+      "screen": "NameEntry",
+      "session": 0,
+      "start_us": 639481,
+      "uniform_context": false
+    },
+    {
+      "difficulty": "Medium",
+      "duration_us": 1000000,
+      "frames": 0,
+      "mode": "Classic",
+      "screen": "NameEntry",
+      "session": 0,
+      "start_us": 1639481,
+      "uniform_context": false
+    },
+    {
+      "difficulty": "Hard",
+      "duration_us": 1000000,
+      "frames": 51,
+      "mode": "Obstacle",
+      "screen": "Gameplay",
+      "session": 1,
+      "start_us": 2639481,
+      "uniform_context": false
+    },
+    {
+      "difficulty": "Hard",
+      "duration_us": 1000000,
+      "frames": 57,
+      "mode": "Obstacle",
+      "screen": "GameOver",
+      "session": 1,
+      "start_us": 3639481,
+      "uniform_context": false
+    },
+    {
+      "difficulty": "Hard",
+      "duration_us": 1000000,
+      "frames": 59,
+      "mode": "Obstacle",
+      "screen": "GameOver",
+      "session": 1,
+      "start_us": 4639481,
+      "uniform_context": true
+    },
+    {
+      "difficulty": "Hard",
+      "duration_us": 1000000,
+      "frames": 51,
+      "mode": "Obstacle",
+      "screen": "GameOver",
+      "session": 1,
+      "start_us": 5639481,
+      "uniform_context": true
+    },
+    {
+      "difficulty": "Hard",
+      "duration_us": 1000000,
+      "frames": 47,
+      "mode": "Obstacle",
+      "screen": "GameOver",
+      "session": 1,
+      "start_us": 6639481,
+      "uniform_context": true
+    },
+    {
+      "difficulty": "Hard",
+      "duration_us": 1000000,
+      "frames": 56,
+      "mode": "Obstacle",
+      "screen": "GameOver",
+      "session": 1,
+      "start_us": 7639481,
+      "uniform_context": true
+    },
+    {
+      "difficulty": "Hard",
+      "duration_us": 1000000,
+      "frames": 55,
+      "mode": "Obstacle",
+      "screen": "GameOver",
+      "session": 1,
+      "start_us": 8639481,
+      "uniform_context": true
+    },
+    {
+      "difficulty": "Hard",
+      "duration_us": 1000000,
+      "frames": 59,
+      "mode": "Obstacle",
+      "screen": "GameOver",
+      "session": 1,
+      "start_us": 9639481,
+      "uniform_context": true
+    },
+    {
+      "difficulty": "Hard",
+      "duration_us": 1000000,
+      "frames": 59,
+      "mode": "Obstacle",
+      "screen": "GameOver",
+      "session": 1,
+      "start_us": 10639481,
+      "uniform_context": true
+    },
+    {
+      "difficulty": "Hard",
+      "duration_us": 1000000,
+      "frames": 59,
+      "mode": "Obstacle",
+      "screen": "GameOver",
+      "session": 1,
+      "start_us": 11639481,
+      "uniform_context": true
+    },
+    {
+      "difficulty": "Hard",
+      "duration_us": 1000000,
+      "frames": 59,
+      "mode": "Obstacle",
+      "screen": "GameOver",
+      "session": 1,
+      "start_us": 12639481,
+      "uniform_context": true
+    },
+    {
+      "difficulty": "Hard",
+      "duration_us": 1000000,
+      "frames": 59,
+      "mode": "Obstacle",
+      "screen": "GameOver",
+      "session": 1,
+      "start_us": 13639481,
+      "uniform_context": true
+    },
+    {
+      "difficulty": "Hard",
+      "duration_us": 1000000,
+      "frames": 57,
+      "mode": "Obstacle",
+      "screen": "GameOver",
+      "session": 1,
+      "start_us": 14639481,
+      "uniform_context": true
+    },
+    {
+      "difficulty": "Hard",
+      "duration_us": 1000000,
+      "frames": 56,
+      "mode": "Obstacle",
+      "screen": "GameOver",
+      "session": 1,
+      "start_us": 15639481,
+      "uniform_context": true
+    },
+    {
+      "difficulty": "Hard",
+      "duration_us": 1000000,
+      "frames": 59,
+      "mode": "Obstacle",
+      "screen": "GameOver",
+      "session": 1,
+      "start_us": 16639481,
+      "uniform_context": true
+    },
+    {
+      "difficulty": "Hard",
+      "duration_us": 1000000,
+      "frames": 58,
+      "mode": "Obstacle",
+      "screen": "GameOver",
+      "session": 1,
+      "start_us": 17639481,
+      "uniform_context": true
+    },
+    {
+      "difficulty": "Hard",
+      "duration_us": 1000000,
+      "frames": 58,
+      "mode": "Obstacle",
+      "screen": "GameOver",
+      "session": 1,
+      "start_us": 18639481,
+      "uniform_context": true
+    },
+    {
+      "difficulty": "Hard",
+      "duration_us": 1000000,
+      "frames": 59,
+      "mode": "Obstacle",
+      "screen": "GameOver",
+      "session": 1,
+      "start_us": 19639481,
+      "uniform_context": true
+    }
+  ],
+  "input_scope": "SFML_dequeue_to_engine_queue_registration_lower_bound",
+  "inputs": [],
+  "invalid_samples": 0,
+  "new_game_scope": "confirm_event_dequeue_to_first_gameplay_display_return",
+  "new_games": [
+    {
+      "confirmed_us": 2880025,
+      "first_grid_us": 2896034,
+      "ordinal": 1,
+      "trigger": "mode_selection"
+    }
+  ],
+  "partial_window": {
+    "duration_us": 12984,
+    "frames": 1,
+    "screen": "GameOver",
+    "start_us": 20639481,
+    "uniform_context": true
+  },
+  "powerups_implemented": false,
+  "schema_version": 1,
+  "startup_phases_scope": "steady_clock_us_since_main_after_each_named_step",
+  "startup_phases_us": [
+    {
+      "phase": "audio_objects_constructed",
+      "us": 250
+    },
+    {
+      "phase": "window_created",
+      "us": 432725
+    },
+    {
+      "phase": "renderer_ready",
+      "us": 434355
+    },
+    {
+      "phase": "settings_ready",
+      "us": 443190
+    },
+    {
+      "phase": "audio_started",
+      "us": 2732630
+    }
+  ]
+}

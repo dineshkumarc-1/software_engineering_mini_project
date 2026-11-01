@@ -1,6 +1,6 @@
 # STP execution and traceability matrix — reconciliation snapshot
 
-**Status:** documentation reconciled; final QA sign-off Pending. This is not a new test execution. Baseline game 7c6733d; docs/tooling main 6db9a7a; PR #60 audio 09bbf96 is separate unmerged product code and is not covered by the baseline Windows EXE.
+**Status:** documentation reconciled; final QA sign-off Pending. Issue #22 is closed by owner direction with TC-PERF-01 explicitly not run; that disposition is not a technical pass, waiver of NFR-001, or final STP sign-off. See the [owner disposition addendum](../sprint2/evidence/issue-22-closure-20261101/owner-disposition-addendum.md). Baseline game 7c6733d; docs/tooling main 6db9a7a; PR #60 audio 09bbf96 is separate unmerged product code and is not covered by the baseline Windows EXE.
 
 ## Authoritative baseline
 
@@ -22,7 +22,7 @@ Evidence anchors: [owner Linux report](OWNER-AUTOMATED-QA-7c6733d.md), [Tejas ca
 
 | Case | Priority | Requirement(s) | Title | Scoped execution status | Remaining action |
 |---|---|---|---|---|---|
-| TC-CORE-01 | H | FR-001 | Grid and snake render on new game | Pending acceptance measurement | Record approved 10 new-game first-grid measurements <=2000ms; do not substitute 3 warm process launches. |
+| TC-CORE-01 | H | FR-001 | Grid and snake render on new game | Measured pass on earlier candidate; carry-forward not re-executed on 4b1d214 | Ten validated confirmation-to-visible-grid captures on source 841ee1 / EXE SHA-256 341bd6394a93741137866c88d95c3b00ae9ccb6d160e19d9044a0fddde68b57b; median 269.167 ms, max 315.944 ms, all <=2000 ms. See closure addendum evidence. |
 | TC-CORE-02 | H | FR-002 | Tick interval per difficulty | Partial evidence | Attach 50 consecutive system tick timestamps per difficulty and +/-10% calculation. |
 | TC-CORE-03 | H | FR-003 | Direction via arrows and WASD | Partial evidence | Reconcile all eight physical key/direction combinations at system level. |
 | TC-CORE-04 | H | FR-003 | 180-degree reversal and queued turns | Automated scope passed | None for defined automated scope; preserve candidate identity. |
@@ -53,10 +53,10 @@ Evidence anchors: [owner Linux report](OWNER-AUTOMATED-QA-7c6733d.md), [Tejas ca
 | TC-SET-02 | M | FR-027 | Independent music and SFX volume | Partial evidence | Human listening for both channel combinations and range behavior; earlier only background sound was explicitly reported. F5 preview at SFX0 must be silent. |
 | TC-SET-03 | L | FR-028 | Classic Neon Retro visual themes | Partial evidence | Record snake/grid appearance in gameplay for all three themes; no Dark theme. |
 | TC-SET-04 | H | FR-029 | Settings persist across restart | Automated scope passed | None for defined automated scope; native report can add independent results. |
-| TC-PERF-01 | H | NFR-001 | Sustained minimum30FPS | Pending acceptance measurement | Three continuous300sHard/Obstacle sessions with power-ups on reference hardware; no one-second window below30FPS, report min/avg/median. |
-| TC-PERF-02 | H | NFR-002 | Input acknowledgement within100ms | Pending acceptance measurement | Approved100 random-time keypress campaign with full requested/accepted/rejected/registered accounting; verify timestamp origin and queue-delay scope. Visible turn is informational, not acknowledgement threshold. |
-| TC-REL-01 | H | NFR-003;SEC-003 | Missing/corrupt config fallback | Automated scope passed | None for defined automated scope. |
-| TC-USE-01 | M | NFR-004 | First game within three screens | Pending human walkthrough | Three outside-team first-time volunteers without help, count primary screens. Not three total clicks/keystrokes and not an AI usability result. |
+| TC-PERF-01 | H | NFR-001 | Sustained minimum30FPS | Not run; owner-directed omission for #22 closure (not a pass) | 0/3 qualifying 300s Hard/Obstacle traces. Dinesh directed that the criterion remain unchecked and #22 proceed to closure. NFR-001 remains unmet; ten short setup attempts do not qualify. See [owner disposition and raw attempts](../sprint2/evidence/issue-22-closure-20261101/owner-disposition-addendum.md). |
+| TC-PERF-02 | H | NFR-002 | Input acknowledgement within100ms | Measured below threshold on earlier candidate; carry-forward not re-executed on 4b1d214 | 100 injected OS keyboard events paired to 100 engine registrations; max 21.131 ms, 50 accepted / 50 rejected, 0 drops or invalid samples. Source 841ee1 / EXE SHA-256 341bd6394a93741137866c88d95c3b00ae9ccb6d160e19d9044a0fddde68b57b. Physical HID latency is not included. See closure addendum evidence. |
+| TC-REL-01 | H | NFR-003;SEC-003 | Missing/corrupt config fallback | Automated scope passed | None for the defined automated scope. Additional owner-reported Windows manual recovery records E_PARSE defaults, usable gameplay and later save; exit code and initially displayed defaults are unrecorded, and the manual executable identity is unknown. Preserve as supplemental evidence, not a new candidate-specific result. |
+| TC-USE-01 | M | NFR-004 | First game within three screens | Partial evidence | Dinesh's owner report says at least three outside-team first-time friends built from GitHub and reached gameplay without help via Main Menu -> Name Entry -> Mode/Difficulty -> Gameplay, matching the prescribed three primary screens. Exact build/date are not recorded; retain attribution and do not invent participant records. |
 | TC-MNT-01 | M | NFR-005 | Module separation | Automated scope passed | None for defined automated scope; specific SAD interface differences remain documented separately. |
 | TC-PORT-01 | M | NFR-006 | Windows 10 and11 clean build/run | Partial evidence | Windows 11 Not tested; proposed omission awaiting explicit disposition. Preserve Windows 10 report and supporting raw logs; no duplicated teammate campaign needed. |
 | TC-TEST-01 | M | NFR-007 | Headless testability | Automated scope passed | None for defined automated scope. |
@@ -70,8 +70,10 @@ Evidence anchors: [owner Linux report](OWNER-AUTOMATED-QA-7c6733d.md), [Tejas ca
 ## Reconciliation totals
 
 - Automated scope passed: **24**.
-- Partial evidence: **16**.
-- Pending acceptance measurement: **3**.
-- Pending human walkthrough: **1**.
+- Measured thresholds passed on earlier candidate, carry-forward not re-executed on latest candidate: **2** (TC-CORE-01, TC-PERF-02).
+- Partial evidence: **17**.
+- Owner-directed not run / unchecked for issue closure: **1** (TC-PERF-01 / NFR-001; not passed or waived).
+- Pending acceptance measurement: **0** in this snapshot; other partial requirements and overall STP sign-off remain open.
+- Pending human walkthrough: **0**. TC-USE-01 has owner-reported completion evidence and is now Partial pending build/date provenance; it is not marked Passed.
 
-Inventory completeness:44/44 unique cases,43/43 unique requirement references,30 High,13 Medium,1 Low. **Final STP pass count and requirement pass percentage are NOT certified**: some cases are partial/pending and evidence/deviations need acceptance.
+Inventory completeness:44/44 unique cases,43/43 unique requirement references,30 High,13 Medium,1 Low. **Final STP pass count and requirement pass percentage are NOT certified**: TC-PERF-01 remains unmet, several cases remain partial, and overall evidence/deviation acceptance is pending. Closing #22 does not complete the STP or Sprint 2.

@@ -1,4 +1,52 @@
-# Current owner follow-up — #22 remains In Progress
+# Issue #22 owner follow-up — closed by owner direction; acceptance gaps retained
+
+## Owner-directed closure update — 2026-11-01
+
+Dinesh directed that TC-PERF-01 remain unchecked because the three 300-second
+Hard/Obstacle workload could not be completed, and asked to close #22 with that
+status disclosed. The issue is therefore closed by owner direction, not because
+the sustained-performance requirement passed or was waived. See the
+[criterion-by-criterion owner disposition](evidence/issue-22-closure-20261101/owner-disposition-addendum.md).
+
+Latest local PR #69 Release candidate: source `4b1d21420ff20a8e06751b675bd20d73e9a13764`,
+EXE SHA-256 `47e43387ecc4d6407de2a29022e8b9884027fea8e3adb09c24d8a9aa8f25a915`;
+build exit 0, CTest 20/20, normal-audio backend smoke 10/10. Dinesh reported
+the requested manual audio listening checks as audible/working. The latest
+candidate was not reboot-tested; the earlier reboot first-frame-marker result
+was 1,517.495 ms but missed the strict environment protocol and is retained as
+limited evidence. No TC-PERF-01 campaign run qualified (0/3); all setup attempts
+remain preserved. PR #69 remains Draft and unmerged. No demo was recorded and
+#26/#28 were not changed. Closing #22 does not mean full STP/Sprint 2 completion
+or release approval.
+
+The previous reconciliation notes below are historical snapshots; the linked
+owner disposition addendum and updated matrix/test summary are the current
+status.
+
+## 2026-11-01 candidate and acceptance reconciliation
+
+PR #69 remains Draft and was not merged. Its head is
+`841ee1dccac37236a4bdcf92ec3dbf17e7a18c80` (startup source change
+`8411808f2682403cbdcd5f43d0fe742b56edd9da`). A local Windows Release build is
+1,911,808 bytes, SHA-256
+`341bd6394a93741137866c88d95c3b00ae9ccb6d160e19d9044a0fddde68b57b`.
+Five pre-reboot normal-audio diagnostics were collected; they are not a cold
+acceptance result. The closure report preserves the first post-reboot attempt,
+environment, and any execution limitation.
+
+TC-CORE-01 is Pending: the old title proxy is invalid and the DWM polling run
+timed out on a locked desktop. TC-PERF-02 is Pending because the existing input
+probe excludes OS/SFML queue wait. TC-PERF-01 remains Pending with 0/3
+qualifying 300-second Hard/Obstacle runs. The corrupt-config manual report is
+partial supplemental evidence; Dinesh's owner usability report matches the
+three-screen/no-help steps but lacks exact build/date, so TC-USE-01 is Partial,
+not Passed. PR #69 affected audio regression checks remain pending.
+
+See [the initial review snapshot](evidence/issue-22-closure-20261101/closure-report.md),
+[the current owner disposition](evidence/issue-22-closure-20261101/owner-disposition-addendum.md),
+and [the authoritative STP execution matrix](../qa/STP_EXECUTION_MATRIX.md).
+The owner-directed issue closure does not mark unchecked requirements as
+passed. Do not change #26 or #28.
 
 ## Subsequent owner hardening — still In Progress
 
@@ -47,4 +95,4 @@ shared browser sessions are not used. It refuses an occupied display :99.
 Do not interpret the 17 smoke checks or the 10 CTest suites as the complete STP
 inventory. The script does not measure input latency, FPS or cold-launch timing.
 It is a reproducible regression aid, not proof of target hardware or usability
-acceptance. No final sign-off for #22, #25, #26 or #28 is claimed.
+acceptance. No final STP sign-off is claimed; #25 remains pending.

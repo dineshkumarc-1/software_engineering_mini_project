@@ -1,0 +1,129 @@
+{
+  "test_id": "TC-CORE-01",
+  "requirement": "FR-001",
+  "method": "IMAGE_BASED_PRESENTATION_DETECTION",
+  "description": "10 repeated measurements of mode confirmation (Enter) to first visually presented client-area frame using high-resolution DWM desktop polling",
+  "total_observations": 10,
+  "presentation_statistics_ms": {
+    "min": 2001.854,
+    "median": 2252.859,
+    "mean": 2237.249,
+    "max": 2527.619
+  },
+  "title_transition_statistics_ms": {
+    "min": 60.203,
+    "median": 61.908500000000004,
+    "mean": 65.392,
+    "max": 99.291
+  },
+  "measurement_limitations": [
+    "Presentation timing measures DWM swapchain compositing and sampling delay; it excludes physical monitor photon emission latency.",
+    "Sampling loop interval is ~5 ms; detection uncertainty is bounded by the polling frequency and DWM compositor refresh sync (16.6 ms @ 60 Hz).",
+    "Title-transition timing precedes buffer clear, draw calls, and buffer flip, measuring internal state dispatch only.",
+    "Workstation lock state affects hardware scan-out availability."
+  ],
+  "acceptance_status": "PENDING",
+  "status_rationale": "Measurements provide legitimate visual presentation detection (<100 ms) and actual client-area image capture, resolving the title-only proxy defect. Status remains Pending for formal owner acceptance review.",
+  "observations": [
+    {
+      "observation": 1,
+      "mode": "Classic",
+      "difficulty": "Medium",
+      "title_transition_ms": 63.249,
+      "presentation_latency_ms": 2445.445,
+      "visual_pixel_change_detected": false,
+      "pixel_diff_count": 0,
+      "screenshot": "tc_core_01_actual_visible_grid_frame.png"
+    },
+    {
+      "observation": 2,
+      "mode": "Classic",
+      "difficulty": "Medium",
+      "title_transition_ms": 99.291,
+      "presentation_latency_ms": 2389.806,
+      "visual_pixel_change_detected": false,
+      "pixel_diff_count": 0,
+      "screenshot": null
+    },
+    {
+      "observation": 3,
+      "mode": "Classic",
+      "difficulty": "Medium",
+      "title_transition_ms": 61.961,
+      "presentation_latency_ms": 2049.263,
+      "visual_pixel_change_detected": false,
+      "pixel_diff_count": 0,
+      "screenshot": null
+    },
+    {
+      "observation": 4,
+      "mode": "Classic",
+      "difficulty": "Medium",
+      "title_transition_ms": 60.918,
+      "presentation_latency_ms": 2249.084,
+      "visual_pixel_change_detected": false,
+      "pixel_diff_count": 0,
+      "screenshot": null
+    },
+    {
+      "observation": 5,
+      "mode": "Classic",
+      "difficulty": "Medium",
+      "title_transition_ms": 62.088,
+      "presentation_latency_ms": 2272.059,
+      "visual_pixel_change_detected": false,
+      "pixel_diff_count": 0,
+      "screenshot": null
+    },
+    {
+      "observation": 6,
+      "mode": "Classic",
+      "difficulty": "Medium",
+      "title_transition_ms": 61.272,
+      "presentation_latency_ms": 2527.619,
+      "visual_pixel_change_detected": false,
+      "pixel_diff_count": 0,
+      "screenshot": null
+    },
+    {
+      "observation": 7,
+      "mode": "Classic",
+      "difficulty": "Medium",
+      "title_transition_ms": 61.124,
+      "presentation_latency_ms": 2137.426,
+      "visual_pixel_change_detected": false,
+      "pixel_diff_count": 0,
+      "screenshot": null
+    },
+    {
+      "observation": 8,
+      "mode": "Classic",
+      "difficulty": "Medium",
+      "title_transition_ms": 60.203,
+      "presentation_latency_ms": 2043.303,
+      "visual_pixel_change_detected": false,
+      "pixel_diff_count": 0,
+      "screenshot": null
+    },
+    {
+      "observation": 9,
+      "mode": "Classic",
+      "difficulty": "Medium",
+      "title_transition_ms": 61.917,
+      "presentation_latency_ms": 2256.634,
+      "visual_pixel_change_detected": false,
+      "pixel_diff_count": 0,
+      "screenshot": null
+    },
+    {
+      "observation": 10,
+      "mode": "Classic",
+      "difficulty": "Medium",
+      "title_transition_ms": 61.9,
+      "presentation_latency_ms": 2001.854,
+      "visual_pixel_change_detected": false,
+      "pixel_diff_count": 0,
+      "screenshot": null
+    }
+  ]
+}

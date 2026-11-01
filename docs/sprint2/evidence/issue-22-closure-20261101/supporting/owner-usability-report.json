@@ -1,0 +1,19 @@
+﻿{
+    "test":  "TC-USE-01",
+    "evidence_type":  "Owner-reported participant observations",
+    "participants_at_least":  3,
+    "outside_project_team":  true,
+    "first_time_users":  true,
+    "built_from_github":  true,
+    "reached_gameplay_without_help":  true,
+    "route":  [
+                  "Main Menu",
+                  "Name Entry",
+                  "Mode/Difficulty",
+                  "Gameplay"
+              ],
+    "primary_screens_before_gameplay":  3,
+    "tested_commit":  "Not recorded",
+    "execution_date":  "Not recorded",
+    "participant_quotes":  "Not collected"
+}

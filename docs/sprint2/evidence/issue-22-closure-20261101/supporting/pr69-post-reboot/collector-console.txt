@@ -1,0 +1,82 @@
+﻿{
+  "acceptance": "not_assessed",
+  "source_snapshot_operator_supplied": "841ee1dccac37236a4bdcf92ec3dbf17e7a18c80",
+  "platform": "Windows",
+  "audio_null_output": false,
+  "cache_condition": "unverified; no OS cache was cleared",
+  "target_hardware_verified": false,
+  "measurement_scope": "process creation request to observed stdout marker after first display; IPC/scheduling adds delay",
+  "warnings": [
+    "Not proof of cold-cache launch or the specified Windows hardware.",
+    "Use the full executable/DLL/assets package. First-run config regeneration is included.",
+    "No personal player input is recorded; inspect local stderr logs before sharing."
+  ],
+  "runs": [
+    {
+      "report_valid": true,
+      "report_error": null,
+      "collection_ok": true,
+      "run": 1,
+      "process_exit": 0,
+      "timed_out": false,
+      "launch_to_observed_first_frame_marker_us": 1419062.0,
+      "report": "launch-1.json",
+      "config_fixture": "missing_temporary_config"
+    },
+    {
+      "report_valid": true,
+      "report_error": null,
+      "collection_ok": true,
+      "run": 2,
+      "process_exit": 0,
+      "timed_out": false,
+      "launch_to_observed_first_frame_marker_us": 482735.4,
+      "report": "launch-2.json",
+      "config_fixture": "missing_temporary_config"
+    },
+    {
+      "report_valid": true,
+      "report_error": null,
+      "collection_ok": true,
+      "run": 3,
+      "process_exit": 0,
+      "timed_out": false,
+      "launch_to_observed_first_frame_marker_us": 703170.1,
+      "report": "launch-3.json",
+      "config_fixture": "missing_temporary_config"
+    },
+    {
+      "report_valid": true,
+      "report_error": null,
+      "collection_ok": true,
+      "run": 4,
+      "process_exit": 0,
+      "timed_out": false,
+      "launch_to_observed_first_frame_marker_us": 482904.2,
+      "report": "launch-4.json",
+      "config_fixture": "missing_temporary_config"
+    },
+    {
+      "report_valid": true,
+      "report_error": null,
+      "collection_ok": true,
+      "run": 5,
+      "process_exit": 0,
+      "timed_out": false,
+      "launch_to_observed_first_frame_marker_us": 732493.7,
+      "report": "launch-5.json",
+      "config_fixture": "missing_temporary_config"
+    },
+    {
+      "report_valid": true,
+      "report_error": null,
+      "collection_ok": true,
+      "run": 6,
+      "process_exit": 0,
+      "timed_out": false,
+      "launch_to_observed_first_frame_marker_us": 761481.3,
+      "report": "launch-6.json",
+      "config_fixture": "missing_temporary_config"
+    }
+  ]
+}
