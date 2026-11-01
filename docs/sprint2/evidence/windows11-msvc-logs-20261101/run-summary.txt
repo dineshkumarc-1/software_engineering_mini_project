@@ -1,0 +1,38 @@
+CapturedAtUtc: 2026-10-31T18:43:23.6614838+00:00
+ComputerName: <COMPUTER>
+OSCaption: Microsoft Windows 11 Home Single Language
+OSVersion: 10.0.26200
+OSBuildNumber: 26200
+OSArchitecture: 64-bit
+PowerShellVersion: 5.1.26100.9711
+GitPath: <PROGRAM_FILES>\Git\cmd\git.exe
+CMakePath: <PROGRAM_FILES>\CMake\bin\cmake.exe
+CTestPath: <PROGRAM_FILES>\CMake\bin\ctest.exe
+CLPath: <PROGRAM_FILES>\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.42.34433\bin\HostX64\x64\cl.exe
+CandidateShaRequested: 3fcc586d740d2b9b461193e482d6861ca8f905e5
+BuildConfiguration: Release
+CMakeOptions: -DSNAKE_FETCH_SFML=ON -DBUILD_SHARED_LIBS=OFF
+ExpectedWindowsCTestCount: 20
+Locally built Release EXE is ready for the visible-client checklist: <EVIDENCE_ROOT>\build\Release\SnakeXtreme.exe
+Open winver, capture the version/build dialog, and save the actual screenshot into the evidence folder.
+Launching the locally built Release EXE after the winver capture: <EVIDENCE_ROOT>\build\Release\SnakeXtreme.exe
+Perform each visible-client check on the locally built EXE. Record Pass, Fail, or Not tested honestly; add the screenshot filename and concise observation.
+Manual result record: <EVIDENCE_ROOT>\manual-gameplay-results.txt
+
+=== Machine-build result summary ===
+Candidate SHA: 3fcc586d740d2b9b461193e482d6861ca8f905e5
+Source tree SHA: 41b54378c177d7d1e01ff17f2bf7b22663789ec6
+Working tree before build: Clean
+Configure exit code: 0
+Build exit code: 0
+Registered CTest tests: 20 (Windows expectation: 20)
+CTest inventory names match: True
+Missing CTest names:
+Unexpected CTest names:
+CTest inventory exit code: 0
+CTest exit code: 0
+EXE size bytes: 1896960
+EXE SHA-256: 3496FD8C9E8ED95FB886BEF272DBAF9D62A181237E3FDB39474FF7627C3E42B5
+Manual gameplay observations: see manual-gameplay-results.txt; screenshots must be independently inspected
+Overall error:
+Complete logs are preserved in: <EVIDENCE_ROOT>

@@ -1,0 +1,343 @@
+COMMAND: <PROGRAM_FILES>\CMake\bin\cmake.exe --build <EVIDENCE_ROOT>\build --config Release --parallel
+MSBuild version 17.12.12+1cce77968 for .NET Framework
+
+  1>Checking Build System
+  Building Custom Rule <EVIDENCE_ROOT>/build/_deps/catch2-src/src/CMakeLists.txt
+  catch_chronometer.cpp
+  Building Custom Rule <EVIDENCE_ROOT>/source/CMakeLists.txt
+  Building Custom Rule <EVIDENCE_ROOT>/source/CMakeLists.txt
+  Building Custom Rule <EVIDENCE_ROOT>/source/CMakeLists.txt
+  Building Custom Rule <EVIDENCE_ROOT>/source/CMakeLists.txt
+  Building Custom Rule <EVIDENCE_ROOT>/build/_deps/sfml-src/src/SFML/System/CMakeLists.txt
+  Building Custom Rule <EVIDENCE_ROOT>/source/CMakeLists.txt
+  Building Custom Rule <EVIDENCE_ROOT>/source/CMakeLists.txt
+  Building Custom Rule <EVIDENCE_ROOT>/source/CMakeLists.txt
+  AppState.cpp
+  AudioModel.cpp
+  Building Custom Rule <EVIDENCE_ROOT>/build/_deps/sfml-src/src/SFML/Main/CMakeLists.txt
+  InputValidator.cpp
+  catch_analyse.cpp
+  GameEngine.cpp
+  Clock.cpp
+  Err.cpp
+  ModeStrategy.cpp
+  PerformanceProbe.cpp
+  MainWin32.cpp
+  ScoreService.cpp
+  snake_app_state.vcxproj -> <EVIDENCE_ROOT>\build\Release\snake_app_state.lib
+  catch_benchmark_function.cpp
+  Lock.cpp
+  Mutex.cpp
+  snake_audio_model.vcxproj -> <EVIDENCE_ROOT>\build\Release\snake_audio_model.lib
+  snake_scoring.vcxproj -> <EVIDENCE_ROOT>\build\Release\snake_scoring.lib
+  snake_validation.vcxproj -> <EVIDENCE_ROOT>\build\Release\snake_validation.lib
+  catch_run_for_at_least.cpp
+  Building Custom Rule <EVIDENCE_ROOT>/source/CMakeLists.txt
+  Building Custom Rule <EVIDENCE_ROOT>/source/CMakeLists.txt
+  Building Custom Rule <EVIDENCE_ROOT>/source/CMakeLists.txt
+  Sleep.cpp
+  String.cpp
+  sfml-main.vcxproj -> <EVIDENCE_ROOT>\build\_deps\sfml-build\lib\Release\sfml-main.lib
+  ModeManager.cpp
+  SecureFileStore.cpp
+  ScoreServiceTests.cpp
+  AppStateTests.cpp
+  catch_stats.cpp
+  snake_engine.vcxproj -> <EVIDENCE_ROOT>\build\Release\snake_engine.lib
+  Building Custom Rule <EVIDENCE_ROOT>/source/CMakeLists.txt
+  Thread.cpp
+  Building Custom Rule <EVIDENCE_ROOT>/source/CMakeLists.txt
+  Generating Code...
+  GameSessionTests.cpp
+  PowerUpEffects.cpp
+  ThreadLocal.cpp
+  Time.cpp
+  score_service_tests.vcxproj -> <EVIDENCE_ROOT>\build\Release\score_service_tests.exe
+  FileInputStream.cpp
+  PowerUpManager.cpp
+  catch_generator_exception.cpp
+  snake_modes.vcxproj -> <EVIDENCE_ROOT>\build\Release\snake_modes.lib
+  catch_generators.cpp
+  game_session_tests.vcxproj -> <EVIDENCE_ROOT>\build\Release\game_session_tests.exe
+  MemoryInputStream.cpp
+  ClockImpl.cpp
+  Generating Code...
+  catch_generators_random.cpp
+  app_state_tests.vcxproj -> <EVIDENCE_ROOT>\build\Release\app_state_tests.exe
+  MutexImpl.cpp
+  snake_powerups.vcxproj -> <EVIDENCE_ROOT>\build\Release\snake_powerups.lib
+  LeaderboardRepository.cpp
+  Building Custom Rule <EVIDENCE_ROOT>/source/CMakeLists.txt
+  SleepImpl.cpp
+  GameplayController.cpp
+  catch_reporter_automake.cpp
+  snake_probe.vcxproj -> <EVIDENCE_ROOT>\build\Release\snake_probe.lib
+  ThreadImpl.cpp
+  catch_reporter_common_base.cpp
+  snake_gameplay.vcxproj -> <EVIDENCE_ROOT>\build\Release\snake_gameplay.lib
+  ThreadLocalImpl.cpp
+  catch_reporter_compact.cpp
+  Generating Code...
+  LeaderboardModel.cpp
+  catch_reporter_console.cpp
+  sfml-system.vcxproj -> <EVIDENCE_ROOT>\build\_deps\sfml-build\lib\Release\sfml-system-s.lib
+  Building Custom Rule <EVIDENCE_ROOT>/build/_deps/sfml-src/src/SFML/Audio/CMakeLists.txt
+  Building Custom Rule <EVIDENCE_ROOT>/build/_deps/sfml-src/src/SFML/Window/CMakeLists.txt
+  catch_reporter_cumulative_base.cpp
+  Clipboard.cpp
+  ALCheck.cpp
+  AlResource.cpp
+  catch_reporter_event_listener.cpp
+  Context.cpp
+  Cursor.cpp
+  AudioDevice.cpp
+  catch_reporter_helpers.cpp
+  GlContext.cpp
+  Generating Code...
+  Listener.cpp
+  Music.cpp
+  catch_reporter_json.cpp
+  Sound.cpp
+  GlResource.cpp
+  Joystick.cpp
+  SoundBuffer.cpp
+  catch_reporter_junit.cpp
+  SoundBufferRecorder.cpp
+  InputSoundFile.cpp
+  JoystickManager.cpp
+  catch_reporter_multi.cpp
+  OutputSoundFile.cpp
+  catch_reporter_registrars.cpp
+  SoundRecorder.cpp
+  snake_persistence.vcxproj -> <EVIDENCE_ROOT>\build\Release\snake_persistence.lib
+  Building Custom Rule <EVIDENCE_ROOT>/source/CMakeLists.txt
+  catch_reporter_sonarqube.cpp
+  Keyboard.cpp
+  Mouse.cpp
+  Settings.cpp
+  SoundSource.cpp
+  SoundStream.cpp
+  SettingsRepository.cpp
+  Generating Code...
+  Touch.cpp
+  Sensor.cpp
+  SensorManager.cpp
+  SoundFileFactory.cpp
+  VideoMode.cpp
+  SoundFileReaderFlac.cpp
+  Window.cpp
+  SoundFileReaderOgg.cpp
+  SoundFileReaderWav.cpp
+  SoundFileWriterFlac.cpp
+  WindowImpl.cpp
+  Compiling...
+  catch_reporter_streaming_base.cpp
+  Generating Code...
+  SoundFileWriterOgg.cpp
+  catch_reporter_tap.cpp
+  SoundFileWriterWav.cpp
+  CursorImpl.cpp
+  catch_reporter_teamcity.cpp
+  Generating Code...
+  snake_settings.vcxproj -> <EVIDENCE_ROOT>\build\Release\snake_settings.lib
+  catch_reporter_xml.cpp
+  ClipboardImpl.cpp
+  catch_interfaces_capture.cpp
+  catch_interfaces_config.cpp
+  sfml-audio.vcxproj -> <EVIDENCE_ROOT>\build\_deps\sfml-build\lib\Release\sfml-audio-s.lib
+  WglContext.cpp
+  catch_interfaces_exception.cpp
+  catch_interfaces_generatortracker.cpp
+  catch_interfaces_registry_hub.cpp
+  catch_interfaces_reporter.cpp
+  WglExtensions.cpp
+  InputImpl.cpp
+  catch_interfaces_reporter_factory.cpp
+  catch_interfaces_testcase.cpp
+  catch_approx.cpp
+  Generating Code...
+  catch_assertion_result.cpp
+  catch_config.cpp
+  Compiling...
+  JoystickImpl.cpp
+  catch_get_random_seed.cpp
+  catch_message.cpp
+  SensorImpl.cpp
+  VideoModeImpl.cpp
+  catch_registry_hub.cpp
+  WindowImplWin32.cpp
+  catch_session.cpp
+  Generating Code...
+  catch_tag_alias_autoregistrar.cpp
+  Generating Code...
+  sfml-window.vcxproj -> <EVIDENCE_ROOT>\build\_deps\sfml-build\lib\Release\sfml-window-s.lib
+  Building Custom Rule <EVIDENCE_ROOT>/build/_deps/sfml-src/src/SFML/Graphics/CMakeLists.txt
+  BlendMode.cpp
+  Color.cpp
+  Font.cpp
+  Glsl.cpp
+  GLCheck.cpp
+  GLExtensions.cpp
+  Compiling...
+  catch_test_case_info.cpp
+  Image.cpp
+  catch_test_spec.cpp
+  ImageLoader.cpp
+  catch_timer.cpp
+  catch_tostring.cpp
+  RenderStates.cpp
+  RenderTexture.cpp
+  catch_totals.cpp
+  catch_translate_exception.cpp
+  RenderTarget.cpp
+  catch_version.cpp
+  catch_assertion_handler.cpp
+  RenderWindow.cpp
+  catch_case_insensitive_comparisons.cpp
+  catch_clara.cpp
+  Shader.cpp
+  catch_commandline.cpp
+  Texture.cpp
+  catch_console_colour.cpp
+  TextureSaver.cpp
+  Transform.cpp
+  Transformable.cpp
+  catch_context.cpp
+  catch_debug_console.cpp
+  View.cpp
+  Vertex.cpp
+  GLLoader.cpp
+  Generating Code...
+  catch_debugger.cpp
+  catch_decomposer.cpp
+  catch_enforce.cpp
+  catch_enum_values_registry.cpp
+  Compiling...
+  Shape.cpp
+  catch_errno_guard.cpp
+  catch_exception_translator_registry.cpp
+  CircleShape.cpp
+  Generating Code...
+  RectangleShape.cpp
+  ConvexShape.cpp
+  Sprite.cpp
+  Text.cpp
+  VertexArray.cpp
+  VertexBuffer.cpp
+  Compiling...
+  catch_fatal_condition_handler.cpp
+  RenderTextureImpl.cpp
+  RenderTextureImplFBO.cpp
+  catch_floating_point_helpers.cpp
+  catch_getenv.cpp
+  catch_istream.cpp
+  catch_jsonwriter.cpp
+  RenderTextureImplDefault.cpp
+  catch_lazy_expr.cpp
+  Generating Code...
+  catch_leak_detector.cpp
+  catch_list.cpp
+  sfml-graphics.vcxproj -> <EVIDENCE_ROOT>\build\_deps\sfml-build\lib\Release\sfml-graphics-s.lib
+  Building Custom Rule <EVIDENCE_ROOT>/source/CMakeLists.txt
+  AppManager.cpp
+  catch_message_info.cpp
+  catch_output_redirect.cpp
+  catch_parse_numbers.cpp
+  catch_polyfills.cpp
+  catch_random_number_generator.cpp
+  catch_random_seed_generation.cpp
+  Renderer.cpp
+  catch_reporter_registry.cpp
+  catch_reporter_spec_parser.cpp
+  catch_reusable_string_stream.cpp
+  catch_run_context.cpp
+  catch_section.cpp
+  AudioService.cpp
+  catch_singletons.cpp
+  Generating Code...
+  Generating Code...
+  Compiling...
+  catch_source_line_info.cpp
+  snake_presentation.vcxproj -> <EVIDENCE_ROOT>\build\Release\snake_presentation.lib
+  Building Custom Rule <EVIDENCE_ROOT>/source/CMakeLists.txt
+  Building Custom Rule <EVIDENCE_ROOT>/source/CMakeLists.txt
+  AudioBackendSmoke.cpp
+  main.cpp
+  catch_startup_exception_registry.cpp
+  catch_stdstreams.cpp
+  catch_string_manip.cpp
+  audio_backend_smoke.vcxproj -> <EVIDENCE_ROOT>\build\Release\audio_backend_smoke.exe
+  catch_stringref.cpp
+  catch_tag_alias_registry.cpp
+  SnakeXtreme.vcxproj -> <EVIDENCE_ROOT>\build\Release\SnakeXtreme.exe
+  catch_test_case_info_hasher.cpp
+  catch_test_case_registry_impl.cpp
+  catch_test_case_tracker.cpp
+  catch_test_failure_exception.cpp
+  catch_test_registry.cpp
+  catch_test_spec_parser.cpp
+  catch_textflow.cpp
+  catch_uncaught_exceptions.cpp
+  catch_wildcard_pattern.cpp
+  catch_xmlwriter.cpp
+  catch_matchers.cpp
+  catch_matchers_container_properties.cpp
+  catch_matchers_exception.cpp
+  catch_matchers_floating_point.cpp
+  Generating Code...
+  Compiling...
+  catch_matchers_predicate.cpp
+  catch_matchers_quantifiers.cpp
+  catch_matchers_string.cpp
+  catch_matchers_templated.cpp
+  catch_matchers_impl.cpp
+  Generating Code...
+  Catch2.vcxproj -> <EVIDENCE_ROOT>\build\_deps\catch2-build\src\Release\Catch2.lib
+  Building Custom Rule <EVIDENCE_ROOT>/build/_deps/catch2-src/src/CMakeLists.txt
+  catch_main.cpp
+  Catch2WithMain.vcxproj -> <EVIDENCE_ROOT>\build\_deps\catch2-build\src\Release\Catch2Main.lib
+  Building Custom Rule <EVIDENCE_ROOT>/source/CMakeLists.txt
+  Building Custom Rule <EVIDENCE_ROOT>/source/CMakeLists.txt
+  Building Custom Rule <EVIDENCE_ROOT>/source/CMakeLists.txt
+  Building Custom Rule <EVIDENCE_ROOT>/source/CMakeLists.txt
+  Building Custom Rule <EVIDENCE_ROOT>/source/CMakeLists.txt
+  Building Custom Rule <EVIDENCE_ROOT>/source/CMakeLists.txt
+  Building Custom Rule <EVIDENCE_ROOT>/source/CMakeLists.txt
+  Building Custom Rule <EVIDENCE_ROOT>/source/CMakeLists.txt
+  Building Custom Rule <EVIDENCE_ROOT>/source/CMakeLists.txt
+  PowerUpTests.cpp
+  GameModeTests.cpp
+  Building Custom Rule <EVIDENCE_ROOT>/source/CMakeLists.txt
+  AudioModelTests.cpp
+  LeaderboardModelTests.cpp
+  GameplayControllerTests.cpp
+  LeaderboardRepositoryTests.cpp
+  SecurityCorpusTests.cpp
+  Building Custom Rule <EVIDENCE_ROOT>/source/CMakeLists.txt
+  SettingsTests.cpp
+  InputValidatorTests.cpp
+  SettingsCorpusTests.cpp
+  PerformanceProbeTests.cpp
+  Building Custom Rule <EVIDENCE_ROOT>/source/CMakeLists.txt
+  SecureFileStoreTests.cpp
+  Building Custom Rule <EVIDENCE_ROOT>/source/CMakeLists.txt
+  ModeEngineIntegrationTests.cpp
+  PowerUpGameplayTests.cpp
+  GameEngineTests.cpp
+  audio_model_tests.vcxproj -> <EVIDENCE_ROOT>\build\Release\audio_model_tests.exe
+  input_validator_tests.vcxproj -> <EVIDENCE_ROOT>\build\Release\input_validator_tests.exe
+  game_engine_tests.vcxproj -> <EVIDENCE_ROOT>\build\Release\game_engine_tests.exe
+  gameplay_tests.vcxproj -> <EVIDENCE_ROOT>\build\Release\gameplay_tests.exe
+  leaderboard_model_tests.vcxproj -> <EVIDENCE_ROOT>\build\Release\leaderboard_model_tests.exe
+  Generating Code...
+  Generating Code...
+  game_mode_tests.vcxproj -> <EVIDENCE_ROOT>\build\Release\game_mode_tests.exe
+  settings_corpus_tests.vcxproj -> <EVIDENCE_ROOT>\build\Release\settings_corpus_tests.exe
+  leaderboard_repository_tests.vcxproj -> <EVIDENCE_ROOT>\build\Release\leaderboard_repository_tests.exe
+  secure_file_store_tests.vcxproj -> <EVIDENCE_ROOT>\build\Release\secure_file_store_tests.exe
+  powerup_tests.vcxproj -> <EVIDENCE_ROOT>\build\Release\powerup_tests.exe
+  settings_tests.vcxproj -> <EVIDENCE_ROOT>\build\Release\settings_tests.exe
+  performance_probe_tests.vcxproj -> <EVIDENCE_ROOT>\build\Release\performance_probe_tests.exe
+  security_corpus_tests.vcxproj -> <EVIDENCE_ROOT>\build\Release\security_corpus_tests.exe
+  Building Custom Rule <EVIDENCE_ROOT>/source/CMakeLists.txt
+EXIT CODE: 0

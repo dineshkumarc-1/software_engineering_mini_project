@@ -1,0 +1,27 @@
+﻿TC-PORT-01 Windows 11 manual observations
+Winver screenshot: 00-msvc-windows-version.png (captured 2026-11-01 as supplementary evidence)
+Capture timestamp UTC: 2026-10-31T18:48:13.8700710+00:00
+
+[Passed] Menu window opens and menu text is visible (font loaded).
+Observation / screenshot: Main menu displayed; text visible and font loaded; screenshot: 01-msvc-main-menu.png
+
+[Passed] Classic: eat food and verify the score increases by +10.
+Observation / screenshot: Classic mode: ate food and score increased by +10; screenshot: 02-msvc-classic-score-plus10.png
+
+[Passed] Timed: countdown starts at 1:00 and runs down.
+Observation / screenshot: Timed mode: countdown started at 1:00 and decreased to 0:55; screenshot: 03-msvc-timed-countdown.png
+
+[Passed] Obstacle: collide with a brown block and observe You hit an obstacle.
+Observation / screenshot: Collided with a brown obstacle; "You hit an obstacle" displayed; screenshot: 04-msvc-obstacle-collision.png
+
+[Passed] Collect a power-up; HUD shows its name and remaining seconds.
+Observation / screenshot: Power-up HUD displayed Speed boost and remaining duration of 3.9 seconds; screenshot: 05-msvc-powerup-hud.png
+
+[Passed] Esc pauses/resumes; M returns to menu; Esc on menu exits.
+Observation / screenshot: Esc paused and resumed gameplay; M returned to main menu; Esc exited cleanly; screenshot: 06-msvc-pause-screen.png
+
+[Passed] Window X closes the game cleanly.
+Observation / screenshot: Clicked window X; game closed cleanly without freezing or errors; no screenshot required.
+
+[Failed] Leaderboard shows the score after a game; a changed setting survives restart.
+Observation / screenshot: Correction: Check 8 should be Failed. After restarting, leaderboard showed 0 entries and No scores yet, despite the previous Game Over screen reporting Score saved: rank 3. Settings persistence not yet verified. Screenshot: 08-msvc-leaderboard-after-restart-empty.png

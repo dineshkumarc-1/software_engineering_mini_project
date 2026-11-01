@@ -1,0 +1,15 @@
+=== Toolchain versions ===
+COMMAND: <PROGRAM_FILES>\CMake\bin\cmake.exe --version
+cmake version 4.5.0-rc1
+
+CMake suite maintained and supported by Kitware (kitware.com/cmake).
+EXIT CODE: 0
+COMMAND: <PROGRAM_FILES>\Git\cmd\git.exe --version
+git version 2.54.0.windows.1
+EXIT CODE: 0
+MSVCCompilerPath: <PROGRAM_FILES>\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.42.34433\bin\HostX64\x64\cl.exe
+MSVCProductVersion: 14.42.34436.0
+MSVCFileVersion: 19.42.34436.0
+COMMAND: <PROGRAM_FILES_X86>\Microsoft Visual Studio\Installer\vswhere.exe -latest -products * -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -property installationVersion
+17.12.35707.178
+EXIT CODE: 0

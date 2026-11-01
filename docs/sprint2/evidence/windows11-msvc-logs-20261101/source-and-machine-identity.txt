@@ -1,0 +1,21 @@
+CapturedAtUtc: 2026-10-31T18:43:23.6614838+00:00
+ComputerName: <COMPUTER>
+OSCaption: Microsoft Windows 11 Home Single Language
+OSVersion: 10.0.26200
+OSBuildNumber: 26200
+OSArchitecture: 64-bit
+PowerShellVersion: 5.1.26100.9711
+GitPath: <PROGRAM_FILES>\Git\cmd\git.exe
+CMakePath: <PROGRAM_FILES>\CMake\bin\cmake.exe
+CTestPath: <PROGRAM_FILES>\CMake\bin\ctest.exe
+CLPath: <PROGRAM_FILES>\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.42.34433\bin\HostX64\x64\cl.exe
+CandidateShaRequested: 3fcc586d740d2b9b461193e482d6861ca8f905e5
+BuildConfiguration: Release
+CMakeOptions: -DSNAKE_FETCH_SFML=ON -DBUILD_SHARED_LIBS=OFF
+ExpectedWindowsCTestCount: 20
+RequestedCommitSha: 3fcc586d740d2b9b461193e482d6861ca8f905e5
+ActualCommitSha: 3fcc586d740d2b9b461193e482d6861ca8f905e5
+SourceTreeSha: 41b54378c177d7d1e01ff17f2bf7b22663789ec6
+WorkingTreeStatusBeforeBuild: Clean
+GitStatusPorcelain:
+(empty)
