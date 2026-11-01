@@ -1,13 +1,13 @@
 # Windows 11 portability and exact-build privacy — preflight handoff
 
-**Prepared:** 2026-10-31  
-**Scope:** Issues #23 (TC-PORT-01) and #24 (SEC-002..004 / SEC-007)  
+**Prepared:** 2026-10-31
+**Scope:** Issues #23 (TC-PORT-01) and #24 (SEC-002..004 / SEC-007)
 **Status:** Windows 11 local GCC/MinGW and Visual Studio 2022/MSVC Release builds have both completed, each with a matching 20/20 CTest pass on the pinned candidate. The original MSVC manual checklist remains recorded as **7/8 passed and 1 failed**; its initial leaderboard-after-restart observation was made before the relaunch was controlled to use the same working directory. A separate controlled MSVC persistence retest on 1 November 2026 used the same executable and identical isolated working directory before and after restart: `leaderboard.json` and the `Neon` setting both survived, with matching before/after hashes. The original failure is preserved as historical evidence; the controlled retest suggests a likely working-directory mismatch, not a reproduced persistence defect. The original eight MSVC screenshots and five controlled-retest screenshots, JSON snapshots, launch logs, summary and hash manifest are committed. The controlled-retest package is under `docs/sprint2/evidence/msvc-persistence-retest-20261101/`. The exact-build passive Issue #24 capture was completed against the GCC executable only; the scoped firewall test remains gated on Dinesh's explicit approval. This remains a partial preflight, **not** final QA sign-off or Sprint 2 sign-off.
 
 ## Candidate identity — pinned for this verification campaign
 
-**Selected test candidate:** `3fcc586d740d2b9b461193e482d6861ca8f905e5`  
-**Source tree:** `41b54378c177d7d1e01ff17f2bf7b22663789ec6`  
+**Selected test candidate:** `3fcc586d740d2b9b461193e482d6861ca8f905e5`
+**Source tree:** `41b54378c177d7d1e01ff17f2bf7b22663789ec6`
 **Reason:** This is the merged #60 product revision containing the integrated collision/Game Over audio change.
 
 This exact SHA is selected **only for the Windows 11 verification campaign**. It is not final release approval, a release tag, a scope waiver or Sprint 2 sign-off. The Windows 11 source build and privacy collection must both use this exact commit and its own generated EXE identity.
