@@ -41,6 +41,13 @@ Do not use a report filename that is also a player configuration/save file.
   Collector exit codes are 0 for all runs collected, 1 for any incomplete run,
   and 2 for invocation/setup failure. A marker alone is never success.
   The collector does not clear OS caches or verify the machine specification.
+- **Start-up phases and new-game timing (#22)** are described in
+  [startup-measurements.md](startup-measurements.md). This applies from
+  PR #69 on: the OpenAL device opens only **after** the first frame. So
+  `audio_started` (or `audio_unavailable`) follows `first_frame`, and
+  `audio_objects_constructed` is close to zero. Report both marks for every
+  launch: `first_frame` is when the menu is visible; `audio_started` is when
+  music and SFX are ready.
 - FPS uses exact non-overlapping 1,000,000-us windows anchored on first display.
   A frame exactly on a boundary belongs to the next window. Stalls generate
   zero-frame windows; the final partial window is separate and is NOT included
