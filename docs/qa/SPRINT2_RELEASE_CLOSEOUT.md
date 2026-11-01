@@ -13,7 +13,7 @@
 - [ ] Execute three 300 s Hard/Obstacle FPS sessions and100 random-time input protocol; verify instrumentation timestamps/accounting and target hardware.
 - [ ] Three outside-team first-time volunteers,without help; count <=3 primary screens,notclicks.
 - [ ] Review exact-candidate privacy capture with explicit scoped firewall authorization,source/EXE provenance,actual offlinegameplay,redaction and sampling limits.
-- [ ] Windows 11NotTested:record explicit disposition/approved deviation or obtain actual Windows 11build/run. Do not silently delete the row.
+- [x] Historical Windows 11 evidence status for candidate `7c6733d` is documented for traceability. Later Windows 11 evidence for candidate `3fcc586` was accepted for Issue #23. This historical row does not reopen Issue #23 or constitute final QA sign-off or release approval.
 - [ ] Review concrete deviations:cleanup guarantee,uncollected5s power-up lifetime,UI labels/interfaces,Loggerrotation and testseams. Record rationale and actual acceptance,not inferred signatures.
 - [ ] FinalTest Summary Report and deviations reviewed by QA; residual defect severities and accepted risks recorded.
 
@@ -30,4 +30,4 @@
 - [ ] Upload `demo/sprint2.mp4` or documented README link; verify playback/access. Use actual captured footage,not a generated placeholder.
 
 ## Status discipline
-Implementation Done is not blanket release certification.22/23/24/25remainIn Progress until their acceptance/disposition;26/28remain Todo untilperformed. No speculative duration estimate or false100%claim. Preserve the old acceptance campaign and isolate the newaudio candidate.
+Implementation Done is not blanket release certification. Issue #22 is owner-accepted closed; retain its outstanding measurement limitations. Issue #23 is Closed / Completed following explicit owner acceptance. Issue #24 remains Open pending Bharath's PR #76 corrections, green cppcheck and Windows MinGW CI, correction and verification of SHA256SUMS.txt, and final review. The existing reviewed corpus and privacy/firewall evidence should be referenced without repeating the firewall test. The native Windows/macOS crash-injection gap still requires explicit disposition; do not report it as passed. Issue #25 remains In Progress until its required sign-offs are completed. Issues #26 and #28 remain incomplete until their acceptance criteria are met. Final QA sign-off and release readiness remain Pending. No release tag or approval is implied.

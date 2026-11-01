@@ -154,9 +154,32 @@ Step 2, the review of modules against unit-test targets:
 | Settings (`snake_settings`) and name validation (`snake_validation`) | In candidate #53: `settings_tests`, `settings_corpus_tests`, `input_validator_tests` | Pass in #53 |
 | Audio model and performance probe (`snake_audio_model`, `snake_probe`) | In candidate #53: `audio_model_tests`, `performance_probe_tests` | Pass in #53 |
 
+## Issue #23 — final accepted evidence and disposition
+
+**Status: Closed / Completed.** Dinesh explicitly accepted the final criterion
+table and closed Issue #23 after reviewing PR #75 at
+`52416fc62d9e44ed978fc0892d862c9d0a2fa900`. This decision covers Issue #23's
+acceptance criteria only. It is not final QA sign-off, release approval, PR #69
+acceptance, macOS crash-injection acceptance, or closure of Issue #24.
+
+| Criterion | Tested candidate / build | Result | Evidence and limitations |
+| --- | --- | --- | --- |
+| Linux ASan/UBSan | `3fcc586d740d2b9b461193e482d6861ca8f905e5`, Clang 18.1.3 | 21/21 tests; zero reported sanitizer findings. CI sanitizer job passed on `26a1f86e05d470fd52500fd0e91de372b3b48f05`. | Preserve the distinct candidate and CI identities. |
+| Linux static analysis | `3fcc586d740d2b9b461193e482d6861ca8f905e5`, cppcheck 2.13 | Zero findings under the approved gate. | This is the approved-gate result, not a claim that every possible analyzer or configuration was run. |
+| Windows 11 build and execution | `3fcc586d740d2b9b461193e482d6861ca8f905e5`; MSVC executable | Clean build; 20/20 tests; actual runtime evidence. The initial leaderboard-after-restart mismatch passed a controlled retest. EXE size 1,896,960 bytes; SHA-256 `3496FD8C9E8ED95FB886BEF272DBAF9D62A181237E3FDB39474FF7627C3E42B5`. | Preserve the initial mismatch. Its root cause remains unproven. |
+| Windows 10 build and execution | `09bbf96e14d9b8f037d46b4b55e07d32aeacf26c`; separate Windows 10 executable | Raw build evidence; CTest 20/20; audio backend 7/7; live-process transitions. EXE size 1,906,688 bytes; SHA-256 `780B5AB208B7FD6DF91916E4E386848E179FE4B71CBA27BC4BCEE60207D2E946`. | Owner accepted source applicability because only 11 documentation files differ from `3fcc586` and no build/test inputs differ. This is not binary equivalence. The raw archive does not independently establish warnings-as-errors or a clean-checkout build; no build exit code or client-area screenshot was recorded, dependencies were reused, and the EXE hash could not be recomputed from the archive. |
+
+The older `7c6733d` portability checklist below is historical and must not
+override the later accepted evidence. Keep all source and executable identities
+separate. Do not publish the original Windows 10 archive further until personal
+paths are redacted in a separate sharing copy; preserve the original. The
+supplemental Windows 11 GCC evidence is not the primary accepted MSVC evidence.
+Issue #24's native crash-injection gap remains a separate pending decision.
+
+
 ## TC-PORT-01 Windows 10 / 11 build and run (NFR-006)
 
-CI already builds the full app with MSVC on Windows Server (`windows-latest`) on every pull request and runs the headless tests with MSVC and MinGW-w64. TC-PORT-01 still needs one clean build and one real game on a **Windows 10** PC and on a **Windows 11** PC.
+The checklist and machine-status table in this section describe the earlier `7c6733d` candidate and are retained for historical traceability. They do not override the later accepted Issue #23 evidence above.
 
 **Needs:**
 - Visual Studio 2022 with the "Desktop development with C++" workload
@@ -203,4 +226,4 @@ Record for each machine:
 | Windows 10 PC | **Reported; independent review Pending.** The report was received; the raw logs and a client-area screenshot are not yet uploaded | `7c6733d95a4fa61a3af83c413a27d1ad2f40d44b` (reported clean tree) | 1,906,688 bytes, `FE3AA1316D634611F3D690665C5D802696BE80DA5124C34B2475D05391CEF1F3` (local build, not the CI package) | Windows 10 Pro 10.0.19045 | MSVC 19.44.35229.0 (VS 2022 Build Tools), CMake 4.4.4, Release | Reported exit 0 | Reported **20/20** (the 21st suite, `secure_write_fault_tests`, is Linux-only) | The owner reports playing and that everything works. The step-by-step record for steps 3–8 is not supplied | [Windows 10 register](qa/WINDOWS10-EVIDENCE-REGISTER.md) | Dinesh / Antigravity (reported) | 30 Oct 2026 |
 | Windows 11 PC | **Not tested.** No Windows 11 machine with a clean build has been reported. Bharath has been asked on issue #23. If no machine is available, this needs a scope-deviation decision (DV06) by Dinesh | – | – | – | – | – | – | – | – | – | – |
 
-A row stays **Pending** or **Not tested** until someone runs the checklist on a real PC with that Windows version and the evidence is uploaded. A reported result stays *Reported* until its logs are reviewed. Nobody but the owner can accept the omission of a Windows version. The CI jobs on Windows Server (`windows-latest`, MSVC and MinGW-w64) are **not** a substitute: they prove the code compiles and the headless tests pass, not that the game runs on Windows 10 or 11. Issue #23 can be closed once both rows are filled in and pass. The Linux build is informational only.
+For this historical `7c6733d` table, Pending, Not tested, and Reported describe the evidence recorded for that candidate at that time. The later Issue #23 disposition is Closed / Completed, as recorded above. Windows Server CI is not a substitute for native manual evidence. Issue #23 closure does not grant final QA sign-off or release approval.
