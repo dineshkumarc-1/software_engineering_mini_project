@@ -1,0 +1,231 @@
+{
+  "protocol": "TC-PERF-01 approved closed-loop steering method; normal game rules/collisions/power-ups enabled; no reboot",
+  "run_kind": "setup",
+  "probe_seconds": 20,
+  "source_commit": "4b1d21420ff20a8e06751b675bd20d73e9a13764",
+  "exe": "C:\\Users\\Dinesh Kumar\\SnakeXtreme-Win10-QA-20261030-115659\\source-pr69-latest\\build-pr69-latest\\Release\\SnakeXtreme.exe",
+  "exe_sha256": "47e43387ecc4d6407de2a29022e8b9884027fea8e3adb09c24d8a9aa8f25a915",
+  "audio_null_output": false,
+  "started_utc": "2026-11-01T01:46:19.684866+00:00",
+  "ac_power_line": "Online",
+  "battery_percent": "65",
+  "antivirus_disabled_by_test": false,
+  "mode": "Obstacle",
+  "difficulty": "Hard",
+  "fps_window_seconds": 1,
+  "collisions_disabled": false,
+  "powerups_disabled": false,
+  "status": "invalid_attempt",
+  "window_title_initial": "SnakeXtreme | Main menu | Up/Down: select, Enter: confirm, Esc: exit",
+  "gameplay_title": "SnakeXtreme | Playing | Obstacle / Hard | Score 0 | High 0 | Esc: pause, M: menu",
+  "gameplay_started_utc": "2026-11-01T01:46:22.372768+00:00",
+  "client_bbox": [
+    519,
+    278,
+    1419,
+    878
+  ],
+  "capture_size": [
+    900,
+    600
+  ],
+  "initial_head": [
+    15,
+    10
+  ],
+  "initial_direction": "Right",
+  "initial_snake_length": 3,
+  "visible_obstacles": 7,
+  "initial_food": [
+    17,
+    7
+  ],
+  "safe_cycle_cells": 42,
+  "safe_cycle": [
+    [
+      15,
+      10
+    ],
+    [
+      15,
+      9
+    ],
+    [
+      15,
+      8
+    ],
+    [
+      15,
+      7
+    ],
+    [
+      15,
+      6
+    ],
+    [
+      15,
+      5
+    ],
+    [
+      15,
+      4
+    ],
+    [
+      15,
+      3
+    ],
+    [
+      15,
+      2
+    ],
+    [
+      15,
+      1
+    ],
+    [
+      16,
+      1
+    ],
+    [
+      17,
+      1
+    ],
+    [
+      18,
+      1
+    ],
+    [
+      19,
+      1
+    ],
+    [
+      20,
+      1
+    ],
+    [
+      21,
+      1
+    ],
+    [
+      22,
+      1
+    ],
+    [
+      23,
+      1
+    ],
+    [
+      24,
+      1
+    ],
+    [
+      25,
+      1
+    ],
+    [
+      26,
+      1
+    ],
+    [
+      27,
+      1
+    ],
+    [
+      27,
+      2
+    ],
+    [
+      27,
+      3
+    ],
+    [
+      27,
+      4
+    ],
+    [
+      27,
+      5
+    ],
+    [
+      27,
+      6
+    ],
+    [
+      27,
+      7
+    ],
+    [
+      27,
+      8
+    ],
+    [
+      27,
+      9
+    ],
+    [
+      27,
+      10
+    ],
+    [
+      26,
+      10
+    ],
+    [
+      25,
+      10
+    ],
+    [
+      24,
+      10
+    ],
+    [
+      23,
+      10
+    ],
+    [
+      22,
+      10
+    ],
+    [
+      21,
+      10
+    ],
+    [
+      20,
+      10
+    ],
+    [
+      19,
+      10
+    ],
+    [
+      18,
+      10
+    ],
+    [
+      17,
+      10
+    ],
+    [
+      16,
+      10
+    ]
+  ],
+  "approach_cells": [],
+  "cycle_entry": [
+    15,
+    10
+  ],
+  "controller_started_utc": "2026-11-01T01:46:22.658486+00:00",
+  "controller_reason": "head_move_timeout",
+  "controller_counts": {
+    "moves": 0,
+    "turns": 1,
+    "powerup_observations": 0,
+    "powerup_spawns": 0,
+    "score_changes": 0
+  },
+  "completed_utc": "2026-11-01T01:46:23.997990+00:00",
+  "process_exit_code": 0,
+  "probe_report_exists": true
+}

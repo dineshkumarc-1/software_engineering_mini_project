@@ -1,0 +1,66 @@
+{
+  "acceptance": "not_assessed",
+  "clock": "steady_clock_us_since_main",
+  "display_scope": "first_display_return_after_engine_consumed_input",
+  "dropped_inputs": 0,
+  "dropped_new_games": 0,
+  "dropped_phases": 0,
+  "dropped_windows": 0,
+  "first_frame_us": 632291,
+  "fps_windows": [
+    {
+      "difficulty": "Hard",
+      "duration_us": 1000000,
+      "frames": 25,
+      "mode": "Obstacle",
+      "screen": "Gameplay",
+      "session": 1,
+      "start_us": 632291,
+      "uniform_context": false
+    }
+  ],
+  "input_scope": "SFML_dequeue_to_engine_queue_registration_lower_bound",
+  "inputs": [],
+  "invalid_samples": 0,
+  "new_game_scope": "confirm_event_dequeue_to_first_gameplay_display_return",
+  "new_games": [
+    {
+      "confirmed_us": 1301815,
+      "first_grid_us": 1317878,
+      "ordinal": 1,
+      "trigger": "mode_selection"
+    }
+  ],
+  "partial_window": {
+    "duration_us": 68529,
+    "frames": 5,
+    "screen": "Gameplay",
+    "start_us": 1632291,
+    "uniform_context": true
+  },
+  "powerups_implemented": false,
+  "schema_version": 1,
+  "startup_phases_scope": "steady_clock_us_since_main_after_each_named_step",
+  "startup_phases_us": [
+    {
+      "phase": "audio_objects_constructed",
+      "us": 152
+    },
+    {
+      "phase": "window_created",
+      "us": 349094
+    },
+    {
+      "phase": "renderer_ready",
+      "us": 350934
+    },
+    {
+      "phase": "settings_ready",
+      "us": 359749
+    },
+    {
+      "phase": "audio_started",
+      "us": 1171572
+    }
+  ]
+}

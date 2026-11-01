@@ -1,0 +1,44 @@
+{
+  "acceptance": "not_assessed",
+  "clock": "steady_clock_us_since_main",
+  "display_scope": "first_display_return_after_engine_consumed_input",
+  "dropped_inputs": 0,
+  "dropped_new_games": 0,
+  "dropped_phases": 0,
+  "dropped_windows": 0,
+  "first_frame_us": null,
+  "fps_windows": [],
+  "input_scope": "SFML_dequeue_to_engine_queue_registration_lower_bound",
+  "inputs": [],
+  "invalid_samples": 0,
+  "new_game_scope": "confirm_event_dequeue_to_first_gameplay_display_return",
+  "new_games": [],
+  "partial_window": {
+    "duration_us": 0,
+    "frames": 0,
+    "screen": "",
+    "start_us": 0,
+    "uniform_context": true
+  },
+  "powerups_implemented": false,
+  "schema_version": 1,
+  "startup_phases_scope": "steady_clock_us_since_main_after_each_named_step",
+  "startup_phases_us": [
+    {
+      "phase": "audio_objects_constructed",
+      "us": 164
+    },
+    {
+      "phase": "window_created",
+      "us": 446853
+    },
+    {
+      "phase": "renderer_ready",
+      "us": 447880
+    },
+    {
+      "phase": "settings_ready",
+      "us": 455947
+    }
+  ]
+}

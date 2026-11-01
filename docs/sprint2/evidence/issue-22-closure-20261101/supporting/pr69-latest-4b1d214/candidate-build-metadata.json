@@ -1,0 +1,20 @@
+{
+  "source_commit": "4b1d21420ff20a8e06751b675bd20d73e9a13764",
+  "executable_path": "C:\\Users\\Dinesh Kumar\\SnakeXtreme-Win10-QA-20261030-115659\\source-pr69-latest\\build-pr69-latest\\Release\\SnakeXtreme.exe",
+  "executable_size_bytes": 1915392,
+  "executable_sha256": "47e43387ecc4d6407de2a29022e8b9884027fea8e3adb09c24d8a9aa8f25a915",
+  "configuration": "Release",
+  "build_shared_libs": "OFF",
+  "full_build_exit_code": 0,
+  "ctest_passed": 20,
+  "ctest_failed": 0,
+  "ctest_exit_code": 0,
+  "ctest_log": "ctest-release.log",
+  "audio_backend_smoke_checks": 10,
+  "audio_backend_smoke_exit_code": 0,
+  "audio_null_output": false,
+  "audio_backend_smoke_log": "audio-backend-smoke-normal.log",
+  "antivirus_disabled_by_test": false,
+  "startup_acceptance": "not_assessed_pending_reboot_run",
+  "recorded_at": "2026-11-01T06:56:27.3416260+05:30"
+}

@@ -1,0 +1,26 @@
+{
+  "run_kind": "setup",
+  "source_commit": "4b1d21420ff20a8e06751b675bd20d73e9a13764",
+  "exe_sha256": "47e43387ecc4d6407de2a29022e8b9884027fea8e3adb09c24d8a9aa8f25a915",
+  "probe_acceptance": "not_assessed",
+  "powerups_implemented_probe_field": false,
+  "probe_dropped_windows": 0,
+  "probe_dropped_inputs": 0,
+  "probe_invalid_samples": 0,
+  "gameplay_hard_obstacle_uniform_windows": 0,
+  "longest_contiguous_gameplay_windows": 0,
+  "selected_300_window_count": 0,
+  "selected_300_min_fps": null,
+  "selected_300_mean_fps": null,
+  "selected_300_below_30": 0,
+  "controller_reason": "unexpected_pause:SnakeXtreme | Paused | Obstacle / Hard | Score 0 | High 0 | Esc/Enter: resume, M: menu",
+  "controller_counts": {
+    "moves": 0,
+    "turns": 1,
+    "powerup_observations": 0,
+    "powerup_spawns": 0,
+    "score_changes": 0
+  },
+  "controller_visible_powerup_spawns": 0,
+  "qualifying_300s_trace": false
+}

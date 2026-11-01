@@ -1,0 +1,191 @@
+{
+  "protocol": "TC-PERF-01 approved closed-loop steering method; normal game rules/collisions/power-ups enabled; no reboot",
+  "run_kind": "setup",
+  "probe_seconds": 20,
+  "source_commit": "4b1d21420ff20a8e06751b675bd20d73e9a13764",
+  "exe": "C:\\Users\\Dinesh Kumar\\SnakeXtreme-Win10-QA-20261030-115659\\source-pr69-latest\\build-pr69-latest\\Release\\SnakeXtreme.exe",
+  "exe_sha256": "47e43387ecc4d6407de2a29022e8b9884027fea8e3adb09c24d8a9aa8f25a915",
+  "audio_null_output": false,
+  "started_utc": "2026-11-01T01:43:13.602741+00:00",
+  "ac_power_line": "Online",
+  "battery_percent": "65",
+  "antivirus_disabled_by_test": false,
+  "mode": "Obstacle",
+  "difficulty": "Hard",
+  "fps_window_seconds": 1,
+  "collisions_disabled": false,
+  "powerups_disabled": false,
+  "status": "invalid_attempt",
+  "window_title_initial": "SnakeXtreme | Main menu | Up/Down: select, Enter: confirm, Esc: exit",
+  "gameplay_title": "SnakeXtreme | Playing | Obstacle / Hard | Score 0 | High 0 | Esc: pause, M: menu",
+  "gameplay_started_utc": "2026-11-01T01:43:16.272346+00:00",
+  "client_bbox": [
+    519,
+    278,
+    1419,
+    878
+  ],
+  "capture_size": [
+    900,
+    600
+  ],
+  "initial_head": [
+    15,
+    10
+  ],
+  "initial_direction": "Right",
+  "initial_snake_length": 3,
+  "visible_obstacles": 8,
+  "initial_food": [
+    14,
+    4
+  ],
+  "safe_cycle_cells": 32,
+  "safe_cycle": [
+    [
+      15,
+      10
+    ],
+    [
+      15,
+      11
+    ],
+    [
+      14,
+      11
+    ],
+    [
+      13,
+      11
+    ],
+    [
+      12,
+      11
+    ],
+    [
+      11,
+      11
+    ],
+    [
+      10,
+      11
+    ],
+    [
+      9,
+      11
+    ],
+    [
+      8,
+      11
+    ],
+    [
+      7,
+      11
+    ],
+    [
+      6,
+      11
+    ],
+    [
+      5,
+      11
+    ],
+    [
+      4,
+      11
+    ],
+    [
+      3,
+      11
+    ],
+    [
+      3,
+      10
+    ],
+    [
+      3,
+      9
+    ],
+    [
+      3,
+      8
+    ],
+    [
+      3,
+      7
+    ],
+    [
+      4,
+      7
+    ],
+    [
+      5,
+      7
+    ],
+    [
+      6,
+      7
+    ],
+    [
+      7,
+      7
+    ],
+    [
+      8,
+      7
+    ],
+    [
+      9,
+      7
+    ],
+    [
+      10,
+      7
+    ],
+    [
+      11,
+      7
+    ],
+    [
+      12,
+      7
+    ],
+    [
+      13,
+      7
+    ],
+    [
+      14,
+      7
+    ],
+    [
+      15,
+      7
+    ],
+    [
+      15,
+      8
+    ],
+    [
+      15,
+      9
+    ]
+  ],
+  "approach_cells": [],
+  "cycle_entry": [
+    15,
+    10
+  ],
+  "controller_started_utc": "2026-11-01T01:43:30.845696+00:00",
+  "controller_reason": "game_over:SnakeXtreme | Game over: You hit an obstacle | Obstacle / Hard | Score 0 | High 0 | Score saved: rank 1 | Enter: play again, M: menu",
+  "controller_counts": {
+    "moves": 0,
+    "turns": 0,
+    "powerup_observations": 0,
+    "powerup_spawns": 0,
+    "score_changes": 0
+  },
+  "completed_utc": "2026-11-01T01:43:31.016209+00:00",
+  "process_exit_code": 0,
+  "probe_report_exists": true
+}

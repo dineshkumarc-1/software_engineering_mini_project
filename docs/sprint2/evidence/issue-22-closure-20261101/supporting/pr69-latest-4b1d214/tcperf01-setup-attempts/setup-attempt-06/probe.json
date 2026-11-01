@@ -1,0 +1,97 @@
+{
+  "acceptance": "not_assessed",
+  "clock": "steady_clock_us_since_main",
+  "display_scope": "first_display_return_after_engine_consumed_input",
+  "dropped_inputs": 0,
+  "dropped_new_games": 0,
+  "dropped_phases": 0,
+  "dropped_windows": 0,
+  "first_frame_us": 551823,
+  "fps_windows": [
+    {
+      "difficulty": "Medium",
+      "duration_us": 1000000,
+      "frames": 1,
+      "mode": "Classic",
+      "screen": "NameEntry",
+      "session": 0,
+      "start_us": 551823,
+      "uniform_context": false
+    },
+    {
+      "difficulty": "Medium",
+      "duration_us": 1000000,
+      "frames": 0,
+      "mode": "Classic",
+      "screen": "NameEntry",
+      "session": 0,
+      "start_us": 1551823,
+      "uniform_context": false
+    },
+    {
+      "difficulty": "Hard",
+      "duration_us": 1000000,
+      "frames": 60,
+      "mode": "Obstacle",
+      "screen": "Gameplay",
+      "session": 1,
+      "start_us": 2551823,
+      "uniform_context": false
+    }
+  ],
+  "input_scope": "SFML_dequeue_to_engine_queue_registration_lower_bound",
+  "inputs": [
+    {
+      "accepted": true,
+      "applied_us": 2981865,
+      "dequeued_us": 2948280,
+      "direction": "Up",
+      "displayed_us": 2997985,
+      "ordinal": 1,
+      "registered_us": 2948284,
+      "session": 1
+    }
+  ],
+  "invalid_samples": 0,
+  "new_game_scope": "confirm_event_dequeue_to_first_gameplay_display_return",
+  "new_games": [
+    {
+      "confirmed_us": 2630406,
+      "first_grid_us": 2647707,
+      "ordinal": 1,
+      "trigger": "mode_selection"
+    }
+  ],
+  "partial_window": {
+    "duration_us": 129209,
+    "frames": 8,
+    "screen": "Gameplay",
+    "start_us": 3551823,
+    "uniform_context": true
+  },
+  "powerups_implemented": false,
+  "schema_version": 1,
+  "startup_phases_scope": "steady_clock_us_since_main_after_each_named_step",
+  "startup_phases_us": [
+    {
+      "phase": "audio_objects_constructed",
+      "us": 133
+    },
+    {
+      "phase": "window_created",
+      "us": 316711
+    },
+    {
+      "phase": "renderer_ready",
+      "us": 317827
+    },
+    {
+      "phase": "settings_ready",
+      "us": 324764
+    },
+    {
+      "phase": "audio_started",
+      "us": 2518737
+    }
+  ]
+}

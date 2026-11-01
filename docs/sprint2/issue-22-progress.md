@@ -1,4 +1,27 @@
-# Current owner follow-up — #22 remains In Progress
+# Issue #22 owner follow-up — closed by owner direction; acceptance gaps retained
+
+## Owner-directed closure update — 2026-11-01
+
+Dinesh directed that TC-PERF-01 remain unchecked because the three 300-second
+Hard/Obstacle workload could not be completed, and asked to close #22 with that
+status disclosed. The issue is therefore closed by owner direction, not because
+the sustained-performance requirement passed or was waived. See the
+[criterion-by-criterion owner disposition](evidence/issue-22-closure-20261101/owner-disposition-addendum.md).
+
+Latest local PR #69 Release candidate: source `4b1d21420ff20a8e06751b675bd20d73e9a13764`,
+EXE SHA-256 `47e43387ecc4d6407de2a29022e8b9884027fea8e3adb09c24d8a9aa8f25a915`;
+build exit 0, CTest 20/20, normal-audio backend smoke 10/10. Dinesh reported
+the requested manual audio listening checks as audible/working. The latest
+candidate was not reboot-tested; the earlier reboot first-frame-marker result
+was 1,517.495 ms but missed the strict environment protocol and is retained as
+limited evidence. No TC-PERF-01 campaign run qualified (0/3); all setup attempts
+remain preserved. PR #69 remains Draft and unmerged. No demo was recorded and
+#26/#28 were not changed. Closing #22 does not mean full STP/Sprint 2 completion
+or release approval.
+
+The previous reconciliation notes below are historical snapshots; the linked
+owner disposition addendum and updated matrix/test summary are the current
+status.
 
 ## 2026-11-01 candidate and acceptance reconciliation
 
@@ -19,10 +42,11 @@ partial supplemental evidence; Dinesh's owner usability report matches the
 three-screen/no-help steps but lacks exact build/date, so TC-USE-01 is Partial,
 not Passed. PR #69 affected audio regression checks remain pending.
 
-See [the closure report](evidence/issue-22-closure-20261101/closure-report.md)
+See [the initial review snapshot](evidence/issue-22-closure-20261101/closure-report.md),
+[the current owner disposition](evidence/issue-22-closure-20261101/owner-disposition-addendum.md),
 and [the authoritative STP execution matrix](../qa/STP_EXECUTION_MATRIX.md).
-Keep #22 Open/In Progress until all required rows pass or an authorized
-disposition is recorded. Do not change #26 or #28.
+The owner-directed issue closure does not mark unchecked requirements as
+passed. Do not change #26 or #28.
 
 ## Subsequent owner hardening — still In Progress
 
@@ -71,4 +95,4 @@ shared browser sessions are not used. It refuses an occupied display :99.
 Do not interpret the 17 smoke checks or the 10 CTest suites as the complete STP
 inventory. The script does not measure input latency, FPS or cold-launch timing.
 It is a reproducible regression aid, not proof of target hardware or usability
-acceptance. No final sign-off for #22, #25, #26 or #28 is claimed.
+acceptance. No final STP sign-off is claimed; #25 remains pending.

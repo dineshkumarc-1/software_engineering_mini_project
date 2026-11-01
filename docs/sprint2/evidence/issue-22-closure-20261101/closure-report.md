@@ -1,8 +1,14 @@
-# Issue #22 closure review package — 2026-11-01
+# Issue #22 closure review package — 2026-11-01 (initial review snapshot)
 
-**Disposition: Not ready for Done.** This package reconciles evidence against
+**Initial disposition: Not ready for Done.** This package reconciles evidence against
 the approved STP v1.0 and records the remaining work. It does not claim a pass,
 waiver, PR merge, Sprint 2 completion, or #28 demo. PR #69 remains Draft.
+
+The issue owner later directed that TC-PERF-01 remain unchecked and #22 proceed
+to issue-tracking closure. The current disposition and subsequent evidence are
+recorded in the [owner disposition addendum](owner-disposition-addendum.md),
+which supersedes this document for current #22 tracking status. This initial
+review snapshot is retained as history.
 
 ## Candidate and environment
 

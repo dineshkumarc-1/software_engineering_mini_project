@@ -1,0 +1,22 @@
+{
+  "source_commit": "841ee1dccac37236a4bdcf92ec3dbf17e7a18c80",
+  "executable_sha256": "341bd6394a93741137866c88d95c3b00ae9ccb6d160e19d9044a0fddde68b57b",
+  "method": "WH_KEYBOARD_LL callback QPC timestamp for 100 LLKHF_INJECTED key-down events produced by keybd_event; matched in exact direction/order to the PR #69 performance probe engine registrations. App steady_clock origin aligned using first-frame stdout marker and first_frame_us.",
+  "injection_caveat": "Windows-injected events; this does not include physical keyboard switch/HID scan latency.",
+  "gameplay_validation": "All 100 registered timestamps precede first GameOver FPS window; report mode Classic, difficulty Medium.",
+  "accepted": 50,
+  "rejected": 50,
+  "input_records": 100,
+  "hook_events": 100,
+  "paired_events": 100,
+  "dropped_inputs": 0,
+  "invalid_samples": 0,
+  "first_gameover_window_us": 9651933,
+  "registration_range_us": [
+    2973727.0,
+    9098267.0
+  ],
+  "maximum_os_event_to_registration_ms": 21.131,
+  "all_below_100ms": true,
+  "candidate_exit_code": 0
+}

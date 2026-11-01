@@ -1,0 +1,87 @@
+{
+  "acceptance": "not_assessed",
+  "clock": "steady_clock_us_since_main",
+  "display_scope": "first_display_return_after_engine_consumed_input",
+  "dropped_inputs": 0,
+  "dropped_new_games": 0,
+  "dropped_phases": 0,
+  "dropped_windows": 0,
+  "first_frame_us": 443888,
+  "fps_windows": [
+    {
+      "difficulty": "Medium",
+      "duration_us": 1000000,
+      "frames": 1,
+      "mode": "Classic",
+      "screen": "MainMenu",
+      "session": 0,
+      "start_us": 443888,
+      "uniform_context": false
+    },
+    {
+      "difficulty": "Medium",
+      "duration_us": 1000000,
+      "frames": 2,
+      "mode": "Classic",
+      "screen": "NameEntry",
+      "session": 0,
+      "start_us": 1443888,
+      "uniform_context": false
+    }
+  ],
+  "input_scope": "SFML_dequeue_to_engine_queue_registration_lower_bound",
+  "inputs": [
+    {
+      "accepted": true,
+      "applied_us": null,
+      "dequeued_us": 3236719,
+      "direction": "Up",
+      "displayed_us": null,
+      "ordinal": 1,
+      "registered_us": 3236722,
+      "session": 1
+    }
+  ],
+  "invalid_samples": 0,
+  "new_game_scope": "confirm_event_dequeue_to_first_gameplay_display_return",
+  "new_games": [
+    {
+      "confirmed_us": 2674486,
+      "first_grid_us": 2693891,
+      "ordinal": 1,
+      "trigger": "mode_selection"
+    }
+  ],
+  "partial_window": {
+    "duration_us": 909097,
+    "frames": 49,
+    "screen": "Paused",
+    "start_us": 2443888,
+    "uniform_context": false
+  },
+  "powerups_implemented": false,
+  "schema_version": 1,
+  "startup_phases_scope": "steady_clock_us_since_main_after_each_named_step",
+  "startup_phases_us": [
+    {
+      "phase": "audio_objects_constructed",
+      "us": 184
+    },
+    {
+      "phase": "window_created",
+      "us": 310967
+    },
+    {
+      "phase": "renderer_ready",
+      "us": 312107
+    },
+    {
+      "phase": "settings_ready",
+      "us": 321943
+    },
+    {
+      "phase": "audio_started",
+      "us": 2365744
+    }
+  ]
+}

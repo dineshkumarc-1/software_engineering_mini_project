@@ -1,0 +1,1865 @@
+{
+  "source_commit": "841ee1dccac37236a4bdcf92ec3dbf17e7a18c80",
+  "exe_sha256": "341bd6394a93741137866c88d95c3b00ae9ccb6d160e19d9044a0fddde68b57b",
+  "candidate_exit": 0,
+  "audio_null_output": false,
+  "scheduled_requests": 100,
+  "hook_events": 100,
+  "probe_input_records": 100,
+  "paired_records": 100,
+  "direction_order_matches": true,
+  "accepted": 50,
+  "rejected": 50,
+  "max_paired_ms": 21.131,
+  "all_paired_lt_100ms": true,
+  "first_frame_marker_seen": true,
+  "probe_report": {
+    "acceptance": "not_assessed",
+    "clock": "steady_clock_us_since_main",
+    "display_scope": "first_display_return_after_engine_consumed_input",
+    "dropped_inputs": 0,
+    "dropped_phases": 0,
+    "dropped_windows": 0,
+    "first_frame_us": 651933,
+    "fps_windows": [
+      {
+        "difficulty": "Medium",
+        "duration_us": 1000000,
+        "frames": 1,
+        "mode": "Classic",
+        "screen": "MainMenu",
+        "session": 0,
+        "start_us": 651933,
+        "uniform_context": false
+      },
+      {
+        "difficulty": "Medium",
+        "duration_us": 1000000,
+        "frames": 8,
+        "mode": "Classic",
+        "screen": "NameEntry",
+        "session": 0,
+        "start_us": 1651933,
+        "uniform_context": false
+      },
+      {
+        "difficulty": "Medium",
+        "duration_us": 1000000,
+        "frames": 60,
+        "mode": "Classic",
+        "screen": "Gameplay",
+        "session": 1,
+        "start_us": 2651933,
+        "uniform_context": false
+      },
+      {
+        "difficulty": "Medium",
+        "duration_us": 1000000,
+        "frames": 60,
+        "mode": "Classic",
+        "screen": "Gameplay",
+        "session": 1,
+        "start_us": 3651933,
+        "uniform_context": true
+      },
+      {
+        "difficulty": "Medium",
+        "duration_us": 1000000,
+        "frames": 60,
+        "mode": "Classic",
+        "screen": "Gameplay",
+        "session": 1,
+        "start_us": 4651933,
+        "uniform_context": true
+      },
+      {
+        "difficulty": "Medium",
+        "duration_us": 1000000,
+        "frames": 60,
+        "mode": "Classic",
+        "screen": "Gameplay",
+        "session": 1,
+        "start_us": 5651933,
+        "uniform_context": true
+      },
+      {
+        "difficulty": "Medium",
+        "duration_us": 1000000,
+        "frames": 60,
+        "mode": "Classic",
+        "screen": "Gameplay",
+        "session": 1,
+        "start_us": 6651933,
+        "uniform_context": true
+      },
+      {
+        "difficulty": "Medium",
+        "duration_us": 1000000,
+        "frames": 60,
+        "mode": "Classic",
+        "screen": "Gameplay",
+        "session": 1,
+        "start_us": 7651933,
+        "uniform_context": true
+      },
+      {
+        "difficulty": "Medium",
+        "duration_us": 1000000,
+        "frames": 60,
+        "mode": "Classic",
+        "screen": "Gameplay",
+        "session": 1,
+        "start_us": 8651933,
+        "uniform_context": true
+      },
+      {
+        "difficulty": "Medium",
+        "duration_us": 1000000,
+        "frames": 60,
+        "mode": "Classic",
+        "screen": "GameOver",
+        "session": 1,
+        "start_us": 9651933,
+        "uniform_context": false
+      },
+      {
+        "difficulty": "Medium",
+        "duration_us": 1000000,
+        "frames": 60,
+        "mode": "Classic",
+        "screen": "GameOver",
+        "session": 1,
+        "start_us": 10651933,
+        "uniform_context": true
+      },
+      {
+        "difficulty": "Medium",
+        "duration_us": 1000000,
+        "frames": 60,
+        "mode": "Classic",
+        "screen": "GameOver",
+        "session": 1,
+        "start_us": 11651933,
+        "uniform_context": true
+      },
+      {
+        "difficulty": "Medium",
+        "duration_us": 1000000,
+        "frames": 59,
+        "mode": "Classic",
+        "screen": "GameOver",
+        "session": 1,
+        "start_us": 12651933,
+        "uniform_context": true
+      },
+      {
+        "difficulty": "Medium",
+        "duration_us": 1000000,
+        "frames": 59,
+        "mode": "Classic",
+        "screen": "GameOver",
+        "session": 1,
+        "start_us": 13651933,
+        "uniform_context": true
+      },
+      {
+        "difficulty": "Medium",
+        "duration_us": 1000000,
+        "frames": 61,
+        "mode": "Classic",
+        "screen": "GameOver",
+        "session": 1,
+        "start_us": 14651933,
+        "uniform_context": true
+      },
+      {
+        "difficulty": "Medium",
+        "duration_us": 1000000,
+        "frames": 60,
+        "mode": "Classic",
+        "screen": "GameOver",
+        "session": 1,
+        "start_us": 15651933,
+        "uniform_context": true
+      },
+      {
+        "difficulty": "Medium",
+        "duration_us": 1000000,
+        "frames": 60,
+        "mode": "Classic",
+        "screen": "GameOver",
+        "session": 1,
+        "start_us": 16651933,
+        "uniform_context": true
+      },
+      {
+        "difficulty": "Medium",
+        "duration_us": 1000000,
+        "frames": 60,
+        "mode": "Classic",
+        "screen": "GameOver",
+        "session": 1,
+        "start_us": 17651933,
+        "uniform_context": true
+      },
+      {
+        "difficulty": "Medium",
+        "duration_us": 1000000,
+        "frames": 60,
+        "mode": "Classic",
+        "screen": "GameOver",
+        "session": 1,
+        "start_us": 18651933,
+        "uniform_context": true
+      },
+      {
+        "difficulty": "Medium",
+        "duration_us": 1000000,
+        "frames": 60,
+        "mode": "Classic",
+        "screen": "GameOver",
+        "session": 1,
+        "start_us": 19651933,
+        "uniform_context": true
+      }
+    ],
+    "input_scope": "SFML_dequeue_to_engine_queue_registration_lower_bound",
+    "inputs": [
+      {
+        "accepted": false,
+        "applied_us": null,
+        "dequeued_us": 2973725,
+        "direction": "Right",
+        "displayed_us": null,
+        "ordinal": 0,
+        "registered_us": 2973727,
+        "session": 1
+      },
+      {
+        "accepted": true,
+        "applied_us": 3056682,
+        "dequeued_us": 3040465,
+        "direction": "Down",
+        "displayed_us": 3072868,
+        "ordinal": 1,
+        "registered_us": 3040468,
+        "session": 1
+      },
+      {
+        "accepted": true,
+        "applied_us": 3172162,
+        "dequeued_us": 3073038,
+        "direction": "Right",
+        "displayed_us": 3188212,
+        "ordinal": 2,
+        "registered_us": 3073040,
+        "session": 1
+      },
+      {
+        "accepted": true,
+        "applied_us": 3307120,
+        "dequeued_us": 3122364,
+        "direction": "Down",
+        "displayed_us": 3322957,
+        "ordinal": 3,
+        "registered_us": 3122366,
+        "session": 1
+      },
+      {
+        "accepted": false,
+        "applied_us": null,
+        "dequeued_us": 3155838,
+        "direction": "Down",
+        "displayed_us": null,
+        "ordinal": 0,
+        "registered_us": 3155839,
+        "session": 1
+      },
+      {
+        "accepted": true,
+        "applied_us": 3424010,
+        "dequeued_us": 3240535,
+        "direction": "Left",
+        "displayed_us": 3440248,
+        "ordinal": 4,
+        "registered_us": 3240537,
+        "session": 1
+      },
+      {
+        "accepted": false,
+        "applied_us": null,
+        "dequeued_us": 3273490,
+        "direction": "Down",
+        "displayed_us": null,
+        "ordinal": 0,
+        "registered_us": 3273491,
+        "session": 1
+      },
+      {
+        "accepted": false,
+        "applied_us": null,
+        "dequeued_us": 3307103,
+        "direction": "Right",
+        "displayed_us": null,
+        "ordinal": 0,
+        "registered_us": 3307106,
+        "session": 1
+      },
+      {
+        "accepted": false,
+        "applied_us": null,
+        "dequeued_us": 3357148,
+        "direction": "Right",
+        "displayed_us": null,
+        "ordinal": 0,
+        "registered_us": 3357150,
+        "session": 1
+      },
+      {
+        "accepted": true,
+        "applied_us": 3542396,
+        "dequeued_us": 3423994,
+        "direction": "Down",
+        "displayed_us": 3558594,
+        "ordinal": 5,
+        "registered_us": 3423995,
+        "session": 1
+      },
+      {
+        "accepted": true,
+        "applied_us": 3658473,
+        "dequeued_us": 3491191,
+        "direction": "Left",
+        "displayed_us": 3674615,
+        "ordinal": 6,
+        "registered_us": 3491195,
+        "session": 1
+      },
+      {
+        "accepted": true,
+        "applied_us": 3776442,
+        "dequeued_us": 3575031,
+        "direction": "Down",
+        "displayed_us": 3793112,
+        "ordinal": 7,
+        "registered_us": 3575034,
+        "session": 1
+      },
+      {
+        "accepted": false,
+        "applied_us": null,
+        "dequeued_us": 3658459,
+        "direction": "Down",
+        "displayed_us": null,
+        "ordinal": 0,
+        "registered_us": 3658461,
+        "session": 1
+      },
+      {
+        "accepted": false,
+        "applied_us": null,
+        "dequeued_us": 3743646,
+        "direction": "Down",
+        "displayed_us": null,
+        "ordinal": 0,
+        "registered_us": 3743648,
+        "session": 1
+      },
+      {
+        "accepted": false,
+        "applied_us": null,
+        "dequeued_us": 3793421,
+        "direction": "Down",
+        "displayed_us": null,
+        "ordinal": 0,
+        "registered_us": 3793422,
+        "session": 1
+      },
+      {
+        "accepted": false,
+        "applied_us": null,
+        "dequeued_us": 3860005,
+        "direction": "Down",
+        "displayed_us": null,
+        "ordinal": 0,
+        "registered_us": 3860006,
+        "session": 1
+      },
+      {
+        "accepted": true,
+        "applied_us": 3910143,
+        "dequeued_us": 3893323,
+        "direction": "Right",
+        "displayed_us": 3926079,
+        "ordinal": 8,
+        "registered_us": 3893325,
+        "session": 1
+      },
+      {
+        "accepted": false,
+        "applied_us": null,
+        "dequeued_us": 3977158,
+        "direction": "Right",
+        "displayed_us": null,
+        "ordinal": 0,
+        "registered_us": 3977160,
+        "session": 1
+      },
+      {
+        "accepted": true,
+        "applied_us": 4142479,
+        "dequeued_us": 4059689,
+        "direction": "Up",
+        "displayed_us": 4158563,
+        "ordinal": 9,
+        "registered_us": 4059691,
+        "session": 1
+      },
+      {
+        "accepted": false,
+        "applied_us": null,
+        "dequeued_us": 4110277,
+        "direction": "Up",
+        "displayed_us": null,
+        "ordinal": 0,
+        "registered_us": 4110280,
+        "session": 1
+      },
+      {
+        "accepted": true,
+        "applied_us": 4258104,
+        "dequeued_us": 4158966,
+        "direction": "Left",
+        "displayed_us": 4273999,
+        "ordinal": 10,
+        "registered_us": 4158967,
+        "session": 1
+      },
+      {
+        "accepted": false,
+        "applied_us": null,
+        "dequeued_us": 4208299,
+        "direction": "Left",
+        "displayed_us": null,
+        "ordinal": 0,
+        "registered_us": 4208300,
+        "session": 1
+      },
+      {
+        "accepted": true,
+        "applied_us": 4373754,
+        "dequeued_us": 4258093,
+        "direction": "Up",
+        "displayed_us": 4389636,
+        "ordinal": 11,
+        "registered_us": 4258094,
+        "session": 1
+      },
+      {
+        "accepted": true,
+        "applied_us": 4507938,
+        "dequeued_us": 4308066,
+        "direction": "Left",
+        "displayed_us": 4525483,
+        "ordinal": 12,
+        "registered_us": 4308067,
+        "session": 1
+      },
+      {
+        "accepted": false,
+        "applied_us": null,
+        "dequeued_us": 4357602,
+        "direction": "Down",
+        "displayed_us": null,
+        "ordinal": 0,
+        "registered_us": 4357603,
+        "session": 1
+      },
+      {
+        "accepted": true,
+        "applied_us": 4624047,
+        "dequeued_us": 4457618,
+        "direction": "Down",
+        "displayed_us": 4640105,
+        "ordinal": 13,
+        "registered_us": 4457620,
+        "session": 1
+      },
+      {
+        "accepted": false,
+        "applied_us": null,
+        "dequeued_us": 4491633,
+        "direction": "Right",
+        "displayed_us": null,
+        "ordinal": 0,
+        "registered_us": 4491636,
+        "session": 1
+      },
+      {
+        "accepted": true,
+        "applied_us": 4740993,
+        "dequeued_us": 4525668,
+        "direction": "Right",
+        "displayed_us": 4756966,
+        "ordinal": 14,
+        "registered_us": 4525669,
+        "session": 1
+      },
+      {
+        "accepted": false,
+        "applied_us": null,
+        "dequeued_us": 4575159,
+        "direction": "Down",
+        "displayed_us": null,
+        "ordinal": 0,
+        "registered_us": 4575161,
+        "session": 1
+      },
+      {
+        "accepted": false,
+        "applied_us": null,
+        "dequeued_us": 4607993,
+        "direction": "Down",
+        "displayed_us": null,
+        "ordinal": 0,
+        "registered_us": 4607995,
+        "session": 1
+      },
+      {
+        "accepted": true,
+        "applied_us": 4856452,
+        "dequeued_us": 4674233,
+        "direction": "Down",
+        "displayed_us": 4872557,
+        "ordinal": 15,
+        "registered_us": 4674235,
+        "session": 1
+      },
+      {
+        "accepted": false,
+        "applied_us": null,
+        "dequeued_us": 4740982,
+        "direction": "Down",
+        "displayed_us": null,
+        "ordinal": 0,
+        "registered_us": 4740984,
+        "session": 1
+      },
+      {
+        "accepted": true,
+        "applied_us": 4973786,
+        "dequeued_us": 4823771,
+        "direction": "Right",
+        "displayed_us": 4989645,
+        "ordinal": 16,
+        "registered_us": 4823772,
+        "session": 1
+      },
+      {
+        "accepted": false,
+        "applied_us": null,
+        "dequeued_us": 4889718,
+        "direction": "Right",
+        "displayed_us": null,
+        "ordinal": 0,
+        "registered_us": 4889720,
+        "session": 1
+      },
+      {
+        "accepted": true,
+        "applied_us": 5108970,
+        "dequeued_us": 4973773,
+        "direction": "Down",
+        "displayed_us": 5124913,
+        "ordinal": 17,
+        "registered_us": 4973775,
+        "session": 1
+      },
+      {
+        "accepted": true,
+        "applied_us": 5224940,
+        "dequeued_us": 5059144,
+        "direction": "Right",
+        "displayed_us": 5242116,
+        "ordinal": 18,
+        "registered_us": 5059149,
+        "session": 1
+      },
+      {
+        "accepted": false,
+        "applied_us": null,
+        "dequeued_us": 5092717,
+        "direction": "Down",
+        "displayed_us": null,
+        "ordinal": 0,
+        "registered_us": 5092719,
+        "session": 1
+      },
+      {
+        "accepted": false,
+        "applied_us": null,
+        "dequeued_us": 5158888,
+        "direction": "Right",
+        "displayed_us": null,
+        "ordinal": 0,
+        "registered_us": 5158890,
+        "session": 1
+      },
+      {
+        "accepted": true,
+        "applied_us": 5341281,
+        "dequeued_us": 5191952,
+        "direction": "Up",
+        "displayed_us": 5357168,
+        "ordinal": 19,
+        "registered_us": 5191954,
+        "session": 1
+      },
+      {
+        "accepted": false,
+        "applied_us": null,
+        "dequeued_us": 5291832,
+        "direction": "Up",
+        "displayed_us": null,
+        "ordinal": 0,
+        "registered_us": 5291834,
+        "session": 1
+      },
+      {
+        "accepted": true,
+        "applied_us": 5458619,
+        "dequeued_us": 5325015,
+        "direction": "Right",
+        "displayed_us": 5474773,
+        "ordinal": 20,
+        "registered_us": 5325016,
+        "session": 1
+      },
+      {
+        "accepted": true,
+        "applied_us": 5574617,
+        "dequeued_us": 5374106,
+        "direction": "Up",
+        "displayed_us": 5591134,
+        "ordinal": 21,
+        "registered_us": 5374107,
+        "session": 1
+      },
+      {
+        "accepted": false,
+        "applied_us": null,
+        "dequeued_us": 5441927,
+        "direction": "Up",
+        "displayed_us": null,
+        "ordinal": 0,
+        "registered_us": 5441928,
+        "session": 1
+      },
+      {
+        "accepted": true,
+        "applied_us": 5707413,
+        "dequeued_us": 5491550,
+        "direction": "Right",
+        "displayed_us": 5725073,
+        "ordinal": 22,
+        "registered_us": 5491554,
+        "session": 1
+      },
+      {
+        "accepted": false,
+        "applied_us": null,
+        "dequeued_us": 5574600,
+        "direction": "Right",
+        "displayed_us": null,
+        "ordinal": 0,
+        "registered_us": 5574603,
+        "session": 1
+      },
+      {
+        "accepted": true,
+        "applied_us": 5824137,
+        "dequeued_us": 5607488,
+        "direction": "Down",
+        "displayed_us": 5840371,
+        "ordinal": 23,
+        "registered_us": 5607490,
+        "session": 1
+      },
+      {
+        "accepted": false,
+        "applied_us": null,
+        "dequeued_us": 5657074,
+        "direction": "Left",
+        "displayed_us": null,
+        "ordinal": 0,
+        "registered_us": 5657076,
+        "session": 1
+      },
+      {
+        "accepted": true,
+        "applied_us": 5940654,
+        "dequeued_us": 5725345,
+        "direction": "Left",
+        "displayed_us": 5957198,
+        "ordinal": 24,
+        "registered_us": 5725347,
+        "session": 1
+      },
+      {
+        "accepted": false,
+        "applied_us": null,
+        "dequeued_us": 5775208,
+        "direction": "Left",
+        "displayed_us": null,
+        "ordinal": 0,
+        "registered_us": 5775209,
+        "session": 1
+      },
+      {
+        "accepted": true,
+        "applied_us": 6058287,
+        "dequeued_us": 5874399,
+        "direction": "Down",
+        "displayed_us": 6075425,
+        "ordinal": 25,
+        "registered_us": 5874401,
+        "session": 1
+      },
+      {
+        "accepted": false,
+        "applied_us": null,
+        "dequeued_us": 5923949,
+        "direction": "Left",
+        "displayed_us": null,
+        "ordinal": 0,
+        "registered_us": 5923952,
+        "session": 1
+      },
+      {
+        "accepted": false,
+        "applied_us": null,
+        "dequeued_us": 5974979,
+        "direction": "Down",
+        "displayed_us": null,
+        "ordinal": 0,
+        "registered_us": 5974980,
+        "session": 1
+      },
+      {
+        "accepted": true,
+        "applied_us": 6176042,
+        "dequeued_us": 6026009,
+        "direction": "Left",
+        "displayed_us": 6192632,
+        "ordinal": 26,
+        "registered_us": 6026012,
+        "session": 1
+      },
+      {
+        "accepted": true,
+        "applied_us": 6309714,
+        "dequeued_us": 6092328,
+        "direction": "Down",
+        "displayed_us": 6326005,
+        "ordinal": 27,
+        "registered_us": 6092329,
+        "session": 1
+      },
+      {
+        "accepted": false,
+        "applied_us": null,
+        "dequeued_us": 6176030,
+        "direction": "Right",
+        "displayed_us": null,
+        "ordinal": 0,
+        "registered_us": 6176032,
+        "session": 1
+      },
+      {
+        "accepted": false,
+        "applied_us": null,
+        "dequeued_us": 6259301,
+        "direction": "Down",
+        "displayed_us": null,
+        "ordinal": 0,
+        "registered_us": 6259303,
+        "session": 1
+      },
+      {
+        "accepted": false,
+        "applied_us": null,
+        "dequeued_us": 6309699,
+        "direction": "Down",
+        "displayed_us": null,
+        "ordinal": 0,
+        "registered_us": 6309701,
+        "session": 1
+      },
+      {
+        "accepted": true,
+        "applied_us": 6426163,
+        "dequeued_us": 6375780,
+        "direction": "Right",
+        "displayed_us": 6442260,
+        "ordinal": 28,
+        "registered_us": 6375781,
+        "session": 1
+      },
+      {
+        "accepted": true,
+        "applied_us": 6544647,
+        "dequeued_us": 6442436,
+        "direction": "Up",
+        "displayed_us": 6561256,
+        "ordinal": 29,
+        "registered_us": 6442438,
+        "session": 1
+      },
+      {
+        "accepted": true,
+        "applied_us": 6663477,
+        "dequeued_us": 6494187,
+        "direction": "Left",
+        "displayed_us": 6680618,
+        "ordinal": 30,
+        "registered_us": 6494190,
+        "session": 1
+      },
+      {
+        "accepted": false,
+        "applied_us": null,
+        "dequeued_us": 6564314,
+        "direction": "Left",
+        "displayed_us": null,
+        "ordinal": 0,
+        "registered_us": 6564317,
+        "session": 1
+      },
+      {
+        "accepted": true,
+        "applied_us": 6780070,
+        "dequeued_us": 6595430,
+        "direction": "Down",
+        "displayed_us": 6796793,
+        "ordinal": 31,
+        "registered_us": 6595432,
+        "session": 1
+      },
+      {
+        "accepted": false,
+        "applied_us": null,
+        "dequeued_us": 6681447,
+        "direction": "Down",
+        "displayed_us": null,
+        "ordinal": 0,
+        "registered_us": 6681450,
+        "session": 1
+      },
+      {
+        "accepted": true,
+        "applied_us": 6913460,
+        "dequeued_us": 6764249,
+        "direction": "Right",
+        "displayed_us": 6929478,
+        "ordinal": 32,
+        "registered_us": 6764252,
+        "session": 1
+      },
+      {
+        "accepted": false,
+        "applied_us": null,
+        "dequeued_us": 6829654,
+        "direction": "Right",
+        "displayed_us": null,
+        "ordinal": 0,
+        "registered_us": 6829657,
+        "session": 1
+      },
+      {
+        "accepted": false,
+        "applied_us": null,
+        "dequeued_us": 6880688,
+        "direction": "Right",
+        "displayed_us": null,
+        "ordinal": 0,
+        "registered_us": 6880694,
+        "session": 1
+      },
+      {
+        "accepted": true,
+        "applied_us": 7030190,
+        "dequeued_us": 6929870,
+        "direction": "Up",
+        "displayed_us": 7047804,
+        "ordinal": 33,
+        "registered_us": 6929876,
+        "session": 1
+      },
+      {
+        "accepted": true,
+        "applied_us": 7147068,
+        "dequeued_us": 7014859,
+        "direction": "Right",
+        "displayed_us": 7164141,
+        "ordinal": 34,
+        "registered_us": 7014862,
+        "session": 1
+      },
+      {
+        "accepted": false,
+        "applied_us": null,
+        "dequeued_us": 7066170,
+        "direction": "Right",
+        "displayed_us": null,
+        "ordinal": 0,
+        "registered_us": 7066173,
+        "session": 1
+      },
+      {
+        "accepted": true,
+        "applied_us": 7266159,
+        "dequeued_us": 7098357,
+        "direction": "Up",
+        "displayed_us": 7282676,
+        "ordinal": 35,
+        "registered_us": 7098362,
+        "session": 1
+      },
+      {
+        "accepted": true,
+        "applied_us": 7383417,
+        "dequeued_us": 7198933,
+        "direction": "Left",
+        "displayed_us": 7400300,
+        "ordinal": 36,
+        "registered_us": 7198964,
+        "session": 1
+      },
+      {
+        "accepted": false,
+        "applied_us": null,
+        "dequeued_us": 7283178,
+        "direction": "Left",
+        "displayed_us": null,
+        "ordinal": 0,
+        "registered_us": 7283181,
+        "session": 1
+      },
+      {
+        "accepted": true,
+        "applied_us": 7515884,
+        "dequeued_us": 7316695,
+        "direction": "Up",
+        "displayed_us": 7532168,
+        "ordinal": 37,
+        "registered_us": 7316697,
+        "session": 1
+      },
+      {
+        "accepted": false,
+        "applied_us": null,
+        "dequeued_us": 7383398,
+        "direction": "Left",
+        "displayed_us": null,
+        "ordinal": 0,
+        "registered_us": 7383402,
+        "session": 1
+      },
+      {
+        "accepted": true,
+        "applied_us": 7633152,
+        "dequeued_us": 7450054,
+        "direction": "Left",
+        "displayed_us": 7649543,
+        "ordinal": 38,
+        "registered_us": 7450056,
+        "session": 1
+      },
+      {
+        "accepted": false,
+        "applied_us": null,
+        "dequeued_us": 7499237,
+        "direction": "Left",
+        "displayed_us": null,
+        "ordinal": 0,
+        "registered_us": 7499240,
+        "session": 1
+      },
+      {
+        "accepted": false,
+        "applied_us": null,
+        "dequeued_us": 7549225,
+        "direction": "Left",
+        "displayed_us": null,
+        "ordinal": 0,
+        "registered_us": 7549229,
+        "session": 1
+      },
+      {
+        "accepted": false,
+        "applied_us": null,
+        "dequeued_us": 7616466,
+        "direction": "Left",
+        "displayed_us": null,
+        "ordinal": 0,
+        "registered_us": 7616469,
+        "session": 1
+      },
+      {
+        "accepted": true,
+        "applied_us": 7751096,
+        "dequeued_us": 7665959,
+        "direction": "Down",
+        "displayed_us": 7767656,
+        "ordinal": 39,
+        "registered_us": 7665964,
+        "session": 1
+      },
+      {
+        "accepted": false,
+        "applied_us": null,
+        "dequeued_us": 7717052,
+        "direction": "Down",
+        "displayed_us": null,
+        "ordinal": 0,
+        "registered_us": 7717055,
+        "session": 1
+      },
+      {
+        "accepted": false,
+        "applied_us": null,
+        "dequeued_us": 7784130,
+        "direction": "Down",
+        "displayed_us": null,
+        "ordinal": 0,
+        "registered_us": 7784132,
+        "session": 1
+      },
+      {
+        "accepted": true,
+        "applied_us": 7868118,
+        "dequeued_us": 7851509,
+        "direction": "Right",
+        "displayed_us": 7884597,
+        "ordinal": 40,
+        "registered_us": 7851511,
+        "session": 1
+      },
+      {
+        "accepted": true,
+        "applied_us": 7983007,
+        "dequeued_us": 7934359,
+        "direction": "Up",
+        "displayed_us": 7999700,
+        "ordinal": 41,
+        "registered_us": 7934361,
+        "session": 1
+      },
+      {
+        "accepted": false,
+        "applied_us": null,
+        "dequeued_us": 8000049,
+        "direction": "Up",
+        "displayed_us": null,
+        "ordinal": 0,
+        "registered_us": 8000051,
+        "session": 1
+      },
+      {
+        "accepted": true,
+        "applied_us": 8116353,
+        "dequeued_us": 8082805,
+        "direction": "Right",
+        "displayed_us": 8132305,
+        "ordinal": 42,
+        "registered_us": 8082807,
+        "session": 1
+      },
+      {
+        "accepted": true,
+        "applied_us": 8232076,
+        "dequeued_us": 8116337,
+        "direction": "Down",
+        "displayed_us": 8248547,
+        "ordinal": 43,
+        "registered_us": 8116340,
+        "session": 1
+      },
+      {
+        "accepted": true,
+        "applied_us": 8348649,
+        "dequeued_us": 8199499,
+        "direction": "Right",
+        "displayed_us": 8364992,
+        "ordinal": 44,
+        "registered_us": 8199502,
+        "session": 1
+      },
+      {
+        "accepted": true,
+        "applied_us": 8464071,
+        "dequeued_us": 8282689,
+        "direction": "Up",
+        "displayed_us": 8480278,
+        "ordinal": 45,
+        "registered_us": 8282691,
+        "session": 1
+      },
+      {
+        "accepted": false,
+        "applied_us": null,
+        "dequeued_us": 8348630,
+        "direction": "Right",
+        "displayed_us": null,
+        "ordinal": 0,
+        "registered_us": 8348632,
+        "session": 1
+      },
+      {
+        "accepted": false,
+        "applied_us": null,
+        "dequeued_us": 8398565,
+        "direction": "Up",
+        "displayed_us": null,
+        "ordinal": 0,
+        "registered_us": 8398567,
+        "session": 1
+      },
+      {
+        "accepted": false,
+        "applied_us": null,
+        "dequeued_us": 8480644,
+        "direction": "Up",
+        "displayed_us": null,
+        "ordinal": 0,
+        "registered_us": 8480648,
+        "session": 1
+      },
+      {
+        "accepted": true,
+        "applied_us": 8581549,
+        "dequeued_us": 8564347,
+        "direction": "Right",
+        "displayed_us": 8597924,
+        "ordinal": 46,
+        "registered_us": 8564349,
+        "session": 1
+      },
+      {
+        "accepted": true,
+        "applied_us": 8714613,
+        "dequeued_us": 8648703,
+        "direction": "Up",
+        "displayed_us": 8730329,
+        "ordinal": 47,
+        "registered_us": 8648706,
+        "session": 1
+      },
+      {
+        "accepted": true,
+        "applied_us": 8829688,
+        "dequeued_us": 8714595,
+        "direction": "Left",
+        "displayed_us": 8846802,
+        "ordinal": 48,
+        "registered_us": 8714598,
+        "session": 1
+      },
+      {
+        "accepted": false,
+        "applied_us": null,
+        "dequeued_us": 8796745,
+        "direction": "Left",
+        "displayed_us": null,
+        "ordinal": 0,
+        "registered_us": 8796748,
+        "session": 1
+      },
+      {
+        "accepted": false,
+        "applied_us": null,
+        "dequeued_us": 8880319,
+        "direction": "Left",
+        "displayed_us": null,
+        "ordinal": 0,
+        "registered_us": 8880324,
+        "session": 1
+      },
+      {
+        "accepted": true,
+        "applied_us": 8947677,
+        "dequeued_us": 8947615,
+        "direction": "Down",
+        "displayed_us": 8963077,
+        "ordinal": 49,
+        "registered_us": 8947619,
+        "session": 1
+      },
+      {
+        "accepted": true,
+        "applied_us": 9065164,
+        "dequeued_us": 8997806,
+        "direction": "Right",
+        "displayed_us": 9081678,
+        "ordinal": 50,
+        "registered_us": 8997809,
+        "session": 1
+      },
+      {
+        "accepted": false,
+        "applied_us": null,
+        "dequeued_us": 9048036,
+        "direction": "Right",
+        "displayed_us": null,
+        "ordinal": 0,
+        "registered_us": 9048038,
+        "session": 1
+      },
+      {
+        "accepted": false,
+        "applied_us": null,
+        "dequeued_us": 9098265,
+        "direction": "Right",
+        "displayed_us": null,
+        "ordinal": 0,
+        "registered_us": 9098267,
+        "session": 1
+      }
+    ],
+    "invalid_samples": 0,
+    "partial_window": {
+      "duration_us": 11644,
+      "frames": 1,
+      "screen": "GameOver",
+      "start_us": 20651933,
+      "uniform_context": true
+    },
+    "powerups_implemented": false,
+    "schema_version": 1,
+    "startup_phases_scope": "steady_clock_us_since_main_after_each_named_step",
+    "startup_phases_us": [
+      {
+        "phase": "audio_objects_constructed",
+        "us": 209
+      },
+      {
+        "phase": "window_created",
+        "us": 431042
+      },
+      {
+        "phase": "renderer_ready",
+        "us": 432492
+      },
+      {
+        "phase": "settings_ready",
+        "us": 456526
+      },
+      {
+        "phase": "audio_started",
+        "us": 2454854
+      }
+    ]
+  },
+  "paired_latency_records": [
+    {
+      "ordinal": 1,
+      "direction": "Right",
+      "accepted": false,
+      "os_delivery_to_registration_ms": 2.217
+    },
+    {
+      "ordinal": 2,
+      "direction": "Down",
+      "accepted": true,
+      "os_delivery_to_registration_ms": 8.316
+    },
+    {
+      "ordinal": 3,
+      "direction": "Right",
+      "accepted": true,
+      "os_delivery_to_registration_ms": 2.702
+    },
+    {
+      "ordinal": 4,
+      "direction": "Down",
+      "accepted": true,
+      "os_delivery_to_registration_ms": 7.258
+    },
+    {
+      "ordinal": 5,
+      "direction": "Down",
+      "accepted": false,
+      "os_delivery_to_registration_ms": 5.281
+    },
+    {
+      "ordinal": 6,
+      "direction": "Left",
+      "accepted": true,
+      "os_delivery_to_registration_ms": 16.635
+    },
+    {
+      "ordinal": 7,
+      "direction": "Down",
+      "accepted": false,
+      "os_delivery_to_registration_ms": 8.898
+    },
+    {
+      "ordinal": 8,
+      "direction": "Right",
+      "accepted": false,
+      "os_delivery_to_registration_ms": 9.527
+    },
+    {
+      "ordinal": 9,
+      "direction": "Right",
+      "accepted": false,
+      "os_delivery_to_registration_ms": 15.0
+    },
+    {
+      "ordinal": 10,
+      "direction": "Down",
+      "accepted": true,
+      "os_delivery_to_registration_ms": 8.702
+    },
+    {
+      "ordinal": 11,
+      "direction": "Left",
+      "accepted": true,
+      "os_delivery_to_registration_ms": 12.766
+    },
+    {
+      "ordinal": 12,
+      "direction": "Down",
+      "accepted": true,
+      "os_delivery_to_registration_ms": 16.96
+    },
+    {
+      "ordinal": 13,
+      "direction": "Down",
+      "accepted": false,
+      "os_delivery_to_registration_ms": 16.509
+    },
+    {
+      "ordinal": 14,
+      "direction": "Down",
+      "accepted": false,
+      "os_delivery_to_registration_ms": 13.654
+    },
+    {
+      "ordinal": 15,
+      "direction": "Down",
+      "accepted": false,
+      "os_delivery_to_registration_ms": 13.194
+    },
+    {
+      "ordinal": 16,
+      "direction": "Down",
+      "accepted": false,
+      "os_delivery_to_registration_ms": 12.615
+    },
+    {
+      "ordinal": 17,
+      "direction": "Right",
+      "accepted": true,
+      "os_delivery_to_registration_ms": 7.39
+    },
+    {
+      "ordinal": 18,
+      "direction": "Right",
+      "accepted": false,
+      "os_delivery_to_registration_ms": 17.688
+    },
+    {
+      "ordinal": 19,
+      "direction": "Up",
+      "accepted": true,
+      "os_delivery_to_registration_ms": 14.344
+    },
+    {
+      "ordinal": 20,
+      "direction": "Up",
+      "accepted": false,
+      "os_delivery_to_registration_ms": 11.881
+    },
+    {
+      "ordinal": 21,
+      "direction": "Left",
+      "accepted": true,
+      "os_delivery_to_registration_ms": 12.371
+    },
+    {
+      "ordinal": 22,
+      "direction": "Left",
+      "accepted": false,
+      "os_delivery_to_registration_ms": 15.159
+    },
+    {
+      "ordinal": 23,
+      "direction": "Up",
+      "accepted": true,
+      "os_delivery_to_registration_ms": 15.211
+    },
+    {
+      "ordinal": 24,
+      "direction": "Left",
+      "accepted": true,
+      "os_delivery_to_registration_ms": 7.094
+    },
+    {
+      "ordinal": 25,
+      "direction": "Down",
+      "accepted": false,
+      "os_delivery_to_registration_ms": 4.226
+    },
+    {
+      "ordinal": 26,
+      "direction": "Down",
+      "accepted": true,
+      "os_delivery_to_registration_ms": 15.892
+    },
+    {
+      "ordinal": 27,
+      "direction": "Right",
+      "accepted": false,
+      "os_delivery_to_registration_ms": 15.077
+    },
+    {
+      "ordinal": 28,
+      "direction": "Right",
+      "accepted": true,
+      "os_delivery_to_registration_ms": 5.154
+    },
+    {
+      "ordinal": 29,
+      "direction": "Down",
+      "accepted": false,
+      "os_delivery_to_registration_ms": 6.835
+    },
+    {
+      "ordinal": 30,
+      "direction": "Down",
+      "accepted": false,
+      "os_delivery_to_registration_ms": 4.244
+    },
+    {
+      "ordinal": 31,
+      "direction": "Down",
+      "accepted": true,
+      "os_delivery_to_registration_ms": 9.429
+    },
+    {
+      "ordinal": 32,
+      "direction": "Down",
+      "accepted": false,
+      "os_delivery_to_registration_ms": 15.913
+    },
+    {
+      "ordinal": 33,
+      "direction": "Right",
+      "accepted": true,
+      "os_delivery_to_registration_ms": 10.287
+    },
+    {
+      "ordinal": 34,
+      "direction": "Right",
+      "accepted": false,
+      "os_delivery_to_registration_ms": 14.027
+    },
+    {
+      "ordinal": 35,
+      "direction": "Down",
+      "accepted": true,
+      "os_delivery_to_registration_ms": 14.375
+    },
+    {
+      "ordinal": 36,
+      "direction": "Right",
+      "accepted": true,
+      "os_delivery_to_registration_ms": 12.329
+    },
+    {
+      "ordinal": 37,
+      "direction": "Down",
+      "accepted": false,
+      "os_delivery_to_registration_ms": 3.631
+    },
+    {
+      "ordinal": 38,
+      "direction": "Right",
+      "accepted": false,
+      "os_delivery_to_registration_ms": 8.832
+    },
+    {
+      "ordinal": 39,
+      "direction": "Up",
+      "accepted": true,
+      "os_delivery_to_registration_ms": 1.929
+    },
+    {
+      "ordinal": 40,
+      "direction": "Up",
+      "accepted": false,
+      "os_delivery_to_registration_ms": 17.588
+    },
+    {
+      "ordinal": 41,
+      "direction": "Right",
+      "accepted": true,
+      "os_delivery_to_registration_ms": 8.276
+    },
+    {
+      "ordinal": 42,
+      "direction": "Up",
+      "accepted": true,
+      "os_delivery_to_registration_ms": 6.247
+    },
+    {
+      "ordinal": 43,
+      "direction": "Up",
+      "accepted": false,
+      "os_delivery_to_registration_ms": 9.54
+    },
+    {
+      "ordinal": 44,
+      "direction": "Right",
+      "accepted": true,
+      "os_delivery_to_registration_ms": 10.361
+    },
+    {
+      "ordinal": 45,
+      "direction": "Right",
+      "accepted": false,
+      "os_delivery_to_registration_ms": 14.945
+    },
+    {
+      "ordinal": 46,
+      "direction": "Down",
+      "accepted": true,
+      "os_delivery_to_registration_ms": 3.703
+    },
+    {
+      "ordinal": 47,
+      "direction": "Left",
+      "accepted": false,
+      "os_delivery_to_registration_ms": 16.391
+    },
+    {
+      "ordinal": 48,
+      "direction": "Left",
+      "accepted": true,
+      "os_delivery_to_registration_ms": 17.527
+    },
+    {
+      "ordinal": 49,
+      "direction": "Left",
+      "accepted": false,
+      "os_delivery_to_registration_ms": 5.278
+    },
+    {
+      "ordinal": 50,
+      "direction": "Down",
+      "accepted": true,
+      "os_delivery_to_registration_ms": 16.432
+    },
+    {
+      "ordinal": 51,
+      "direction": "Left",
+      "accepted": false,
+      "os_delivery_to_registration_ms": 8.797
+    },
+    {
+      "ordinal": 52,
+      "direction": "Down",
+      "accepted": false,
+      "os_delivery_to_registration_ms": 8.803
+    },
+    {
+      "ordinal": 53,
+      "direction": "Left",
+      "accepted": true,
+      "os_delivery_to_registration_ms": 7.78
+    },
+    {
+      "ordinal": 54,
+      "direction": "Down",
+      "accepted": true,
+      "os_delivery_to_registration_ms": 5.663
+    },
+    {
+      "ordinal": 55,
+      "direction": "Right",
+      "accepted": false,
+      "os_delivery_to_registration_ms": 8.841
+    },
+    {
+      "ordinal": 56,
+      "direction": "Down",
+      "accepted": false,
+      "os_delivery_to_registration_ms": 9.55
+    },
+    {
+      "ordinal": 57,
+      "direction": "Down",
+      "accepted": false,
+      "os_delivery_to_registration_ms": 11.268
+    },
+    {
+      "ordinal": 58,
+      "direction": "Right",
+      "accepted": true,
+      "os_delivery_to_registration_ms": 2.194
+    },
+    {
+      "ordinal": 59,
+      "direction": "Up",
+      "accepted": true,
+      "os_delivery_to_registration_ms": 5.709
+    },
+    {
+      "ordinal": 60,
+      "direction": "Left",
+      "accepted": true,
+      "os_delivery_to_registration_ms": 16.912
+    },
+    {
+      "ordinal": 61,
+      "direction": "Left",
+      "accepted": false,
+      "os_delivery_to_registration_ms": 18.095
+    },
+    {
+      "ordinal": 62,
+      "direction": "Down",
+      "accepted": true,
+      "os_delivery_to_registration_ms": 5.842
+    },
+    {
+      "ordinal": 63,
+      "direction": "Down",
+      "accepted": false,
+      "os_delivery_to_registration_ms": 21.131
+    },
+    {
+      "ordinal": 64,
+      "direction": "Right",
+      "accepted": true,
+      "os_delivery_to_registration_ms": 14.716
+    },
+    {
+      "ordinal": 65,
+      "direction": "Right",
+      "accepted": false,
+      "os_delivery_to_registration_ms": 6.411
+    },
+    {
+      "ordinal": 66,
+      "direction": "Right",
+      "accepted": false,
+      "os_delivery_to_registration_ms": 16.049
+    },
+    {
+      "ordinal": 67,
+      "direction": "Up",
+      "accepted": true,
+      "os_delivery_to_registration_ms": 14.627
+    },
+    {
+      "ordinal": 68,
+      "direction": "Right",
+      "accepted": true,
+      "os_delivery_to_registration_ms": 17.21
+    },
+    {
+      "ordinal": 69,
+      "direction": "Right",
+      "accepted": false,
+      "os_delivery_to_registration_ms": 13.928
+    },
+    {
+      "ordinal": 70,
+      "direction": "Up",
+      "accepted": true,
+      "os_delivery_to_registration_ms": 1.838
+    },
+    {
+      "ordinal": 71,
+      "direction": "Left",
+      "accepted": true,
+      "os_delivery_to_registration_ms": 16.349
+    },
+    {
+      "ordinal": 72,
+      "direction": "Left",
+      "accepted": false,
+      "os_delivery_to_registration_ms": 15.99
+    },
+    {
+      "ordinal": 73,
+      "direction": "Up",
+      "accepted": true,
+      "os_delivery_to_registration_ms": 2.755
+    },
+    {
+      "ordinal": 74,
+      "direction": "Left",
+      "accepted": false,
+      "os_delivery_to_registration_ms": 2.302
+    },
+    {
+      "ordinal": 75,
+      "direction": "Left",
+      "accepted": true,
+      "os_delivery_to_registration_ms": 2.646
+    },
+    {
+      "ordinal": 76,
+      "direction": "Left",
+      "accepted": false,
+      "os_delivery_to_registration_ms": 9.502
+    },
+    {
+      "ordinal": 77,
+      "direction": "Left",
+      "accepted": false,
+      "os_delivery_to_registration_ms": 8.506
+    },
+    {
+      "ordinal": 78,
+      "direction": "Left",
+      "accepted": false,
+      "os_delivery_to_registration_ms": 11.865
+    },
+    {
+      "ordinal": 79,
+      "direction": "Down",
+      "accepted": true,
+      "os_delivery_to_registration_ms": 9.406
+    },
+    {
+      "ordinal": 80,
+      "direction": "Down",
+      "accepted": false,
+      "os_delivery_to_registration_ms": 12.352
+    },
+    {
+      "ordinal": 81,
+      "direction": "Down",
+      "accepted": false,
+      "os_delivery_to_registration_ms": 2.757
+    },
+    {
+      "ordinal": 82,
+      "direction": "Right",
+      "accepted": true,
+      "os_delivery_to_registration_ms": 4.229
+    },
+    {
+      "ordinal": 83,
+      "direction": "Up",
+      "accepted": true,
+      "os_delivery_to_registration_ms": 16.358
+    },
+    {
+      "ordinal": 84,
+      "direction": "Up",
+      "accepted": false,
+      "os_delivery_to_registration_ms": 15.414
+    },
+    {
+      "ordinal": 85,
+      "direction": "Right",
+      "accepted": true,
+      "os_delivery_to_registration_ms": 17.461
+    },
+    {
+      "ordinal": 86,
+      "direction": "Down",
+      "accepted": true,
+      "os_delivery_to_registration_ms": 1.705
+    },
+    {
+      "ordinal": 87,
+      "direction": "Right",
+      "accepted": true,
+      "os_delivery_to_registration_ms": 7.062
+    },
+    {
+      "ordinal": 88,
+      "direction": "Up",
+      "accepted": true,
+      "os_delivery_to_registration_ms": 16.022
+    },
+    {
+      "ordinal": 89,
+      "direction": "Right",
+      "accepted": false,
+      "os_delivery_to_registration_ms": 3.074
+    },
+    {
+      "ordinal": 90,
+      "direction": "Up",
+      "accepted": false,
+      "os_delivery_to_registration_ms": 4.14
+    },
+    {
+      "ordinal": 91,
+      "direction": "Up",
+      "accepted": false,
+      "os_delivery_to_registration_ms": 5.91
+    },
+    {
+      "ordinal": 92,
+      "direction": "Right",
+      "accepted": true,
+      "os_delivery_to_registration_ms": 14.858
+    },
+    {
+      "ordinal": 93,
+      "direction": "Up",
+      "accepted": true,
+      "os_delivery_to_registration_ms": 14.972
+    },
+    {
+      "ordinal": 94,
+      "direction": "Left",
+      "accepted": true,
+      "os_delivery_to_registration_ms": 10.185
+    },
+    {
+      "ordinal": 95,
+      "direction": "Left",
+      "accepted": false,
+      "os_delivery_to_registration_ms": 9.139
+    },
+    {
+      "ordinal": 96,
+      "direction": "Left",
+      "accepted": false,
+      "os_delivery_to_registration_ms": 8.953
+    },
+    {
+      "ordinal": 97,
+      "direction": "Down",
+      "accepted": true,
+      "os_delivery_to_registration_ms": 15.286
+    },
+    {
+      "ordinal": 98,
+      "direction": "Right",
+      "accepted": true,
+      "os_delivery_to_registration_ms": 18.364
+    },
+    {
+      "ordinal": 99,
+      "direction": "Right",
+      "accepted": false,
+      "os_delivery_to_registration_ms": 5.731
+    },
+    {
+      "ordinal": 100,
+      "direction": "Right",
+      "accepted": false,
+      "os_delivery_to_registration_ms": 13.037
+    }
+  ]
+}

@@ -34,7 +34,9 @@ Source: submitted Part1PDF,STP§13/AppendixA. **44 unique cases,43 unique requir
 |---|---|
 | Automated scope passed |24 |
 | Partial evidence |17 |
-| Pending acceptance measurement |3 |
+| Measured thresholds passed on earlier candidate; not re-executed on latest |2 |
+| Owner-directed not run / unchecked for #22 closure |1 |
+| Pending acceptance measurement |0 |
 | Pending human walkthrough |0 |
 
 These are evidence-reconciliation statuses,not a final approved44-case execution result. TC-USE-01 moved from Pending human walkthrough to Partial evidence based on Dinesh's saved owner report; exact build/date are absent and no Passed status is assigned. **Do not claim100% execution,100% Highpass or100% requirement-pass coverage.** [Per-case matrix](STP_EXECUTION_MATRIX.md) and [CSV](STP_EXECUTION_MATRIX.csv) identify exact remaining steps. Mapping completeness100% does not mean execution completeness100%.
@@ -47,13 +49,13 @@ D1=date validation,D2=>10-entry rejection,D3=schema-corrupt recovery,D4date-only
 
 ## Team close-out and release gates
 
-Implementation issues 14–21 are Done following their recorded implementation, tests, and owner-acceptance evidence. Dinesh's saved Issue #22 report records at least three outside-team first-time friends, built from GitHub, reaching gameplay without help through Main Menu → Name Entry → Mode/Difficulty → Gameplay, matching the STP's three primary screens. Exact source/EXE and date, plus participant-level observations, are absent; TC-USE-01 is Partial evidence, not Passed or candidate-specific. Issue #22 performance and remaining acceptance, #23 portability disposition, #24 exact-build privacy, #25 final report/STP acceptance, #26 UAT/tag/freeze, and #28 complete-product video remain open. PR #60 is merged; this does not grant final QA sign-off.
+Implementation issues 14–21 are Done following their recorded implementation, tests, and owner-acceptance evidence. Dinesh's saved Issue #22 report records at least three outside-team first-time friends, built from GitHub, reaching gameplay without help through Main Menu → Name Entry → Mode/Difficulty → Gameplay, matching the STP's three primary screens. Exact source/EXE and date, plus participant-level observations, are absent; TC-USE-01 is Partial evidence, not Passed or candidate-specific. Issue #22 is closed by owner direction with TC-PERF-01 unchecked; this does not establish full STP completion. #23 portability disposition, #24 exact-build privacy, #25 final report/STP acceptance, #26 UAT/tag/freeze, and #28 complete-product video remain open. PR #60 is merged; this does not grant final QA sign-off.
 
 Final-signoff decision must check the approved exit criteria:100% planned execution,100% Highpass,0 open Critical/High,agreedMediumplans,43/43 requirements withpassing evidence,C6-C11>=80%,nosanitizer/cppcheck findings. Current evidence does not yet establish all criteria. No release authorization/signature is asserted.
 
 ## Immediate handoff
 
-- Complete remaining native live checks, the required performance campaign, and approved privacy capture. Independently verify the revised audio archive before treating its corrected records as inspected evidence.
+- TC-PERF-01 remains unexecuted by owner direction for #22 tracking closure; do not claim it passed. Complete the separate remaining STP/release gates and approved privacy capture. Independently verify the revised audio archive before treating its corrected records as inspected evidence.
 - Tejas: review portability evidence and deviations without duplicating the same Windows 10campaign.
 - Bharath: review/document exact-build privacy and persistence-cleanup disposition.
 - Ayushi: review this44-case/43-requirement reconciliation,incorporate final raw evidence and actual human observations,and request final sign-off only when conditions are met.
@@ -61,7 +63,7 @@ Final-signoff decision must check the approved exit criteria:100% planned execut
 
 <!-- Evidence reconciliation: Windows performance and grid review -->
 
-### Evidence reconciliation — acceptance status
+### Historical evidence reconciliation — pre-follow-up snapshot (superseded below)
 
 **Overall status remains In Progress; final sign-off Pending.** The reviewed Windows performance evidence consists of short diagnostic segments and does not meet the required three continuous 300-second Hard/Obstacle sessions. The input registration metric is internal dequeue-to-registration timing, not OS/SFML queue-inclusive acceptance; launch results do not establish cold-launch acceptance. The reported grid timing results do not establish first-grid-render acceptance, and the reported TC-CORE-01 screenshot depicts a conversation rather than the game grid. The referenced grid artifacts were not present in this checkout for independent reinspection.
 
@@ -69,10 +71,38 @@ The separate Linux Release regression is additional evidence for the merged code
 
 The Linux run does not establish Windows performance/privacy/volunteer acceptance, fresh sanitizer or coverage results, or final release approval. Its redacted 19-file evidence ZIP was supplied in the owner conversation and is not committed repository evidence. Issues #22 and #25 and final QA sign-off remain pending. PR #60's merge does not authorize a release tag or final QA sign-off.
 
-## Issue #22 owner closure reconciliation — 2026-11-01
+## Issue #22 pre-follow-up review snapshot — 2026-11-01 (superseded)
 
 The local Windows Release candidate built from PR #69 head `841ee1dccac37236a4bdcf92ec3dbf17e7a18c80` has executable SHA-256 `341bd6394a93741137866c88d95c3b00ae9ccb6d160e19d9044a0fddde68b57b` (1,911,808 bytes). It is a local build, not a CI artifact. The first post-reboot normal-audio launch produced a 1,419.062 ms external process-create-to-first-frame-marker upper bound and a 1,049.583 ms internal `main`-to-first-display phase. Audio began 1,876.168 ms after first display. Six process reports validated and exited 0. The laptop was on battery/offline, other applications were restored after login, and OS cache state is unknown; this does not meet the documented plugged-in/other-apps-closed protocol, and no deviation is approved. Five pre-reboot diagnostics were 1,027.585, 621.219, 579.294, 612.492 and 590.747 ms with unverified cache condition. These results are recorded as limited evidence, not cold-launch acceptance. Full metadata and raw reports are in the [closure package](../sprint2/evidence/issue-22-closure-20261101/closure-report.md).
 
 TC-CORE-01 remains Pending: no valid ten-run confirmation-to-visible-grid set exists; the locked-desktop poll timed out without pixels. TC-PERF-01 remains Pending at 0/3 qualifying continuous 300-second Hard/Obstacle runs with power-ups. TC-PERF-02 remains Pending: the historical 100-record Windows probe reports 18 accepted and 82 rejected, but timestamps begin at SFML dequeue and omit OS/SFML queue wait. TC-REL-01's automated scope remains passed; the supplemental owner manual record supports `E_PARSE: defaults loaded`, usable play and subsequent save, with exit code and initial defaults unrecorded. TC-USE-01 is Partial as above. PR #69 remains Draft; its Windows-audio regression checks have not been recorded. No waiver or final sign-off is approved.
 
 See the [Issue #22 closure report and criterion table](../sprint2/evidence/issue-22-closure-20261101/closure-report.md) and its [supporting evidence](../sprint2/evidence/issue-22-closure-20261101/supporting/).
+
+## Current Issue #22 owner-directed closure — 2026-11-01
+
+Dinesh directed that TC-PERF-01 remain unchecked because the three 300-second
+Hard/Obstacle traces could not be completed and requested closure of #22. The
+issue is now closed following the owner's explicit acceptance/administrative
+closure comment ([GitHub comment](https://github.com/dineshkumarc-1/software_engineering_mini_project/issues/22#issuecomment-6555082843)).
+TC-PERF-01 remains **not run / not passed**; the closure does not claim a
+separate QA/test-plan waiver. This tracking decision does not certify the
+complete STP, overall release, or Sprint 2. The earlier section above is
+retained as history and is superseded for current issue status.
+
+The latest PR #69 local Release candidate is source
+`4b1d21420ff20a8e06751b675bd20d73e9a13764`, EXE SHA-256
+`47e43387ecc4d6407de2a29022e8b9884027fea8e3adb09c24d8a9aa8f25a915`; build
+exit 0, CTest 20/20, normal-audio backend smoke 10/10. Owner-reported audio
+listening checks are recorded in the [owner disposition addendum](../sprint2/evidence/issue-22-closure-20261101/owner-disposition-addendum.md).
+The latest candidate has no reboot-protocol startup measurement. The earlier
+1,517.495 ms marker is limited evidence because the documented environment
+conditions were not fully met.
+
+Current case snapshot: 24 automated-scope cases passed; two thresholds were
+measured below their limits on earlier candidate `841ee1` and were not rerun on
+`4b1d214` (TC-CORE-01 visible grid, TC-PERF-02 injected-event acknowledgement);
+17 cases have partial evidence; TC-PERF-01 is owner-directed unchecked. These
+statuses do not add to a final STP pass percentage. See the updated
+[case matrix](STP_EXECUTION_MATRIX.md), [CSV matrix](STP_EXECUTION_MATRIX.csv),
+and [criterion-by-criterion closure addendum](../sprint2/evidence/issue-22-closure-20261101/owner-disposition-addendum.md).
