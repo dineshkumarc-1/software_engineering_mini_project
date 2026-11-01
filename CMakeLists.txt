@@ -283,6 +283,9 @@ snake_add_catch2_test(input_validator_tests
         target_compile_definitions(secure_write_fault_writer_windows PRIVATE
             SNAKE_HAVE_SETTINGS)
         snake_warnings(secure_write_fault_writer_windows)
+        if(MINGW)
+            target_link_options(secure_write_fault_writer_windows PRIVATE -municode)
+        endif()
 
         snake_add_catch2_test(secure_write_fault_tests_windows
             SOURCES tests/SecureWriteFaultWindowsTests.cpp

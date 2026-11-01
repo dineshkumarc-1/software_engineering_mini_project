@@ -386,3 +386,26 @@ TEST_CASE("TC-SEC-04 Windows: settings retain old or new valid data across injec
         REQUIRE(lockSidecars(directory.path(), L"config.json").empty());
     }
 }
+
+TEST_CASE("TC-SEC-04 Windows: a fresh crash leftover is kept, so cleanup never races a live save",
+    "[security][TC-SEC-04][fault-injection][windows]") {
+    // Agreed cleanup policy: only leftovers older than 24 hours are removed.
+    // A crash moments ago looks like a save still in progress, so the next
+    // load and save must keep its files. Mirrors the Linux fault test.
+    TempDir directory;
+    const fs::path board = directory.file(L"leaderboard.json");
+    writeBytes(board, boardJson({300, 200, 100}));
+    REQUIRE(runWriter(L"leaderboard", board, L"crash-after-flush").exitCode ==
+        InjectedCrashExitCode);
+    const auto left = temporaries(directory.path(), L"leaderboard.json");
+    REQUIRE(left.size() == 1);
+    const std::string leftBytes = readBytes(left.front());
+
+    snake::LeaderboardRepository repository(board);
+    REQUIRE(repository.top10().size() == 3);
+    REQUIRE(repository.addScore("Next", 500, snake::GameMode::Timed,
+        snake::Difficulty::Hard).status == snake::ScoreSubmissionStatus::Submitted);
+    REQUIRE(repository.top10().size() == 4);
+    REQUIRE(fs::exists(left.front()));
+    REQUIRE(holds(left.front(), leftBytes));
+}

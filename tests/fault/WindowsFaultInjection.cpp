@@ -81,7 +81,7 @@ FARPROC addressFromFunction(Function function) {
 
 bool patchImport(HMODULE image, const char* importedName, FARPROC replacement) {
     auto* base = reinterpret_cast<unsigned char*>(image);
-    auto* dos = reinterpret_cast<IMAGE_DOS_HEADER*>(base);
+    const auto* dos = reinterpret_cast<const IMAGE_DOS_HEADER*>(base);
     if (dos->e_magic != IMAGE_DOS_SIGNATURE) {
         return false;
     }
@@ -115,7 +115,7 @@ bool patchImport(HMODULE image, const char* importedName, FARPROC replacement) {
                 continue;
             }
 
-            auto* importByName = reinterpret_cast<IMAGE_IMPORT_BY_NAME*>(
+            const auto* importByName = reinterpret_cast<const IMAGE_IMPORT_BY_NAME*>(
                 base + names->u1.AddressOfData);
             if (std::strcmp(reinterpret_cast<const char*>(importByName->Name),
                     importedName) != 0) {

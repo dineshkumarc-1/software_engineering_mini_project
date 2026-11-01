@@ -2,7 +2,7 @@
 
 **Prepared:** 2026-10-31  
 **Scope:** Issues #23 (TC-PORT-01) and #24 (SEC-002..004 / SEC-007)  
-**Status:** Windows 11 local GCC/MinGW and Visual Studio 2022/MSVC Release builds have both completed, each with a matching 20/20 CTest pass on the pinned candidate. The original MSVC manual checklist remains recorded as **7/8 passed and 1 failed**; its initial leaderboard-after-restart observation was made before the relaunch was controlled to use the same working directory. A separate controlled MSVC persistence retest on 1 November 2026 used the same executable and identical isolated working directory before and after restart: `leaderboard.json` and the `Neon` setting both survived, with matching before/after hashes. The original failure is preserved as historical evidence; the controlled retest suggests a likely working-directory mismatch, not a reproduced persistence defect. The original eight MSVC screenshots and five controlled-retest screenshots, JSON snapshots, launch logs, summary and hash manifest are committed. The controlled-retest package is under `docs/sprint2/evidence/msvc-persistence-retest-20261101/`. The exact-build passive Issue #24 capture was completed against the GCC executable only; the scoped firewall test remains gated on Dinesh's explicit approval. This remains a partial preflight, **not** final QA sign-off or Sprint 2 sign-off.
+**Status:** Windows 11 local GCC/MinGW and Visual Studio 2022/MSVC Release builds have both completed, each with a matching 20/20 CTest pass on the pinned candidate. The original MSVC manual checklist remains recorded as **7/8 passed and 1 failed**; its initial leaderboard-after-restart observation was made before the relaunch was controlled to use the same working directory. A separate controlled MSVC persistence retest on 1 November 2026 used the same executable and identical isolated working directory before and after restart: `leaderboard.json` and the `Neon` setting both survived, with matching before/after hashes. The original failure is preserved as historical evidence; the controlled retest suggests a likely working-directory mismatch, not a reproduced persistence defect. The original eight MSVC screenshots and five controlled-retest screenshots, JSON snapshots, launch logs, summary and hash manifest are committed. The controlled-retest package is under `docs/sprint2/evidence/msvc-persistence-retest-20261101/`. Exact-build Issue #24 evidence is complete for the two approved runs: the GCC passive capture (58 samples) and the one-off Dinesh-approved MSVC scoped-firewall capture (57 samples); the temporary executable-scoped rule was removed and verified absent from ActiveStore and PersistentStore. Do not repeat the firewall run without fresh explicit owner approval. These sampled endpoint observations are not packet capture and cannot exclude activity between samples. This remains a partial preflight, **not** final QA sign-off or Sprint 2 sign-off.
 
 ## Candidate identity — pinned for this verification campaign
 
@@ -187,13 +187,14 @@ Use the already-published regression evidence:
 - [Run 3 persistence-fix verification](../../qa/evidence/issue-18-run3-fix-verification.txt)
 - [Run 4 final-candidate regression evidence](../../qa/evidence/issue-18-23-final-candidate-7c6733d.txt)
 - [Full TC-PWR-LB-SEC execution record](../../qa/TC-PWR-LB-SEC-EXECUTION.md)
+- [Owner automated QA and deterministic JSON corpus report](../../qa/OWNER-AUTOMATED-QA-7c6733d.md)
 - [24-hour cleanup policy](./issue-15-17-temp-cleanup-policy.md)
 
 The historical Run 4 reports D6 at 4/4 assertions and the Linux fault-injection suite at 214 assertions / 8 cases on candidate `7c6733d`. Keep that scoped to its recorded candidate/platform; do not relabel it as a new Windows 11 run.
 
 The persistence cleanup contract remains **24-hour best-effort**. Eligible stale temporary/orphan-lock files are removed by a later read or write after the age threshold. Fresh crash leftovers are intentionally preserved; cleanup is not guaranteed on the next startup.
 
-Deterministic malformed/truncated-input tests are **fuzz-style regression tests**, not coverage-guided fuzzing. Linux `LD_PRELOAD` crash-injection evidence remains separate from the native Windows run. Native Windows locked-file refusal tests also remain separate. Native Windows crash injection has now been implemented and executed on 1 November 2026; see the evidence section below. A test-only DLL patches the child writer's Import Address Table for `CreateFileW`, `WriteFile`, `FlushFileBuffers`, `MoveFileExW` and `CloseHandle`. It is loaded only into the isolated child writer process; no product hook was added. The tests cover four abrupt process-termination points and three injected API failures, with parent-side leaderboard and settings recovery checks. This is user-mode process-termination and API-failure evidence, not physical power-loss, kernel-crash, hardware-failure or macOS coverage. Independent Tejas/Dinesh review and acceptance remain pending.
+Deterministic malformed/truncated-input tests are **regression corpus tests, not coverage-guided fuzzing**. The existing Run 4 report records 25 valid and 25 malformed leaderboard fixtures and 25 valid and 25 malformed settings fixtures; see the linked owner automated QA report and TC-PWR-LB-SEC execution record. Linux `LD_PRELOAD` crash-injection evidence remains separate from the native Windows run. Native Windows locked-file refusal tests also remain separate. Native Windows crash injection has now been implemented and executed on 1 November 2026; see the evidence section below. A test-only DLL patches the child writer's Import Address Table for `CreateFileW`, `WriteFile`, `FlushFileBuffers`, `MoveFileExW` and `CloseHandle`. It is loaded only into the isolated child writer process; no product hook was added. The tests cover four abrupt process-termination points and three injected API failures, with parent-side leaderboard and settings recovery checks. This is user-mode process-termination and API-failure evidence, not physical power-loss, kernel-crash, hardware-failure or macOS coverage. Independent Tejas/Dinesh review and acceptance remain pending.
 
 ## Native Windows crash injection — 1 November 2026
 
@@ -240,7 +241,7 @@ Three Windows API failure modes are also injected:
 
 ### Recovery coverage
 
-The seven Catch2 cases cover:
+The eight Catch2 cases cover:
 
 - The leaderboard remaining the old valid version before replacement, or the new valid version after replacement.
 - A subsequent save succeeding after each injected termination.
@@ -248,28 +249,31 @@ The seven Catch2 cases cover:
 - Failed first saves leaving no destination or temporary artifacts.
 - Normal control save without injection.
 - Cleanup of crash leftovers after the agreed 24-hour age, using isolated files whose timestamps are advanced to 48 hours.
+- A fresh crash leftover remains present and byte-identical after the next repository load and save.
 - Settings retaining valid old or new data across injected crashes and API failures.
 
 ### Results
 
-- Focused `secure_write_fault_tests_windows`: **7/7 cases, 196/196 assertions passed**.
-- Clean Release rebuild: **passed**.
-- Full Windows CTest after clean rebuild: **21/21 passed**, 0 failed; 9.68 seconds.
+- Focused `secure_write_fault_tests_windows`: **8/8 cases, 206/206 assertions passed**.
+- Corrected Windows fault-test target rebuild: **passed**; complete configured Release build: **passed**.
+- Full Windows CTest: **21/21 passed**, 0 failed; 13.07 seconds.
 - Final inventory contains all 21 tests with no missing executables.
 
 ### Binary identities
 
-- Injector DLL SHA-256: `142E4EB26250C76D4C64E462A65393627F558B6CF0BA84B02F6C3F867B671586`
+- Injector DLL SHA-256: `AB26FEB4F79E29930E4511772094760F167B35DBCB8943F320426C55343C7F3B`
 - Child writer EXE SHA-256: `10A435073CCE9C9DC7115D85AD36E885664808E595D5E0F8E63891B0EA02539B`
-- Catch2 test EXE SHA-256: `411E307A45D444321620F9F8565A4C174F60BB6F81EA5181FCA26BBD292880E8`
+- Catch2 test EXE SHA-256: `5DF88D505389A163B66C2D5BCA7F93AC473B4E9DB0A3B3F2BFB6AC52126059AC`
 
 ### Published evidence
 
 All published files are redacted and have a matching SHA-256 manifest:
 
 - [Evidence summary](./windows11-crash-injection-20261101/native-windows-crash-injection-summary.md)
-- [Clean Release build log](./windows11-crash-injection-20261101/build-release.log)
-- [Full CTest log](./windows11-crash-injection-20261101/ctest-release.log)
+- [Initial clean Release build log (seven-case baseline)](./windows11-crash-injection-20261101/build-release.log)
+- [Initial full CTest log (seven-case baseline)](./windows11-crash-injection-20261101/ctest-release.log)
+- [Review-fix full Release build log](./windows11-crash-injection-20261101/build-review-fix-release.log)
+- [Review-fix full CTest log](./windows11-crash-injection-20261101/ctest-review-fix-release.log)
 - [Focused fault-injection result](./windows11-crash-injection-20261101/windows-crash-injection-details.log)
 - [CTest inventory](./windows11-crash-injection-20261101/ctest-inventory.log)
 - [Toolchain and binary identities](./windows11-crash-injection-20261101/run-identity.txt)
@@ -279,7 +283,7 @@ Raw machine-specific logs remain in the local ignored `build-win-crash` director
 
 ### Limitations
 
-This verifies controlled user-mode process termination and injected API failures against the real Windows persistence path. It does **not** simulate physical power loss, kernel crashes, hardware/disk-controller failures or real disk-full conditions. The desktop application was not built in this headless test run. Advancing timestamps on isolated test files is not a 24-hour real-time wait. macOS crash injection remains untested. Independent review and owner acceptance remain required.
+This verifies controlled user-mode process termination and injected API failures against the real Windows persistence path. It does **not** simulate physical power loss, kernel crashes, hardware/disk-controller failures or real disk-full conditions. The desktop application was not built in this headless test run. Advancing timestamps on isolated test files is not a 24-hour real-time wait. Windows 10 and macOS crash injection remain untested. Independent review and owner acceptance remain required.
 
 ## Current status table
 
@@ -296,7 +300,8 @@ This verifies controlled user-mode process termination and injected API failures
 | Redacted privacy evidence | **Published for both runs** | GCC passive JSON + manifest committed in `66d7640`; MSVC scoped-firewall JSON + manifest committed in `c84c8a6`; raw files remain private |
 | Exact-build MSVC firewall/offline privacy test | **Run completed; cleanup verified; review pending** | Dinesh approved the one-off run on 1 Nov 2026. Exact EXE-scoped rule verified at start/end; 57 samples, 0 query failures/errors, no TCP/UDP records; rule removed and absent from PersistentStore and ActiveStore; redacted JSON + hash manifest committed in `c84c8a6` |
 | Persistence regression (existing Linux evidence) | **Pass, scoped** | Run 3 / Run 4 links above |
-| Native Windows crash injection | **Executed; review pending** | Windows 11 MSVC Release, 1 Nov 2026: 7/7 cases and 196/196 assertions; full headless CTest 21/21 after clean rebuild. Test-only child-process IAT hooks; no product hooks. Evidence: `windows11-crash-injection-20261101/`; power-loss and macOS coverage remain untested |
+| Deterministic malformed/truncated JSON corpus | **Existing regression evidence retained; not coverage-guided fuzzing** | Run 4 records 25 valid + 25 malformed leaderboard fixtures and 25 valid + 25 malformed settings fixtures; see `../../qa/OWNER-AUTOMATED-QA-7c6733d.md` and `../../qa/TC-PWR-LB-SEC-EXECUTION.md` |
+| Native Windows crash injection | **Executed; review pending** | Windows 11 MSVC Release, 1 Nov 2026: 8/8 cases and 206/206 assertions; full configured build passed and CTest 21/21 (13.07 seconds). Fresh crash-leftover preservation is tested. Test-only child-process IAT hooks; no product hooks. Evidence: `windows11-crash-injection-20261101/`; power-loss, Windows 10 and macOS coverage remain untested |
 | Hosted Windows CI | **Pass, supplemental only** | Run `41215354989`: Windows MSVC app build and 20/20 CTest; not TC-PORT-01 |
 | Final review PR and issue closure | **Blocked** | Independent review of Windows 11 build, privacy and native crash-injection evidence; Tejas collector review and remaining owner dispositions; issues remain open |
 

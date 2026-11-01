@@ -2,15 +2,18 @@
 
 Date: 1 November 2026
 
-## Result
+## Result — review-fix verification
 
-Native Windows TC-SEC-04 process-crash injection completed successfully.
+Native Windows TC-SEC-04 process-crash injection and recovery tests passed on Windows 11.
 
-- Focused Windows fault-injection suite: 7/7 test cases passed.
-- Assertions: 196/196 passed.
-- Full Windows CTest suite: 21/21 passed.
-- Full CTest elapsed time: 9.68 seconds.
-- Clean Release rebuild completed successfully.
+- Focused Windows fault-injection suite: **8/8 test cases passed**.
+- Assertions: **206/206 passed**.
+- Full configured Windows Release build: **passed**.
+- Full Windows CTest suite: **21/21 passed**, 0 failures.
+- Full CTest elapsed time: **13.07 seconds**.
+- The corrected Windows fault-test target was rebuilt successfully with MSVC and warnings treated as errors.
+
+The eighth test verifies that a fresh crash leftover is retained byte-for-byte through the next repository load and save. The existing 24-hour cleanup policy continues to preserve fresh leftovers.
 
 ## Environment
 
@@ -35,13 +38,18 @@ Native Windows TC-SEC-04 process-crash injection completed successfully.
 
 Branch: feature/issue-24-windows-crash-injection
 
-Base commit:
-aef168a2fb679ab86b1c1ca401c4e51cf460f633
+Base commit (pre-review-fix PR head):
+36ac9e2bf562c6cdfe546dc5a0611c559b248ea8
 
 Base tree:
-4a6e6cb666789c7bfec0be71f9f18b77eb0d1665
+dd83fe9661adaf5ee8f2b35fcb817d1056be377b
 
-The Git blob hashes of the four changed source/build files are recorded in run-identity.txt.
+The review-fix source changes were present in the local working tree when this verification was performed. The exact Git blob hashes of the four relevant source/build files are recorded in run-identity.txt. The three-file review-fix diff had not yet been committed at run-identity capture time.
+
+The review fixes:
+- Add the MinGW-only -municode linker option for the Windows child writer's wmain entry point.
+- Make the two PE import-inspection pointers const to satisfy cppcheck.
+- Add the eighth Windows parity test for preserving a fresh crash leftover across a subsequent load and save.
 
 ## Implementation
 
@@ -79,7 +87,7 @@ These are simulated API failures, not actual disk-full or hardware failures.
 
 ## Recovery checks
 
-The tests verify:
+The eight Windows Catch2 cases verify:
 - The old complete leaderboard remains valid before replacement.
 - The new complete leaderboard is valid after replacement.
 - Subsequent saves work after injected process termination.
@@ -87,37 +95,47 @@ The tests verify:
 - Failed first saves do not leave a destination or temporary files.
 - Normal saves work without injection.
 - Settings preserve valid old or new data.
-- Crash leftovers are cleaned up according to the agreed 24-hour policy, using test files aged to 48 hours.
+- A fresh crash leftover remains present and byte-identical after the next repository load and save.
+- Eligible stale leftovers are cleaned up according to the agreed 24-hour policy, using test files aged to 48 hours.
 
 ## Results
 
 Focused suite:
-7 test cases, 196 assertions, all passed.
+8 test cases, 206 assertions, all passed.
+
+Focused test output:
+RNG seed: 3849940829
+All tests passed (206 assertions in 8 test cases)
+
+Full configured Windows Release build:
+Passed.
 
 Full Windows CTest:
 21 registered, 21 passed, 0 failed.
 
 Full CTest elapsed time:
-9.68 seconds.
+13.07 seconds.
 
 ## Test artifact SHA-256
 
 Injector DLL:
-142E4EB26250C76D4C64E462A65393627F558B6CF0BA84B02F6C3F867B671586
+AB26FEB4F79E29930E4511772094760F167B35DBCB8943F320426C55343C7F3B
 
 Child writer:
 10A435073CCE9C9DC7115D85AD36E885664808E595D5E0F8E63891B0EA02539B
 
 Catch2 test executable:
-411E307A45D444321620F9F8565A4C174F60BB6F81EA5181FCA26BBD292880E8
+5DF88D505389A163B66C2D5BCA7F93AC473B4E9DB0A3B3F2BFB6AC52126059AC
 
 ## Limitations
 
-- This demonstrates native Windows user-mode process-termination and API-failure recovery.
+- This demonstrates native Windows user-mode process-termination and API-failure recovery on Windows 11.
 - It does not simulate physical power loss, kernel crashes or hardware failures.
+- The simulated ERROR_DISK_FULL result is not a real disk-full test.
 - The desktop application was not built in this headless test run.
 - The cleanup test advances timestamps on isolated test files; it does not wait 24 real hours.
-- macOS crash-injection coverage remains untested.
+- Windows 10 and macOS crash-injection coverage are not established by this run.
+- The local run used MSVC. The MinGW-specific -municode correction still requires hosted MinGW CI verification.
 - Independent owner and team review are still required.
 
 ## Privacy

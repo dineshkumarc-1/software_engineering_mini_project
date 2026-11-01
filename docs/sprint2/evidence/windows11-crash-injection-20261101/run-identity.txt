@@ -1,33 +1,37 @@
-Captured: 2026-11-01T13:19:12.7072589+05:30
-OS: Windows 10 Home Single Language
+Captured: 2026-11-01T14:29:15.5869996+05:30
+OS: Microsoft Windows 11 Home Single Language (Win32_OperatingSystem Caption)
 Display version: 25H2
+OS version: 10.0.26200
 OS build: 26200.9711
+Architecture: 64-bit
 PowerShell: 5.1.26100.9711
 CMake: cmake version 4.5.0-rc1
 MSVC compiler: 19.42.34436.0
 MSVC tools: 14.42.34433
-Windows SDK: 10.0.22621.0\
+Windows SDK: 10.0.22621.0
 Generator: Visual Studio 17 2022
 Configuration: Release
+Catch2: 3.8.1
+SNAKE_BUILD_APP: OFF
+SNAKE_WARNINGS_AS_ERRORS: ON
 Branch: feature/issue-24-windows-crash-injection
-Base HEAD: aef168a2fb679ab86b1c1ca401c4e51cf460f633
-Base tree: 4a6e6cb666789c7bfec0be71f9f18b77eb0d1665
+Base HEAD: 36ac9e2bf562c6cdfe546dc5a0611c559b248ea8
+Base tree: dd83fe9661adaf5ee8f2b35fcb817d1056be377b
 
-Source file Git blob hashes:
-CMakeLists.txt : 6d40dd2a6626091d400561195eb5b8eec02b2708
-tests/SecureWriteFaultWindowsTests.cpp : a1bea9ca3eb04c018c829b0547860f6c5efc29dd
-tests/fault/WindowsFaultInjection.cpp : fa58812149e0d3ded2456da1ba61c35590a0b750
+Verification results:
+Focused Windows fault-injection suite: 8 test cases, 206 assertions, all passed.
+Full configured Release build: passed.
+Full Windows CTest: 21/21 passed, 0 failed, 13.07 seconds.
+
+Source file Git blob hashes (review-fix working tree):
+CMakeLists.txt : 446d66b687aab1d3c5b186ad5e22731151b585e3
+tests/SecureWriteFaultWindowsTests.cpp : 60a1a60e226d91bffe63a432de9ea043f44f267b
+tests/fault/WindowsFaultInjection.cpp : 8c048fbe3021f28bc66700df5f363c683de44b76
 tests/fault/WindowsFaultWriter.cpp : 66615c67cad191c1fb57471fd833cac9c5e1a5ba
 
 Built binary SHA-256 hashes:
-snake_fault_inject_windows.dll : 142E4EB26250C76D4C64E462A65393627F558B6CF0BA84B02F6C3F867B671586
+snake_fault_inject_windows.dll : AB26FEB4F79E29930E4511772094760F167B35DBCB8943F320426C55343C7F3B
 secure_write_fault_writer_windows.exe : 10A435073CCE9C9DC7115D85AD36E885664808E595D5E0F8E63891B0EA02539B
-secure_write_fault_tests_windows.exe : 411E307A45D444321620F9F8565A4C174F60BB6F81EA5181FCA26BBD292880E8
+secure_write_fault_tests_windows.exe : 5DF88D505389A163B66C2D5BCA7F93AC473B4E9DB0A3B3F2BFB6AC52126059AC
 
-Verified OS identity (Win32_OperatingSystem):
-OS caption: Microsoft Windows 11 Home Single Language
-OS version: 10.0.26200
-OS build: 26200.9711
-Display version: 25H2
-Architecture: 64-bit
-Note: Registry ProductName/Get-ComputerInfo retain a stale Windows 10 label; CIM caption is used for OS identification.
+Note: the review-fix source changes were uncommitted at capture time. Base HEAD/tree identify the parent revision; the source blob hashes identify the exact corrected files used for the local build.
