@@ -13,7 +13,7 @@
 - [ ] Execute three 300 s Hard/Obstacle FPS sessions and100 random-time input protocol; verify instrumentation timestamps/accounting and target hardware.
 - [ ] Three outside-team first-time volunteers,without help; count <=3 primary screens,notclicks.
 - [ ] Review exact-candidate privacy capture with explicit scoped firewall authorization,source/EXE provenance,actual offlinegameplay,redaction and sampling limits.
-- [ ] Windows 11NotTested:record explicit disposition/approved deviation or obtain actual Windows 11build/run. Do not silently delete the row.
+- [ ] Windows 11: an actual build and run of `3fcc586` is now recorded (MSVC EXE `3496FD8C9E8ED95FB886BEF272DBAF9D62A181237E3FDB39474FF7627C3E42B5`, 20/20 CTest, manual 7 of 8 plus a passing controlled persistence retest; separate supplemental GCC EXE). Still open: the owner's review of that evidence, the unexplained first leaderboard-after-restart mismatch, and DV06 disposition. Do not tick until the owner records the decision; do not silently delete the row. See `docs/sprint2/evidence/windows11-issue23-24-preflight.md`.
 - [ ] Review concrete deviations:cleanup guarantee,uncollected5s power-up lifetime,UI labels/interfaces,Loggerrotation and testseams. Record rationale and actual acceptance,not inferred signatures.
 - [ ] FinalTest Summary Report and deviations reviewed by QA; residual defect severities and accepted risks recorded.
 
