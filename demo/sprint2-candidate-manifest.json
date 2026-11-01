@@ -1,0 +1,131 @@
+{
+  "purpose": "Issue #28 candidate demonstration, not final acceptance",
+  "source_commit": "3fcc586d740d2b9b461193e482d6861ca8f905e5",
+  "source_tree": "41b54378c177d7d1e01ff17f2bf7b22663789ec6",
+  "platform": "Linux / SFML 2.5.1 / Xvfb software OpenGL",
+  "executable_sha256": "4abc22684ff77b433f7a900194ff2dc6a2f8c8fa1811b00030ff831c558f8b34",
+  "video_sha256": "d5b937abee8d961891ae34c1d9739d963826ae9b614e9a9c4e486303624a5347",
+  "video_size_bytes": 3759087,
+  "duration_seconds": 120.021333,
+  "video_format": "H264, 1280x800, 30fps; AAC stereo 48kHz",
+  "audio": "Actual application OpenAL software-mixed wave output, edited alongside its video; not microphone/physical endpoint evidence",
+  "timeline": [
+    {
+      "start": 0,
+      "end": 6,
+      "title": "Main menu > Name entry > Mode selection",
+      "source_session": 1,
+      "source_start": 0,
+      "audio_offset_seconds": 0.8
+    },
+    {
+      "start": 6,
+      "end": 15,
+      "title": "Classic mode - food and growth",
+      "source_session": 1,
+      "source_start": 6,
+      "audio_offset_seconds": 0.8
+    },
+    {
+      "start": 15,
+      "end": 24,
+      "title": "Multiplier power-up",
+      "source_session": 1,
+      "source_start": 15,
+      "audio_offset_seconds": 0.8
+    },
+    {
+      "start": 24,
+      "end": 32,
+      "title": "Shrink power-up",
+      "source_session": 1,
+      "source_start": 24.5,
+      "audio_offset_seconds": 0.8
+    },
+    {
+      "start": 32,
+      "end": 41,
+      "title": "Speed power-up",
+      "source_session": 1,
+      "source_start": 49,
+      "audio_offset_seconds": 0.8
+    },
+    {
+      "start": 41,
+      "end": 47,
+      "title": "Pause and resume",
+      "source_session": 1,
+      "source_start": 200.5,
+      "audio_offset_seconds": 0.8
+    },
+    {
+      "start": 47,
+      "end": 54,
+      "title": "Collision and Game Over",
+      "source_session": 1,
+      "source_start": 206.5,
+      "audio_offset_seconds": 0.8
+    },
+    {
+      "start": 54,
+      "end": 60,
+      "title": "Leaderboard - six columns",
+      "source_session": 1,
+      "source_start": 213.5,
+      "audio_offset_seconds": 0.8
+    },
+    {
+      "start": 60,
+      "end": 67,
+      "title": "Settings - independent audio controls",
+      "source_session": 1,
+      "source_start": 219.5,
+      "audio_offset_seconds": 0.8
+    },
+    {
+      "start": 67,
+      "end": 75,
+      "title": "Clean relaunch - configuration persists",
+      "source_session": 2,
+      "source_start": 0,
+      "audio_offset_seconds": 0.7786666666666666
+    },
+    {
+      "start": 75,
+      "end": 81,
+      "title": "Leaderboard persists across relaunch",
+      "source_session": 2,
+      "source_start": 8,
+      "audio_offset_seconds": 0.7786666666666666
+    },
+    {
+      "start": 81,
+      "end": 96,
+      "title": "Timed Challenge mode",
+      "source_session": 2,
+      "source_start": 14.5,
+      "audio_offset_seconds": 0.7786666666666666
+    },
+    {
+      "start": 96,
+      "end": 120,
+      "title": "Obstacle mode",
+      "source_session": 3,
+      "source_start": 3,
+      "audio_offset_seconds": 0.7786666666666666
+    }
+  ],
+  "source_capture_hashes": {
+    "raw-1.mp4": "759184acb5c7f01f6527081ec00defdd9ce6ccaf13df3b632e0aabd4dc63442f",
+    "raw-2.mp4": "933cad6ed8f6e95e4454d6d4f1497be7def511404a04d2782b041ee8bf867176",
+    "raw-3.mp4": "464993c5d4035620b21dea2d38591b5e7a38a42812260be5f9bfa321c49c5fab"
+  },
+  "limitations": [
+    "Recorded before outstanding Sprint2 PRs were finalized; candidate only, not final post-merge deliverable.",
+    "No Windows/macOS or performance acceptance claim.",
+    "Edited excerpts from three normal sessions, at normal playback speed.",
+    "Keyboard/mouse steering only; no game source, clocks, collisions, RNG or scoring changes.",
+    "Session2 attempted Obstacle selection actually remained Classic; that excerpt was excluded and fresh session3 verified Obstacle mode.",
+    "Linux settings/leaderboard persistence observed here does not resolve Bharath's separate Windows11 discrepancy."
+  ]
+}
