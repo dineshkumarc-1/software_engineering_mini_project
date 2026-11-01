@@ -1,10 +1,58 @@
-# Issue #22: start-up phases and audio after the first frame (PR #69), Linux regression
+# Issue #22: start-up profiling and audio after the first frame, Linux regression
+
+Author: B V TEJAS. AI-assisted. This is **Linux diagnostic and regression evidence only**. It is **not** cold-launch or FR-001 acceptance, **not** Windows evidence, and **not** an audible test. Every start-up and FR-001 target stays **Pending** until it is measured on the reference Windows hardware with real audio. Bharath's pinned Windows 11 candidate `3fcc586` is not changed, and no earlier evidence is changed.
+
+## Run 2: 1 Nov 2026, after splitting profiling from the fix
+
+| Build | PR | Tested tree | Contents |
+| --- | --- | --- | --- |
+| **P**, profiling | Profiling PR (base `main`) | `0b25ca01c2d84289e7d7d37a4b4de3f25be6052e` | Start-up phase marks, FR-001 confirm-to-grid timing, smoke checks and docs. No change to behaviour |
+| **F**, fix | #69 (stacked on P) | `20a3053d06d9117db53d4f303ec900af5202c426` | P plus audio opened after the first frame, fix-side checks and the Windows retest steps |
+
+The GitHub commit for each build is given in its PR description. Commits after the tested tree change only this evidence file.
+
+**Environment:** as in run 1 below. Clang ASan + UBSan builds use the CI flags. "Release" means GCC 13.3 with `-Werror`.
+
+| Check | P | F |
+| --- | --- | --- |
+| CTest, Release, normal user | 21/21 | 21/21 |
+| CTest, ASan + UBSan + leak, normal user | 21/21, 0 reports | 21/21, 0 reports |
+| `performance_probe_tests` (4 new cases in total) | 115 assertions / 15 cases | 115 / 15 |
+| cppcheck / banned-API / layering | 0 / 0 hits in 47 files / 35 files | same |
+| Python tooling tests (9 new in total) | 42 pass | 42 pass |
+| `desktop_probe_smoke.py` (now also checks the phases and the new-game sample; on F also that audio starts after the first frame) | pass | pass in Release **and** with the game built under ASan + UBSan |
+| Desktop navigation | 23/23 (first attempt: "app window missing"; retry passed) | 23/23 in Release and under ASan + UBSan |
+| Desktop Settings, including the invalid-driver silent fallback | — | 22/22 in Release (first two attempts: "application window did not appear"); 22/22 under ASan + UBSan |
+| `audio_backend_smoke` (on F also: nothing opened before `start()`, calls before it are no-ops) | — | 10/10 with null output, in Release and under ASan + UBSan; with no device it stops cleanly with "Audio backend not available" |
+| Leaderboard UI (`leaderboard_ui_check.py`, unchanged) | — | 75/75 |
+
+Several smoke attempts failed with "Failed to open X11 display" or a missing window. The game was started before Xvfb accepted connections: the harnesses wait only for the socket file. The same failure happened on the unchanged `3fcc586` baseline (run 1 below). Each failed attempt is listed above; none was dropped.
+
+The debug sanitizer build of `audio_backend_smoke` with no device also prints SFML's debug-only OpenAL error checks when the sound objects are destroyed. These are not sanitizer reports (there are 0).
+
+**Linux identities of these builds** (not Windows EXEs):
+
+| Build | Linux `SnakeXtreme` size | SHA-256 |
+| --- | --- | --- |
+| P | 1,370,360 | `3f2f9591064153bc68244cc22b9fb9aef1154d5cfc894572b47fc7c197e20d27` |
+| F | 1,370,712 | `6c8cc894718a1b686b5382e40edbfeebb7cf2a20d8c63216bfd39332461890f8` |
+
+**Launch timelines on Linux, null audio, warm, 5 runs each.** These are medians in ms of `startup_step_us` and the external marker:
+
+| Build | audio objects | window created | renderer | settings | first frame | audio started | external marker |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| P | 1.0 | 37.9 | 0.1 | 1.9 | 13.6 (audio step 1.2 came before it) | — | 61.7 |
+| F | 0.0 | 38.3 | 0.1 | 1.9 | 15.3 | 2.2, **after** the first frame | 59.5 |
+
+With the null driver the audio cost here is about 1–2 ms, so this shows the order of the steps, not the size of the saving on Windows. That needs the Windows retest in `docs/sprint2/issue-22-windows-startup-retest.md`.
+
+## Run 1: 31 Oct 2026 (historical; stage 1 `26d9dba`, stage 2 `8411808`)
 
 Executed 31 Oct 2026 by B V TEJAS. This is AI-assisted **Linux diagnostic and regression evidence only**. It is **not** cold-launch acceptance, **not** Windows evidence and **not** an audible test. The cold-launch criterion (< 2 s) stays **Pending** until it is measured on the target Windows hardware with real audio enabled.
 
 It does not touch Bharath's pinned Windows 11 candidate `3fcc586`, and no existing evidence is changed.
 
-## Builds
+### Builds
 
 | Build | GitHub commit | Tree (identical to the tested local tree) | What it is |
 | --- | --- | --- | --- |
@@ -24,7 +72,7 @@ The Linux executable hashes below identify these Linux builds only. They are not
 | Stage 1 | 1,361,480 | `da1b54e4007186d60ca34522e4e2f267d21968d688f4dada7f0d62dc1a099a02` |
 | Stage 2 | 1,361,832 | `a22f675ce86e9c77d91913d6234db38e0980970044707eea9d60880249675c19` |
 
-## Regression results
+### Regression results
 
 | Check | Stage 1 | Stage 2 |
 | --- | --- | --- |
@@ -49,7 +97,7 @@ The Linux executable hashes below identify these Linux builds only. They are not
 
 Because it failed the same way on the unchanged baseline, I treat it as an Xvfb problem in this container and have not attributed it to the change. The leaderboard behaviour itself was covered by `leaderboard_ui_check.py` (75/75), which this change does not touch.
 
-## Start-up timelines on Linux (`collect_launch.py`, milliseconds per step)
+### Start-up timelines on Linux (`collect_launch.py`, milliseconds per step)
 
 Each value is the time since the previous mark. A step also includes anything else that ran since that mark.
 
@@ -86,7 +134,7 @@ Each value is the time since the previous mark. A step also includes anything el
 
 **What they do not show.** With the null driver, opening the audio device takes about 1 ms, so these runs cannot show how much the fix saves on Windows. That needs a Windows run with real audio.
 
-## Still Pending on Windows
+### Still Pending on Windows (superseded by the retest document)
 
 1. Build **stage 1** (`26d9dba`) and **stage 2** (`8411808`, or the PR head) on the measured Windows 10 PC. Record each EXE's size and SHA-256.
 2. For each build, do one launch after a reboot, then five more:
