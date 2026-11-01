@@ -58,3 +58,13 @@ Final-signoff decision must check the approved exit criteria:100% planned execut
 - Bharath: review/document exact-build privacy and persistence-cleanup disposition.
 - Ayushi: review this44-case/43-requirement reconciliation,incorporate final raw evidence and actual human observations,and request final sign-off only when conditions are met.
 - Pin the accepted final artifact, accept or reject explicit deviations, and complete UAT/release/demo decisions. PR #60 is already merged; merge status does not authorize a release tag or final QA sign-off. See [release close-out](SPRINT2_RELEASE_CLOSEOUT.md).
+
+<!-- Evidence reconciliation: Windows performance and grid review -->
+
+### Evidence reconciliation — acceptance status
+
+**Overall status remains In Progress; final sign-off Pending.** The reviewed Windows performance evidence consists of short diagnostic segments and does not meet the required three continuous 300-second Hard/Obstacle sessions. The input registration metric is internal dequeue-to-registration timing, not OS/SFML queue-inclusive acceptance; launch results do not establish cold-launch acceptance. The reported grid timing results do not establish first-grid-render acceptance, and the reported TC-CORE-01 screenshot depicts a conversation rather than the game grid. The referenced grid artifacts were not present in this checkout for independent reinspection.
+
+The separate Linux Release regression is additional evidence for the merged code, not a substitute for Windows-target acceptance. The fresh warnings-as-errors Release build succeeded; CTest passed 21/21, Python tests passed 33/33, audio tests reported 161 assertions across 5 cases, cppcheck 2.13.0 reported zero findings, and Xvfb UI reruns passed navigation (23 checks), Settings (22), and leaderboard (29). An initial parallel UI run had a missing Settings app window and a leaderboard X11 display-startup failure; original logs were preserved and unchanged sequential reruns passed, with no causal diagnosis established. Permission checks ran with effective capabilities dropped and gates unchanged.
+
+The Linux run does not establish Windows performance/privacy/volunteer acceptance, fresh sanitizer or coverage results, or final release approval. Its redacted 19-file evidence ZIP was supplied in the owner conversation and is not committed repository evidence. Issues #22 and #25 and final QA sign-off remain pending. PR #60's merge does not authorize a release tag or final QA sign-off.

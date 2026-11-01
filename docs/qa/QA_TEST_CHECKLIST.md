@@ -218,3 +218,13 @@ The detailed execution records are maintained in `docs/qa/TEST_EXECUTION_LOG.md`
 This collector result does not replace the seven historical Windows x64 manual checks, establish that they used the final integrated candidate, or authorize final QA sign-off.
 
 **Final QA sign-off remains Pending.**
+
+### Dated platform-access clarification — 2026-10-31
+
+Windows 11 access has been confirmed in issue #23. This supersedes the assumption that Windows 11 hardware is unavailable as a current access constraint; it does not change the historical record or establish that the current candidate has been tested on Windows 11.
+
+Windows 11 candidate-specific build/run, portability, and applicable privacy acceptance remain Pending until the exact candidate/build is identified and supporting execution evidence is reviewed. Earlier Windows 11 collector observations remain limited to their original collection and must not be treated as final-candidate acceptance.
+
+The subsequent performance/grid evidence review also remains incomplete: the two new probes have zero complete qualifying Hard/Obstacle windows, all ten grid observations are inconclusive or skipped, and the box-loop lacks obstacle-pixel feedback. The functional findings and their limitations are recorded in the Windows evidence register and test execution log. These observations do not satisfy the outstanding acceptance criteria.
+
+Issue #22 remains In Progress, issue #25 remains open, and final QA/release sign-off remains Pending.

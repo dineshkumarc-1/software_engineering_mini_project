@@ -42,3 +42,46 @@ The user specifically reported hearing background sound without the volume setti
 ## Privacy provenance
 
 Historical redacted capture exists at audit branch commit`d59d85e2e028a244fee71d8b95c5e2e77e6c8b66`,not baseline main; redacted JSON hash`0a2ac44068c9fecf7c288d2f1fbc9023026bb06598f35b7700681ed439c47dc4`. It records60samples,zero observed process-ownedTCP/UDP and ActiveStore checks at endpoints;104.7soverall,98.35ssample span. It lacks exact source/EXE identity. Sampling is not a packet capture or a universal no-network proof. Final exact-candidate approved firewall/offline evidence remains Pending.
+
+<!-- Evidence reconciliation: Windows performance and grid review -->
+
+### Evidence reconciliation — performance and grid review
+
+**Disposition: Incomplete / pending acceptance.** The reviewed Windows performance archive contains 32 entries (71,558 bytes; SHA-256 `150317713668114380ac058700c50df177d6c55772ba93504b84ba55a49393c5`). Its manifest identifies source/EXE revision `09bbf96` and EXE SHA-256 `780B5AB208B7FD6DF91916E4E386848E179FE4B71CBA27BC4BCEE60207D2E946`. The unchanged analyzer from merged revision `3fcc586` accepts the schema and timestamps in all 11 supplied raw probe JSON files. This validates the supplied traces and their format; it does not independently establish Windows execution, binary provenance, or target-machine conditions.
+
+Manual FPS traces contain only 3-, 1-, and 5-second continuous Hard/Obstacle segments. The eligible windows reported are respectively 4 (mean 60.25 FPS, minimum 60), 1 (45 FPS), and 10 (mean 59.8 FPS, minimum 59); no eligible window below 30 FPS was observed. Each of the three original automated attempts had only one qualifying second, while the idle-menu run had no gameplay. These observations do **not** meet the required three continuous 300-second sessions and do not justify a waiver.
+
+The input trace records 100 directions in the requested order, with 18 accepted, 82 rejected, and zero drops. The reported 1–6 microsecond registration interval is an internal dequeue-to-registration measurement, not an OS/SFML queue-inclusive input-acceptance measurement. Launch times of 3.007, 1.179, and 1.321 seconds remain cache-unknown/warm diagnostics; cold-launch acceptance is unverified.
+
+The owner/reviewer-reported grid-results JSON retains `all_passed: true` / `passed: true` for title-based 4–16 ms timing. That result is not proof of first-grid-render acceptance; the corrected report leaves first render pending. The reported `tc_core_01_grid_snake_frame.png` was visually inspected and depicts a conversation rather than the game grid, so it cannot support TC-CORE-01 rendering. The referenced grid artifacts were not found in this checkout for independent reinspection. Preserve the historical report and results, document their scope, and do not silently substitute a replacement capture.
+
+Issue #22 remains In Progress and issue #25/final QA sign-off remain pending. No confirmed performance product defect was established by these short runs, but required acceptance remains unproven. The reported volunteer attestation is retained with build/route unknown. This reconciliation does not approve a waiver, close issues, or authorize release.
+
+### Addendum — subsequent performance, grid, and functional evidence review (2026-10-31)
+
+This addendum records two later-reviewed evidence captures separately from the historical 71,558-byte archive documented above. The raw files for these two captures are not present in this checkout. Their identifiers, sizes, and review observations below are recorded from the supplied review information; they have not been independently rehashed or reproduced during this documentation update.
+
+| Evidence record | Reported size | Supplied identifier | Review disposition |
+|---|---:|---|---|
+| Subsequent performance archive | 1,028,500 bytes | `5c63ca97...` | Separate later capture; do not merge its results into the historical 71,558-byte archive record. |
+| Subsequent evidence batch | 1,420,509 bytes | `6ede6694...` | Separate batch; its reported 45-file manifest validation does not imply that all observations passed. |
+
+**Performance scope:** The batch review found zero complete qualifying Hard/Obstacle windows in its two new probes. These probes do not satisfy the required three continuous 300-second Hard/Obstacle campaigns with power-ups active. Preserve the reported probe results as diagnostic evidence only. Performance acceptance remains Pending.
+
+**Grid scope:** All ten grid observations in the reviewed batch were inconclusive or skipped. The box-loop observation has no obstacle-pixel feedback. These observations do not establish first-grid-render timing, correct obstacle rendering, or TC-CORE-01 acceptance.
+
+**Functional evidence corrections:**
+
+- The reported nine-combination array is empty; it does not establish successful coverage of the nine required combinations.
+- The 16-character and invalid-character assertions were executed on Mode Selection. They do not establish the corresponding settings-screen validation behavior.
+- `settings_saved=false` does not establish successful settings persistence.
+- `cancel_preserved_music=false` does not establish that Cancel preserved the previous music setting.
+- A no-crash observation establishes only that no crash was observed in that run; it does not prove that a requested theme loaded or rendered correctly.
+- Retain the valid pause/resume/restart observations and corrupt-board observations within their demonstrated scope.
+- Retain the genuine six-column image with its actual provenance. Do not substitute a different image or claim an unverified build association.
+
+The manifest's reported validation of 45 files is a batch-integrity observation, not a blanket pass for the individual probes or functional checks. Preserve individual results and limitations rather than promoting the supplied batch summary wholesale to Passed.
+
+The two new captures do not replace, relabel, or retrospectively extend the historical 71,558-byte archive. The historical 3-, 1-, and 5-second Hard/Obstacle segments remain short diagnostic runs and do not satisfy the required 300-second campaigns.
+
+**Disposition:** Evidence review only; acceptance remains incomplete. Issue #22 remains In Progress, issue #25 remains open, and final QA/release sign-off remains Pending. This addendum approves no waiver and authorizes no release.
