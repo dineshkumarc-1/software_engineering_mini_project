@@ -41,28 +41,13 @@ Do not use a report filename that is also a player configuration/save file.
   Collector exit codes are 0 for all runs collected, 1 for any incomplete run,
   and 2 for invocation/setup failure. A marker alone is never success.
   The collector does not clear OS caches or verify the machine specification.
-- **Start-up phases (#22).** `startup_phases_us` lists named steady-clock marks
-  (same clock as `first_frame_us`), each taken just after that step finished;
-  `dropped_phases` counts any beyond 16. The analyzer and `collect_launch.py`
-  return them as `startup_phases_us` and as `startup_step_us`, the time since
-  the previous mark on a timeline that also contains `first_frame`. A step also
-  includes anything else that ran since the previous mark. Marks:
-  - `audio_objects_constructed`: the `AudioService` member has been built.
-  - `window_created`: the `sf::RenderWindow` and its first OpenGL context exist.
-  - `renderer_ready`: the renderer, including its font, is loaded.
-  - `settings_ready`: settings are loaded, or regenerated and saved.
-  - `audio_started` or `audio_unavailable`: the OpenAL device is open, the
-    buffers are uploaded and music is playing, or the silent fallback is active.
-
-  Where the OpenAL device opens depends on the build. Before the change in
-  this PR, `sf::SoundBuffer`/`sf::Sound` members opened it during
-  `audio_objects_constructed`, before the window, and audio started before the
-  first frame. From that change on, `AudioService` opens the device only in
-  `start()`, which runs **after** the first frame. `audio_started` then comes
-  after `first_frame`, and `audio_objects_constructed` is near zero. Report
-  both `first_frame` and `audio_started` for a launch; the first is the visible
-  menu, the second is when music and SFX are ready. These are diagnostics, not
-  cold-launch acceptance; that still needs real audio on the target hardware.
+- **Start-up phases and new-game timing (#22)** are described in
+  [startup-measurements.md](startup-measurements.md). This applies from
+  PR #69 on: the OpenAL device opens only **after** the first frame. So
+  `audio_started` (or `audio_unavailable`) follows `first_frame`, and
+  `audio_objects_constructed` is close to zero. Report both marks for every
+  launch: `first_frame` is when the menu is visible; `audio_started` is when
+  music and SFX are ready.
 - FPS uses exact non-overlapping 1,000,000-us windows anchored on first display.
   A frame exactly on a boundary belongs to the next window. Stalls generate
   zero-frame windows; the final partial window is separate and is NOT included
