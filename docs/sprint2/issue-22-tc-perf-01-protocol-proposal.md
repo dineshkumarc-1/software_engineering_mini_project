@@ -16,7 +16,7 @@ Author: B V TEJAS, for #22. **Status: proposal only.** It is **not** an approved
 
 - **A person cannot reliably survive 300 s on Hard/Obstacle.** At Hard the snake moves every 70 ms, which is about 4,300 moves in 5 minutes. The board is 30×20 with 8 obstacles, and the snake keeps growing.
   - The reviewed Windows traces have continuous Hard/Obstacle segments of only **3 s, 1 s and 5 s**, and two later probes had **zero** complete qualifying windows (see `WINDOWS10-EVIDENCE-REGISTER.md`).
-  - Dinesh reported one five-minute Obstacle/Hard session, but its raw probe has not been uploaded and analysed.
+  - The reported five-minute Obstacle/Hard session **does not exist on disk**: #72's `tc-perf01-historical-report.md` searched the repository, runtime folders and evidence archives and found none. Its longest Obstacle/Hard segments are 10, 5, 3 and 1 s, and the repaired automated runs are 1.03, 1.01 and 0.40 s.
 - **The STP marks the test "Auto", but no automation exists.** Nothing in the project can play 300 s of Hard/Obstacle without a person.
 - **"Power-ups active" cannot be checked from the probe today.** The probe report hard-codes `"powerups_implemented": false`, and its FPS windows do not record whether a power-up was on the board or an effect was running. That data no longer matches the game, which has power-ups.
 
@@ -38,7 +38,7 @@ Any replacement has to cover these three things, or state openly that it doesn't
 | --- | --- | --- | --- |
 | A1, pooled | Hard + Obstacle, power-ups collected whenever possible, as many sessions as needed (restarts allowed). Same EXE, reference PC, probe on | **≥ 900** complete, uniform Gameplay/Obstacle/Hard windows in total, from at least 3 sessions; **every** window ≥ 30 FPS; 0 dropped or invalid samples; min/avg/median and each session's length reported | R1 and R3 (sample size at the real worst-case tick rate) |
 | A2, continuous | **Obstacle + Easy** (200 ms tick, which a person can survive), power-ups collected, **3 × 300 s without a restart** | Every complete window ≥ 30 FPS for each 300 s run | R2 (sustained run, and a *longer* snake, so more drawing per frame) |
-| A3, link check | Compare A1's Hard/Obstacle FPS distribution with A2's Easy/Obstacle distribution on the same PC | Medians agree closely (the threshold, e.g. ±5 %, must be agreed before running) | Tests the assumption that frame cost depends on what is drawn, not on the tick rate. **If A3 fails, A is not valid** |
+| A3, link check | Compare A1's Hard/Obstacle frame times with A2's Easy/Obstacle frame times on the same PC | **Lower tail**, not medians: the minimum, the 1st percentile of the 1-s FPS windows, and the 99th percentile of frame time must each agree within a margin that is agreed before running (for example 10 %). At a vsync-locked 59-60 FPS the medians are almost identical whatever the load, so a median check cannot fail | Tests the assumption that frame cost depends on what is drawn, not on the tick rate. **If A3 fails, A is not valid** |
 
 - **What A measures:** per-second frame rate under the real Hard/Obstacle workload with enough samples, plus a sustained 5-minute run with the same drawing workload.
 - **What A does not measure:**
@@ -66,6 +66,11 @@ This is the same method Dinesh proposed in #72's closure report. It is the recom
 4. **Power-ups are visible in the data.** The probe records, for each FPS window, whether a power-up was on the board and which effect was active. The hard-coded `powerups_implemented: false` is fixed.
 5. **No stitching.** Each run is one 300 s gameplay interval, counted from the first displayed Gameplay frame. A run that dies, restarts, pauses or changes context is **Incomplete**, and a new full run starts. Attempts are never joined.
 6. **Unchanged pass rule.** 3 runs; no complete 1-s window below 30 FPS; zero-frame stall windows count; min/avg/median reported; same EXE SHA and reference PC for all 3 runs.
+7. **The driver's own cost is part of the measurement.** The driver runs in the game thread, so its path-finding time is inside every frame it is measured against, which is the conservative direction. Record its time per decision (median, p99, maximum) in the report, and do not run it from a separate thread without saying so.
+8. **Log volume must fit the probe.** The probe holds at most 4,096 input samples (`MaxInputs`) and 3,600 windows. A Hard run has about 4,300 ticks (more during Speed), so logging every tick would overflow and the "0 dropped samples" rule would fail every run. Log **direction changes** (and rejected requests), not every tick, and check `dropped_inputs = 0` per run.
+9. **Power-up activity needs a rule that can be checked.** The game has three power-ups (Speed 5 s, Multiplier 10 s, Shrink, instant), at most one on the board, appearing every 8-15 s and lasting 5 s uncollected, so about 20-35 appear in 300 s. A run counts only if the per-window data shows **at least one Speed activation (the 42 ms worst-case tick), one Multiplier activation and one Shrink pick-up**. A "Freeze" power-up appears in #72's historical report, but **it does not exist in the game**; remove it from the checklist or ask the owner what it refers to.
+10. **The driver is not an input test.** It sends directions inside the process, so it does not pass through the OS queue. Its samples carry source `autopilot` and are excluded from TC-PERF-02, which uses the external method in `docs/sprint2/issue-22-timing-methods.md`.
+11. **Campaign metadata.** Record the PC, power state (charger connected, power plan), display refresh rate and whether vsync is on, apps open, time since boot, and the EXE SHA-256, as in the start-up collector. A 300 s run on a laptop can be thermally limited, so say whether the charger and the power plan were the same for all 3 runs.
 
 **What B verifies:**
 
@@ -88,6 +93,21 @@ This is the same method Dinesh proposed in #72's closure report. It is the recom
 
 - **What it is:** an opt-in switch that ignores collisions during the probe.
 - **Why not:** it keeps the frame load but changes the game's rules, so the measured run is not gameplay. It also has the same code cost as B.
+
+## 4a. Corrections made in review (before approval)
+
+| # | What changed | Why |
+| --- | --- | --- |
+| 1 | The "reported five-minute session" is stated as not found. | #72's search found none; the earlier text said it was merely not analysed. |
+| 2 | A3 compares the lower tail, not medians. | A vsync-locked median cannot fail. |
+| 3 | B requirement 7: driver cost is recorded and counted. | Path-finding runs inside the frames being measured. |
+| 4 | B requirement 8: log direction changes only. | `MaxInputs` is 4,096; per-tick logging overflows it and breaks "0 dropped". |
+| 5 | B requirement 9: a checkable power-up rule, and "Freeze" removed. | The game has Speed, Multiplier and Shrink only. |
+| 6 | B requirement 10: the driver is excluded from TC-PERF-02. | It bypasses the OS input queue. |
+| 7 | B requirement 11: campaign metadata. | Thermal and power state affect a 5-minute run. |
+| 8 | Timing methods for TC-CORE-01 and TC-PERF-02 are in `docs/sprint2/issue-22-timing-methods.md`. | #72 asks for valid visible-grid and queue-inclusive endpoints. |
+
+Also in #72's closure report: step 1 says to "mark gameplay start after the visible grid and initial snake are confirmed". Take the 300 s start from the probe's first displayed Gameplay frame instead, and keep the external screenshot as a separate check. Otherwise the 300 s interval depends on a capture tool that has its own latency.
 
 ## 5. Recommendation and decision needed
 
