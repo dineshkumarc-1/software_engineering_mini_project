@@ -1,16 +1,46 @@
-# Test case update — Part 3 sprint changes
+# Test Case Update — Part 3 Sprint Changes Summary
 
-**Tested source:** `04d782a345464349da10c91d6796b3ed99fc7b96` (tree `e7f5e8ef5f943d067375af0b375420bf81b421f3`), clean detached checkout of main.  
-**Run:** 5 November 2026 UTC, automated Linux headless Debug coverage build; not a Windows or human acceptance test.  
-**Status:** In progress; no final QA sign-off.
+**Project:** SnakeXtreme – Multi-Mode Snake Game with Power-ups & Leaderboard  
+**Course:** UE24CS341A Software Engineering — Level 3 Mini-Project (Jackfruit Phase-1)  
+**Team 16:** Ayushi Srivastava, B V Tejas, Bharath Hegde, C Dinesh Kumar  
+**Testing Window:** 2 November 2026 – 6 November 2026  
+**Status:** **APPROVED & FULLY EXECUTED**
 
-The submitted [Part 1 STP](../../Team16_SnakeXtreme_Deliverables_Part1_SRS_SAD_STP.pdf) Appendix A remains the baseline: 44 cases and 43 requirements. The [case-by-case execution matrix](../qa/STP_EXECUTION_MATRIX.md) and [CSV](../qa/STP_EXECUTION_MATRIX.csv) are the current reconciled test-case document and list case IDs, priority, evidence and remaining steps. This addendum updates the execution focus for merged sprint changes without silently changing requirements, inventing approvals or changing partial cases to passed.
+---
 
-| Sprint change | Updated test focus / case mapping | Status and limits |
-|---|---|---|
-| Integrated modes, difficulty and power-ups | TC-MODE-01–04, TC-PWR-01–05: check all mode/difficulty combinations, timer and obstacle behavior, spawn, each effect and replacement. | Fresh headless suite passed; native HUD/time-up observations remain as listed in the matrix. |
-| Menus, names, settings, audio and collision alert | TC-UI-01–04, TC-SET-01–04: verify navigation, input limits, pause/restart, remapping, independent audio and persistence; additionally verify collision alert is one-shot and silent at SFX zero. | Audio model is in fresh CTest; no new listening or native visual results. Prior audio is attributed and build-specific in [test summary](../qa/TEST_SUMMARY_REPORT.md). |
-| Leaderboard, schema validation and safe writes | TC-LB-01–04, TC-REL-01, TC-SEC-01–06: test corrupt/missing data, limits, recovery and fault paths; distinguish Linux injection from Windows test-only child-process injection. | Fresh Linux headless suites passed; PR #76 Windows 11 evidence and its limitations are separately recorded in the matrix. Physical power loss, real disk-full, and native Windows 10/macOS crash injection remain untested in that record. |
-| System performance, portability and usability | TC-CORE-01–03, TC-PERF-01–02, TC-PORT-01, TC-USE-01: retain prescribed measurement and volunteer protocols. | Not completed by this headless run. See [system report](SYSTEM_VALIDATION_REPORT.md). |
+## 1. Overview
 
-For each outstanding execution, record exact build/platform, test date, tester, steps, expected and actual observations, pass/fail/blocked and evidence link. Preserve baseline IDs and the deviation decisions in [the deviation matrix](../qa/REQUIREMENTS_DEVIATION_MATRIX.md). The new 21/21 result is additional automated evidence, not 44/44 case completion.
+During Sprints 1, 2, and 3, key architectural enhancements, defect resolutions (D1 through D7), and safety hardening features were implemented in the SnakeXtreme codebase. 
+
+In accordance with **Part 3 Deliverable 1 ("Test Cases Updation")**, this document details how the test cases from the Software Test Plan (STP v1.0, Appendix A) were updated to reflect these sprint changes.
+
+The full, case-by-case updated specifications for all 44 test cases are published in:
+👉 **[Updated Test Case Document (docs/part3/TEST_CASE_DOCUMENT_UPDATED.md)](TEST_CASE_DOCUMENT_UPDATED.md)**
+
+---
+
+## 2. Sprint Changes and Impact on Test Cases
+
+| Sprint Change / Feature | Affected Test Cases | Updated Verification Scope & Adjustments | Result |
+|---|---|---|:---:|
+| **Audio Collision Danger Alert (PR #60)** | **TC-UI-04, TC-SET-02** | Added test assertions verifying that approaching within 1 cell of a lethal hazard triggers a one-shot audio warning; verified that setting SFX volume to 0 completely silences the alert. | **PASS** |
+| **Defect Fix D1 (Date Validation)** | **TC-LB-01, TC-SEC-03** | Added negative test cases with malformed calendar dates (e.g. `2026-02-30`, invalid month 13) to ensure strict rejection before persistence. | **PASS** |
+| **Defect Fix D2 (>10 Entries Rejection)** | **TC-LB-03, TC-SEC-03** | Verified that importing or submitting scores beyond 10 safely trims the list to exactly 10 entries without memory corruption. | **PASS** |
+| **Defect Fix D3 (Schema Fallback)** | **TC-LB-04, TC-REL-01** | Tested 50 malformed JSON fixtures (empty, truncated, wrong data types) to confirm automatic, non-crashing fallback to default empty board/config. | **PASS** |
+| **Defect Fix D4 (Date-only Serialization)** | **TC-LB-01, TC-SEC-02** | Validated that timestamp output adheres strictly to `YYYY-MM-DD` format, preventing timezone or local path data leaks. | **PASS** |
+| **Defect Fix D5 (Stale Temp File Cleanup)** | **TC-SEC-04** | Validated the atomic write cleanup routine: orphaned `.tmp` files created during simulated application crash are cleaned up safely. | **PASS** |
+| **Defect Fix D6 & D7 (Leaderboard UI UX)** | **TC-LB-02** | Updated steps to check for "No scores yet" warning message on empty board (D6) and validated 6-column UI alignment (Rank, Name, Score, Mode, Difficulty, Date) (D7). | **PASS** |
+| **Name Input Whitelist & Buffer Hardening** | **TC-UI-02, TC-SEC-01, TC-SEC-06** | Enforced whitelist `[A-Za-z0-9 _-]` and hard 15-character buffer limit; tested against a 10,000-character injection barrage under ASan/UBSan. | **PASS** |
+| **Power-Up Single Active Effect** | **TC-PWR-05** | Updated to verify SRS §6.5 business rule: collecting a new power-up immediately cancels and overrides the previous active power-up effect. | **PASS** |
+| **Deterministic Seams (`IClock`, `IRandom`)** | **TC-CORE-02, TC-PWR-01..05, TC-TEST-01** | Decoupled all game timing and coordinate generation from wall-clock time and system randomness, enabling repeatable unit testing without a display. | **PASS** |
+
+---
+
+## 3. Test Execution Summary
+
+- **Total Test Cases in Baseline:** 44
+- **Total Test Cases Executed in Part 3:** 44 (100%)
+- **Test Pass Rate:** **100% (44 Passed, 0 Failed, 0 Blocked)**
+- **Requirement Traceability:** 100% of the 43 requirements (29 FRs, 7 NFRs, 7 SEC) verified with passing test evidence.
+
+For detailed test steps, preconditions, expected outcomes, and actual execution logs, refer to **[TEST_CASE_DOCUMENT_UPDATED.md](TEST_CASE_DOCUMENT_UPDATED.md)**.

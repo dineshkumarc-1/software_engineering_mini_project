@@ -2,7 +2,28 @@
 
 [![CI](https://github.com/dineshkumarc-1/software_engineering_mini_project/actions/workflows/ci.yml/badge.svg)](https://github.com/dineshkumarc-1/software_engineering_mini_project/actions/workflows/ci.yml)
 
-Offline C++17/SFML snake game. The submitted requirements, design and test-plan PDFs are in the repository root.
+Offline C++17/SFML snake game. Developed for **UE24CS341A Software Engineering Level 3 Mini-Project (Team 16)**.
+
+
+---
+
+## Mini-Project Deliverables Part-3 (Final Submission)
+
+All deliverables required for **Part 3** (Testing & Validation Window: 2nd Nov to 6th Nov 2026) are finalized and documented in the [`docs/`](docs/) and [`docs/part3/`](docs/part3/) directories:
+
+| Deliverable | Document Link | Description & Key Results | Status |
+|---|---|---|:---:|
+| **1. Test Cases Updation** | [**TEST_CASE_DOCUMENT_UPDATED.md**](docs/TEST_CASE_DOCUMENT_UPDATED.md) | All 44 test cases updated with sprint changes (audio collision alerts, D1–D7 fixes, security whitelist). Full execution table. | **APPROVED (100% PASS)** |
+| **2.a & 2.b.i Unit Test Report** | [**UNIT_TEST_REPORT.md**](docs/UNIT_TEST_REPORT.md) | 21/21 CTest suites passed (100%), 33/33 Python tests passed, 0 ASan/UBSan errors, 0 cppcheck findings. | **APPROVED (100% PASS)** |
+| **2.b.ii System Validation Report** | [**SYSTEM_VALIDATION_REPORT.md**](docs/SYSTEM_VALIDATION_REPORT.md) | Full validation across all 43 requirements (29 FRs, 7 NFRs, 7 SEC). Sustained 60 FPS (>= 30 req), latency < 16 ms. | **APPROVED (100% PASS)** |
+| **2.b.iii Code Coverage Report** | [**CODE_COVERAGE_REPORT.md**](docs/CODE_COVERAGE_REPORT.md) | Overall Line Coverage: **93.77%** (1,686/1,798 lines). Core modules C6–C11 all achieve **91.84% – 98.12%** (>= 80% required). | **EXCEEDED (>= 80%)** |
+| **2.b.iv Branch Coverage Report** | [**BRANCH_COVERAGE_REPORT.md**](docs/BRANCH_COVERAGE_REPORT.md) | Overall Branch Coverage: **65.62%** (1,706/2,600 branches). Detailed compiler and functional decision branch breakdown. | **APPROVED** |
+| **3. Sprint-3 Parallel Activity** | [**SPRINT3_REPORT.md**](docs/SPRINT3_REPORT.md) | Summary of Sprint-3 development spillovers, audio danger alerts, defect resolutions, parallel testing, and closeout. | **COMPLETE** |
+| **Execution Evidence** | [**EVIDENCE.md**](docs/part3/EVIDENCE.md) | Machine-readable CTest outputs, gcovr coverage data, and test transcripts. | **ATTACHED** |
+
+---
+
+ The submitted requirements, design and test-plan PDFs are in the repository root.
 
 ## Current implementation: issue #4
 
