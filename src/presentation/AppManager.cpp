@@ -43,8 +43,11 @@ AppManager::AppManager(PerformanceProbe* probe, std::chrono::steady_clock::time_
         }
     }
     settingsEditor_.open(settings_);
-    if (!audio_.start(settings_.musicVolume, settings_.sfxVolume))
+    markPhase("settings_ready");
+    const bool audioReady = audio_.start(settings_.musicVolume, settings_.sfxVolume);
+    if (!audioReady)
         std::cerr << "[WARN] AudioService: playback unavailable; silent fallback\n";
+    markPhase(audioReady ? "audio_started" : "audio_unavailable");
     refreshTitle();
 }
 
@@ -89,6 +92,10 @@ int AppManager::run() {
     }
 
     return 0;
+}
+
+void AppManager::markPhase(const char* name) const {
+    if (probe_ != nullptr) probe_->phase(name, probeNow());
 }
 
 std::int64_t AppManager::probeNow() const {
@@ -331,7 +338,12 @@ void AppManager::select(MenuInput input) {
 void AppManager::startGame() {
     if (gameplay_.start(selectedConfig_)) {
         leaderboard_.beginSession();
-        if (probe_ != nullptr) probe_->beginSession();
+        if (probe_ != nullptr) {
+            probe_->beginSession();
+            // FR-001 / TC-CORE-01 timing starts at the confirming event.
+            probe_->newGameConfirmed(state_.screen() == Screen::GameOver ? "restart" : "mode_selection",
+                                     inputDequeuedUs_);
+        }
         menuError_.clear();
         if (state_.screen() == Screen::ModeSelection) dispatch(Action::BeginGame);
         else if (state_.screen() == Screen::GameOver) dispatch(Action::Restart);

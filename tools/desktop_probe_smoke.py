@@ -77,13 +77,28 @@ try:
         assert any(i["accepted"] for i in parsed["inputs"]), "no accepted engine input"
         assert any(i["displayed_us"] is not None for i in parsed["inputs"]), "no application/display correlation"
         assert not any(parsed[k] for k in ("dropped_inputs", "dropped_windows", "invalid_samples")), "lost/invalid measurements"
+        # Start-up phases (#22) are recorded once each, in order.
+        phase_names = [p["phase"] for p in parsed["startup_phases_us"]]
+        for name in ("audio_objects_constructed", "window_created", "renderer_ready", "settings_ready"):
+            assert name in phase_names, "missing start-up phase " + name
+        assert ("audio_started" in phase_names) != ("audio_unavailable" in phase_names), "audio start-up not recorded once"
+        times = [p["us"] for p in parsed["startup_phases_us"]]
+        assert times == sorted(times), "start-up phases out of order"
+        # FR-001 / TC-CORE-01: the mode-selection confirmation reached a Gameplay frame.
+        games = parsed["new_games"]
+        assert len(games) == 1 and games[0]["trigger"] == "mode_selection", "new game not recorded"
+        assert games[0]["first_grid_us"] is not None and games[0]["first_grid_us"] >= games[0]["confirmed_us"], \
+            "no first Gameplay frame after confirmation"
         summary = summarize(report)
         (output / "gameplay-summary.json").write_text(json.dumps(summary, indent=2), encoding="utf-8")
         print("PASS: all 100 synthetic burst requests recorded in order; accepted/rejected/consumed/displayed separated; no display-name leakage")
+        print("PASS: start-up phases recorded in order; new-game confirmation reached a Gameplay frame "
+              f"({(games[0]['first_grid_us'] - games[0]['confirmed_us']) / 1000:.1f} ms here, not a target measurement)")
     # Preserve environment only for this script's child collector (no global OS settings).
     os.environ.update({k: env[k] for k in ("DISPLAY", "ALSOFT_DRIVERS", "LIBGL_ALWAYS_SOFTWARE")})
     launched = collect(exe, output / "launches", 3, "uncommitted probe smoke working-tree; not a release build")
     assert all(r["collection_ok"] and r["report_valid"] for r in launched["runs"])
+    assert all(r["startup_phases_us"] for r in launched["runs"]), "launch traces lack start-up phases"
     print("PASS: 3 isolated external launch-marker traces; cache condition and target hardware unverified")
     print("All instrumentation smoke checks pass; target performance acceptance NOT ASSESSED")
 finally:
