@@ -98,3 +98,70 @@ TEST_CASE("Leaderboard fallback keeps the existing QA rank-name-score delimiter"
     CHECK(snake::leaderboardRowTitle(3U, entry) ==
           " | 3. Low 10 10 | Timed / Medium / 2024-02-29");
 }
+
+TEST_CASE(
+    "Leaderboard model reports a score tied with tenth place as not qualified",
+    "[leaderboard][integration][coverage]") {
+
+    Fixture fixture;
+    const auto path = fixture.directory / "leaderboard.json";
+    snake::LeaderboardModel model(path);
+
+    // Fill all ten positions with descending scores.
+    for (int score = 10; score >= 1; --score) {
+        model.beginSession();
+        model.finish(
+            "Player" + std::to_string(score),
+            score,
+            snake::GameMode::Classic,
+            snake::Difficulty::Medium);
+
+        REQUIRE(model.message().find("Score saved: rank ") == 0);
+    }
+
+    // A score equal to tenth place must not enter the Top 10.
+    model.beginSession();
+    model.finish(
+        "TiedPlayer",
+        1,
+        snake::GameMode::Classic,
+        snake::Difficulty::Medium);
+
+    CHECK(model.message() == "Score did not reach the Top 10");
+}
+
+TEST_CASE(
+    "Leaderboard model includes a warning after recovering malformed JSON",
+    "[leaderboard][integration][coverage]") {
+
+    Fixture fixture;
+    const auto path = fixture.directory / "leaderboard.json";
+
+    {
+        std::ofstream output(path, std::ios::binary);
+        REQUIRE(output.good());
+        output << "{broken JSON";
+        REQUIRE(output.good());
+    }
+
+    snake::LeaderboardModel model(path);
+    model.beginSession();
+    model.finish(
+        "Alice",
+        42,
+        snake::GameMode::Classic,
+        snake::Difficulty::Medium);
+
+    CHECK(model.message().find("Score saved: rank 1") == 0);
+    CHECK(
+        model.message().find(
+            "Warning: the previous leaderboard JSON was malformed or "
+            "schema-invalid. A fresh leaderboard was saved.")
+        != std::string::npos);
+
+    model.refresh();
+    REQUIRE(model.entries().size() == 1U);
+    CHECK(model.entries()[0].playerName == "Alice");
+    CHECK(model.entries()[0].score == 42);
+}
+
