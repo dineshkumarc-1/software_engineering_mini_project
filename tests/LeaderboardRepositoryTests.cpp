@@ -5,6 +5,8 @@
 #include <nlohmann/json.hpp>
 
 #include <atomic>
+#include <cstdint>
+#include <limits>
 #include <filesystem>
 #include <fstream>
 #include <string>
@@ -721,4 +723,225 @@ TEST_CASE(
         (std::istreambuf_iterator<char>(afterInput)),
         std::istreambuf_iterator<char>());
     CHECK(contentsAfter == contentsBefore);
+}
+
+
+TEST_CASE(
+    "Leaderboard rejects unsupported game modes and difficulty values",
+    "[persistence][leaderboard][validation]") {
+
+    TemporaryDirectory directory;
+    const auto file = directory.path() / "leaderboard.json";
+    snake::LeaderboardRepository repository(file);
+
+    const auto invalidMode = repository.addScore(
+        "Alice",
+        10,
+        static_cast<snake::GameMode>(999),
+        snake::Difficulty::Medium);
+
+    CHECK(invalidMode.status == snake::ScoreSubmissionStatus::Error);
+    CHECK_FALSE(std::filesystem::exists(file));
+
+    const auto invalidDifficulty = repository.addScore(
+        "Alice",
+        10,
+        snake::GameMode::Classic,
+        static_cast<snake::Difficulty>(999));
+
+    CHECK(invalidDifficulty.status == snake::ScoreSubmissionStatus::Error);
+    CHECK_FALSE(std::filesystem::exists(file));
+}
+
+TEST_CASE(
+    "Equal leaderboard scores receive the correct rank and retain insertion order",
+    "[persistence][leaderboard][ranking]") {
+
+    TemporaryDirectory directory;
+    snake::LeaderboardRepository repository(
+        directory.path() / "leaderboard.json");
+
+    const auto first = repository.addScore(
+        "Alice", 100, snake::GameMode::Classic, snake::Difficulty::Medium);
+    REQUIRE(first.status == snake::ScoreSubmissionStatus::Submitted);
+    REQUIRE(first.rank.has_value());
+    CHECK(*first.rank == 1U);
+
+    const auto tied = repository.addScore(
+        "Bob", 100, snake::GameMode::Timed, snake::Difficulty::Hard);
+    REQUIRE(tied.status == snake::ScoreSubmissionStatus::Submitted);
+    REQUIRE(tied.rank.has_value());
+    CHECK(*tied.rank == 2U);
+
+    auto entries = repository.top10();
+    REQUIRE(entries.size() == 2U);
+    CHECK(entries[0].playerName == "Alice");
+    CHECK(entries[1].playerName == "Bob");
+    CHECK(entries[0].score == entries[1].score);
+
+    const auto higher = repository.addScore(
+        "Charlie", 101, snake::GameMode::Obstacle, snake::Difficulty::Easy);
+    REQUIRE(higher.status == snake::ScoreSubmissionStatus::Submitted);
+    REQUIRE(higher.rank.has_value());
+    CHECK(*higher.rank == 1U);
+
+    entries = repository.top10();
+    REQUIRE(entries.size() == 3U);
+    CHECK(entries[0].playerName == "Charlie");
+    CHECK(entries[1].playerName == "Alice");
+    CHECK(entries[2].playerName == "Bob");
+}
+
+TEST_CASE(
+    "Malformed leaderboard JSON reports a read warning without changing the file",
+    "[persistence][leaderboard][warning]") {
+
+    TemporaryDirectory directory;
+    const auto file = directory.path() / "leaderboard.json";
+    const std::string malformed = R"({"version":1,"entries":[)";
+    {
+        std::ofstream output(file, std::ios::binary | std::ios::trunc);
+        REQUIRE(output.good());
+        output << malformed;
+        REQUIRE(output.good());
+    }
+
+    const snake::LeaderboardRepository repository(file);
+    std::string warning = "stale warning";
+
+    CHECK(repository.top10(&warning).empty());
+    CHECK(warning.find("E_LEADERBOARD_READ") != std::string::npos);
+
+    std::ifstream input(file, std::ios::binary);
+    REQUIRE(input.good());
+    const std::string after(
+        (std::istreambuf_iterator<char>(input)),
+        std::istreambuf_iterator<char>());
+    CHECK(after == malformed);
+}
+
+TEST_CASE(
+    "Leaderboard rejects unhandled schema shapes and numeric boundary values",
+    "[persistence][leaderboard][schema]") {
+
+    TemporaryDirectory directory;
+    const auto file = directory.path() / "leaderboard.json";
+    const snake::LeaderboardRepository repository(file);
+
+    const auto validEntry = [] {
+        return nlohmann::json{
+            {"player_name", "Alice"},
+            {"score", 50},
+            {"game_mode", "Classic"},
+            {"difficulty", "Medium"},
+            {"date_achieved", "2026-10-29"}
+        };
+    };
+
+    const auto makeBoard = [](nlohmann::json entries) {
+        return nlohmann::json{
+            {"version", snake::LeaderboardSchemaVersion},
+            {"entries", entries}
+        };
+    };
+
+    std::vector<nlohmann::json> invalidDocuments;
+
+    // The root and schema envelope must have the expected JSON shape.
+    invalidDocuments.push_back(nlohmann::json::array());
+    invalidDocuments.push_back(nlohmann::json{
+        {"entries", nlohmann::json::array()}
+    });
+    invalidDocuments.push_back(nlohmann::json{
+        {"version", "1"},
+        {"entries", nlohmann::json::array()}
+    });
+    invalidDocuments.push_back(nlohmann::json{
+        {"version", std::numeric_limits<std::uint64_t>::max()},
+        {"entries", nlohmann::json::array()}
+    });
+    invalidDocuments.push_back(nlohmann::json{
+        {"version", snake::LeaderboardSchemaVersion}
+    });
+    invalidDocuments.push_back(nlohmann::json{
+        {"version", snake::LeaderboardSchemaVersion},
+        {"entries", nlohmann::json::object()}
+    });
+
+    // Entries must be objects containing every required schema field.
+    invalidDocuments.push_back(makeBoard(
+        nlohmann::json::array({"not-an-entry-object"})));
+
+    for (const std::string field : {
+             "player_name", "score", "game_mode",
+             "difficulty", "date_achieved"}) {
+        auto entry = validEntry();
+        entry.erase(field);
+        invalidDocuments.push_back(
+            makeBoard(nlohmann::json::array({entry})));
+    }
+
+    // Text fields must remain strings; a padded or illegal name is not
+    // canonical persisted data even though submission can normalize input.
+    for (const std::string field : {
+             "player_name", "game_mode", "difficulty", "date_achieved"}) {
+        auto entry = validEntry();
+        entry[field] = 42;
+        invalidDocuments.push_back(
+            makeBoard(nlohmann::json::array({entry})));
+    }
+
+    {
+        auto entry = validEntry();
+        entry["player_name"] = "  Alice  ";
+        invalidDocuments.push_back(
+            makeBoard(nlohmann::json::array({entry})));
+    }
+    {
+        auto entry = validEntry();
+        entry["player_name"] = "Alice@";
+        invalidDocuments.push_back(
+            makeBoard(nlohmann::json::array({entry})));
+    }
+    {
+        auto entry = validEntry();
+        entry["difficulty"] = "Unknown";
+        invalidDocuments.push_back(
+            makeBoard(nlohmann::json::array({entry})));
+    }
+
+    // Scores must be integral, fit in int, and convert safely to int64_t.
+    {
+        auto entry = validEntry();
+        entry["score"] = 50.5;
+        invalidDocuments.push_back(
+            makeBoard(nlohmann::json::array({entry})));
+    }
+    {
+        auto entry = validEntry();
+        entry["score"] =
+            static_cast<long long>(std::numeric_limits<int>::max()) + 1LL;
+        invalidDocuments.push_back(
+            makeBoard(nlohmann::json::array({entry})));
+    }
+    {
+        auto entry = validEntry();
+        entry["score"] = std::numeric_limits<std::uint64_t>::max();
+        invalidDocuments.push_back(
+            makeBoard(nlohmann::json::array({entry})));
+    }
+
+    for (std::size_t index = 0; index < invalidDocuments.size(); ++index) {
+        CAPTURE(index);
+        {
+            std::ofstream output(file, std::ios::binary | std::ios::trunc);
+            REQUIRE(output.good());
+            output << invalidDocuments[index].dump();
+            REQUIRE(output.good());
+        }
+
+        std::string warning;
+        CHECK(repository.top10(&warning).empty());
+        CHECK(warning.find("E_LEADERBOARD_READ") != std::string::npos);
+    }
 }
