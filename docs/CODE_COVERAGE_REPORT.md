@@ -19,7 +19,7 @@
 As defined in the Software Test Plan (STP §5 Exit Criteria), a key requirement for project release is:
 $$\text{Line Coverage of Core Components } (C6\text{--}C11) \ge 80\%$$
 
-This report documents the official line coverage achieved across all system components.
+This report transcribes the coverage measured in the supplied gcovr HTML snapshot; it does not establish coverage for the current repository revision.
 
 - **Overall Project Line Coverage:** **93.7% (1,698 / 1,812 lines covered)**
 - **Function / Method Coverage:** **98.5% (255 / 259 functions covered)**
