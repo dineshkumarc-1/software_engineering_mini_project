@@ -9,8 +9,8 @@
 - C Dinesh Kumar (PES1UG24CS117) — Menu, UI, Settings & Diagnostics Owner  
 
 **Testing Window:** 2 November 2026 – 6 November 2026  
-**Tested Commit:** `c01fab2` (release candidate build)  
-**Status:** **APPROVED & FULLY SIGNED OFF**
+**Tested Commit:** Not identified by the supplied HTML snapshot  
+**Status:** **UPDATED FROM SUPPLIED HTML SNAPSHOT; NOT INDEPENDENTLY RERUN**
 
 ---
 
@@ -21,70 +21,60 @@ $$\text{Line Coverage of Core Components } (C6\text{--}C11) \ge 80\%$$
 
 This report documents the official line coverage achieved across all system components.
 
-- **Overall Project Line Coverage:** **93.77% (1,686 / 1,798 executable lines covered)**
-- **Function / Method Coverage:** **98.45% (254 / 258 functions covered)**
-- **Core Logic & Persistence (C6–C11):** **All components achieved between 91.84% and 98.12% line coverage**, comfortably surpassing the 80% threshold.
+- **Overall Project Line Coverage:** **93.7% (1,698 / 1,812 lines covered)**
+- **Function / Method Coverage:** **98.5% (255 / 259 functions covered)**
+- **Branch Coverage:** **60.1% (1,766 / 2,940 branches)**. The supplied report does not identify the tested source commit, so the C6–C11 quality gate is not asserted here.
 
 ---
 
-## 2. STP Core Component Line Coverage Criterion ($C6\text{--}C11$)
+## 2. STP Core Component Line Coverage Criterion (C6–C11)
 
-The table below maps the architectural components defined in SAD §3.4 to their source implementations and measured line coverage:
-
-| Component ID | Component Name & File Paths | Executable Lines | Covered Lines | Line Coverage | STP Threshold ($\ge 80\%$) | Status |
-|:---:|---|:---:|:---:|:---:|:---:|:---:|
-| **C6** | **GameEngine**<br>`src/engine/GameEngine.cpp`<br>`include/snakextreme/GameEngine.hpp` | 213 | 209 | **98.12%** | $\ge 80\%$ | **EXCEEDED** |
-| **C7** | **ModeManager & Strategies**<br>`src/modes/ModeManager.cpp`<br>`src/modes/ModeStrategy.cpp`<br>`include/snakextreme/GameMode.hpp`<br>`include/snakextreme/ModeManager.hpp`<br>`include/snakextreme/ModeStrategy.hpp`<br>`include/snakextreme/DifficultyProfile.hpp` | 212 | 205 | **96.70%** | $\ge 80\%$ | **EXCEEDED** |
-| **C8** | **PowerUpManager & Effects**<br>`src/powerups/PowerUpManager.cpp`<br>`src/powerups/PowerUpEffects.cpp`<br>`include/snakextreme/PowerUp.hpp`<br>`include/snakextreme/PowerUpManager.hpp` | 183 | 178 | **97.27%** | $\ge 80\%$ | **EXCEEDED** |
-| **C9** | **ScoreService**<br>`src/scoring/ScoreService.cpp` | 25 | 24 | **96.00%** | $\ge 80\%$ | **EXCEEDED** |
-| **C10** | **InputValidator**<br>`src/validation/InputValidator.cpp` | 37 | 36 | **97.30%** | $\ge 80\%$ | **EXCEEDED** |
-| **C11** | **LeaderboardRepository**<br>`src/persistence/LeaderboardRepository.cpp` | 196 | 180 | **91.84%** | $\ge 80\%$ | **EXCEEDED** |
-
-**Conclusion on Core Quality Gate:** Every single owned core component exceeds the 80% line coverage requirement by more than 11 percentage points.
+The supplied HTML report gives file-level measurements but does not identify the tested source commit or provide architectural component roll-ups. The former C6–C11 aggregates have therefore been removed rather than carried forward as though they were verified by this snapshot. The STP requires at least 80% line coverage for these components; confirming that gate requires a run against the corresponding source revision.
 
 ---
 
-## 3. Comprehensive File-by-File Coverage Analysis
+## 3. File-by-File Coverage From the Supplied HTML Snapshot
 
-Coverage was measured using GCC `--coverage -O0` and summarized via `gcovr 8.8` across all instrumented source and header files:
+The following values are transcribed from the attached gcovr 8.8 HTML report generated **2026-11-10 14:54:36 UTC**. Percentages are calculated from the reported covered and total counts. A dash means gcovr reported no branch denominator for that file.
 
-| File Path | Total Lines | Covered Lines | Line % | Total Functions | Covered Functions | Function % |
-|---|:---:|:---:|:---:|:---:|:---:|:---:|
-| **Header Files (`include/snakextreme/`)** | | | | | | |
-| `DifficultyProfile.hpp` | 10 | 10 | 100.0% | 1 | 1 | 100.0% |
-| `Direction.hpp` | 8 | 8 | 100.0% | 1 | 1 | 100.0% |
-| `GameEngine.hpp` | 5 | 5 | 100.0% | 2 | 2 | 100.0% |
-| `GameMode.hpp` | 11 | 11 | 100.0% | 4 | 4 | 100.0% |
-| `GameSession.hpp` | 3 | 3 | 100.0% | 2 | 2 | 100.0% |
-| `LeaderboardModel.hpp` | 3 | 3 | 100.0% | 2 | 2 | 100.0% |
-| `LeaderboardTable.hpp` | 30 | 28 | 93.3% | 6 | 6 | 100.0% |
-| `MenuSelection.hpp` | 13 | 13 | 100.0% | 3 | 3 | 100.0% |
-| `ModeManager.hpp` | 3 | 3 | 100.0% | 2 | 2 | 100.0% |
-| `ModeStrategy.hpp` | 1 | 1 | 100.0% | 1 | 1 | 100.0% |
-| `NameEntry.hpp` | 18 | 18 | 100.0% | 4 | 4 | 100.0% |
-| `PowerUp.hpp` | 5 | 5 | 100.0% | 2 | 2 | 100.0% |
-| `PowerUpManager.hpp` | 12 | 12 | 100.0% | 3 | 3 | 100.0% |
-| `Settings.hpp` | 5 | 5 | 100.0% | 5 | 5 | 100.0% |
-| `SettingsRepository.hpp` | 1 | 1 | 100.0% | 1 | 1 | 100.0% |
-| `UiHitTest.hpp` | 32 | 28 | 87.5% | 5 | 5 | 100.0% |
-| **Source Implementation Files (`src/`)** | | | | | | |
-| `src/app/AppState.cpp` | 32 | 31 | 96.9% | 1 | 1 | 100.0% |
-| `src/audio/AudioModel.cpp` | 34 | 32 | 94.1% | 4 | 4 | 100.0% |
-| `src/diagnostics/PerformanceProbe.cpp` | 83 | 78 | 94.0% | 10 | 9 | 90.0% |
-| `src/engine/GameEngine.cpp` | 208 | 204 | 98.1% | 24 | 24 | 100.0% |
-| `src/gameplay/GameplayController.cpp` | 143 | 140 | 97.9% | 28 | 28 | 100.0% |
-| `src/modes/ModeManager.cpp` | 49 | 47 | 95.9% | 16 | 15 | 93.8% |
-| `src/modes/ModeStrategy.cpp` | 119 | 117 | 98.3% | 23 | 23 | 100.0% |
-| `src/persistence/LeaderboardModel.cpp` | 21 | 14 | 66.7% | 2 | 2 | 100.0% |
-| `src/persistence/LeaderboardRepository.cpp` | 196 | 180 | 91.8% | 13 | 13 | 100.0% |
-| `src/persistence/SecureFileStore.cpp` | 365 | 316 | 86.6% | 21 | 20 | 95.2% |
-| `src/persistence/Settings.cpp` | 60 | 56 | 93.3% | 13 | 12 | 92.3% |
-| `src/persistence/SettingsRepository.cpp` | 50 | 49 | 98.0% | 4 | 4 | 100.0% |
-| `src/powerups/PowerUpEffects.cpp` | 60 | 56 | 93.3% | 15 | 15 | 100.0% |
-| `src/powerups/PowerUpManager.cpp` | 106 | 106 | 100.0% | 16 | 16 | 100.0% |
-| `src/scoring/ScoreService.cpp` | 25 | 24 | 96.0% | 7 | 7 | 100.0% |
-| `src/validation/InputValidator.cpp` | 37 | 36 | 97.3% | 4 | 4 | 100.0% |
-| **Total Project Metrics** | **1,798** | **1,686** | **93.77%** | **258** | **254** | **98.45%** |
+| File Path | Lines Covered / Total | Line % | Branches Taken / Total | Branch % | Functions Covered / Total | Function % |
+|---|---:|---:|---:|---:|---:|---:|
+| `include/snakextreme/AppState.hpp` | 1/1 | 100.0% | — | — | 1/1 | 100.0% |
+| `include/snakextreme/AudioModel.hpp` | 2/2 | 100.0% | — | — | 2/2 | 100.0% |
+| `include/snakextreme/DifficultyProfile.hpp` | 10/11 | 90.9% | 3/4 | 75.0% | 2/2 | 100.0% |
+| `include/snakextreme/GameEngine.hpp` | 5/5 | 100.0% | 4/4 | 100.0% | 3/3 | 100.0% |
+| `include/snakextreme/GameMode.hpp` | 26/28 | 92.9% | 14/16 | 87.5% | 4/4 | 100.0% |
+| `include/snakextreme/GameSession.hpp` | 19/19 | 100.0% | 2/2 | 100.0% | 6/6 | 100.0% |
+| `include/snakextreme/LeaderboardModel.hpp` | 5/5 | 100.0% | 1/2 | 50.0% | 4/4 | 100.0% |
+| `include/snakextreme/LeaderboardTable.hpp` | 10/10 | 100.0% | 17/38 | 44.7% | 2/2 | 100.0% |
+| `include/snakextreme/MenuSelection.hpp` | 33/33 | 100.0% | 15/17 | 88.2% | 3/3 | 100.0% |
+| `include/snakextreme/ModeStrategy.hpp` | 4/4 | 100.0% | — | — | 4/4 | 100.0% |
+| `include/snakextreme/NameEntry.hpp` | 29/31 | 93.5% | 26/36 | 72.2% | 4/4 | 100.0% |
+| `include/snakextreme/PerformanceProbe.hpp` | 6/6 | 100.0% | — | — | 6/6 | 100.0% |
+| `include/snakextreme/PowerUp.hpp` | 14/15 | 93.3% | 3/4 | 75.0% | 5/5 | 100.0% |
+| `include/snakextreme/Settings.hpp` | 5/5 | 100.0% | — | — | 5/5 | 100.0% |
+| `include/snakextreme/SettingsRepository.hpp` | 1/1 | 100.0% | — | — | 1/1 | 100.0% |
+| `include/snakextreme/UiHitTest.hpp` | 28/32 | 87.5% | 41/54 | 75.9% | 5/5 | 100.0% |
+| `src/app/AppState.cpp` | 31/32 | 96.9% | 35/39 | 89.7% | 1/1 | 100.0% |
+| `src/audio/AudioModel.cpp` | 32/34 | 94.1% | 25/32 | 78.1% | 4/4 | 100.0% |
+| `src/diagnostics/PerformanceProbe.cpp` | 82/87 | 94.3% | 276/680 | 40.6% | 9/10 | 90.0% |
+| `src/engine/GameEngine.cpp` | 202/206 | 98.1% | 160/219 | 73.1% | 24/24 | 100.0% |
+| `src/gameplay/GameplayController.cpp` | 139/142 | 97.9% | 109/147 | 74.1% | 28/28 | 100.0% |
+| `src/modes/ModeManager.cpp` | 48/50 | 96.0% | 20/26 | 76.9% | 15/16 | 93.8% |
+| `src/modes/ModeStrategy.cpp` | 118/120 | 98.3% | 93/118 | 78.8% | 23/23 | 100.0% |
+| `src/persistence/LeaderboardModel.cpp` | 14/21 | 66.7% | 10/32 | 31.3% | 2/2 | 100.0% |
+| `src/persistence/LeaderboardRepository.cpp` | 189/204 | 92.6% | 248/398 | 62.3% | 13/13 | 100.0% |
+| `src/persistence/SecureFileStore.cpp` | 315/366 | 86.1% | 295/482 | 61.2% | 21/22 | 95.5% |
+| `src/persistence/Settings.cpp` | 56/60 | 93.3% | 84/125 | 67.2% | 12/13 | 92.3% |
+| `src/persistence/SettingsRepository.cpp` | 50/52 | 96.2% | 135/254 | 53.1% | 4/4 | 100.0% |
+| `src/powerups/PowerUpEffects.cpp` | 56/60 | 93.3% | 26/44 | 59.1% | 15/15 | 100.0% |
+| `src/powerups/PowerUpManager.cpp` | 108/108 | 100.0% | 81/114 | 71.1% | 16/16 | 100.0% |
+| `src/scoring/ScoreService.cpp` | 24/25 | 96.0% | 4/5 | 80.0% | 7/7 | 100.0% |
+| `src/validation/InputValidator.cpp` | 36/37 | 97.3% | 39/48 | 81.3% | 4/4 | 100.0% |
+| **Total** | **1,698 / 1,812** | **93.7%** | **1,766 / 2,940** | **60.1%** | **255 / 259** | **98.5%** |
+
+
+**Verification status:** These figures match the supplied HTML snapshot. They have not been independently regenerated because the report does not identify its source commit and the repository could not be cloned in this session.
 
 ---
 
@@ -98,7 +88,9 @@ Coverage was measured using GCC `--coverage -O0` and summarized via `gcovr 8.8` 
 
 ---
 
-## 5. Approvals & Sign-Off
+## 5. Historical Approvals & Sign-Off
+
+The signatures below were recorded in the prior report version dated 06-Nov-2026; they do not constitute sign-off of the updated coverage snapshot.
 
 | Role | Team Member | Status | Date |
 |---|---|:---:|:---:|
