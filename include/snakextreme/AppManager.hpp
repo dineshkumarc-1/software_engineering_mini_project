@@ -29,6 +29,13 @@ public:
     int run();
 
 private:
+    // Start-up phase marks for the optional probe (#22). Each mark is declared
+    // right after the member it times, so it records when that member finished
+    // constructing. Without --perf-probe a mark does nothing.
+    struct StartupMark {
+        StartupMark(const AppManager& owner, const char* name) { owner.markPhase(name); }
+    };
+    void markPhase(const char* name) const;
     std::int64_t probeNow() const;
     ProbeContext probeContext() const;
     void pollEvents();
@@ -51,6 +58,7 @@ private:
     std::optional<int> probeSeconds_;
     std::int64_t inputDequeuedUs_{0};
     AudioService audio_;
+    StartupMark audioObjectsMark_{*this, "audio_objects_constructed"};
     SettingsRepository settingsRepository_;
     LeaderboardModel leaderboard_;
     Settings settings_;
@@ -60,8 +68,10 @@ private:
     NameEntry nameEntry_;
     std::size_t menuIndex_{0};
     sf::RenderWindow window_;
+    StartupMark windowMark_{*this, "window_created"};
     AppState state_;
     Renderer renderer_;
+    StartupMark rendererMark_{*this, "renderer_ready"};
 
     // Main-menu choice; Classic / Medium by default (FR-008, FR-009).
     SessionConfig selectedConfig_{};

@@ -44,17 +44,22 @@ def collect(executable, output_dir, runs, snapshot):
                 reader.join(timeout=5)
                 process.stdout.close()
         report_error = None
+        phases = steps = None
         try:
             if report.is_symlink() or not report.is_file():
                 report_error = "missing_or_non_regular_report"
-            elif summarize(report)["main_to_first_frame_us"] is None:
-                report_error = "missing_first_frame"
+            else:
+                summary = summarize(report)
+                phases, steps = summary["startup_phases_us"], summary["startup_step_us"]
+                if summary["main_to_first_frame_us"] is None:
+                    report_error = "missing_first_frame"
         except (OSError, ValueError, KeyError, TypeError, RecursionError):
             report_error = "invalid_or_unreadable_report"
         collection_ok = (code == 0 and not timed_out and bool(observed) and report_error is None)
         records.append({"report_valid": report_error is None, "report_error": report_error,
                         "collection_ok": collection_ok, "run": index + 1, "process_exit": code, "timed_out": timed_out,
                         "launch_to_observed_first_frame_marker_us": observed[0] if observed else None,
+                        "startup_phases_us": phases, "startup_step_us": steps,
                         "report": report.name, "config_fixture": "missing_temporary_config"})
     result = {"acceptance": "not_assessed", "source_snapshot_operator_supplied": snapshot,
               "platform": platform.system(), "audio_null_output": os.getenv("ALSOFT_DRIVERS") == "null",
